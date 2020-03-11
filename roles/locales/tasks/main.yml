@@ -1,0 +1,26 @@
+---
+
+- name: Ensure "locales" is installed.
+  apt:
+    pkg: "locales"
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+
+- name: Copy locales settings.
+  template:
+    src: "locale.gen.j2"
+    dest: "/etc/locale.gen"
+
+- name: Define default locale.
+  template:
+    src: "locale.j2"
+    dest: "/etc/default/locale"
+
+- name: Trigger overrides
+  include_role: 
+    name: _overrides
+
+- name: Generates locales.
+  command: "/usr/sbin/locale-gen"
+

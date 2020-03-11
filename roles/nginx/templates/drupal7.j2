@@ -1,0 +1,7 @@
+######### Default block.
+
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^/(.*)$ /index.php?q=$1;
+}
+include "/etc/nginx/conf.d/drupal_common";

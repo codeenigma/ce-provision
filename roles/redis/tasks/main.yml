@@ -1,0 +1,39 @@
+---
+
+- name: Ensure Redis is installed.
+  apt:
+    pkg: "redis-server"
+    state: present
+
+- name: Copy Redis configuration in place.
+  template:
+    src: redis.conf.j2
+    dest: "/etc/redis/redis.conf"
+    owner: redis
+    group: redis
+    mode: 0640
+
+- name: Copy Redis sysctl configuration in place.
+  template:
+    src: redis.sysctl.j2
+    dest: "/etc/sysctl.d/02-redis.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: redis.vm_overcommit_memory
+
+- name: Remove Redis sysctl configuration in place.
+  file:
+    path: "/etc/sysctl.d/02-redis.conf"
+    state: absent
+  when: not redis.vm_overcommit_memory
+
+- name: Trigger overrides
+  include_role: 
+    name: _overrides
+
+- name: Restart Redis.
+  service:
+    name: redis-server
+    state: restarted
+    enabled: yes

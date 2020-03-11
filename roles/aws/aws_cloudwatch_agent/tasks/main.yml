@@ -1,0 +1,58 @@
+---
+
+- name: Install deb for AWS CloudWatch agent.
+  apt:
+    deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb"
+    state: present
+
+- name: Adds cwagent user to adm group for log access.
+  user:
+    name: cwagent
+    group: cwagent
+    groups: adm
+    append: yes
+
+- name: Ensure cwagent user .aws directory.
+  file:
+    path: /home/cwagent/.aws
+    recurse: yes
+    owner: cwagent
+    group: cwagent
+
+- name: Generate AWS credentials
+  template:
+    src: credentials.j2
+    dest: /home/cwagent/.aws/credentials
+    owner: cwagent
+    group: cwagent
+
+- name: Stop the agent
+  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
+
+- name: Start the agent
+  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+
+- name: Remove default config
+  file:
+    path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/default
+    state: absent
+
+- name: Generate main config
+  template:
+    src: config.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/bin/config.json
+    owner: cwagent
+    group: cwagent
+
+- name: Install main config
+  template:
+    src: config.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/config.json
+    owner: cwagent
+    group: cwagent
+
+- name: Stop the agent
+  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
+
+- name: Start the agent
+  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start

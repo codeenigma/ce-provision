@@ -1,0 +1,37 @@
+# /etc/nslcd.conf
+# nslcd configuration file. See nslcd.conf(5)
+# for details.
+
+# The user and group nslcd should run as.
+uid nslcd
+gid nslcd
+
+# The location at which the LDAP server(s) should be reachable.
+uri {{ pam_ldap.endpoints | join(' ') }}
+
+# The search base that will be used for all queries.
+base {{ pam_ldap.lookup_base }}
+
+# The LDAP protocol version to use.
+#ldap_version 3
+
+# The DN to bind with for normal lookups.
+{% if pam_ldap.binddn is defined and pam_ldap.binddn %}
+binddn {{ pam_ldap.binddn }}
+{% endif %}
+{% if pam_ldap.bindpw is defined and pam_ldap.bindpw %}
+bindpw {{ pam_ldap.bindpw }}
+{% endif %}
+#bindpw secret
+
+# The DN used for password modifications by root.
+#rootpwmoddn cn=admin,dc=example,dc=com
+
+# SSL options
+{% if pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate %}
+ssl on
+tls_reqcert demand
+tls_cacertfile /etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}
+{% endif %}
+# The search scope.
+#scope sub 

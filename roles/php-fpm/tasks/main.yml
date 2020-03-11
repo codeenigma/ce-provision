@@ -1,0 +1,43 @@
+---
+
+- name: Install PHP packages.
+  apt:
+    pkg:
+      - "php{{ version }}-fpm"
+    state: present
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
+
+- name: Copy php.ini for php-fpm.
+  template:
+    src: php.fpm.ini.j2
+    dest: "/etc/php/{{ version }}/fpm/php.ini"
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
+
+- name: Copy default pool configuration.
+  template:
+    dest: "/etc/php/{{ version }}/fpm/pool.d/www.conf"
+    src: "www.conf.j2"
+    mode: 0555    
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
+
+- name: Setup xdebug.
+  include_role:
+    name: php_xdebug
+
+- name: Trigger overrides
+  include_role: 
+    name: _overrides
+
+- name: Restart FPM service.
+  service:
+    name: "php{{ version }}-fpm"
+    state: restarted
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version

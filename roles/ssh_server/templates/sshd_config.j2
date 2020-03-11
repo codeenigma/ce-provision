@@ -1,0 +1,144 @@
+###	{{ ansible_managed }}
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them comm ented.  Uncommented options override the
+# default value.
+
+#Port 22
+{% for port in sshd.Port %}
+Port {{ port }}
+{% endfor %}
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+{% for address in sshd.ListenAddress %}
+ListenAddress {{ address }}
+{% endfor %}
+
+#HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_ecdsa_key
+#HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey {{ sshd.HostKey }}
+
+# Ciphers and keying
+#RekeyLimit default none
+RekeyLimit {{ sshd.RekeyLimit }}
+
+# Logging
+#SyslogFacility AUTH
+#LogLevel INFO
+SyslogFacility {{ sshd.SyslogFacility }}
+LogLevel {{ sshd.LogLevel }}
+
+# Authentication:
+
+#LoginGraceTime 2m
+LoginGraceTime {{ sshd.LoginGraceTime }}
+#PermitRootLogin prohibit-password
+PermitRootLogin {{ sshd.PermitRootLogin }}
+#StrictModes yes
+StrictModes {{ sshd.StrictModes }}
+#MaxAuthTries 6
+MaxAuthTries {{ sshd.MaxAuthTries }}
+#MaxSessions 10
+MaxSessions {{ sshd.MaxSessions }}
+
+#PubkeyAuthentication yes
+PubkeyAuthentication {{ sshd.PubkeyAuthentication }}
+
+{% if sshd.AuthenticationMethods %}
+AuthenticationMethods {{ sshd.AuthenticationMethods }}
+{% endif %}
+
+
+# Expect .ssh/authorized_keys2 to be disregarded by default in future.
+#AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+
+{% if sshd.AuthorizedKeysCommand %}
+AuthorizedKeysCommand {{ sshd.AuthorizedKeysCommand }}
+AuthorizedKeysCommandUser {{ sshd.AuthorizedKeysCommandUser }}
+{% else %}
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+{% endif %}
+
+#AuthorizedPrincipalsFile none
+
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+#PasswordAuthentication yes
+PasswordAuthentication {{ sshd.PasswordAuthentication }}
+#PermitEmptyPasswords no
+
+# Change to yes to enable challenge-response passwords (beware issues with
+# some PAM modules and threads)
+ChallengeResponseAuthentication {{ sshd.ChallengeResponseAuthentication }}
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+
+# GSSAPI options
+#GSSAPIAuthentication no
+#GSSAPICleanupCredentials yes
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM {{ sshd.UsePAM }}
+
+AllowAgentForwarding {{ sshd.AllowAgentForwarding }}
+AllowTcpForwarding {{ sshd.AllowTcpForwarding }}
+GatewayPorts {{ sshd.GatewayPorts }}
+X11Forwarding {{ sshd.X11Forwarding }}
+X11DisplayOffset {{ sshd.X11DisplayOffset }}
+X11UseLocalhost {{ sshd.X11UseLocalhost }}
+PermitTTY {{ sshd.PermitTTY }}
+PrintMotd {{ sshd.PrintMotd }}
+PrintLastLog {{ sshd.PrintMotd }}
+TCPKeepAlive {{ sshd.TCPKeepAlive }}
+PermitUserEnvironment {{ sshd.PermitUserEnvironment }}
+Compression {{ sshd.Compression }}
+ClientAliveInterval {{ sshd.ClientAliveInterval }}
+ClientAliveCountMax {{ sshd.ClientAliveCountMax }}
+UseDNS {{ sshd.UseDNS }}
+
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+PermitTunnel {{ sshd.PermitTunnel }}
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
+
+# override default of no subsystems
+#Subsystem	sftp	/usr/lib/openssh/sftp-server
+Subsystem	sftp {{ sshd.Subsystem_sftp }}

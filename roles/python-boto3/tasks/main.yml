@@ -1,0 +1,8 @@
+---
+
+- name: Ensure Boto3 is installed.
+  apt:
+    pkg: "python-boto3"
+    state: present
+    update_cache: yes
+    cache_valid_time: 240

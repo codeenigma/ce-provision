@@ -1,0 +1,57 @@
+---
+
+- name: Ensure Certbot is installed.
+  apt:
+    pkg: certbot
+    state: present
+
+- name: define SSL base path.
+  set_fact:
+    _ssl_base_path: '/etc/letsencrypt/live/{{ ssl.domain }}'
+
+- name: define key path.
+  set_fact:
+    _ssl_current_key_path: "{{ _ssl_base_path }}/privkey.pem"
+
+- name: define cert path.
+  set_fact:
+    _ssl_current_cert_path: "{{ _ssl_base_path }}/fullchain.pem"    
+
+- name: Check if we have a certificate.
+  stat:
+    path: "{{ _ssl_current_cert_path }}"
+  register: letsencrypt_cert
+
+- name: Stop services listening on port 80.
+  service:
+    name: "{{ ssl_service }}"
+    state: stopped
+  with_items: "{{ ssl.services }}"
+  loop_control:
+    loop_var: ssl_service
+  when: 
+    - not letsencrypt_cert.stat.exists
+
+- name: Register certificate if needed.
+  command: "/usr/bin/certbot certonly -n --cert-name {{ ssl.domain }} --standalone --preferred-challenges http -d {{ ssl.domain }} --agree-tos -m {{ ssl.email }}"
+  when: 
+    - not letsencrypt_cert.stat.exists
+
+- name: Restart services.
+  service:
+    name: "{{ ssl_service }}"
+    state: started
+  with_items: "{{ ssl.services }}"
+  loop_control:
+    loop_var: ssl_service
+  when: 
+    - not letsencrypt_cert.stat.exists
+
+- name: Create cron entry for LetsEncrypt.
+  template:
+    src: "cron.j2"
+    dest: "/etc/cron.daily/letsencrypt-{{ ssl.domain }}"
+
+- name: Add key/cert pairs to know paths information.
+  set_fact:
+    _ssl_paths: "{{ _ssl_paths | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"

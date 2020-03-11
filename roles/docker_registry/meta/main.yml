@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - role: docker_compose
+  - { role: 'nginx', when: docker_registry.proxy }

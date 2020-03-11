@@ -1,0 +1,113 @@
+---
+
+- name: Install Selenium dependencies.
+  apt:
+    pkg:
+      - firefox-esr
+      - chromium
+      - xvfb
+      - xterm
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+
+- name: Install VNC.
+  apt:
+    pkg: tightvncserver
+    state: present
+  when: selenium.display_manager == 'VNC'
+
+- name: Set Selenium major version
+  set_fact:
+    _selenium_major_version: "{{ selenium.version | regex_replace('\\.[0-9]+$', '') }}"
+
+- name: create Selenium folder.
+  file:
+    path: /opt/selenium
+    state: directory
+
+- name: Download Selenium
+  get_url:
+    url: "http://selenium-release.storage.googleapis.com/{{ _selenium_major_version }}/selenium-server-standalone-{{ selenium.version }}.jar"
+    dest: "/opt/selenium/selenium-server-standalone.jar"
+
+- name: Download GeckoDriver
+  unarchive:
+    src: "https://github.com/mozilla/geckodriver/releases/download/v{{ selenium.gecko_version }}/geckodriver-v{{ selenium.gecko_version }}-linux64.tar.gz"
+    dest: /opt/selenium
+    remote_src: yes
+
+- name: Download ChromeDriver
+  unarchive:
+    src: "https://chromedriver.storage.googleapis.com/{{ selenium.chrome_version }}/chromedriver_linux64.zip"
+    dest: /opt/selenium
+    remote_src: yes
+
+- name: Install init.d service.
+  template:
+    src: "selenium.init.j2"
+    dest: /etc/init.d/selenium
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create Selenium start script.
+  template:
+    src: "selenium-daemon-start-{{ selenium.display_manager }}.j2"
+    dest: /opt/selenium/selenium-daemon-start
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Create selenium stop script.
+  template:
+    src: "selenium-daemon-stop.j2"
+    dest: /opt/selenium/selenium-daemon-stop
+    owner: root
+    group: root
+    mode: 0555
+
+- name: Create home X dir if needed.
+  file:
+    path: "/home/{{ deploy_user.username }}/.vnc"
+    owner: "{{ deploy_user.username }}"
+    group: "{{ deploy_user.username }}"
+    state: directory
+  when: selenium.display_manager == "VNC"
+
+- name: Create X startup script.
+  template:
+    src: "xstartup.j2"
+    dest: "/home/{{ deploy_user.username }}/.vnc/xstartup"
+    owner: "{{ deploy_user.username }}"
+    group: "{{ deploy_user.username }}"
+    mode: 0755
+  when: selenium.display_manager == "VNC"
+
+- name: Generate VNC password.
+  shell: "echo '{{ deploy_user.username }}' | vncpasswd -f > /home/{{ deploy_user.username }}/.vnc/passwd"
+  become: true
+  become_user: "{{ deploy_user.username }}"
+  when: selenium.display_manager == "VNC"
+
+- name: Fix VNC folder permissions.
+  file:
+    dest: "/home/{{ deploy_user.username }}/.vnc"
+    owner: "{{ deploy_user.username }}"
+    group: "{{ deploy_user.username }}"
+    mode: 0700
+  when: selenium.display_manager == "VNC"
+  
+- name: Fix VNC password file permissions.
+  file:
+    dest: "/home/{{ deploy_user.username }}/.vnc/passwd"
+    owner: "{{ deploy_user.username }}"
+    group: "{{ deploy_user.username }}"
+    mode: 0700
+  when: selenium.display_manager == "VNC"
+
+- name: Ensure Selenium is restarted.
+  service:
+    name: selenium
+    state: restarted

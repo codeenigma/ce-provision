@@ -1,0 +1,48 @@
+---
+
+# - name: Add key for LinOTP repository.
+#   apt_key: keyserver=eu.pool.sks-keyservers.net id=913DFF12F86258E5 state=present
+
+# - name: Add repository for LinOTP.
+#   apt_repository: repo='deb http://www.linotp.org/apt/debian strech linotp' state=present
+
+# - name: Ensure libpam-linotp is installed.
+#   apt:
+#     pkg: libpam-linotp
+#     state: present
+
+# @todo this is temporary workaround.
+- name: copy LinOTP lib.
+  copy:
+    src: pam_linotp.so
+    dest: /lib/x86_64-linux-gnu/security/pam_linotp.so
+    mode: 0755
+
+- name: Generate LinOTP config.
+  template:
+    src: common-linotp.j2
+    dest: /etc/pam.d/common-linotp
+
+- name: Enable LinOTP for sudo.
+  lineinfile:
+    path: /etc/pam.d/sudo
+    insertbefore: '^@include common-auth'
+    line: '@include common-linotp'
+    state: present
+  when: pam_linotp.sudo
+
+- name: Enable LinOTP for su.
+  lineinfile:
+    path: /etc/pam.d/su
+    insertbefore: '^@include common-auth'
+    line: '@include common-linotp'
+    state: present
+  when: pam_linotp.su
+
+- name: Enable LinOTP for ssh.
+  lineinfile:
+    path: /etc/pam.d/sshd
+    insertbefore: '^@include common-auth'
+    line: '@include common-linotp'
+    state: present
+  when: pam_linotp.ssh

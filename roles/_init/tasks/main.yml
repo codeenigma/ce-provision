@@ -1,0 +1,12 @@
+---
+
+- name: Randomize root password.
+  user:
+    name: root
+    state: present
+    password: "{{ lookup('password', '/dev/null') | password_hash('sha512', lookup('password', '/dev/null')) }}"
+# Make sure custom scripts dir exists.
+- name: Ensure /opt/bin directory exists.
+  file:
+    path: "/opt/bin"
+    state: directory

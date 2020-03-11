@@ -1,0 +1,74 @@
+---
+
+- name: Ensure Blackfire agent is not installed.
+  apt:
+    pkg: "blackfire-agent"
+    state: absent
+    purge: yes
+  when: not blackfire.enable
+
+- name: Ensure Blackfire probe is not installed.
+  apt:
+    pkg: "blackfire-php"
+    state: absent
+    purge: yes
+  when: not blackfire.enable
+
+- name: Ensure Blackfire local startup is not present.
+  file:
+    path: "/opt/run-parts/blackfire"
+    state: absent
+  when: not blackfire.enable
+
+- name: Add key for Blackfire repository.
+  apt_key: url=https://packages.blackfire.io/gpg.key state=present
+  when: blackfire.enable
+
+- name: Add repository for Blackfire.
+  apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
+  when: blackfire.enable
+
+- name: Ensure Blackfire agent is installed.
+  apt:
+    pkg: "blackfire-agent"
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+  when: blackfire.enable
+
+- name: Ensure Blackfire probe is installed.
+  apt:
+    pkg: "blackfire-php"
+    state: present
+  when: blackfire.enable
+
+- name: Generate agent server configuration.
+  template:
+    src: agent.j2
+    dest: "/etc/blackfire/agent"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: blackfire.enable
+
+- name: Generate agent CLI configuration.
+  template:
+    src: blackfire.ini.j2
+    dest: "/home/vagrant/.blackfire.ini"
+    owner: vagrant
+    group: vagrant
+    mode: 0644
+  when:
+  - blackfire.enable
+  - is_local is defined and is_local
+
+- name: Trigger overrides
+  include_role: 
+    name: _overrides
+
+- name: Ensure Blackfire is restarted.
+  service:
+    name: blackfire-agent
+    state: restarted
+  when: blackfire.enable

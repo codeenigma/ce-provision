@@ -1,0 +1,90 @@
+---
+
+- name: Ensure xdebug is not installed.
+  apt:
+    pkg: php-xdebug
+    state: absent
+    purge: yes
+  when:
+    - not xdebug.cli
+    - not xdebug.fpm
+
+- name: Remove trace output folder.
+  file:
+    path: "{{ xdebug.trace_output_dir }}"
+    state: absent
+  when:
+    - not xdebug.cli
+    - not xdebug.fpm
+
+- name: Remove profiler output folder.
+  file:
+    path: "{{ xdebug.profiler_output_dir }}"
+    state: absent
+  when:
+    - not xdebug.cli
+    - not xdebug.fpm
+
+- name: Ensure xdebug is installed.
+  apt:
+    pkg: php-xdebug
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+  when: xdebug.cli or xdebug.fpm
+#@todo Maybe use sticky bit ?
+- name: Create trace output folder.
+  file:
+    path: "{{ xdebug.trace_output_dir }}"
+    state: directory
+    owner: www-data
+    group: www-data
+  when: xdebug.cli or xdebug.fpm
+
+- name: Create profiler output folder.
+  file:
+    path: "{{ xdebug.profiler_output_dir }}"
+    state: directory
+    owner: www-data
+    group: www-data
+  when: xdebug.cli or xdebug.fpm
+
+- name: Set remote host (Default)
+  set_fact: xdebug.remote_host = "127.0.0.1"
+  when: 
+    - xdebug.remote_host == 'auto'
+#@todo
+# - name: Set remote host (Docker for Mac)
+#   set_fact: xdebug.remote_host = "docker.for.mac.localhost"
+#   when: 
+#     - xdebug.remote_host == 'auto'
+#     - host_platform == 'mac_os'
+
+- name: Enable xdebug connect back (Default)
+  set_fact: xdebug.remote_connect_back = 1
+  when:
+    - xdebug.remote_host == 'auto'
+#@todo    
+# - name: Disable xdebug connect back (Docker for Mac)
+#   set_fact: xdebug.remote_connect_back = 0
+#   when:
+#     - xdebug.remote_connect_back == 'auto'
+#     - host_platform == 'mac_os'
+    
+- name: Copy xdebug configuration in place.
+  template:
+    src: 30-xdebug-dev.ini.j2
+    dest: "/etc/php/{{ php.version }}/cli/conf.d/30-xdebug-dev.ini"
+    owner: root
+    group: root
+    mode: 0644
+  when: xdebug.cli
+
+- name: Copy xdebug configuration in place.
+  template:
+    src: 30-xdebug-dev.ini.j2
+    dest: "/etc/php/{{ php.version }}/fpm/conf.d/30-xdebug-dev.ini"
+    owner: root
+    group: root
+    mode: 0644
+  when: xdebug.fpm

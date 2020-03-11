@@ -1,0 +1,97 @@
+---
+
+- name: Ensure libnss-ldapd is installed.
+  apt:
+    pkg: [libpam-ldapd, libnss-ldapd]
+    state: present
+
+- name: Create certificate directory.
+  file:
+    path: /etc/ldap/ssl
+    state: directory
+  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
+
+- name: Copy certificate.
+  copy:
+    src: "{{ pam_ldap.ssl_certificate }}"
+    dest: "/etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}"
+  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
+
+- name: Copy nslcd config.
+  template:
+    src: nslcd.conf.j2
+    dest: /etc/nslcd.conf
+
+- name: Copy ldap config.
+  template:
+    src: ldap.conf.j2
+    dest: /etc/ldap/ldap.conf
+
+- name: Copy nsswitch config.
+  template:
+    src: nsswitch.conf.j2
+    dest: /etc/nsswitch.conf
+
+- name: Ensure sudo-ldap is installed.
+  apt:
+    pkg: sudo-ldap
+    state: present
+
+- name: Regenerate configuration from pam_ldap.
+  debconf:
+    name: libpam-ldapd
+
+- name: Regenerate configuration from pam_ldap.
+  debconf:
+    name: sudo-ldap
+
+- name: Copy PAM configuration.
+  copy:
+    src: "{{ file }}"
+    dest: "/etc/pam.d/{{ file }}"
+  with_items:
+    - common-account
+    - common-auth
+    - common-password
+    - common-session
+    - common-session-noninteractive
+  loop_control:
+    loop_var: file
+
+- name: Ensure sudoers are looked up.
+  lineinfile:
+    path: /etc/sudo-ldap.conf
+    line: "sudoers_base ou=SUDOers,{{ pam_ldap.lookup_base }}"
+    state: present
+
+- name: Copy LDAP key script.
+  copy: 
+    src: ssh-getkey-ldap.sh
+    dest: /opt/bin/ssh-getkey-ldap
+    mode: 0555
+
+- name: Configure SSH pub key command.
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: 'AuthorizedKeysCommand '
+    line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap
+
+- name: Configure SSH pub key command user.
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: 'AuthorizedKeysCommandUser '
+    line: AuthorizedKeysCommandUser nobody
+
+- name: Trigger overrides.
+  include_role: 
+    name: _overrides
+
+- name: Restart nslcd service.
+  service:
+    name: nslcd
+    state: restarted
+
+- name: Restart SSH service.
+  service:
+    name: ssh
+    state: restarted

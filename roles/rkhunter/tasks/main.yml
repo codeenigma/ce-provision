@@ -1,0 +1,28 @@
+---
+
+- name: Ensure rkhunter is installed.
+  apt:
+    pkg: "rkhunter"
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+
+- name: Copy rkhunter configuration.
+  template:
+    src: "rkhunter.conf.j2"
+    dest: "/etc/rkhunter.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Copy rkhunter default startup configuration.
+  template:
+    src: "rkhunter.default.j2"
+    dest: "/etc/default/rkhunter"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Trigger overrides
+  include_role:
+    name: _overrides

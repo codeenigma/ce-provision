@@ -1,0 +1,21 @@
+---
+
+rkhunter:
+  report_email_recipient: system@example.com
+  warning_email_recipient: ""
+  disable_tests: 'suspscan hidden_procs deleted_files packet_cap_apps apps os_specific'
+  scriptwhitelist:
+    - /bin/egrep
+    - /bin/fgrep
+    - /bin/which
+    - /usr/bin/ldd
+    # - /usr/bin/lwp-request
+    - /usr/sbin/adduser
+    # - /usr/sbin/prelink
+    - /usr/sbin/unhide.rb
+  allowhiddendir:
+    - /etc/.java
+  allowhiddenfile:
+    - /etc/.etckeeper
+  allowdevfile:
+    - /dev/shm/network/ifstate

@@ -1,0 +1,4 @@
+Match Group {{ group.name }}
+{% for key, value in group.settings.items() %}
+{{ key }} {{ value }}
+{% endfor %}

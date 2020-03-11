@@ -1,0 +1,18 @@
+---
+
+- hosts: provision-target
+  become: yes
+  vars:
+    - project_name: provision
+    - env_type: dev
+    - ansible_provision:
+        username: "ce-dev"
+        own_repository: "https://github.com/codeenigma/ansible-provision.git"
+        own_repository_branch: "master"
+        config_repository: "https://github.com/codeenigma/ansible-provision-config-example.git"
+        config_repository_branch: "master"
+        local_dir: "{{ playbook_dir | dirname }}"
+    - domain_name: provision-target.local
+  tasks:
+    - import_role:
+        name: nginx

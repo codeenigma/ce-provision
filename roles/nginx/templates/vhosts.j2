@@ -1,0 +1,28 @@
+### {{ ansible_managed }}
+
+{% for upstream in domain.upstreams %}
+upstream {{ upstream.name }} {
+{% for backend in upstream.backends %}
+    server {{ backend }};
+{% endfor %}
+}
+{% endfor %}
+
+{% for server in domain.servers %}
+server {
+    listen {{ server.port }}{% if domain.is_default is defined and domain.is_default %} default_server{% endif %}{% if server.ssl %} ssl{% endif %};
+    server_name {{ domain.server_name }};
+{% if server.https_redirect %}
+    rewrite ^ https://{{ domain.server_name }}$request_uri? permanent;
+{% endif %}
+{% if server.ssl %}
+    ssl_certificate {{ _ssl_paths[domain.server_name].certificate }};
+    ssl_certificate_key {{ _ssl_paths[domain.server_name].key }};
+{% endif %}
+    error_log {{ domain.error_log }} {{ domain.error_log_level }};
+    access_log {{ domain.access_log }};
+    root "{{ domain.webroot }}";
+    include "/etc/nginx/conf.d/{{ domain.project_type }}";
+    include "/etc/nginx/conf.d/_common";
+}
+{% endfor %}

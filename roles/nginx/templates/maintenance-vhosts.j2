@@ -1,0 +1,33 @@
+server {
+    listen 80{% if domain.is_default %} default_server{% endif %};
+    server_name {{ domain.server_name }};
+    {% if domain.https_redirect %}
+    rewrite ^ https://{{ domain.server_name }}$request_uri? permanent;
+    {% endif %}
+    error_log {{ domain.error_log }};
+    access_log {{ domain.access_log }};
+    root "/var/www/html/maintenance";
+    location / {
+        {% if domain.maintenance_page is defined %}
+        try_files {{ domain.maintenance_page }}.html /{{ domain.maintenance_page }}.html =404;
+        {% else %}
+        try_files index.html /index.html =404;
+        {% endif %}
+    }
+}
+server {
+    listen 443{% if domain.is_default %} default_server{% endif %} ssl;
+    server_name {{ domain.server_name }};
+    ssl_certificate {{ domain.ssl_certificate }};
+    ssl_certificate_key {{ domain.ssl_certificate_key }};
+    error_log {{ domain.error_log }};
+    access_log {{ domain.access_log }};
+    root "/var/www/html/maintenance";
+    location / {
+        {% if domain.maintenance_page is defined %}
+        try_files {{ domain.maintenance_page }}.html /{{ domain.maintenance_page }}.html =404;
+        {% else %}
+        try_files index.html /index.html =404;
+        {% endif %}
+    }
+}

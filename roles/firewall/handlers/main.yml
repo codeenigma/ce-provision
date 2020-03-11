@@ -1,0 +1,17 @@
+---
+
+- name: enable firewall
+  ufw:
+    state: enabled
+
+- name: disable firewall
+  ufw:
+    state: disabled
+
+- name: reload firewall
+  ufw:
+    state: reloaded
+
+- name: reset firewall
+  ufw:
+    state: reset

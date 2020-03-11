@@ -1,0 +1,2 @@
+---
+template_override_path: "{{ playbook_dir }}/override"

@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: 'aws/aws_cloudwatch_agent', when: is_local is not defined or not is_local }

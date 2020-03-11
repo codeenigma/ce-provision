@@ -1,0 +1,69 @@
+---
+
+- name: Add repository key for Jenkins.
+  apt_key: url=https://pkg.jenkins.io/debian/jenkins.io.key state=present
+  
+- name: Add repository for Jenkins.
+  apt_repository: repo='deb http://pkg.jenkins.io/debian-stable binary/' state=present
+
+- name: Ensure Jenkins is installed.
+  apt:
+    pkg: "jenkins"
+    state: present
+    update_cache: yes
+    
+- name: Generates SSL keys.
+  include_role:
+    name: "{{ jenkins.ssl_handling }}"
+  vars:
+    ssl:
+      domain: "{{ jenkins.server_name }}"
+      services: []
+
+- name: Check if we have an existing keystore.
+  stat:
+    path: "/var/lib/jenkins/{{ jenkins.server_name }}.jks"
+  register: jenkins_keystore
+
+- name: Convert SSL key to intermediate PK12.
+  command: "openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ _ssl_paths[jenkins.server_name].key }} -in {{ _ssl_paths[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}"
+  when: not jenkins_keystore.stat.exists
+
+- name: Convert PK12 to keystore.
+  command: "keytool -importkeystore -srckeystore /dev/shm/jenkins_keystore.p12 -srcstorepass '{{ jenkins.keystore_pass }}' -srcstoretype PKCS12 -srcalias {{ jenkins.server_name }} -deststoretype JKS -destkeystore /var/lib/jenkins/{{ jenkins.server_name }}.jks -deststorepass '{{ jenkins.keystore_pass }}' -destalias {{ jenkins.server_name }}"
+  when: not jenkins_keystore.stat.exists
+
+- name: Ensure keystore ownership.
+  file:
+    path: /var/lib/jenkins
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    recurse: true
+
+- name: Ensure log ownership.
+  file:
+    path: /var/log/jenkins
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    recurse: true
+
+- name: Ensure cache ownership.
+  file:
+    path: /var/cache/jenkins
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    recurse: true
+
+- name: Copy Jenkins configuration file.
+  template:
+    src: "jenkins.j2"
+    dest: /etc/default/jenkins
+
+- name: Trigger overrides
+  include_role: 
+    name: _overrides
+
+- name: Restart Jenkins.
+  service:
+    name: jenkins
+    state: restarted

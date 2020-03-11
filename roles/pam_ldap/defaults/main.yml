@@ -1,0 +1,16 @@
+---
+
+pam_ldap:
+  # File name under config/files in your "private" repo.
+  # @todo this need a bit more work to be more robust/flexible.
+  ssl_certificate: ""
+  # ssl_certificate: ldap.example.pem
+  # List of ldap servers to 
+  endpoints: []
+    # - ldaps://ldap-example.codeenigma.com
+  # Base lookup pattern.
+  lookup_base: ""
+  # lookup_base: dc=codeenigma,dc=net
+  # For non-anonymous lookup.
+  binddn: ""
+  bindpw: ""

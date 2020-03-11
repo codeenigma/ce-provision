@@ -1,0 +1,24 @@
+#!/bin/sh
+
+PID=$(pgrep --full "selenium-server-standalone.jar")
+if [ ! -z "$PID" ]; then
+  kill $PID
+fi
+
+PID=$(pgrep "Xtightvnc")
+if [ ! -z "$PID" ]; then
+  kill $PID
+fi
+
+PID=$(pgrep --full "Xvfb")
+if [ ! -z "$PID" ]; then
+  kill $PID
+fi
+
+if [ -e "/tmp/.X99-lock" ]; then
+  rm "/tmp/.X99-lock"
+fi
+
+if [ -e "/tmp/.X11-unix" ]; then
+  rm -rf "/tmp/.X11-unix"
+fi

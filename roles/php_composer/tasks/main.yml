@@ -1,0 +1,6 @@
+---
+
+- name: Install composer.
+  apt:
+    pkg: composer
+    state: present

@@ -1,0 +1,16 @@
+---
+
+- name: Ensure compose folder exists.
+  file:
+    path: /opt/docker_registry
+    state: directory
+
+- name: Copy docker-compose file.
+  template:
+    src: "docker-compose.yml.j2"
+    dest: /opt/docker_registry/docker-compose.yml
+
+- name: Spin up the registry instance.
+  command: docker-compose up -d
+  args:
+    chdir: /opt/docker_registry

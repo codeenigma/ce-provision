@@ -1,0 +1,12 @@
+---
+
+_ansible_provision:
+  username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
+
+ansible_provision:
+  username: "{{ _ansible_provision.username }}"
+  own_repository: "https://github.com/codeenigma/ansible-provision.git"
+  own_repository_branch: "master"
+  config_repository: ""
+  config_repository_branch: "master"
+  local_dir: "/home/{{ _ansible_provision.username }}/ansible-provision"

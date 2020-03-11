@@ -1,0 +1,34 @@
+---
+
+- name: Create the deploy user for deployments.
+  user:
+    name: "{{ user_ansible.username }}"
+    comment: Continuous Deployment
+    shell: /bin/bash
+    group: "{{ user_ansible.username }}"
+    uid: "{{ user_ansible.uid | default(omit) }}"
+
+- name: Add user to sudoers.
+  template:
+    src: "sudoer.j2"
+    dest: "/etc/sudoers.d/{{ user_ansible.username }}"
+    owner: root
+    group: root
+    mode: 0600
+  when: user_ansible.sudoer
+
+- name: Create an .ssh folder.
+  file:
+    path: "/home/{{ user_ansible.username }}/.ssh"
+    state: directory
+    owner: "{{ user_ansible.username }}"
+    group: "{{ user_ansible.username }}"
+    mode: 0700
+
+- name: Copy public key from utility server.
+  copy:
+    src: "/home/{{ user_ansible.utility_username }}/.ssh/id_rsa.pub"
+    dest: "/home/{{ user_ansible.username }}/.ssh/authorized_keys"
+    owner: "{{ user_ansible.username }}"
+    group: "{{ user_ansible.username }}"
+    mode: 0644

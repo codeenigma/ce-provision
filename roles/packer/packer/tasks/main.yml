@@ -1,0 +1,8 @@
+---
+
+- name: Fetch and extract Packer zip.
+  unarchive:
+    src: https://releases.hashicorp.com/packer/{{ packer.version }}/packer_{{ packer.version }}_linux_amd64.zip
+    dest: /usr/local/bin/
+    remote_src: yes
+    mode: 0755

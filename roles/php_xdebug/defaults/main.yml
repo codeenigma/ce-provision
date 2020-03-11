@@ -1,0 +1,13 @@
+---
+xdebug:
+  cli: no
+  fpm: no
+  scream: 0
+  max_nesting_level: 1024
+  trace_enable_trigger: 1
+  trace_output_dir: "/var/log/php/xdebug"
+  profiler_enable_trigger: 1
+  profiler_output_dir: "/var/log/php/xdebug"
+  remote_port: 9000
+  remote_host: auto
+  remote_connect_back: auto

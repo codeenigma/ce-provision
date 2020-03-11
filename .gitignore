@@ -1,0 +1,6 @@
+*.retry
+/data
+/build
+/config
+/hosts
+/ansible.cfg

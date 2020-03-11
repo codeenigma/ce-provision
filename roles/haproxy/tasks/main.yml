@@ -1,0 +1,34 @@
+---
+
+- name: Ensure haproxy is installed.
+  apt:
+    pkg: haproxy
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+
+- name: Create HAProxy SSL folder.
+  file:
+    path: "/etc/haproxy/ssl"
+    state: directory
+
+# - name: Create the SSL pem file.
+#   shell: cat /etc/ssl/private/ssl-cert-snakeoil.key /etc/ssl/certs/ssl-cert-snakeoil.pem > /etc/haproxy/ssl/haproxy.pem
+
+- name: Copy HAProxy configuration.
+  template:
+    src: "{{ haproxy.template }}.cfg.j2"
+    dest: "/etc/haproxy/haproxy.cfg"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Trigger overrides
+  include_role: 
+    name: _overrides
+
+- name: Ensure HAProxy is restarted.
+  service:
+    name: haproxy
+    state: restarted

@@ -1,0 +1,9 @@
+---
+
+docker_registry:
+  bind: 127.0.0.1
+  port: 5000
+  # Wether it is behind an Nginx proxy (for auth).
+  proxy: no
+nginx:
+  client_max_body_size: 0

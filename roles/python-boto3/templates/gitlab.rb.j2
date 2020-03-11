@@ -1,0 +1,5 @@
+postgresql['shared_buffers'] = '1MB'
+node_exporter['enable'] = false
+host = `hostname`.strip
+external_url "http://#{host}"
+

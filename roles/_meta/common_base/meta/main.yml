@@ -1,0 +1,6 @@
+---
+
+dependencies:
+  - role: locales
+  - { role: apt_extra_packages, apt_extra_packages: ['rsync'] }
+  - role: rkhunter

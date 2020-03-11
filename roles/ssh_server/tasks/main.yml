@@ -1,0 +1,52 @@
+---
+
+- name: Ensure OpenSSH server is present.
+  apt:
+    pkg: [openssh-server]
+    state: present
+
+- name: Generate main section of the sshd_config file.
+  template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    mode: 0400
+
+- name: Ensure groups exist.
+  group:
+    name: "{{ group.name }}"
+    state: present
+  with_items: "{{ sshd.groups }}"
+  loop_control:
+    loop_var: group
+  when: sshd.groups | length
+
+- name: Generate group section of the sshd_config file.
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    mode: 0400
+    marker: "#### {mark} group section {{ group.name }}"
+    block: "{{ lookup('template', 'group_block.j2') }}"
+  with_items: "{{ sshd.groups }}"
+  loop_control:
+    loop_var: group
+  when: sshd.groups | length
+
+- name: Generate user section of the sshd_config file.
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    mode: 0400
+    marker: "#### {mark} user section {{ users.names | join(' ') }}"
+    block: "{{ lookup('template', 'user_block.j2') }}"
+  with_items: "{{ sshd.users }}"
+  loop_control:
+    loop_var: users
+  when: sshd.users | length
+
+# - name: Trigger overrides
+#   include_role: 
+#     name: _overrides
+
+- name: Restart SSH service.
+  service:
+    name: ssh
+    state: restarted
