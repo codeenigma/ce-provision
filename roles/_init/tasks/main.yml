@@ -21,7 +21,7 @@
 
   - name: Include custom variables.
     include_vars:
-      file: ansible_provision.extra_repository_vars_file
+      file: "{{ _ansible_provision_build_tmp_dir }}/extra/{{ ansible_provision.extra_repository_vars_file }}"
       name: _ansible_provision_extra_vars
     when: 
       - ansible_provision.extra_repository
@@ -29,15 +29,16 @@
   
   - name: Filter allowed custom variables.
     set_fact:
-      ansible_provision_extra_vars_filtered: "{{ ansible_provision_extra_vars_filtered | default({}) | combine({item.name: _ansible_provision_extra_vars[item.name]}, recursive=True) }}"
+      ansible_provision_extra_vars_filtered: "{{ _ansible_provision_extra_vars | allowed_vars(ansible_provision.extra_repository_allowed_vars) }}"
     when:
-      - _ansible_provision_extra_vars[item.name] is defined
-      - _ansible_provision_extra_vars[item.name]
-    loop: "{{ ansible_provision.extra_repository_allowed_vars }}"
+      - ansible_provision.extra_repository
+      - ansible_provision.extra_repository_vars_file
+      - ansible_provision.extra_repository_allowed_vars
 
   - name: Override variables with custom ones.
     set_fact:
       "{{ item.name }}": "{{ ansible_provision_extra_vars_filtered[item.name] }}"
     when:
+      - ansible_provision_extra_vars_filtered is defined
       - ansible_provision_extra_vars_filtered[item.name] is defined
     loop: "{{ ansible_provision.extra_repository_allowed_vars }}"
