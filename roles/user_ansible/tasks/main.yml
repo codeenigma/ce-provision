@@ -3,11 +3,14 @@
 - name: Create the deploy user for deployments.
   user:
     name: "{{ user_ansible.username }}"
-    comment: Continuous Deployment
     shell: /bin/bash
     group: "{{ user_ansible.username }}"
     uid: "{{ user_ansible.uid | default(omit) }}"
-
+    system: yes
+    create_home: yes
+    home: "/home/{{ user_ansible.username }}"
+    password: '*'
+    
 - name: Add user to sudoers.
   template:
     src: "sudoer.j2"
