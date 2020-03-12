@@ -7,41 +7,14 @@
     shell: /bin/bash
     group: "{{ ansible_deploy.username }}"
     uid: "{{ ansible_deploy.uid | default(omit) }}"
-
-
-- name: Create an .ssh folder.
-  file:
-    path: "/home/{{ ansible_deploy.username }}/.ssh"
-    state: directory
-    owner: "{{ ansible_deploy.username }}"
-    group: "{{ ansible_deploy.username }}"
-    mode: 0700
-
-- name: Check if we have an SSH key for the deploy user.
-  stat:
-    path: "/home/{{ ansible_deploy.username }}/.ssh/id_rsa.pub"
-  register: ansible_deploy_ssh_pubkey
-
-- name: generate an SSH key pair for the deploy user.
-  command: ssh-keygen -t rsa -b 4096 -N "" -f "/home/{{ ansible_deploy.username }}/.ssh/id_rsa"
-  when: not ansible_deploy_ssh_pubkey.stat.exists
-
-- name: Set permissions for private key.
-  file:
-    path: "/home/{{ ansible_deploy.username }}/.ssh/id_rsa"
-    state: file
-    owner: "{{ ansible_deploy.username }}"
-    group: "{{ ansible_deploy.username }}"
-    mode: 0600
-
-- name: Set permissions for public key.
-  file:
-    path: "/home/{{ ansible_deploy.username }}/.ssh/id_rsa.pub"
-    state: file
-    owner: "{{ ansible_deploy.username }}"
-    group: "{{ ansible_deploy.username }}"
-    mode: 0644
-
+    create_home: yes
+    generate_ssh_key: yes
+    home: "/home/{{ ansible_deploy.username }}"
+    password: '*'
+    ssh_key_bits: 4096
+    ssh_key_comment: "{{ ansible_deploy.username }}@{{ ansible_host }}"
+    system: yes
+    
 - name: Ensure Git is installed.
   apt:
     pkg: "git"
