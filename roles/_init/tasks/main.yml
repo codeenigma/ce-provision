@@ -1,12 +1,43 @@
 ---
 
-- name: Randomize root password.
-  user:
-    name: root
-    state: present
-    password: "{{ lookup('password', '/dev/null') | password_hash('sha512', lookup('password', '/dev/null')) }}"
-# Make sure custom scripts dir exists.
-- name: Ensure /opt/bin directory exists.
-  file:
-    path: "/opt/bin"
-    state: directory
+# - name: Randomize root password.
+#   user:
+#     name: root
+#     state: present
+#     password: "{{ lookup('password', '/dev/null') | password_hash('sha512', lookup('password', '/dev/null')) }}"
+
+# - name: Ensure /opt/bin directory exists.
+#   file:
+#     path: "/opt/bin"
+#     state: directory
+# - include_vars:
+
+  - name: Clone custom extra directory.
+    git:
+      repo: "{{ ansible_provision.extra_repository }}"
+      dest: "{{ _ansible_provision_build_tmp_dir }}/extra"
+      version: "{{ ansible_provision.extra_repository_branch }}"
+    when: ansible_provision.extra_repository
+
+  - name: Include custom variables.
+    include_vars:
+      file: ansible_provision.extra_repository_vars_file
+      name: _ansible_provision_extra_vars
+    when: 
+      - ansible_provision.extra_repository
+      - ansible_provision.extra_repository_vars_file
+  
+  - name: Filter allowed custom variables.
+    set_fact:
+      ansible_provision_extra_vars_filtered: "{{ ansible_provision_extra_vars_filtered | default({}) | combine({item.name: _ansible_provision_extra_vars[item.name]}, recursive=True) }}"
+    when:
+      - _ansible_provision_extra_vars[item.name] is defined
+      - _ansible_provision_extra_vars[item.name]
+    loop: "{{ ansible_provision.extra_repository_allowed_vars }}"
+
+  - name: Override variables with custom ones.
+    set_fact:
+      "{{ item.name }}": "{{ ansible_provision_extra_vars_filtered[item.name] }}"
+    when:
+      - ansible_provision_extra_vars_filtered[item.name] is defined
+    loop: "{{ ansible_provision.extra_repository_allowed_vars }}"

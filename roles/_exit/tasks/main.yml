@@ -1,3 +1,13 @@
 ---
 
-# We do nothing there, just a placeholder for now.
+  - set_fact:
+      ansible_provision_extra_vars_computed: "{{ ansible_provision_extra_vars_computed | default({}) | combine({item.name: lookup('vars', item.name)}, recursive=True) }}"
+    when: lookup('vars', item.name, default=null)
+    loop: "{{ ansible_provision.extra_repository_allowed_vars }}"
+  
+  - name: Generate/Update custom vars file.
+    local_action:
+      module: template
+      src: vars.j2
+      dest: '/home/ce-dev/custom.yml'
+      

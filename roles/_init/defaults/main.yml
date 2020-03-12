@@ -12,5 +12,5 @@ ansible_provision:
   extra_repository: ""
   extra_repository_branch: "master"
   extra_repository_vars_file: "custom.yml"
-  extra_repository_allowed_vars: "custom.yml"
+  extra_repository_allowed_vars: []
   local_dir: "/home/{{ _ansible_provision.username }}/ansible-provision"
