@@ -2,44 +2,17 @@
 - name: Create the provision user for provisioning.
   user:
     name: "{{ ansible_provision.username }}"
-    comment: Provisioning
+    comment: Provisioning user
     shell: /bin/bash
+    create_home: yes
     group: "{{ ansible_provision.username }}"
     uid: "{{ ansible_provision.uid | default(omit) }}"
-
-- name: Create an .ssh folder.
-  file:
-    path: "/home/{{ ansible_provision.username }}/.ssh"
-    state: directory
-    owner: "{{ ansible_provision.username }}"
-    group: "{{ ansible_provision.username }}"
-    mode: 0700
-
-- name: Check if we have an SSH key for the provision user.
-  stat:
-    path: "/home/{{ ansible_provision.username }}/.ssh/id_rsa.pub"
-  register: ansible_provision_ssh_pubkey
-
-- name: generate an SSH key pair for the provision user.
-  command: ssh-keygen -t rsa -b 4096 -N "" -f "/home/{{ ansible_provision.username }}/.ssh/id_rsa"
-  when: not ansible_provision_ssh_pubkey.stat.exists
-
-- name: Set permissions for private key.
-  file:
-    path: "/home/{{ ansible_provision.username }}/.ssh/id_rsa"
-    state: file
-    owner: "{{ ansible_provision.username }}"
-    group: "{{ ansible_provision.username }}"
-    mode: 0600
-
-- name: Set permissions for public key.
-  file:
-    path: "/home/{{ ansible_provision.username }}/.ssh/id_rsa.pub"
-    state: file
-    owner: "{{ ansible_provision.username }}"
-    group: "{{ ansible_provision.username }}"
-    mode: 0644
-
+    generate_ssh_key: yes
+    home: "{{ ansible_provision.username }}"
+    password: '*'
+    ssh_key_bits: 4096
+    ssh_key_comment: "{{ ansible_provision.username }}@{{ ansible_host }}"
+    system: yes
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
   set_fact:

@@ -36,6 +36,6 @@
     local_action:
       module: command
       cmd: "git push origin {{ ansible_provision.extra_repository_branch }}"
-      args: 
+      args:
         chdir: "{{ _ansible_provision_build_tmp_dir }}/extra"
     when: ansible_provision_extra_vars_computed is defined
