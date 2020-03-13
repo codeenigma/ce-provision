@@ -1,6 +1,8 @@
 ---
-
-pam_ldap:
+# Common configuration for all LDAP enabled roles.
+# This allow to define common defaults, that can still be overriden
+# per role.
+ldap_client:
   # File name under config/files in your "private" repo.
   # @todo this need a bit more work to be more robust/flexible.
   ssl_certificate: ""
@@ -14,3 +16,10 @@ pam_ldap:
   # For non-anonymous lookup.
   binddn: ""
   bindpw: ""
+
+pam_ldap:
+  ssl_certificate: ldap_client.ssl_certificate
+  endpoints: ldap_client.endpoints
+  lookup_base: ldap_client.lookup_base
+  binddn: ldap_client.binddn
+  bindpw: ldap_client.bindpw
