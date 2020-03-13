@@ -1,4 +1,10 @@
 ---
+
+- name: Create the provision group for provisioning.
+  group:
+    name: "{{ ansible_provision.username }}"
+    system: yes
+
 - name: Create the provision user for provisioning.
   user:
     name: "{{ ansible_provision.username }}"
@@ -8,11 +14,12 @@
     group: "{{ ansible_provision.username }}"
     uid: "{{ ansible_provision.uid | default(omit) }}"
     generate_ssh_key: yes
-    home: "{{ ansible_provision.username }}"
+    home: "/home/{{ ansible_provision.username }}"
     password: '*'
     ssh_key_bits: 4096
     ssh_key_comment: "{{ ansible_provision.username }}@{{ ansible_host }}"
     system: yes
+    groups: "{{ ansible_provision.groups }}"
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
   set_fact:
@@ -75,7 +82,7 @@
 
 - name: Ensure ownership of Ansible folder.
   file:
-    path: "{{ ansible_provision.local_dir }}"
+    path: "/home/{{ ansible_provision.username }}"
     state: directory
     owner: "{{ ansible_provision.username }}"
     recurse: yes

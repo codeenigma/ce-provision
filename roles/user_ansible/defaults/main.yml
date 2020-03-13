@@ -6,3 +6,5 @@ user_ansible:
   # Local username of the deploy user.
   utility_username: ""
   sudoer: no
+    # List of additional groups to add the user to.
+  groups: ''

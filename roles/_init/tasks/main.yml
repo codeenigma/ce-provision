@@ -1,19 +1,19 @@
 ---
 
-# - name: Randomize root password.
-#   user:
-#     name: root
-#     state: present
-#     password: "{{ lookup('password', '/dev/null') | password_hash('sha512', lookup('password', '/dev/null')) }}"
+  - name: Randomize root password.
+    user:
+      name: root
+      state: present
+      password: "{{ lookup('password', '/dev/null') | password_hash('sha512', lookup('password', '/dev/null')) }}"
 
-# - name: Ensure /opt/bin directory exists.
-#   file:
-#     path: "/opt/bin"
-#     state: directory
-# - include_vars:
-
+  - name: Ensure /opt/bin directory exists.
+    file:
+      path: "/opt/bin"
+      state: directory
+  
   - name: Clone custom extra directory.
-    git:
+    local_action:
+      module: git
       repo: "{{ ansible_provision.extra_repository }}"
       dest: "{{ _ansible_provision_build_tmp_dir }}/extra"
       version: "{{ ansible_provision.extra_repository_branch }}"

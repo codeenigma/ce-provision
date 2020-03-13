@@ -1,6 +1,11 @@
 ---
 
-- name: Create the deploy user for deployments.
+- name: Create the system group.
+  group:
+    name: "{{ user_ansible.username }}"
+    system: yes
+
+- name: Create the system user.
   user:
     name: "{{ user_ansible.username }}"
     shell: /bin/bash
@@ -10,6 +15,7 @@
     create_home: yes
     home: "/home/{{ user_ansible.username }}"
     password: '*'
+    groups: "{{ user_ansible.groups }}"
     
 - name: Add user to sudoers.
   template:
