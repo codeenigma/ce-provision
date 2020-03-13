@@ -1,2 +1,5 @@
 ---
-template_override_path: "{{ playbook_dir }}/override"
+template_override:
+  paths:
+    - "{{ playbook_dir }}/override"
+  _paths_defaults: []

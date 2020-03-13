@@ -1,0 +1,15 @@
+---
+
+- name: Find overrides
+  find: 
+    paths: "{{ template_override_path }}"
+    file_type: file
+    recurse: yes
+  register: template_overrides
+
+- name: Install overridden files on the guest.
+  template:
+    src: "{{ item.path }}"
+    dest: "{{ item.path | regex_replace(template_override_path, '') }}"
+    force: yes
+  with_items: "{{ template_overrides.files }}"

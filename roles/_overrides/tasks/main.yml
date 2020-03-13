@@ -1,15 +1,11 @@
 ---
 
-- name: Find overrides
-  find: 
-    paths: "{{ template_override_path }}"
-    file_type: file
-    recurse: yes
-  register: template_overrides
+- name: Define override paths.
+  set_fact:
+    _template_override_paths: "{{ template_override._paths_defaults + template_override.paths }}"
 
-- name: Install overridden files on the guest.
-  template:
-    src: "{{ item.path }}"
-    dest: "{{ item.path | regex_replace(template_override_path, '') }}"
-    force: yes
-  with_items: "{{ template_overrides.files }}"
+- name: Run overrides in order.
+  include_tasks: override.yml
+  with_items: "{{ _template_override_paths }}"
+  loop_control:
+    loop_var: template_override_path    
