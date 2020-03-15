@@ -65,10 +65,11 @@
     state: present
 
 - name: Copy LDAP key script.
-  copy: 
-    src: ssh-getkey-ldap.sh
+  get_url: 
+    url: https://raw.githubusercontent.com/codeenigma/ssh-getkey-ldap/master/ssh-getkey-ldap
     dest: /opt/bin/ssh-getkey-ldap
     mode: 0555
+    owner: root
 
 - name: Configure SSH pub key command.
   lineinfile:
