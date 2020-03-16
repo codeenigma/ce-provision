@@ -30,7 +30,7 @@
   vars:
     template_params:
       files: gitlab.rb.j2
-      paths: ansible_provision_search_paths_template
+      paths: "{{ ansible_provision_search_paths_template }}"
       
 - name: Make sure run-parts dir exists.
   file:
