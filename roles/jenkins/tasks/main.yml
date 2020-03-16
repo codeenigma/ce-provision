@@ -63,7 +63,7 @@
   include_role: 
     name: _overrides
 
-- name: Restart Jenkins.
-  service:
-    name: jenkins
-    state: reloaded
+# - name: Restart Jenkins.
+#   service:
+#     name: jenkins
+#     state: reloaded
