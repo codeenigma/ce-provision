@@ -22,5 +22,5 @@ php:
     upload_max_filesize: 200M
     max_file_uploads: 20
     date_timezone: "Europe/London"
-    pool_user: "{{ deploy_user.username }}"
-    pool_group: "{{ deploy_user.username }}"
+    pool_user: "{{ user_deploy.username }}"
+    pool_group: "{{ user_deploy.username }}"

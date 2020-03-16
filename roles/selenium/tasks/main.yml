@@ -70,40 +70,40 @@
 
 - name: Create home X dir if needed.
   file:
-    path: "/home/{{ deploy_user.username }}/.vnc"
-    owner: "{{ deploy_user.username }}"
-    group: "{{ deploy_user.username }}"
+    path: "/home/{{ user_deploy.username }}/.vnc"
+    owner: "{{ user_deploy.username }}"
+    group: "{{ user_deploy.username }}"
     state: directory
   when: selenium.display_manager == "VNC"
 
 - name: Create X startup script.
   template:
     src: "xstartup.j2"
-    dest: "/home/{{ deploy_user.username }}/.vnc/xstartup"
-    owner: "{{ deploy_user.username }}"
-    group: "{{ deploy_user.username }}"
+    dest: "/home/{{ user_deploy.username }}/.vnc/xstartup"
+    owner: "{{ user_deploy.username }}"
+    group: "{{ user_deploy.username }}"
     mode: 0755
   when: selenium.display_manager == "VNC"
 
 - name: Generate VNC password.
-  shell: "echo '{{ deploy_user.username }}' | vncpasswd -f > /home/{{ deploy_user.username }}/.vnc/passwd"
+  shell: "echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
   become: true
-  become_user: "{{ deploy_user.username }}"
+  become_user: "{{ user_deploy.username }}"
   when: selenium.display_manager == "VNC"
 
 - name: Fix VNC folder permissions.
   file:
-    dest: "/home/{{ deploy_user.username }}/.vnc"
-    owner: "{{ deploy_user.username }}"
-    group: "{{ deploy_user.username }}"
+    dest: "/home/{{ user_deploy.username }}/.vnc"
+    owner: "{{ user_deploy.username }}"
+    group: "{{ user_deploy.username }}"
     mode: 0700
   when: selenium.display_manager == "VNC"
   
 - name: Fix VNC password file permissions.
   file:
-    dest: "/home/{{ deploy_user.username }}/.vnc/passwd"
-    owner: "{{ deploy_user.username }}"
-    group: "{{ deploy_user.username }}"
+    dest: "/home/{{ user_deploy.username }}/.vnc/passwd"
+    owner: "{{ user_deploy.username }}"
+    group: "{{ user_deploy.username }}"
     mode: 0700
   when: selenium.display_manager == "VNC"
 

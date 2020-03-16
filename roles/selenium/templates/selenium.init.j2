@@ -16,7 +16,7 @@ usage(){
 
 case "$1" in
   start)
-        runuser -l {{ deploy_user.username }} -c "/bin/sh /opt/selenium/selenium-daemon-start"
+        runuser -l {{ user_deploy.username }} -c "/bin/sh /opt/selenium/selenium-daemon-start"
         ;;
   stop)
         /bin/sh /opt/selenium/selenium-daemon-stop
@@ -25,7 +25,7 @@ case "$1" in
   restart)
         /bin/sh /opt/selenium/selenium-daemon-stop
         sleep 1
-        runuser -l {{ deploy_user.username }} -c "/bin/sh /opt/selenium/selenium-daemon-start"
+        runuser -l {{ user_deploy.username }} -c "/bin/sh /opt/selenium/selenium-daemon-start"
         ;;      
 
   status)

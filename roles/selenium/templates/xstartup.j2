@@ -1,7 +1,7 @@
 #!/bin/sh
 
 [ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
-[ -r /home/{{ deploy_user.username }}/.Xresources ] && xrdb $HOME/.Xresources
+[ -r /home/{{ user_deploy.username }}/.Xresources ] && xrdb $HOME/.Xresources
 xsetroot -solid grey
 export DISPLAY=:99
 java -Dwebdriver.gecko.driver=/opt/selenium/geckodriver -Dwebdriver.chrome.driver=/opt/selenium/chromedriver -jar /opt/selenium/selenium-server-standalone.jar &
