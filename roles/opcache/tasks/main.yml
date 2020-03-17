@@ -1,0 +1,13 @@
+---
+# tasks file for opcache
+#
+
+- name: Find the location of opcache.so
+  command: find /usr/lib/php5 -name 'opcache.so'
+  register: 'opcache_zend_extension'
+
+- name: Copy Zend OpCache config file
+  template: src=opcache.ini.j2 dest=/etc/php5/mods-available/opcache.ini
+
+- name: Enable Zend OpCache module
+  command: php5enmod opcache

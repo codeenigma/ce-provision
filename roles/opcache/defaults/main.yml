@@ -1,0 +1,12 @@
+---
+# defaults file for opcache
+
+opcache:
+  version: 7.0.3
+  memory_consumption: 128
+  interned_strings_buffer: 8
+  max_accelerated_files: 4000
+  revalidate_freq: 60
+  fast_shutdown: 1
+  enable_cli: 1
+  save_comments: 0
