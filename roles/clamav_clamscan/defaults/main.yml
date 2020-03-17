@@ -1,0 +1,7 @@
+---
+# defaults file for clamav
+
+clamav_clamscan:
+
+  email: 'sysadm@codeenigma.com'
+  schedule: '0 0 * * *'
