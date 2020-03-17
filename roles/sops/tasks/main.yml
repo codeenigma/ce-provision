@@ -1,0 +1,6 @@
+---
+
+- name: Install SOPS package.
+  apt:
+    deb: "https://github.com/mozilla/sops/releases/download/v{{ sops.version }}/sops_{{ sops.version }}_amd64.deb"
+    state: present
