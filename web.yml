@@ -1,0 +1,10 @@
+---
+- hosts: ip-172-31-41-186.ec2.internal 
+  become: yes
+
+  vars:
+    - domain_name: www.lalala.com
+    - env_type: dev
+
+  roles:
+    - ssh_server

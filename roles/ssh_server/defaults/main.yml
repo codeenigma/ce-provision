@@ -7,7 +7,7 @@ sshd:
     - "0.0.0.0"
     - "::"
   AllowAgentForwarding: "yes"
-  AllowGroups: "sysadmin"
+  AllowGroups: "sysadmins"
   AllowTcpForwarding: "yes"
   AuthenticationMethods: ""
   AuthorizedKeysCommand: ""
