@@ -1,2 +1,2 @@
 MAILTO=""
-{{ clamav_clamscan.schedule }} root	/usr/local/bin/clamscan-report -d /var/www
+{{ clamav_clamscan.schedule }} root	/usr/local/bin/clamscan-report -d {{ clamav_clamscan.path }}
