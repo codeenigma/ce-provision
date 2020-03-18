@@ -113,7 +113,9 @@ UsePAM {{ sshd.UsePAM }}
 
 AllowAgentForwarding {{ sshd.AllowAgentForwarding }}
 AllowTcpForwarding {{ sshd.AllowTcpForwarding }}
+{% if sshd.AllowGroups|length %}
 AllowGroups {{ sshd.AllowGroups }}
+{% endif %}
 GatewayPorts {{ sshd.GatewayPorts }}
 X11Forwarding {{ sshd.X11Forwarding }}
 X11DisplayOffset {{ sshd.X11DisplayOffset }}
