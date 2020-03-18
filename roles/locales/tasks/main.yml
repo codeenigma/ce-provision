@@ -24,3 +24,6 @@
 - name: Generates locales.
   command: "/usr/sbin/locale-gen"
 
+- name: Set timezone
+  timezone:
+    name: "{{ locales.timezone }}"
