@@ -11,7 +11,6 @@ _haproxy:
 ssl_handling: ssl_selfsigned
 
 haproxy:
-firewall_allow_from: [] # This can be a list of IP.
 template: "haproxy-ssl-passthru"
 ssl_handling: "{{ _haproxy.ssl_handling }}"
 listen_bind_address: "0.0.0.0"

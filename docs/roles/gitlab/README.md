@@ -2,7 +2,9 @@
 
 <!--TOC-->
 <!--ENDTOC-->
-
+## Configuration
+Because of the size of the gitlab.rb file, it is impractical to try to parameterized it.
+Only a few basic variables are thus provided. To further customize it, the recommended approach is to leverage the "override" system and provide a custom template.
 
 <!--ROLEVARS-->
 ## Default variables
