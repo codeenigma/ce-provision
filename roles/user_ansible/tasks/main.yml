@@ -41,3 +41,4 @@
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
     mode: 0644
+  delegate_to: "{{ user_ansible.utility_host }}"

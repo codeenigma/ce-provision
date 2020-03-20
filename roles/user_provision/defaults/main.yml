@@ -4,6 +4,7 @@ user_provision:
   # This sets both username and main group.
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
   # Local username of the system user.
+  utility_host: "localhost"
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
   sudoer: yes
   groups: ''
