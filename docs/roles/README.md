@@ -2,6 +2,9 @@
 Ansible roles and group of roles that constitute the deploy stack.
 <!--TOC-->
 ## [AWS tools roles](aws/README.md)
+### [Amazon credentials](aws/aws_credentials/README.md)
+Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
+
 ## [UFW Firewall](firewall/README.md)
 
 ## [Gitlab](gitlab/README.md)

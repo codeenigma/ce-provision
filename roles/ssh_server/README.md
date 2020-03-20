@@ -16,6 +16,7 @@ sshd:
     - "0.0.0.0"
     - "::"
   AllowAgentForwarding: "yes"
+  AllowGroups: ""
   AllowTcpForwarding: "yes"
   AuthenticationMethods: ""
   AuthorizedKeysCommand: ""
@@ -74,6 +75,7 @@ sshd:
   #     settings: 
   #       PasswordAuthentication: "no"
   #       AuthenticationMethods: publickey
+
 ```
 
 <!--ENDROLEVARS-->
