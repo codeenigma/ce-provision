@@ -33,7 +33,8 @@
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
     mode: 0700
-
+- debug:
+    msg: "{{ user_ansible.utility_host }}"
 - name: Copy public key from utility server.
   copy:
     src: "/home/{{ user_ansible.utility_username }}/.ssh/id_rsa.pub"
