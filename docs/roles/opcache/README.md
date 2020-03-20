@@ -2,6 +2,9 @@
 
 Installs and configures gordalina's cache tool: https://github.com/gordalina/cachetool
 
+<!--TOC-->
+<!--ENDTOC-->
+
 <!--ROLEVARS-->
 ## Default variables
 ```yaml
@@ -9,8 +12,8 @@ Installs and configures gordalina's cache tool: https://github.com/gordalina/cac
 # defaults file for opcache
 
 opcache:
-  host: '127.0.0.1'
-  port: '9072'
+host: '127.0.0.1'
+port: '9072'
 
 ```
 

@@ -2,12 +2,28 @@
 # tasks file for opcache
 #
 
-- name: Find the location of opcache.so
-  command: find /usr/lib/php5 -name 'opcache.so'
-  register: 'opcache_zend_extension'
+- name: Install cachetool
+  get_url:
+    url: https://gordalina.github.io/cachetool/downloads/cachetool.phar
+    dest: /usr/local/bin/cachetool
+    owner: root
+    group: root
+    mode: '0755'
 
-- name: Copy Zend OpCache config file
-  template: src=opcache.ini.j2 dest=/etc/php5/mods-available/opcache.ini
+- name: Get php-fpm host
+  shell: 
+    cmd: "netstat -anp | grep php-fpm | grep tcp | awk '{print $4}' | cut -d: -f1"
+  register: _phpfpm_host
 
-- name: Enable Zend OpCache module
-  command: php5enmod opcache
+- name: Get php-fpm port
+  shell: 
+    cmd: "netstat -anp | grep php-fpm | grep tcp | awk '{print $4}' | cut -d: -f2"
+  register: _phpfpm_port
+    
+- name: Copy cachetool config
+  template:
+    src: cachetool.j2
+    dest: /etc/cachetool.yml
+    owner: root
+    group: root
+    mode: '0644'

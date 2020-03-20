@@ -1,0 +1,6 @@
+adapter: fastcgi
+{% if _phpfpm_host.stdout|length and _phpfpm_port.stdout|length %}
+fastcgi: {{ _phpfpm_host.stdout }}:{{ _phpfpm_port.stdout }}
+{% else %}
+fastcgi: {{ opcache.host }}:{{ opcache.port }}
+{% endif %}

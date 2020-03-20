@@ -1,2 +1,5 @@
+---
+
 dependencies:
-- role: php-common
+  - role: user_deploy 
+  - role: php-fpm
