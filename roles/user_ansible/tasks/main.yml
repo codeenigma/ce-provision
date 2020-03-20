@@ -38,6 +38,7 @@
   fetch:
     src: "/home/{{ user_ansible.utility_username }}/.ssh/id_rsa.pub"
     dest: "{{ _ansible_provision_build_tmp_dir }}/authorized_keys"
+    flat: yes
   delegate_to: "{{ user_ansible.utility_host }}"
 
 - name: Copy public key to target.
