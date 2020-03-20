@@ -2,5 +2,5 @@
 # defaults file for opcache
 
 opcache:
-  host: '127.0.0.1'
-  port: '9072'
+  host: ''
+  port: ''
