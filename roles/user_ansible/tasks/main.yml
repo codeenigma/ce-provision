@@ -33,13 +33,17 @@
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
     mode: 0700
-- debug:
-    msg: "{{ user_ansible.utility_host }}"
-- name: Copy public key from utility server.
-  copy:
+
+- name: Fetch public key from utility server.
+  fetch:
     src: "/home/{{ user_ansible.utility_username }}/.ssh/id_rsa.pub"
+    dest: "{{ _ansible_provision_build_tmp_dir }}/authorized_keys"
+  delegate_to: "{{ user_ansible.utility_host }}"
+
+- name: Copy public key to target.
+  copy:
+    src: "{{ _ansible_provision_build_tmp_dir }}/authorized_keys"
     dest: "/home/{{ user_ansible.username }}/.ssh/authorized_keys"
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
     mode: 0644
-  delegate_to: "{{ user_ansible.utility_host }}"
