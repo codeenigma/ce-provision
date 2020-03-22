@@ -1,7 +1,6 @@
 ---
 
 dependencies:
-  - role: _init
   - role: _meta/common_base
   - role: firewall
   - role: ssh_server
@@ -13,4 +12,4 @@ dependencies:
   - role: php-cli
   - role: php-fpm
   - role: nginx
-  - role: _exit
+  

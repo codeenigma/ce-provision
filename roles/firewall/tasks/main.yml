@@ -21,14 +21,43 @@
   delegate_to: "localhost"
   delegate_facts: yes
 
+- name: Gather facts from the utility server.
+  setup:
+  delegate_to: "{{ user_deploy.utility_host }}"
+  delegate_facts: yes
+  when: 
+    - user_deploy is defined
+    - user_deploy.utility_host is defined
+    - not user_deploy.utility_host == 'localhost'
+
+- name: Gather allowed SSH hosts from inventory.
+  set_fact:
+    _firewall_allow_ssh: "{{ hostvars['localhost']['ansible_all_ipv4_addresses'] + ansible_all_ipv4_addresses + hostvars['localhost']['ansible_all_ipv6_addresses'] + ansible_all_ipv6_addresses }}"
+
+- name: Gather allowed SSH hosts from utility server.
+  set_fact:
+    _firewall_allow_ssh: "{{ _firewall_allow_ssh + hostvars[user_deploy.utility_host]['ansible_all_ipv4_addresses'] + hostvars[user_deploy.utility_host]['ansible_all_ipv6_addresses'] }}"
+  when: 
+    - user_deploy is defined
+    - user_deploy.utility_host is defined
+    - not user_deploy.utility_host == 'localhost'
+
+- name: Gather allowed SSH hosts from utility domain name.
+  set_fact:
+    _firewall_allow_ssh: "{{ _firewall_allow_ssh + lookup('dig', user_deploy.utility_host, 'qtype=A', wantlist=True) + lookup('dig', user_deploy.utility_host, 'qtype=AAAA', wantlist=True) }}"
+  when: 
+    - user_deploy is defined
+    - user_deploy.utility_host is defined
+    - not user_deploy.utility_host == 'localhost'
+
 - name: Add a rule to allow SSH from the provisioner (IPV4).
   ufw:
     from_ip: "{{ ip }}"
     to_port: "22"
     rule: allow
     proto: tcp
-    comment: Allow SSH from provisioner.
-  with_items: "{{ hostvars['localhost']['ansible_all_ipv4_addresses'] }}"
+    comment: Allow SSH from associated servers.
+  with_items: "{{ _firewall_allow_ssh }}"
   loop_control:
     loop_var: ip
 
@@ -39,7 +68,7 @@
     rule: allow
     proto: tcp
     comment: Allow SSH from provisioner.
-  with_items: "{{ hostvars['localhost']['ansible_all_ipv6_addresses'] }}"
+  with_items: "{{ hostvars['localhost']['ansible_all_ipv6_addresses'] + ansible_all_ipv6_addresses }}"
   loop_control:
     loop_var: ip
   when: firewall.ipv6

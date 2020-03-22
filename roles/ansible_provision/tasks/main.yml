@@ -27,7 +27,7 @@
 
 - name: Ensure Git is installed.
   apt:
-    pkg: "git"
+    pkg: ["git", "python-dnspython"]
     state: present
 
 - name: Ensure provision scripts are presents.
