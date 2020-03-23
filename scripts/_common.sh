@@ -57,7 +57,7 @@ parse_options(){
 
 # An ID for the build.
 get_build_id(){
-  BUILD_ID="$(echo "$TARGET_PROVISION_REPO-$TARGET_PROVISION_BRANCH-$TARGET_PROVISION_PLAYBOOK" | tr / -)"
+  BUILD_ID="$(echo "$TARGET_PROVISION_REPO-$TARGET_PROVISION_BRANCH-$TARGET_PROVISION_PLAYBOOK" | tr / - | tr : -)"
 }
 
 # Compute defaults variables.
