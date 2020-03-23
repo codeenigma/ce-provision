@@ -4,7 +4,7 @@
     user:
       name: root
       state: present
-      password: "{{ lookup('password', '/dev/null') | password_hash('sha512', lookup('password', '/dev/null')) }}"
+      password: "*"
 
   - name: Ensure /opt/bin directory exists.
     file:
