@@ -1,5 +1,20 @@
 ---
 
+  - name: Set "tracking" file for the playbook.
+    set_fact:
+      current_play_md5_file: "{{ _ansible_provision_build_id }}-{{ playbook_dir | basename }}"
+  
+  - name: Sanitize tracking file name.
+    set_fact:
+      current_play_md5_file: "{{ current_play_md5_file | regex_replace('[^A-z0-9]', '') }}"
+
+  - name: Make sure file exists.
+    local_action:  
+      module: copy
+      content: ""
+      dest: "{{ _ansible_provision_data_dir }}/{{ current_play_md5_file }}"
+      force: no
+  
   - name: Compute current playbook md5
     shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | sort -k 2 | md5sum'
     args:
@@ -8,13 +23,13 @@
     
   - name: Lookup current playbook md5
     set_fact:
-      previous_play_dir_md5: "{{ lookup('file', '{{ _ansible_provision_data_dir }}/{{ _ansible_provision_build_id }}' ) }}"
+      previous_play_dir_md5: "{{ lookup('file', '{{ _ansible_provision_data_dir }}/{{ current_play_md5_file }}' ) }}"
 
   - name: Store current playbook md5.
     local_action:  
       module: copy
       content: "{{ current_play_dir_md5.stdout }}"
-      dest: "{{ _ansible_provision_data_dir }}/{{ _ansible_provision_build_id }}"
+      dest: "{{ _ansible_provision_data_dir }}/{{ current_play_md5_file }}"
   
   - meta: end_play
     when: 
