@@ -1,5 +1,25 @@
 ---
 
+  - name: Compute current playbook md5
+    shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | sort -k 2 | md5sum'
+    args:
+      warn: no
+    register: current_play_dir_md5
+    
+  - name: Lookup current playbook md5
+    set_fact:
+      previous_play_dir_md5: "{{ lookup('file', '{{ _ansible_provision_data_dir }}/{{ _ansible_provision_build_id }}' ) }}"
+
+  - name: Store current playbook md5.
+    local_action:  
+      module: copy
+      content: "{{ current_play_dir_md5.stdout }}"
+      dest: "{{ _ansible_provision_data_dir }}/{{ _ansible_provision_build_id }}"
+  
+  - meta: end_play
+    when: 
+      - current_play_dir_md5.stdout == previous_play_dir_md5
+
   - name: Randomize root password.
     user:
       name: root

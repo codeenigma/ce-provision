@@ -13,6 +13,7 @@ ANSIBLE_EXTRA_VARS=""
 ANSIBLE_DEFAULT_EXTRA_VARS=""
 BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
+BUILD_ID=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
 fi
@@ -54,6 +55,11 @@ parse_options(){
   done
 }
 
+# An ID for the build.
+get_build_id(){
+  BUILD_ID="$(echo "$TARGET_PROVISION_REPO-$TARGET_PROVISION_BRANCH-$TARGET_PROVISION_PLAYBOOK" | tr / -)"
+}
+
 # Compute defaults variables.
 get_build_workspace(){
   BUILD_WORKSPACE=$(mktemp -d -p "$BUILD_WORKSPACE_BASE")
@@ -61,7 +67,8 @@ get_build_workspace(){
 
 # Common extra-vars to pass to Ansible.
 get_ansible_defaults_vars(){
-  ANSIBLE_DEFAULT_EXTRA_VARS="{_ansible_provision_base_dir: $OWN_DIR, _ansible_provision_build_dir: $BUILD_WORKSPACE, _ansible_provision_build_tmp_dir: $BUILD_TMP_DIR, _ansible_provision_data_dir: $ANSIBLE_DATA_DIR}"
+  get_build_id
+  ANSIBLE_DEFAULT_EXTRA_VARS="{_ansible_provision_base_dir: $OWN_DIR, _ansible_provision_build_dir: $BUILD_WORKSPACE, _ansible_provision_build_tmp_dir: $BUILD_TMP_DIR, _ansible_provision_data_dir: $ANSIBLE_DATA_DIR, _ansible_provision_build_id: $BUILD_ID}"
 }
 
 # Clone our target repo.
