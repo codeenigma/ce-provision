@@ -16,6 +16,10 @@ Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 ## ["Meta" roles that group individual roles together.](meta/README.md)
 
 ## [MariaDB Client](mysql_client/README.md)
+## [opcache](opcache/README.md)
+
+Installs and configures gordalina's cache tool: https://github.com/gordalina/cachetool
+
 ## [SSHD](ssh_server/README.md)
 
 <!--ENDTOC-->

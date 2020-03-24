@@ -28,6 +28,10 @@ Ansible roles and group of roles that constitute the deploy stack.
 ### ["Meta" roles that group individual roles together.](roles/meta/README.md)
 
 ### [MariaDB Client](roles/mysql_client/README.md)
+### [opcache](roles/opcache/README.md)
+
+Installs and configures gordalina's cache tool: https://github.com/gordalina/cachetool
+
 ### [SSHD](roles/ssh_server/README.md)
 
 ## [Contribute](contribute/README.md)
