@@ -16,7 +16,7 @@
       force: no
   
   - name: Compute current playbook md5
-    shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | sort -k 2 | md5sum'
+    shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
     args:
       warn: no
     delegate_to: 'localhost'
