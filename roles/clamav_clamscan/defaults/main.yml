@@ -3,6 +3,6 @@
 
 clamav_clamscan:
 
-  email: 'sysadm@codeenigma.com'
+  email: 'admins@example.com'
   schedule: '0 0 * * *'
   path: '/var/www'
