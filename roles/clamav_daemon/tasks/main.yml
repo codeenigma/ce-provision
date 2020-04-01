@@ -1,0 +1,22 @@
+---
+# tasks file for clamav
+
+- name: Ensure ClamAV packages are installed
+  apt:
+    pkg: ['clamav-daemon']
+    state: present
+    update_cache: yes
+    cache_valid_time: 240
+
+- name: Copy main ClamAV config
+  template:
+    src: "clamd.conf.j2"
+    dest: "/etc/clamav/clamd.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart clamav
+
+- pause:
+    minutes: 1 
