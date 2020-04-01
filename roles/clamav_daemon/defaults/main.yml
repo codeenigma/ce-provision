@@ -1,0 +1,7 @@
+---
+# defaults file for clamav
+
+clamav_daemon:
+
+  host: '127.0.0.1'
+  port: '3310'
