@@ -11,6 +11,7 @@
   template:
     src: "locale.gen.j2"
     dest: "/etc/locale.gen"
+  register: locales_gen_changed
 
 - name: Define default locale.
   template:
@@ -23,7 +24,8 @@
 
 - name: Generates locales.
   command: "/usr/sbin/locale-gen"
-
+  when: locales_gen_changed.changed
+  
 - name: Set timezone
   timezone:
     name: "{{ locales.timezone }}"
