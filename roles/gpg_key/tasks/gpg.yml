@@ -40,7 +40,7 @@
 
 - name: Publish GPG key to openpgp.org.
   command:
-    cmd: "gpg --keyserver hkps://keys.openpgp.org --send-keys {{ gpg_user.user_ansible_gpg_key_id.stdout }}"
+    cmd: "gpg --keyserver hkps://keys.openpgp.org --send-keys {{ user_ansible_gpg_key_id.stdout }}"
   become: yes
   become_user: "{{ gpg_user.username }}"
   when: 
