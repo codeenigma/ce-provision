@@ -1,11 +1,22 @@
 ---
 
-user_deploy:
+_user_deploy:
   # This sets both username and main group.
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
+
+user_deploy:
+  # This sets both username and main group.
+  username: "{{ _user_deploy.username }}"
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
   sudoer: no
   # List of additional groups to add the user to.
   groups: ''
+  gpg:
+    generate: yes
+    publish: yes
+    key_type: 'RSA'
+    key_length: 4096
+    email: "{{ _user_deploy.username }}@{{ domain_name }}"
+    expire: 0
