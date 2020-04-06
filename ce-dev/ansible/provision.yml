@@ -15,4 +15,4 @@
     - domain_name: provision-target.local
   tasks:
     - import_role:
-        name: nginx
+        name: user_deploy

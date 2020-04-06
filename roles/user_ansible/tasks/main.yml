@@ -48,3 +48,7 @@
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
     mode: 0644
+
+- name: Generate GPG key.
+  include_tasks: gpg.yml
+  when: user_ansible.gpg.generate
