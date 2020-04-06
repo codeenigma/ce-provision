@@ -14,9 +14,9 @@ NOTE: This approach will not install clamd. Check the clamav_daemon role if this
 
 clamav_clamscan:
 
-  email: 'admins@example.com'
-  schedule: '0 0 * * *'
-  path: '/var/www'
+email: 'admins@example.com'
+schedule: '0 0 * * *'
+path: '/var/www'
 
 ```
 

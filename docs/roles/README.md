@@ -5,10 +5,16 @@ Ansible roles and group of roles that constitute the deploy stack.
 ### [Amazon credentials](aws/aws_credentials/README.md)
 Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 
+## [ClamAV Clamscan](clamav_clamscan/README.md)
+
+## [ClamAV Daemon](clamav_daemon/README.md)
+
 ## [UFW Firewall](firewall/README.md)
 
 ## [Gitlab](gitlab/README.md)
 
+## [GPG Key](gpg_key/README.md)
+Generates a passwordless GPG key for a given user or users.
 ## [HA Proxy](haproxy/README.md)
 
 ## [Jenkins](jenkins/README.md)

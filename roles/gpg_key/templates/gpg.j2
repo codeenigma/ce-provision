@@ -1,0 +1,9 @@
+%echo Generating OpenPGP key
+%no-protection
+Key-Type: {{ gpg_user.key_type }}
+Key-Length: {{ gpg_user.key_length }}
+Name-Email: {{ gpg_user.email }}
+Expire-Date: {{ gpg_user.expire }}
+%no-ask-passphrase
+%commit
+%echo done

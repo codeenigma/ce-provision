@@ -17,10 +17,16 @@ While you can re-use/fork roles or call playbooks directly from your deployment 
 ## [Roles](roles/README.md)
 Ansible roles and group of roles that constitute the deploy stack.
 ### [AWS tools roles](roles/aws/README.md)
+### [ClamAV Clamscan](roles/clamav_clamscan/README.md)
+
+### [ClamAV Daemon](roles/clamav_daemon/README.md)
+
 ### [UFW Firewall](roles/firewall/README.md)
 
 ### [Gitlab](roles/gitlab/README.md)
 
+### [GPG Key](roles/gpg_key/README.md)
+Generates a passwordless GPG key for a given user or users.
 ### [HA Proxy](roles/haproxy/README.md)
 
 ### [Jenkins](roles/jenkins/README.md)
