@@ -1,9 +1,0 @@
-%echo Generating OpenPGP key
-%no-protection
-Key-Type: {{ user_ansible.gpg.key_type }}
-Key-Length: {{ user_ansible.gpg.key_length }}
-Name-Email: {{ user_ansible.gpg.email }}
-Expire-Date: {{ user_ansible.gpg.expire }}
-%no-ask-passphrase
-%commit
-%echo done

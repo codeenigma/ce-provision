@@ -1,20 +1,10 @@
 ---
 
-_user_provision:
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
-
 user_provision:
   # This sets both username and main group.
-  username: "{{ _user_provision.username }}"
+  username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
   # Local username of the system user.
   utility_host: "localhost"
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
   sudoer: yes
   groups: ''
-  gpg:
-    generate: yes
-    publish: no
-    key_type: 'RSA'
-    key_length: 4096
-    email: "{{ _user_provision.username }}@{{ domain_name }}"
-    expire: 0
