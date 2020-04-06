@@ -49,7 +49,7 @@
 
 - name: Publish GPG key to mit.edu.
   command:
-    cmd: "gpg --keyserver hkps://pgp.mit.edu --send-keys {{ gpg_user.user_ansible_gpg_key_id.stdout }}"
+    cmd: "gpg --keyserver hkps://pgp.mit.edu --send-keys {{ user_ansible_gpg_key_id.stdout }}"
   become: yes
   become_user: "{{ gpg_user.username }}"
   when: 
