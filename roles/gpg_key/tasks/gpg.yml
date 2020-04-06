@@ -19,8 +19,6 @@
   template:
     src: "gpg.j2"
     dest: "/tmp/gpg-{{ gpg_user.username }}"
-  become: yes
-  become_user: "{{ gpg_user.username }}"
   when: not user_ansible_gpg_key_exists.stdout
 
 - name: Generate GPG key.
