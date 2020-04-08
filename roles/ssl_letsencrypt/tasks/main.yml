@@ -47,11 +47,6 @@
   when: 
     - not letsencrypt_cert.stat.exists
 
-- name: Create cron entry for LetsEncrypt.
-  template:
-    src: "cron.j2"
-    dest: "/etc/cron.daily/letsencrypt-{{ ssl.domain }}"
-
 - name: Add key/cert pairs to know paths information.
   set_fact:
     _ssl_paths: "{{ _ssl_paths | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
