@@ -30,6 +30,19 @@
     pkg: ["git", "python-dnspython"]
     state: present
 
+# This is needed for "pushing" in certain cases.
+- name: Setup Git identity.
+  command:
+    cmd: "git config --global user.name {{ ansible_provision.username }}"
+  become: yes
+  become_user: "{{ ansible_provision.username }}"
+
+- name: Setup Git identity email.
+  command:
+    cmd: "git config --global user.email {{ ansible_provision.username }}@{{ domain_name }}"
+  become: yes
+  become_user: "{{ ansible_provision.username }}"
+
 - name: Ensure provision scripts are presents.
   git:
     repo: "{{ ansible_provision.own_repository | default('https://github.com/codeenigma/ansible-provision.git')}}"
