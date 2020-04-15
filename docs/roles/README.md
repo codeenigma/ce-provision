@@ -2,9 +2,16 @@
 Ansible roles and group of roles that constitute the deploy stack.
 <!--TOC-->
 ## [AWS tools roles](aws/README.md)
+### [AMI Debian Buster](aws/ami_debian_buster/README.md)
+Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+
 ### [Amazon credentials](aws/aws_credentials/README.md)
 Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 
+### [AMI Debian Buster](aws/aws_ec2_with_eip/README.md)
+Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
+Creates a key pair for the current "provision user"
 ## [ClamAV Clamscan](clamav_clamscan/README.md)
 
 ## [ClamAV Daemon](clamav_daemon/README.md)
