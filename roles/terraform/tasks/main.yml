@@ -1,0 +1,8 @@
+---
+
+- name: Fetch and extract Terraform zip.
+  unarchive:
+    src: "https://releases.hashicorp.com/terraform/{{ terraform.version }}/terraform_{{ terraform.version }}_linux_amd64.zip"
+    dest: /usr/local/bin/
+    remote_src: yes
+    mode: 0755
