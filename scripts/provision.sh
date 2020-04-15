@@ -14,6 +14,7 @@ usage(){
   echo 'Available options:'
   echo '--ansible-extra-vars: Variable to pass as --extra-vars arguments to ansible-playbook. Make sure to escape them properly.'
   echo '--workspace: a local existing clone of the repo/branch (if your deployment tool already has one). This will skip the cloning/fetching of the repo.'
+  echo '--force: bypass the md5 checks on playbooks and play them regardless.'
 }
 
 # Common processing.

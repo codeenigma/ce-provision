@@ -29,7 +29,8 @@
   - meta: end_play
     when: 
       - current_play_dir_md5.stdout == previous_play_dir_md5
-
+      - not _ansible_provision_force_play
+      
   - name: Randomize root password.
     user:
       name: root
