@@ -49,6 +49,12 @@
     dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
+- name: Init Terraform.
+  command:
+    cmd: terraform init
+    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+  when: not aws_ec2_with_eip_instances_eip.addresses
+
 - name: Create EIP with Terraform if we don't have one.
   command:
     cmd: terraform apply -auto-approve
