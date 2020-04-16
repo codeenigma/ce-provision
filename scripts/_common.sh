@@ -2,7 +2,7 @@
 
 set -eu
 
-export ANSIBLE_FORCE_COLOR=true
+export ANSIBLE_FORCE_COLOR=True
 export ANSIBLE_CONFIG="$OWN_DIR/ansible.cfg"
 
 # Default variables.
