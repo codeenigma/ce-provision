@@ -94,8 +94,7 @@
 
 - name: Download Jenkins CLI
   get_url:
-    url: "https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
-    validate_certs: no
+    url: "https://{{ jenkins.server_name }}/jnlpJars/jenkins-cli.jar"
     dest: /opt/jenkins-cli.jar
 
 - name: Set Jenkins update cronjob
@@ -141,7 +140,7 @@
     timeout: "30"
     updates_expiration: "86400"
     updates_url: "https://updates.jenkins.io"
-    url: "https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}"
+    url: "https://{{ jenkins.server_name }}"
     validate_certs: "no"
     with_dependencies: "yes"
   with_items: "{{ jenkins.plugins }}"
