@@ -94,7 +94,7 @@
 
 - name: Download Jenkins CLI
   get_url:
-    url: "https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
+    url: "https://{{ jenkins.server_name }}/jnlpJars/jenkins-cli.jar"
     validate_certs: no
     dest: /opt/jenkins-cli.jar
 
