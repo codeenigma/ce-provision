@@ -7,8 +7,6 @@ Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 
 ## [ClamAV Clamscan](clamav_clamscan/README.md)
 
-## [ClamAV Daemon](clamav_daemon/README.md)
-
 ## [UFW Firewall](firewall/README.md)
 
 ## [Gitlab](gitlab/README.md)
