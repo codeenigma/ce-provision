@@ -1,0 +1,7 @@
+#!/bin/bash
+
+USER="{{ jenkins.user }}"
+PORT="{{ jenkins.sshport }}"
+HOST="{{ jenkins.sshhost }}"
+
+ssh -l $USER -p $PORT $HOST safe-restart

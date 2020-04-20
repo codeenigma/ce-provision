@@ -1,0 +1,24 @@
+#!/bin/bash
+
+USER="{{ jenkins.user }}"
+PORT="{{ jenkins.sshport }}"
+HOST="{{ jenkins.sshhost }}"
+UPDATING=1
+
+ssh -l $USER -p $PORT $HOST quiet-down
+for PLUGIN in $(ssh -l $USER -p $PORT $HOST list-plugins | egrep "\)$" | awk '{print $1}'); do
+  UPDATING=0
+  echo "Updating plugin $PLUGIN..."
+  ssh -l $USER -p $PORT $HOST install-plugin $PLUGIN
+  if [ $? -ne 0 ]; then
+    echo "Jenkins might be restarting already, or some other problem installing the plugin.. we'll sleep and try again..."
+    sleep 30
+    ssh -l $USER -p $PORT $HOST install-plugin $PLUGIN
+  fi
+done
+ssh -l $USER -p $PORT $HOST cancel-quiet-down
+if [ $UPDATING -eq 0 ]; then
+  echo "Attempting a safe restart now that plugins are updated..."
+  ssh -l $USER -p $PORT $HOST safe-restart
+fi
+

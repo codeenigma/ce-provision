@@ -14,8 +14,6 @@ Creates an image from Debian Buster base with Packer, provisioned with an Ansibl
 Creates a key pair for the current "provision user"
 ## [ClamAV Clamscan](clamav_clamscan/README.md)
 
-## [ClamAV Daemon](clamav_daemon/README.md)
-
 ## [UFW Firewall](firewall/README.md)
 
 ## [Gitlab](gitlab/README.md)
