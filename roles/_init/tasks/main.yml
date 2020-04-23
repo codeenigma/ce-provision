@@ -2,7 +2,7 @@
 
   - name: Set "tracking" file for the playbook.
     set_fact:
-      current_play_md5_file: "{{ _ansible_provision_build_id }}-{{ playbook_dir | basename }}"
+      current_play_md5_file: "{{ _ansible_provision_build_id }}-{{ playbook_dir | basename }}-{{ inventory_hostname }}"
   
   - name: Sanitize tracking file name.
     set_fact:
