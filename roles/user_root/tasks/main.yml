@@ -4,4 +4,4 @@
   user:
     name: root
     state: present
-    password: "*"
+    password: "{{ lookup('password', '/dev/null') | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
