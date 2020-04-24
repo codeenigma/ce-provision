@@ -31,12 +31,6 @@
       - current_play_dir_md5.stdout == previous_play_dir_md5
       - not _ansible_provision_force_play
 
-  # - name: Randomize root password.
-  #   user:
-  #     name: root
-  #     state: present
-  #     password: "*"
-
   # - name: Ensure /opt/bin directory exists.
   #   file:
   #     path: "/opt/bin"
