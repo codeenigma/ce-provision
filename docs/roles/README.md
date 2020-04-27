@@ -12,7 +12,11 @@ Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
 ### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
 Creates a key pair for the current "provision user"
+### [VPC](aws/aws_vpc_with_subnets/README.md)
+Creates a VPC and associated subnets.
 ## [ClamAV Clamscan](clamav_clamscan/README.md)
+
+## [ClamAV Daemon](clamav_daemon/README.md)
 
 ## [UFW Firewall](firewall/README.md)
 

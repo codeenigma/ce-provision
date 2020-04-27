@@ -19,6 +19,8 @@ Ansible roles and group of roles that constitute the deploy stack.
 ### [AWS tools roles](roles/aws/README.md)
 ### [ClamAV Clamscan](roles/clamav_clamscan/README.md)
 
+### [ClamAV Daemon](roles/clamav_daemon/README.md)
+
 ### [UFW Firewall](roles/firewall/README.md)
 
 ### [Gitlab](roles/gitlab/README.md)
