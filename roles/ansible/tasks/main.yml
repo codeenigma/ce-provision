@@ -13,6 +13,6 @@
 
 - name: Ensure Ansible is installed.
   apt:
-    pkg: "ansible"
+    pkg: ["ansible", "ansible-lint"]
     state: latest
     update_cache: yes
