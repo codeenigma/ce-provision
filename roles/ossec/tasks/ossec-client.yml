@@ -1,0 +1,16 @@
+---
+# tasks file for ossec-client
+
+- name: Ensure OSSEC is installed.
+  apt:
+    pkg: ['ossec-hids-agent']
+    state: present
+    update_cache: yes
+
+- name: Set logrotate file
+  copy:
+    src: "ossec-client-logrotate"
+    dest: "/etc/logrotate.d/ossec-client"
+    owner: root
+    group: root
+    mode: 0644

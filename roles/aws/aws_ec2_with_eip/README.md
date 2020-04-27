@@ -19,6 +19,7 @@ aws_ec2_with_eip:
   state: running
   instance_name: "{{ domain_name }}"
   root_volume_size: 80
+  security_groups: []
   tags:
     Name: "{{ domain_name }}"
 ```
