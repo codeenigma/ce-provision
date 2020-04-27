@@ -1,0 +1,27 @@
+---
+# tasks file for ossec
+
+- name: Add repository key for OSSEC.
+  apt_key: url=https://www.atomicorp.com/RPM-GPG-KEY.atomicorp.txt state=present
+
+- name: Add repository for OSSEC.
+  apt_repository: repo='deb https://updates.atomicorp.com/channels/atomic/debian buster main' state=present
+
+- name: Install OSSEC Server
+  include_tasks: ossec-server.yml
+  when: not ossec.client
+
+- name: Install OSSEC Client
+  include_tasks: ossec-client.yml
+  when: ossec.client
+
+- name: Copy OSSEC configuration 
+  template:
+    src: ossec.conf.j2
+    dest: "/var/ossec/etc/ossec.conf"
+    owner: root
+    group: ossec
+    mode: 0440
+  notify: restart ossec
+
+

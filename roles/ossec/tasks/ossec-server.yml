@@ -1,0 +1,34 @@
+---
+# tasks file for ossec-server
+
+- name: Ensure OSSEC is installed.
+  apt:
+    pkg: ['ossec-hids-server']
+    state: present
+    update_cache: yes
+
+- name: Set ossec-watchdog cron
+  copy:
+    src: "ossec-watchdog-cron"
+    dest: "/etc/cron.d/ossec_watchdog"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Set ossec-watchdog script
+  template:
+    src: "ossec_watchdog.j2"
+    dest: "/usr/local/bin/ossec-watchdog"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy OSSEC rules
+  copy:
+    src: "{{ item }}"
+    dest: "/var/ossec/rules/"
+    owner: root
+    group: ossec
+    mode: 0550
+  with_fileglob: "*_rules.xml"
+  notify: restart ossec

@@ -19,6 +19,7 @@ vpc_subnet_id: subnet-xxx
 state: running
 instance_name: "{{ domain_name }}"
 root_volume_size: 80
+security_groups: []
 tags:
 Name: "{{ domain_name }}"
 ```
