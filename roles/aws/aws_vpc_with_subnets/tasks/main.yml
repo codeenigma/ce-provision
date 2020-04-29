@@ -16,3 +16,10 @@
   with_items: "{{ aws_vpc_with_subnets.subnets }}"
   loop_control:
     loop_var: subnet
+
+- name: Create VPC Security groups.
+  include_tasks:
+    file: "security_group.yml"
+  with_items: "{{ aws_vpc_with_subnets.security_groups }}"
+  loop_control:
+    loop_var: security_group
