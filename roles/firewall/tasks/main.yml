@@ -56,19 +56,20 @@
 
 - name: Gather allowed SSH hosts from utility domain name (IPV4).
   set_fact:
-    _firewall_allow_ssh_ipv4: "{{ _firewall_allow_ssh_ipv4 + lookup('dig', user_deploy.utility_host, 'qtype=A', wantlist=True) }}"
+    _firewall_allow_ssh_ipv4: "{{ _firewall_allow_ssh_ipv4 + [ hostvars[inventory_hostname]['public_ip_address'] ] }}"
   when: 
     - user_deploy is defined
     - user_deploy.utility_host is defined
     - not user_deploy.utility_host == 'localhost'
+    - hostvars[inventory_hostname]['public_ip_address'] is defined
 
-- name: Gather allowed SSH hosts from utility domain name (IPV6).
-  set_fact:
-    _firewall_allow_ssh_ipv6: "{{ _firewall_allow_ssh_ipv6 + lookup('dig', user_deploy.utility_host, 'qtype=AAAA', wantlist=True) }}"
-  when: 
-    - user_deploy is defined
-    - user_deploy.utility_host is defined
-    - not user_deploy.utility_host == 'localhost'
+# - name: Gather allowed SSH hosts from utility domain name (IPV6).
+#   set_fact:
+#     _firewall_allow_ssh_ipv6: "{{ _firewall_allow_ssh_ipv6 + lookup('dig', user_deploy.utility_host, 'qtype=AAAA', wantlist=True) }}"
+#   when: 
+#     - user_deploy is defined
+#     - user_deploy.utility_host is defined
+#     - not user_deploy.utility_host == 'localhost'
 
 - name: Add a rule to allow SSH from known hosts (IPV4).
   ufw:

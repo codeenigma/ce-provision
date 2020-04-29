@@ -9,6 +9,7 @@ This role will install the ClamAV daemon. If you want to install clamscan and ge
 ## Default variables
 ```yaml
 ---
+# defaults file for clamav
 
 clamav_daemon:
 

@@ -2,6 +2,7 @@
 
 dependencies:
   - role: locales
+  - role: user_root
   - role: apt_extra_packages
   - { role: apt_extra_packages, apt_extra_packages: ['rsync'] }
   - role: rkhunter

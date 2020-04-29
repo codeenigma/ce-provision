@@ -1,0 +1,16 @@
+---
+
+- name: Generate Packer template.
+  template:
+    src: packer.json.j2
+    dest: "{{ _ansible_provision_build_tmp_dir }}/packer.json"
+
+- name: Inspect Packer configuration.
+  command:
+    cmd: "packer inspect {{ _ansible_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ansible_provision_base_dir }}"
+
+- name: Build AMI.
+  command:
+    cmd: "packer build {{ _ansible_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ansible_provision_base_dir }}"

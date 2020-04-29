@@ -1,0 +1,72 @@
+---
+
+- name: Gather AMI image from name.
+  ec2_ami_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    owners: self
+    filters:
+      name: "{{ aws_ec2_with_eip.ami_name }}"
+  register: aws_ec2_with_eip_image
+
+- name: Register latest AMI image.
+  set_fact: 
+    aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
+
+- name: Create EC2 instance.
+  ec2_instance:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    key_name: "{{ aws_ec2_with_eip.key_name }}"
+    instance_type: "{{ aws_ec2_with_eip.instance_type }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
+    state: "{{ aws_ec2_with_eip.state }}"
+    wait: yes
+    vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
+    name: "{{ aws_ec2_with_eip.instance_name }}"
+    tags: "{{ aws_ec2_with_eip.tags }}"
+    security_groups: "{{ aws_ec2_with_eip.security_groups }}"
+    volumes:
+      - device_name: /dev/xvda
+        ebs:
+          volume_size: "{{ aws_ec2_with_eip.root_volume_size }}"
+          delete_on_termination: true
+  register: aws_ec2_with_eip_instances
+
+- name: Check if we have an existing EIP.
+  ec2_eip_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    filters:
+      tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
+  register: aws_ec2_with_eip_instances_eip
+- debug:
+    msg: "{{ aws_ec2_with_eip_instances_eip }}"
+
+- name: Generate Terraform template.
+  template:
+    src: eip.tf.j2
+    dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
+  when: not aws_ec2_with_eip_instances_eip.addresses
+
+- name: Init Terraform.
+  command:
+    cmd: terraform init
+    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+  when: not aws_ec2_with_eip_instances_eip.addresses
+
+- name: Create EIP with Terraform if we don't have one.
+  command:
+    cmd: terraform apply -auto-approve
+    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+  when: not aws_ec2_with_eip_instances_eip.addresses
+
+#@todo Deletion.
+- name: Associate Elastic IP.
+  ec2_eip:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
+    in_vpc: yes
+    tag_name: Name
+    tag_value: "{{ aws_ec2_with_eip.instance_name }}"

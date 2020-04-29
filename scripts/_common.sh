@@ -2,7 +2,7 @@
 
 set -eu
 
-export ANSIBLE_FORCE_COLOR=true
+export ANSIBLE_FORCE_COLOR=True
 export ANSIBLE_CONFIG="$OWN_DIR/ansible.cfg"
 
 # Default variables.
@@ -14,6 +14,7 @@ ANSIBLE_DEFAULT_EXTRA_VARS=""
 BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
+FORCE_PLAY="no"
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
 fi
@@ -46,6 +47,9 @@ parse_options(){
           shift
           BUILD_WORKSPACE="$1"
         ;;
+      "--force")
+          FORCE_PLAY="yes"
+        ;;
         *)
         usage
         exit 1
@@ -68,7 +72,7 @@ get_build_workspace(){
 # Common extra-vars to pass to Ansible.
 get_ansible_defaults_vars(){
   get_build_id
-  ANSIBLE_DEFAULT_EXTRA_VARS="{_ansible_provision_base_dir: $OWN_DIR, _ansible_provision_build_dir: $BUILD_WORKSPACE, _ansible_provision_build_tmp_dir: $BUILD_TMP_DIR, _ansible_provision_data_dir: $ANSIBLE_DATA_DIR, _ansible_provision_build_id: $BUILD_ID}"
+  ANSIBLE_DEFAULT_EXTRA_VARS="{_ansible_provision_base_dir: $OWN_DIR, _ansible_provision_build_dir: $BUILD_WORKSPACE, _ansible_provision_build_tmp_dir: $BUILD_TMP_DIR, _ansible_provision_data_dir: $ANSIBLE_DATA_DIR, _ansible_provision_build_id: $BUILD_ID, _ansible_provision_force_play: $FORCE_PLAY}"
 }
 
 # Clone our target repo.

@@ -10,11 +10,13 @@ NOTE: This approach will not install clamd. Check the clamav_daemon role if this
 ## Default variables
 ```yaml
 ---
+# defaults file for clamav
 
 clamav_clamscan:
 
   email: 'admins@example.com'
   schedule: '0 0 * * *'
+  path: '/var/www'
 
 ```
 

@@ -1,0 +1,25 @@
+---
+
+- name: Create VPC.
+  ec2_vpc_net:
+    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
+    name: "{{ aws_vpc_with_subnets.name }}"
+    cidr_block: "{{ aws_vpc_with_subnets.cidr_block }}"
+    region: "{{ aws_vpc_with_subnets.region }}"
+    tags: "{{ aws_vpc_with_subnets.tags }}"
+    state: "{{ aws_vpc_with_subnets.state }}"
+  register: _ec2_vpc_created
+    
+- name: Create VPC subnets.
+  include_tasks:
+    file: "subnet.yml"
+  with_items: "{{ aws_vpc_with_subnets.subnets }}"
+  loop_control:
+    loop_var: subnet
+
+- name: Create VPC Security groups.
+  include_tasks:
+    file: "security_group.yml"
+  with_items: "{{ aws_vpc_with_subnets.security_groups }}"
+  loop_control:
+    loop_var: security_group

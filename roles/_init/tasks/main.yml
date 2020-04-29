@@ -2,7 +2,7 @@
 
   - name: Set "tracking" file for the playbook.
     set_fact:
-      current_play_md5_file: "{{ _ansible_provision_build_id }}-{{ playbook_dir | basename }}"
+      current_play_md5_file: "{{ _ansible_provision_build_id }}-{{ playbook_dir | basename }}-{{ inventory_hostname }}"
   
   - name: Sanitize tracking file name.
     set_fact:
@@ -25,27 +25,16 @@
   - name: Lookup current playbook md5
     set_fact:
       previous_play_dir_md5: "{{ lookup('file', '{{ _ansible_provision_data_dir }}/{{ current_play_md5_file }}' ) }}"
-
-  - name: Store current playbook md5.
-    local_action:  
-      module: copy
-      content: "{{ current_play_dir_md5.stdout }}"
-      dest: "{{ _ansible_provision_data_dir }}/{{ current_play_md5_file }}"
   
   - meta: end_play
     when: 
       - current_play_dir_md5.stdout == previous_play_dir_md5
+      - not _ansible_provision_force_play
 
-  - name: Randomize root password.
-    user:
-      name: root
-      state: present
-      password: "*"
-
-  - name: Ensure /opt/bin directory exists.
-    file:
-      path: "/opt/bin"
-      state: directory
+  # - name: Ensure /opt/bin directory exists.
+  #   file:
+  #     path: "/opt/bin"
+  #     state: directory
   
   - name: Clone custom extra directory.
     local_action:
