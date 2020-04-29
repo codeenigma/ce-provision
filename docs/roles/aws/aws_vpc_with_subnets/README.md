@@ -23,7 +23,15 @@ cidr: "10.0.0.0/24"
 state: present
 assign_instances_ipv6: no
 security_groups:
-- name: example-vpc-2 - web open
+- name: web - open
+description: Allow all incoming traffic on ports 80 and 443
+rules:
+- proto: tcp
+ports:
+- 80
+- 443
+cidr_ip: 0.0.0.0/0
+rule_desc: Allow all incoming traffic on ports 80 and 443
 ```
 
 <!--ENDROLEVARS-->
