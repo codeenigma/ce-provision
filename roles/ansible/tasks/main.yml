@@ -18,6 +18,6 @@
     update_cache: yes
 
 - name: Install ansible-lint.
-  apt:
-    command: pip install ansible-lint
+  command:
+    cmd: pip install ansible-lint
   become: no
