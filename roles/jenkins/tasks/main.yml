@@ -106,18 +106,18 @@
     line: "{{ jenkins.schedule }} {{ jenkins.user }}  /usr/local/bin/jenkins-cert-renewal 2> /dev/null"
     insertafter: EOF
 
-- name: Install or Update Jenkins plugins
-  jenkins_plugin:
-    name: "{{ item }}"
-    jenkins_home: "/var/lib/jenkins"
-    url_username: "{{ jenkins.adminuser }}"
-    url_password: "{{ jenkins.adminpass }}"
-    state: "present"
-    timeout: "30"
-    updates_expiration: "86400"
-    updates_url: "https://updates.jenkins.io"
-    url: "https://{{ jenkins.server_name }}"
-    validate_certs: "no"
-    with_dependencies: "yes"
-  with_items: "{{ jenkins.plugins }}"
-  notify: restart jenkins
+# - name: Install or Update Jenkins plugins
+#   jenkins_plugin:
+#     name: "{{ item }}"
+#     jenkins_home: "/var/lib/jenkins"
+#     url_username: "{{ jenkins.adminuser }}"
+#     url_password: "{{ jenkins.adminpass }}"
+#     state: "present"
+#     timeout: "30"
+#     updates_expiration: "86400"
+#     updates_url: "https://updates.jenkins.io"
+#     url: "https://{{ jenkins.server_name }}"
+#     validate_certs: "no"
+#     with_dependencies: "yes"
+#   with_items: "{{ jenkins.plugins }}"
+#   notify: restart jenkins
