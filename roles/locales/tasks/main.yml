@@ -29,3 +29,4 @@
 - name: Set timezone
   timezone:
     name: "{{ locales.timezone }}"
+  when: not is_local is defined or not is_local
