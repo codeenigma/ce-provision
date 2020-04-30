@@ -4,7 +4,7 @@
   apt_key: url=https://pkg.jenkins.io/debian/jenkins.io.key state=present
   
 - name: Add repository for Jenkins.
-  apt_repository: repo='deb http://pkg.jenkins.io/debian-stable binary/' state=present
+  apt_repository: repo='deb https://pkg.jenkins.io/debian-stable binary/' state=present
 
 - name: Ensure Jenkins is installed.
   apt:
