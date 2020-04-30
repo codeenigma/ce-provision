@@ -92,48 +92,23 @@
     minutes: 1
   when: not secinit.stat.exists
 
-- name: Download Jenkins CLI
-  get_url:
-    url: "https://{{ jenkins.server_name }}/jnlpJars/jenkins-cli.jar"
-    validate_certs: no
-    dest: /opt/jenkins-cli.jar
-
-- name: Set Jenkins update cronjob
-  template:
-    src: "jenkins-cron.j2"
-    dest: "/etc/cron.d/jenkins_cron"
-    owner: root
-    group: root
-    mode: 0644
-
-- name: Set Jenkins cert renewal cronjob
+- name: Install Jenkins cert renewal script
   template:
     src: "jenkins-cert-renewal.j2"
-    dest: "/etc/cron.d/jenkins-cert-renewal"
+    dest: "/usr/local/bin/jenkins-cert-renewal"
     owner: root
     group: root
-    mode: 0644
+    mode: 0775
 
-- name: Copy Jenkins plugin update script
-  template:
-    src: "jenkins-plugin-update.j2"
-    dest: "/usr/local/bin/jenkins-plugin-update"
-    owner: "{{ jenkins.user }}"
-    group: "{{ jenkins.user }}"
-    mode: 0700
-
-- name: Copy Jenkins safe restart script
-  template:
-    src: "jenkins-safe-restart.j2"
-    dest: "/usr/local/bin/jenkins-safe-restart"
-    owner: "{{ jenkins.user }}"
-    group: "{{ jenkins.user }}"
-    mode: 0700
+- name: Add Jenkins cert renewal job
+  lineinfile:
+    path: '/etc/cron.d/certbot'
+    line: "{{ jenkins.schedule }} {{ jenkins.user }}  /usr/local/bin/jenkins-cert-renewal 2> /dev/null"
+    insertafter: EOF
 
 - name: Install or Update Jenkins plugins
   jenkins_plugin:
     name: "{{ item }}"
-    #version: "{{ default(omit) }}"
     jenkins_home: "/var/lib/jenkins"
     url_username: "{{ jenkins.adminuser }}"
     url_password: "{{ jenkins.adminpass }}"
