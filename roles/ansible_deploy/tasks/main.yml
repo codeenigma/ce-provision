@@ -48,7 +48,7 @@
 - name: Synchronize config directory.
   synchronize:
     src: "{{ _ansible_provision_build_tmp_dir }}/config"
-    dest: "{{ ansible_deploy.local_dir }}/config"
+    dest: "{{ ansible_deploy.local_dir }}/"
     delete: yes
     rsync_opts:
       - "--chown={{ ansible_deploy.username }}:{{ ansible_deploy.username }}"
