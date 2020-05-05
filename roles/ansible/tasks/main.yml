@@ -14,8 +14,8 @@
 - name: Ensure Ansible is installed.
   apt:
     pkg: ["ansible", "python-pip"]
-    state: latest
-  update_cache: yes
+    state: present
+    update_cache: yes
 
 - name: Install ansible-lint.
   command:
