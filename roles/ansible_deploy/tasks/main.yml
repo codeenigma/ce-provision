@@ -40,9 +40,18 @@
   git:
     repo: "{{ ansible_deploy.config_repository }}"
     accept_hostkey: yes
-    dest: "{{ ansible_deploy.local_dir }}/config"
-  become: yes
-  become_user: "{{ ansible_deploy.username }}"
+    dest: "{{ _ansible_provision_build_tmp_dir }}/config"
+  become: no
+  delegate_to: localhost
+  when: ansible_deploy.config_repository is defined and ansible_deploy.config_repository
+
+- name: Synchronize config directory.
+  synchronize:
+    src: "{{ _ansible_provision_build_tmp_dir }}/config"
+    dest: "{{ ansible_deploy.local_dir }}/"
+    delete: yes
+    rsync_opts:
+      - "--chown={{ ansible_deploy.username }}:{{ ansible_deploy.username }}"
   when: ansible_deploy.config_repository is defined and ansible_deploy.config_repository
 
 - name: Check if we have a config directory.

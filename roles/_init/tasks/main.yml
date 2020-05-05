@@ -31,10 +31,10 @@
       - current_play_dir_md5.stdout == previous_play_dir_md5
       - not _ansible_provision_force_play
 
-  # - name: Ensure /opt/bin directory exists.
-  #   file:
-  #     path: "/opt/bin"
-  #     state: directory
+  - name: Ensure /opt/bin directory exists.
+    file:
+      path: "/opt/bin"
+      state: directory
   
   - name: Clone custom extra directory.
     local_action:
