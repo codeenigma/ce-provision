@@ -10,7 +10,7 @@
 - name: Copy MySQL overriding configuration in place.
   template:
     src: mysql_dev.cnf.j2
-    dest: "/etc/mysql/mysql.conf.d/zz_dev.cnf"
+    dest: "/etc/mysql/conf.d/zz_dev.cnf"
     owner: root
     group: root
     mode: 0644
