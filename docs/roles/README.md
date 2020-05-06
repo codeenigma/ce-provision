@@ -1,6 +1,13 @@
 # Roles
 Ansible roles and group of roles that constitute the deploy stack.
 <!--TOC-->
+## [Ansible](ansible/README.md)
+## [ansible-deploy](ansible_deploy/README.md)
+Installs Code Enigma's deploy stack on a server.
+## [ansible-provision](ansible_provision/README.md)
+Installs Code Enigma's infrastructure management stack on a server.
+## [Extra packages](apt_extra_packages/README.md)
+Provides a wrapper for installing packages through apt.
 ## [AWS tools roles](aws/README.md)
 ### [AMI Debian Buster](aws/ami_debian_buster/README.md)
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
@@ -14,6 +21,8 @@ Creates an image from Debian Buster base with Packer, provisioned with an Ansibl
 Creates a key pair for the current "provision user"
 ### [VPC](aws/aws_vpc_with_subnets/README.md)
 Creates a VPC and associated subnets.
+## [Extra packages](ce_dev/README.md)
+Provides a wrapper for installing packages through apt.
 ## [ClamAV Clamscan](clamav_clamscan/README.md)
 
 ## [ClamAV Daemon](clamav_daemon/README.md)
