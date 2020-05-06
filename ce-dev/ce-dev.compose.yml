@@ -6,14 +6,12 @@ x-ce_dev:
     - ce-dev/ansible/provision.yml
 services:
   provision:
-    image: codeenigma/ce-dev:1.0.0
+    image: codeenigma/ce-dev-1.x
     x-ce_dev: {}
     volumes:
       - ../:/home/ce-dev/ansible-provision
   target:
-    image: codeenigma/ce-dev:1.0.0
+    image: codeenigma/ce-dev-1.x
     x-ce_dev:
       host_aliases:
         - provision-target.local
-    volumes:
-      - ../:/home/ce-dev/ansible-provision
