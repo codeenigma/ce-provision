@@ -16,7 +16,16 @@ You can install either:
 While you can re-use/fork roles or call playbooks directly from your deployment tool, it is recommended to use the provided wrapper script, as it will take care of setting up the needed environments variables.
 ## [Roles](roles/README.md)
 Ansible roles and group of roles that constitute the deploy stack.
+### [Ansible](roles/ansible/README.md)
+### [ansible-deploy](roles/ansible_deploy/README.md)
+Installs Code Enigma's deploy stack on a server.
+### [ansible-provision](roles/ansible_provision/README.md)
+Installs Code Enigma's infrastructure management stack on a server.
+### [Extra packages](roles/apt_extra_packages/README.md)
+Provides a wrapper for installing packages through apt.
 ### [AWS tools roles](roles/aws/README.md)
+### [Extra packages](roles/ce_dev/README.md)
+Provides a wrapper for installing packages through apt.
 ### [ClamAV Clamscan](roles/clamav_clamscan/README.md)
 
 ### [ClamAV Daemon](roles/clamav_daemon/README.md)
