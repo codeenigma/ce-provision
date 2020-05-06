@@ -11,5 +11,5 @@
 - name: Link to binary.
   file:
     src: /opt/ce-dev/bin/ce-dev
-    dest: /opt/bin/ce-dev
+    dest: /usr/local/bin/ce-dev
     state: link
