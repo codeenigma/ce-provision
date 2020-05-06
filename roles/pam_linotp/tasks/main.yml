@@ -1,22 +1,15 @@
 ---
 
-# - name: Add key for LinOTP repository.
-#   apt_key: keyserver=eu.pool.sks-keyservers.net id=913DFF12F86258E5 state=present
+- name: Add key for LinOTP repository.
+  apt_key: keyserver=http://packages.codeenigma.com/debian/codeenigma.pub id=A344A0826FD987C6 state=present
 
-# - name: Add repository for LinOTP.
-#   apt_repository: repo='deb http://www.linotp.org/apt/debian strech linotp' state=present
+- name: Add repository for LinOTP.
+  apt_repository: repo='deb http://packages.codeenigma.com/debian buster main' state=present
 
-# - name: Ensure libpam-linotp is installed.
-#   apt:
-#     pkg: libpam-linotp
-#     state: present
-
-# @todo this is temporary workaround.
-- name: copy LinOTP lib.
-  copy:
-    src: pam_linotp.so
-    dest: /lib/x86_64-linux-gnu/security/pam_linotp.so
-    mode: 0755
+- name: Ensure libpam-linotp is installed.
+  apt:
+   pkg: libpam-linotp
+   state: present
 
 - name: Generate LinOTP config.
   template:
