@@ -3,7 +3,7 @@
 
 - name: Fetch and extract ce-dev.
   unarchive:
-    src: https://github.com/codeenigma/ce-dev/releases/download/1.0.6/ce-dev-v1.0.6-linux-x64.tar.gz
+    src: https://github.com/codeenigma/ce-dev/releases/download/1.0.7/ce-dev-v1.0.7-linux-x64.tar.gz
     dest: /opt/
     remote_src: yes
     mode: 0755
