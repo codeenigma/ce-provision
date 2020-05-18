@@ -1,5 +1,5 @@
 ---
-ssl:
+ssl_selfsigned:
   domain: 'www.example.com'
 # Internal use. This gets populated as domain names and cert/key paths.
 _ssl_paths: {}
