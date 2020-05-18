@@ -8,7 +8,7 @@
     - ansible_provision:
         username: "ce-dev"
         own_repository: "https://github.com/codeenigma/ansible-provision.git"
-        own_repository_branch: "master"
+        own_repository_branch: "1.x"
         config_repository: "https://github.com/codeenigma/ansible-provision-config-example.git"
         config_repository_branch: "master"
         local_dir: "{{ playbook_dir | dirname }}"
@@ -16,3 +16,19 @@
   tasks:
     - import_role:
         name: nginx
+- hosts: provision-provision
+  become: yes
+  vars:
+    - domain_name: provision-provision.local
+    - project_name: provision
+    - env_type: dev
+    - ansible_provision:
+        username: "ce-dev"
+        own_repository: "https://github.com/codeenigma/ansible-provision.git"
+        own_repository_branch: "1.x"
+        config_repository: "https://github.com/codeenigma/ansible-provision-config-example.git"
+        config_repository_branch: "master"
+        local_dir: "{{ playbook_dir | dirname }}"
+  tasks:
+    - import_role:
+        name: ansible_provision
