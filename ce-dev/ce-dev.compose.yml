@@ -4,6 +4,7 @@ x-ce_dev:
   project_name: provision
   provision: 
     - ce-dev/ansible/provision.yml
+  unison: false
 services:
   provision:
     image: codeenigma/ce-dev-1.x
