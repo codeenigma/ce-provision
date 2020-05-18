@@ -19,6 +19,7 @@
 - hosts: provision-provision
   become: yes
   vars:
+    - domain_name: provision-provision.local
     - project_name: provision
     - env_type: dev
     - ansible_provision:
