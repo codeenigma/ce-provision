@@ -30,10 +30,17 @@ location / {
 ############ Whitelist block.
 
 # Whitelisted php files.
-location ~ ^/(index)\.php$ {
+location ~ ^/(index|filemanager)\.php$ {
     #@todo there probably a better way to do this.
     try_files @phpprocess @phpprocess;
 }
+
+# Allow index_dev/upgrade for local stack.
+{% if is_local is defined and is_local %}
+location ~ ^/(index_dev|upgrade)\.php$ {
+    try_files @phpprocess @phpprocess;
+}
+{% endif %}
 
 # Allow public files and image styles.
 location ~ ^/media/(images|css|dashboards|js)/.* {
