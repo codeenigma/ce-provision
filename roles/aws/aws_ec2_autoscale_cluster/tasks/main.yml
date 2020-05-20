@@ -1,0 +1,40 @@
+- name: Create cluster's VPC
+  include_role:
+    name: aws/aws_vpc_with_subnets
+  vars:
+    _aws_vpc_with_subnets_cidr_base: "{{ aws_ec2_autoscale_cluster.cidr_base }}"
+    aws_vpc_with_subnets:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      state: "{{ aws_ec2_autoscale_cluster.state }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.security_groups }}"
+
+- name: Gather AMI image from name.
+  ec2_ami_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    owners: self
+    filters:
+      name: "{{ aws_ec2_autoscale_cluster.ami_name }}"
+  register: aws_ec2_autoscale_cluster_image
+
+- name: Register latest AMI image.
+  set_fact: 
+    aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
+
+- name: Create Launch Configuration
+  ec2_lc:
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+#@todo gather group names.    security_groups: ['group', 'group2' ]
+    instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
+    volumes:
+      - device_name: /dev/xvda
+        ebs:
+          volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
+          delete_on_termination: true
+  register: _aws_ec2_lc_created

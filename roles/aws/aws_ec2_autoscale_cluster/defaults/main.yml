@@ -1,0 +1,15 @@
+---
+
+aws_ec2_autoscale_cluster:
+  aws_profile: default
+  region: eu-west-3
+  name: "{{ domain_name }}"
+  cidr_base: "10.10.0" # Used to derive main cidr_block and subnets.
+  instance_type: t2.micro
+  key_name: "{{ ansible_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
+  ami_name: "{{ domain_name }}" # The name of an AMI image to use. Image must exists in the same region.
+  ami_owner: self # Default to self-created image.
+  root_volume_size: 40
+  security_groups: []
+  tags:
+    Name: "{{ domain_name }}"

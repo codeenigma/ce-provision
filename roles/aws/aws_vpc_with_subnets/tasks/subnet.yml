@@ -16,6 +16,6 @@
     region: "{{ aws_vpc_with_subnets.region }}"
     tags: "{{ _vpc_subnet_tags }}"
     az: "{{ aws_vpc_with_subnets.region }}{{ subnet.az }}"
-    state: "{{ subnet.state }}"
+    state: "{{ aws_vpc_with_subnets.state }}"
     vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
-    assign_instances_ipv6: "{{ subnet.assign_instances_ipv6 }}"
+    assign_instances_ipv6: "{{ aws_vpc_with_subnets.assign_instances_ipv6 }}"
