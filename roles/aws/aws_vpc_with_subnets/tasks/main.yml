@@ -9,7 +9,16 @@
     tags: "{{ aws_vpc_with_subnets.tags }}"
     state: "{{ aws_vpc_with_subnets.state }}"
   register: _ec2_vpc_created
-    
+  
+- name: Create IGW
+  ec2_vpc_igw:
+    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
+    region: "{{ aws_vpc_with_subnets.region }}"
+    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
+    state: present
+    tags: "{{ aws_vpc_with_subnets.tags }}"
+  when: aws_vpc_with_subnets.create_gateway
+
 - name: Create VPC subnets.
   include_tasks:
     file: "subnet.yml"
