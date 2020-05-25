@@ -6,6 +6,7 @@ aws_vpc_with_subnets:
   name: example-vpc-2
   cidr_block: "10.0.0.0/16"
   state: present
+  create_gateway: yes
   tags:
     #Type: "util"
   state: present
