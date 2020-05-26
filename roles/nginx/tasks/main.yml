@@ -52,7 +52,20 @@
     group: root
     mode: 0644
     force: yes
-  with_items: ['_common', 'custom', 'docker_registry', 'drupal_common', 'drupal7', 'drupal8', 'flat', 'matomo', 'simplesamlphp', 'symfony3', 'symfony4', 'wordpress']
+  with_items:
+    - _common
+    - custom
+    - docker_registry
+    - drupal_common
+    - drupal7
+    - drupal8
+    - flat
+    - matomo
+    - mautic
+    - simplesamlphp
+    - symfony3
+    - symfony4
+    - wordpress
 
 - name: Ensure default nginx catch-all is not present
   file:

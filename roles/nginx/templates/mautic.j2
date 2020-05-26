@@ -1,0 +1,85 @@
+### {{ ansible_managed }}
+######### Default block.
+
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^ /index.php$is_args$args;
+}
+#  PHP fastcgi pass.
+location @phpprocess {
+    fastcgi_split_path_info ^(.+?\.php)(|/.*)$;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $request_filename;
+    fastcgi_intercept_errors on;
+    fastcgi_read_timeout 60;
+    include fastcgi_params;
+    fastcgi_pass {{ nginx.php_fastcgi_backend }};
+}
+
+# Rewrite any request not whitelisted below, 
+# so they get processed through the app level (and 404).
+location / {
+    {% if nginx.ratelimitingcrawlers %}
+#    @todo
+#    limit_req zone=bots burst=5 nodelay;
+    {% endif %}
+    try_files @rewrite /index.php;
+}
+
+
+############ Whitelist block.
+
+# Whitelisted php files.
+location ~ ^/(index|filemanager)\.php$ {
+    #@todo there probably a better way to do this.
+    try_files @phpprocess @phpprocess;
+}
+
+# Allow index_dev/upgrade for local stack.
+{% if is_local is defined and is_local %}
+location ~ ^/(index_dev|upgrade)\.php$ {
+    try_files @phpprocess @phpprocess;
+}
+{% endif %}
+
+# Allow public files and image styles.
+location ~ ^/media/(images|css|dashboards|js)/.* {
+    try_files $uri @rewrite;
+}
+
+# Core and contrib assets can be pretty much anywhere.
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff)$ {
+    try_files $uri =404;
+}
+
+# Allow themes to embed their own fonts.
+#@todo Regex untested, and we might need to add other extensions.
+#location ~ ^/themes/.*\.(woff|eot)$ {
+#    try_files @phpprocess @phpprocess;
+#}
+
+# Allow Let's Encrypt RFC 5785 ACME protocol.
+location ~* ^/.well-known/ {
+    try_files $uri =404;
+}
+
+# Allow robots.txt.
+location = /robots.txt {
+    try_files $uri @rewrite;
+}
+
+
+############ Blacklist block.
+# Most of those should not be in the webroot in the first place,
+# but we still provide a safety net.
+
+# Private files protection.
+location ~* ^/media/files/ {
+    access_log off;
+    deny    all;
+}
+
+# Deny requests to serve (potentially uploaded malicious) html files.
+location ~* ^/media/.*/.*\.html$ {
+    deny all;
+}
