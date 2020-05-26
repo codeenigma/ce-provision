@@ -8,7 +8,6 @@
   set_fact:
     _vpc_subnet_tags: "{{ aws_vpc_with_subnets.tags | combine(_vpc_subnet_name_tag) }}"
 
-
 - name: Create VPC subnet.
   ec2_vpc_subnet:
     profile: "{{ aws_vpc_with_subnets.aws_profile }}"

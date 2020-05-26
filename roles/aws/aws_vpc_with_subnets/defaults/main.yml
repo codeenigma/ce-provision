@@ -11,11 +11,11 @@ aws_vpc_with_subnets:
   region: eu-west-3
   name: example-vpc-2
   cidr_block: "{{ _aws_vpc_with_subnets_cidr_base }}.0/16"
-  state: present
   tags:
     #Type: "util"
   state: present
   assign_instances_ipv6: no
+  create_gateway: yes
   subnets:
     # - az: a
     #   cidr: "{{ _aws_vpc_with_subnets_cidr_base }}.0/26"
