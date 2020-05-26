@@ -13,6 +13,7 @@
   set_fact: 
     aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
+#@todo https://github.com/ansible/ansible/issues/54174
 - name: Create EC2 instance.
   ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
