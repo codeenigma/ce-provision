@@ -70,3 +70,6 @@
 - name: Restart Gitlab.
   shell: /opt/gitlab/bin/gitlab-ctl start
   when: not is_local is defined or not is_local
+
+- name: Disable self-register
+  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(signup_enabled: false)'"
