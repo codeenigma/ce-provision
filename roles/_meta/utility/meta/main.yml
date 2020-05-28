@@ -1,0 +1,17 @@
+---
+
+dependencies:
+  - role: _meta/common_base
+  - role: firewall
+  - role: sops
+  - role: gpg_key
+  - role: user_provision
+  - role: firewall
+  - role: gitlab
+  - role: jenkins
+  - role: docker_registry
+  - role: haproxy
+  - role: ansible_deploy
+  - role: ssh_server
+  - role: pam_ldap
+  - role: pam_linotp
