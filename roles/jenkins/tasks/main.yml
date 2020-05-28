@@ -89,7 +89,7 @@
   when: aptoutput.changed
 
 - pause:
-    minutes: 1
+    minutes: 2
   when: aptoutput.changed
 
 - name: Download Jenkins CLI
@@ -101,22 +101,26 @@
 - name: Install Jenkins cert renewal script
   template:
     src: "jenkins-cert-renewal.j2"
-    dest: "/usr/local/bin/jenkins-cert-renewal"
+    dest: "/opt/jenkins-cert-renewal.sh"
     owner: root
     group: root
     mode: 0775
-
+# @todo this needs refactoring, we want to run right after cerbot, not independently.
 - name: Add Jenkins cert renewal job
   lineinfile:
     path: '/etc/cron.d/certbot'
-    line: "{{ jenkins.schedule }} {{ jenkins.user }}  /usr/local/bin/jenkins-cert-renewal >> /var/log/jenkins/jenkins-cert-renewal.log"
+    line: "{{ jenkins.schedule }} root  /bin/sh /opt/jenkins-cert-renewal >> /var/log/jenkins/jenkins-cert-renewal.log"
     create: yes
     insertafter: EOF
 
 - name: Install Jenkins Plugins
   command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
+  become: yes
+  become_user: "{{ jenkins.user }}"
   register: pluginoutput
 
 - name: Safe restart jenkins
   command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
+  become: yes
+  become_user: "{{ jenkins.user }}"
   when: pluginoutput.changed
