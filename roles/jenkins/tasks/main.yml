@@ -1,17 +1,18 @@
 ---
 
 - name: Add repository key for Jenkins.
-  apt_key: url=https://pkg.jenkins.io/debian-stable/jenkins.io.key state=present
-  
+  apt_key: url=https://pkg.jenkins.io/debian/jenkins.io.key state=present
+
 - name: Add repository for Jenkins.
-  apt_repository: repo='deb https://pkg.jenkins.io/debian-stable binary/' state=present
+  apt_repository: repo='deb http://pkg.jenkins.io/debian binary/' state=present
 
 - name: Ensure Jenkins is installed.
   apt:
     pkg: "jenkins"
     state: present
     update_cache: yes
-    
+  register: aptoutput
+
 - name: Generates SSL keys.
   include_role:
     name: "{{ jenkins.ssl_handling }}"
@@ -60,7 +61,7 @@
     dest: /etc/default/jenkins
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Create init.groovy.d directory
@@ -69,10 +70,9 @@
     state: directory
     mode: '0755'
 
-- name: Check if groovy security file exists    
+- name: Check if groovy security file exists
   stat:
     path: "/var/lib/jenkins/init.groovy.d/basic-security.groovy"
-  register: secinit
 
 - name: Copy groovy security file
   template:
@@ -86,11 +86,17 @@
   service:
     name: jenkins
     state: restarted
-  when: not secinit.stat.exists
+  when: aptoutput.changed
 
 - pause:
     minutes: 1
-  when: not secinit.stat.exists
+  when: aptoutput.changed
+
+- name: Download Jenkins CLI
+  get_url:
+    url: "https://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
+    validate_certs: no
+    dest: /opt/jenkins-cli.jar
 
 - name: Install Jenkins cert renewal script
   template:
@@ -103,21 +109,14 @@
 - name: Add Jenkins cert renewal job
   lineinfile:
     path: '/etc/cron.d/certbot'
-    line: "{{ jenkins.schedule }} {{ jenkins.user }}  /usr/local/bin/jenkins-cert-renewal 2> /dev/null"
+    line: "{{ jenkins.schedule }} {{ jenkins.user }}  /usr/local/bin/jenkins-cert-renewal >> /var/log/jenkins/jenkins-cert-renewal.log"
+    create: yes
     insertafter: EOF
 
-# - name: Install or Update Jenkins plugins
-#   jenkins_plugin:
-#     name: "{{ item }}"
-#     jenkins_home: "/var/lib/jenkins"
-#     url_username: "{{ jenkins.adminuser }}"
-#     url_password: "{{ jenkins.adminpass }}"
-#     state: "present"
-#     timeout: "30"
-#     updates_expiration: "86400"
-#     updates_url: "https://updates.jenkins.io"
-#     url: "https://{{ jenkins.server_name }}"
-#     validate_certs: "no"
-#     with_dependencies: "yes"
-#   with_items: "{{ jenkins.plugins }}"
-#   notify: restart jenkins
+- name: Install Jenkins Plugins
+  command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
+  register: pluginoutput
+
+- name: Safe restart jenkins
+  command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
+  when: pluginoutput.changed

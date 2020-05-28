@@ -1,7 +1,6 @@
 ---
 
 - name: restart jenkins
-  #command: /usr/local/bin/jenkins-safe-restart
   service:
     name: jenkins
     state: restarted
