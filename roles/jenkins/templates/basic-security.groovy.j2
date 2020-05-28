@@ -5,7 +5,6 @@ import jenkins.model.*
 
 
 def instance = Jenkins.getInstance()
-{% if jenkins['security'] == 'basic' %}
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 def users = hudsonRealm.getAllUsers()
 def ssh = instance.getDescriptor("org.jenkinsci.main.modules.sshd.SSHD")
@@ -13,6 +12,12 @@ def sshport = '{{ jenkins.sshport }}'
 usermap = users.collect { it.toString() }
 ssh.setPort(sshport.toInteger())
 ssh.save()
+
+def jenkinsLocationConfiguration = JenkinsLocationConfiguration.get()
+jenkinsLocationConfiguration.setUrl("https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}/")
+jenkinsLocationConfiguration.save()
+
+{% if jenkins['security'] == 'basic' %}
 if ( "{{ jenkins.adminuser }}" in usermap) {
   def user = hudson.model.User.get('{{ jenkins.adminuser }}');
   def pass = hudson.security.HudsonPrivateSecurityRealm.Details.fromPlainPassword('{{ jenkins.adminpass }}')
@@ -28,7 +33,7 @@ else {
   instance.save()
 }
 {% elif jenkins['security'] == 'ldap'  %}
-SecurityRealm ldap_realm = new LDAPSecurityRealm('{{ jenkins.ldap_endpoint }}','{{ jenkins.ldap_lookup_base }}','{{ jenkins.ldap_lookup_user }}','','','{{ jenkins.ldap_binddn }}','{{ jenkins.ldap_bindpw }}',false) 
+SecurityRealm ldap_realm = new LDAPSecurityRealm('{{ jenkins.ldap_endpoint }}','{{ jenkins.ldap_lookup_base }}','','uid={0}','','{{ jenkins.ldap_binddn }}','{{ jenkins.ldap_bindpw }}',false)
 instance.setSecurityRealm(ldap_realm)
 def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
 strategy.setAllowAnonymousRead(false)

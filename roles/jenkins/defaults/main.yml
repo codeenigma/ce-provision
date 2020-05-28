@@ -15,15 +15,15 @@ jenkins:
   listen_bind_address: "0.0.0.0"
   keystore_pass: "cleartext"
   user: "jenkins"
-  adminuser: "admin"
+  adminuser: "adm"
   adminpass: ""
-  # security: basic | ldap 
+ # security: basic | ldap 
   security: "basic"
   plugins:
     - ldap
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
   ldap_lookup_base: "{{ ldap_client.lookup_base }}"
-  ldap_lookup_user: "{{ ldap_client.lookup_user}}"
+  ldap_lookup_user: "{{ ldap_client.lookup_user }}"
   ldap_binddn: "{{ ldap_client.binddn }}"
   ldap_bindpw: "{{ ldap_client.bindpw }}"
   mailto: "admins@example.com"
