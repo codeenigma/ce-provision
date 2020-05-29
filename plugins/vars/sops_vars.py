@@ -41,6 +41,7 @@ from ansible.utils.display import Display
 display = Display()
 
 FOUND = {}
+DECRYPTED = {}
 DEFAULT_VALID_EXTENSIONS = [".sops.yaml", ".sops.yml", ".sops.json"]
 
 # From https://github.com/mozilla/sops/blob/master/cmd/sops/codes/codes.go
@@ -152,7 +153,11 @@ class VarsModule(BaseVarsPlugin):
                                 self._display.warning("Found %s that is not a directory, skipping: %s" % (subdir, opath))
 
                     for found in found_files:
-                        file_content = decrypt_with_sops(found)
+                        if cache and found in DECRYPTED:
+                            file_content = DECRYPTED[found]
+                        else:
+                            file_content = decrypt_with_sops(found)
+                            DECRYPTED[found] = file_content
                         new_data = loader.load(file_content)
                         if new_data:  # ignore empty files
                             data = combine_vars(data, new_data)
