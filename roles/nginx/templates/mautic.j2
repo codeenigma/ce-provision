@@ -30,7 +30,7 @@ location / {
 ############ Whitelist block.
 
 # Whitelisted php files.
-location ~ ^/(index|filemanager)\.php$ {
+location ~ ^/(index|filemanager)\.php(/|$) {
     #@todo there probably a better way to do this.
     try_files @phpprocess @phpprocess;
 }
