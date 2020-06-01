@@ -25,8 +25,7 @@
 
 - name: Copy Gitlab configuration file.
   template:
-    #src: "{{ lookup('first_found', template_params) }}"
-    src: gitlab.rb.j2
+    src: "{{ lookup('first_found', template_params) }}"
     dest: /etc/gitlab/gitlab.rb
   vars:
     template_params:
