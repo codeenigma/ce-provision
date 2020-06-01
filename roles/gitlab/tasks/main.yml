@@ -81,8 +81,8 @@
 - name: Disable ECDSA 
   shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(ecdsa_key_restriction: -1)'"
 
-- name: Enforce at least 4096bits for RSA 
-  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(rsa_key_restriction: 4096)'"
+- name: Enforce at least 2048bits for RSA 
+  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(rsa_key_restriction: 2048)'"
 
 - name: Disable password auth over HTTP/S 
   shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(password_authentication_enabled_for_git: false)'"
