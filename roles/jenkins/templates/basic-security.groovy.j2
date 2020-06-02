@@ -7,11 +7,7 @@ import jenkins.model.*
 def instance = Jenkins.getInstance()
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 def users = hudsonRealm.getAllUsers()
-def ssh = instance.getDescriptor("org.jenkinsci.main.modules.sshd.SSHD")
-def sshport = '{{ jenkins.sshport }}'
 usermap = users.collect { it.toString() }
-ssh.setPort(sshport.toInteger())
-ssh.save()
 
 def jenkinsLocationConfiguration = JenkinsLocationConfiguration.get()
 jenkinsLocationConfiguration.setUrl("https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}/")
