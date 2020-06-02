@@ -10,7 +10,7 @@ aws_vpc_with_subnets:
   aws_profile: default
   region: eu-west-3
   name: example-vpc-2
-  cidr_block: "{{ _aws_vpc_with_subnets_cidr_base }}.0/16"
+  cidr_block: "{{ _aws_vpc_with_subnets_cidr_base }}.0/24"
   tags:
     #Type: "util"
   state: present
