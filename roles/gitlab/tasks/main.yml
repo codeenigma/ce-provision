@@ -25,12 +25,8 @@
 
 - name: Copy Gitlab configuration file.
   template:
-    src: "{{ lookup('first_found', template_params) }}"
+    src: gitlab.rb.j2
     dest: /etc/gitlab/gitlab.rb
-  vars:
-    template_params:
-      files: gitlab.rb.j2
-      paths: "{{ ansible_provision_search_paths_template }}"
       
 - name: Make sure run-parts dir exists.
   file:
