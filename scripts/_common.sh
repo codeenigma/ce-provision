@@ -15,8 +15,6 @@ BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
 FORCE_PLAY="no"
-DRY_RUN=""
-VERBOSE=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
 fi
@@ -51,12 +49,6 @@ parse_options(){
         ;;
       "--force")
           FORCE_PLAY="yes"
-        ;;
-      "--dry-run")
-          DRY_RUN="--check"
-        ;;
-      "--verbose")
-          VERBOSE="-v"
         ;;
         *)
         usage
@@ -104,6 +96,6 @@ cleanup_build_tmp_dir(){
 }
 # Trigger actual Ansible job.
 ansible_play(){
-  /usr/bin/ansible-playbook "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK" --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS" "$DRY_RUN" "$VERBOSE"
+  /usr/bin/ansible-playbook --verbose "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK" --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
   return $?
 }
