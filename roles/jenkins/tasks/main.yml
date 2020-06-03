@@ -98,20 +98,11 @@
     validate_certs: no
     dest: /opt/jenkins-cli.jar
 
-- name: Install Jenkins cert renewal script
-  template:
-    src: "jenkins-cert-renewal.j2"
-    dest: "/opt/jenkins-cert-renewal.sh"
-    owner: root
-    group: root
-    mode: 0775
-# @todo this needs refactoring, we want to run right after cerbot, not independently.
 - name: Add Jenkins cert renewal job
-  lineinfile:
-    path: '/etc/cron.d/certbot'
-    line: "{{ jenkins.schedule }} root  /bin/sh /opt/jenkins-cert-renewal >> /var/log/jenkins/jenkins-cert-renewal.log"
-    create: yes
-    insertafter: EOF
+  template:
+    src: 'jenkins-cert-renewal.sh.j2'
+    dest: /etc/cron.daily/jenkins-cert-renewal
+    mode: 0644
 
 - name: Install Jenkins Plugins
   command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"

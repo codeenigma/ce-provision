@@ -8,7 +8,6 @@ def instance = Jenkins.getInstance()
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 def users = hudsonRealm.getAllUsers()
 usermap = users.collect { it.toString() }
-
 def jenkinsLocationConfiguration = JenkinsLocationConfiguration.get()
 jenkinsLocationConfiguration.setUrl("https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}/")
 jenkinsLocationConfiguration.save()
