@@ -15,6 +15,7 @@
   group:
     name: "{{ group.name }}"
     state: present
+    system: "{{ group.system | default(yes) }}"
   with_items: "{{ sshd.groups }}"
   loop_control:
     loop_var: group

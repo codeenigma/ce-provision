@@ -5,6 +5,16 @@
     name: "{{ ansible_provision.username }}"
     system: yes
 
+- name: Create additional groups.
+  group:
+    name: "{{ group }}"
+    state: present
+    system: yes
+  with_items: "{{ ansible_provision.groups }}"
+  loop_control:
+    loop_var: group
+  when: ansible_provision.groups | length
+
 - name: Create the provision user for provisioning.
   user:
     name: "{{ ansible_provision.username }}"
