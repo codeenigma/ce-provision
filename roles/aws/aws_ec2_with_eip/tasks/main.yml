@@ -40,8 +40,6 @@
     filters:
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
   register: aws_ec2_with_eip_instances_eip
-- debug:
-    msg: "{{ aws_ec2_with_eip_instances_eip }}"
 
 # - name: Generate Terraform template.
 #   template:
@@ -66,7 +64,7 @@
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
-#    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip | default(omit) }}"
     private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
     in_vpc: yes
     tag_name: Name
