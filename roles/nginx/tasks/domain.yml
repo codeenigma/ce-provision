@@ -1,0 +1,65 @@
+- name: Generates SSL keys.
+  include_role:
+    name: "{{ domain.ssl_handling }}"
+  vars:
+    ssl:
+      domain: "{{ domain.server_name }}"
+      services: ['nginx']
+
+# If auth_enabled is defined and yes, and auth_pass is not defined or is defined but empty, generate a random password.
+- name: Generate random htauth password.
+  set_fact:
+    _nginx_htauth_pass: "{{ lookup('password', _ansible_provision_data_dir + '/' + inventory_hostname + '/nginx-passwords/' + domain.server_name) }}"
+  when:
+    - domain.basic_auth.auth_enabled is defined
+    - domain.basic_auth.auth_enabled
+    - domain.basic_auth.auth_pass is not defined or domain.basic_auth.auth_pass | length == 0
+
+# If auth_enabled is defined and yes, and auth_pass is defined and not empty, use that password instead.
+- name: Set fact if htauth password is provided.
+  set_fact:
+    _nginx_htauth_pass: "{{ domain.basic_auth.auth_pass }}"
+  when:
+    - domain.basic_auth.auth_enabled is defined
+    - domain.basic_auth.auth_enabled
+    - domain.basic_auth.auth_pass is defined
+    - domain.basic_auth.auth_pass | length > 0
+
+- name: Create basic htauth files.
+  htpasswd:
+    path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
+    name: "{{ domain.basic_auth.auth_user }}"
+    password: "{{ _nginx_htauth_pass }}"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - domain.basic_auth.auth_enabled is defined
+    - domain.basic_auth.auth_enabled
+
+- name: Print basic htauth password.
+  debug:
+    msg: Basic auth password is {{ _nginx_htauth_pass }}
+
+- name: Copy vhost in place.
+  template:
+    src: vhosts.j2
+    dest: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable vhost.
+  file:
+    src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
+    state: link
+
+- name: Generates AWS Cloudwatch vhost config.
+  template:
+    src: cloudwatch-vhost.json.j2
+    dest: "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-{{ domain.server_name }}.json"
+  when:
+    - not domain.access_log == "/var/log/nginx/access.log"
+    - not domain.error_log == "/var/log/nginx/error.log"
+    - is_local is not defined or not is_local
