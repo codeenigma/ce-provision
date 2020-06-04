@@ -2,47 +2,26 @@
 
 - name: Ensure nginx is installed.
   apt:
-    pkg: nginx
+    name:
+      - nginx
+      - python-passlib
     state: present
     update_cache: yes
     cache_valid_time: 240
 
-- name: Generates SSL keys.
-  include_role:
-    name: "{{ item.ssl_handling }}"
-  vars:
-    ssl:
-      domain: "{{ item.server_name }}"
-      services: ['nginx']
-  with_items: "{{ nginx.domains }}"
-
-- name: Copy maing nginx config.
+- name: Copy main nginx config.
   template:
     src: nginx.conf.j2
     dest: "/etc/nginx/nginx.conf"
     owner: root
     group: root
     mode: 0644
-  
-- name: Copy vhosts in place.
-  template:
-    src: vhosts.j2
-    dest: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    owner: root
-    group: root
-    mode: 0644
-  with_items: "{{ nginx.domains }}"
-  loop_control:
-    loop_var: domain
 
-- name: Enable vhosts.
+- name: Ensure passwords directory exists.
   file:
-    src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
-    state: link
-  with_items: "{{ nginx.domains }}"
-  loop_control:
-    loop_var: domain
+    path: /etc/nginx/passwords
+    state: directory
+    mode: '0755'
 
 - name: Copy project type-specific configuration in place.
   template:
@@ -79,14 +58,8 @@
   when:
     - is_local is not defined or not is_local
 
-- name: Generates AWS Cloudwatch vhosts config.
-  template:
-    src: cloudwatch-vhost.json.j2
-    dest: "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-{{ domain.server_name }}.json"
-  when:
-    - not domain.access_log == "/var/log/nginx/access.log"
-    - not domain.error_log == "/var/log/nginx/error.log"
-    - is_local is not defined or not is_local
+- name: Generate domain specific configuration.
+  include_tasks: domain.yml
   with_items: "{{ nginx.domains }}"
   loop_control:
     loop_var: domain
