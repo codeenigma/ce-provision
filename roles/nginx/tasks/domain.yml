@@ -40,6 +40,10 @@
 - name: Print basic htauth password.
   debug:
     msg: Basic auth password is {{ _nginx_htauth_pass }}
+  when:
+    - domain.basic_auth.auth_enabled is defined
+    - domain.basic_auth.auth_enabled
+    - _nginx_htauth_pass is defined
 
 - name: Copy vhost in place.
   template:
