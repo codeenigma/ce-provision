@@ -3,36 +3,31 @@
 import hudson.security.*
 import jenkins.model.*
 
-
 def instance = Jenkins.getInstance()
-def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 def users = hudsonRealm.getAllUsers()
 usermap = users.collect { it.toString() }
+
 def jenkinsLocationConfiguration = JenkinsLocationConfiguration.get()
 jenkinsLocationConfiguration.setUrl("https://{{ jenkins.server_name }}:{{ jenkins.listen_https_port }}/")
 jenkinsLocationConfiguration.save()
 
-{% if jenkins['security'] == 'basic' %}
 if ( "{{ jenkins.adminuser }}" in usermap) {
-  def user = hudson.model.User.get('{{ jenkins.adminuser }}');
+  def user = hudson.model.User.get('{{ jenkins.adminuser }}')
   def pass = hudson.security.HudsonPrivateSecurityRealm.Details.fromPlainPassword('{{ jenkins.adminpass }}')
   user.addProperty(pass)
   user.save()
 }
 else {
   hudsonRealm.createAccount('{{ jenkins.adminuser }}', '{{ jenkins.adminpass }}')
-  instance.setSecurityRealm(hudsonRealm)
-  def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
-  strategy.setAllowAnonymousRead(false)
-  instance.setAuthorizationStrategy(strategy)
-  instance.save()
 }
-{% elif jenkins['security'] == 'ldap'  %}
+{% if jenkins['security'] == 'basic' %}
+def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+instance.setSecurityRealm(hudsonRealm)
+{% else %}
 SecurityRealm ldap_realm = new LDAPSecurityRealm('{{ jenkins.ldap_endpoint }}','{{ jenkins.ldap_lookup_base }}','','uid={0}','','{{ jenkins.ldap_binddn }}','{{ jenkins.ldap_bindpw }}',false)
 instance.setSecurityRealm(ldap_realm)
+{% endif %}
 def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
 strategy.setAllowAnonymousRead(false)
 instance.setAuthorizationStrategy(strategy)
 instance.save()
-{% else %}
-{% endif %}
