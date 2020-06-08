@@ -102,7 +102,7 @@
   template:
     src: 'jenkins-cert-renewal.sh.j2'
     dest: /etc/cron.daily/jenkins-cert-renewal
-    mode: 0644
+    mode: 0755
 
 - name: Install Jenkins Plugins
   command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
