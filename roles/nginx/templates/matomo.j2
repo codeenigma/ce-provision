@@ -1,5 +1,12 @@
-## only allow accessing the following php files
-location ~ ^/(index|matomo|piwik|js/index|plugins/HeatmapSessionRecording/configs)\.php {
+### {{ ansible_managed }}
+
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^ /index.php?$query_string;
+}
+
+# PHP factcgi pass.
+location @phpprocess {
     include fastcgi_params;
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
     fastcgi_param DOCUMENT_ROOT $realpath_root;
@@ -8,32 +15,22 @@ location ~ ^/(index|matomo|piwik|js/index|plugins/HeatmapSessionRecording/config
     fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
 
-## deny access to all other .php files
-location ~* ^.+\.php$ {
-    deny all;
-    return 403;
-}
-
 ## serve all other files normally
 location / {
-    index index.php
-    try_files $uri $uri/ =404;
+    {% if nginx.ratelimitingcrawlers %}
+#    @todo
+#    limit_req zone=bots burst=5 nodelay;
+    {% endif %}
+    
+    index index.php;
+    try_files @rewrite /index.php;
 }
 
-## disable all access to the following directories
-location ~ /(config|tmp|core|lang) {
-    deny all;
-    return 403; # replace with 404 to not show these directories exist
-}
+############ Whitelist block.
 
-location ~ /\.ht {
-    deny  all;
-    return 403;
-}
-
-location ~ js/container_.*_preview\.js$ {
-    expires off;
-    add_header Cache-Control 'private, no-cache, no-store';
+## only allow accessing the following php files
+location ~ ^/(index|matomo|piwik|js/index|plugins/HeatmapSessionRecording/configs)\.php {
+    try_files @phpprocess @phpprocess;
 }
 
 location ~ \.(gif|ico|jpg|png|svg|js|css|htm|html|mp3|mp4|wav|ogg|avi|ttf|eot|woff|woff2|json)$ {
@@ -45,12 +42,35 @@ location ~ \.(gif|ico|jpg|png|svg|js|css|htm|html|mp3|mp4|wav|ogg|avi|ttf|eot|wo
     add_header Cache-Control "public";
 }
 
-location ~ /(libs|vendor|plugins|misc/user) {
+# Allow Let's Encrypt RFC 5785 ACME protocol.
+location ~* ^/.well-known/ {
+    try_files $uri =404;
+}
+
+# Allow robots.txt.
+location = /robots.txt {
+    try_files $uri @rewrite;
+}
+
+location ~ js/container_.*_preview\.js$ {
+    expires off;
+    add_header Cache-Control 'private, no-cache, no-store';
+}
+
+############ Blacklist block.
+
+## disable all access to the following directories
+location ~ /(config|tmp|core|lang) {
     deny all;
+    return 404; # replace with 404 to not show these directories exist
+}
+
+location ~ /\.ht {
+    deny  all;
     return 403;
 }
 
-## properly display textfiles in root directory
-location ~/(.*\.md|LEGALNOTICE|LICENSE) {
-    default_type text/plain;
+location ~ /(libs|vendor|plugins|misc/user) {
+    deny all;
+    return 403;
 }

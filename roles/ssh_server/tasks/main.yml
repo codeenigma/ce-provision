@@ -15,6 +15,7 @@
   group:
     name: "{{ group.name }}"
     state: present
+    system: "{% if group.system is defined and not group.system %}no{% else %}yes{% endif %}"
   with_items: "{{ sshd.groups }}"
   loop_control:
     loop_var: group

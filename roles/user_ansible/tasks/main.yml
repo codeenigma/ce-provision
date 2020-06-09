@@ -5,6 +5,16 @@
     name: "{{ user_ansible.username }}"
     system: yes
 
+- name: Create additional groups.
+  group:
+    name: "{{ group }}"
+    state: present
+    system: yes
+  with_items: "{{ user_ansible.groups }}"
+  loop_control:
+    loop_var: group
+  when: user_ansible.groups | length
+
 - name: Create the system user.
   user:
     name: "{{ user_ansible.username }}"

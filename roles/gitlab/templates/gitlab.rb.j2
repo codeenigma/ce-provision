@@ -250,8 +250,44 @@ external_url 'https://{{ gitlab.server_name }}'
 ###! **Be careful not to break the indentation in the ldap_servers block. It is
 ###!   in yaml format and the spaces must be retained. Using tabs will not work.**
 
-# gitlab_rails['ldap_enabled'] = false
-# gitlab_rails['ldap_servers'] = ''
+gitlab_rails['ldap_enabled'] = true
+gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block with 'EOS' below
+  main: # 'main' is the GitLab 'provider ID' of this LDAP server
+    label: 'LDAP'
+    host: "{{ gitlab.ldap_endpoint }}"
+    port: 636
+    uid: 'uid'
+    method: 'ssl' # "tls" or "ssl" or "plain"
+    bind_dn: '{{ gitlab.ldap_binddn }}'
+    password: '{{ gitlab.ldap_bindpw }}'
+    active_directory: false
+    allow_username_or_email_login: false
+    block_auto_created_users: false
+    base: '{{ gitlab.ldap_lookup_base }}'
+    user_filter: ''
+    ## EE only
+    group_base: ''
+    admin_group: ''
+    sync_ssh_keys: false
+
+#   secondary: # 'secondary' is the GitLab 'provider ID' of second LDAP server
+#     label: 'LDAP'
+#     host: '_your_ldap_server'
+#     port: 389
+#     uid: 'sAMAccountName'
+#     method: 'plain' # "tls" or "ssl" or "plain"
+#     bind_dn: '_the_full_dn_of_the_user_you_will_bind_with'
+#     password: '_the_password_of_the_bind_user'
+#     active_directory: true
+#     allow_username_or_email_login: false
+#     block_auto_created_users: false
+#     base: ''
+#     user_filter: ''
+#     ## EE only
+#     group_base: ''
+#     admin_group: ''
+#     sync_ssh_keys: false
+ EOS
 
 ### Smartcard authentication settings
 ###! Docs: https://docs.gitlab.com/ee/administration/auth/smartcard.html
@@ -394,7 +430,9 @@ external_url 'https://{{ gitlab.server_name }}'
 #### Change the initial default admin password and shared runner registration tokens.
 ####! **Only applicable on initial setup, changing these settings after database
 ####!   is created and seeded won't yield any change.**
-# gitlab_rails['initial_root_password'] = "password"
+
+gitlab_rails['initial_root_password'] = "{{ gitlab.initial_root_password }}"
+
 # gitlab_rails['initial_shared_runners_registration_token'] = "token"
 
 #### Enable or disable automatic database migrations

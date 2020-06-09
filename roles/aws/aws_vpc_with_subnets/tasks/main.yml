@@ -1,5 +1,3 @@
----
-
 - name: Create VPC.
   ec2_vpc_net:
     profile: "{{ aws_vpc_with_subnets.aws_profile }}"
@@ -9,7 +7,17 @@
     tags: "{{ aws_vpc_with_subnets.tags }}"
     state: "{{ aws_vpc_with_subnets.state }}"
   register: _ec2_vpc_created
-    
+
+- name: Create IGW
+  ec2_vpc_igw:
+    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
+    region: "{{ aws_vpc_with_subnets.region }}"
+    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
+    state: present
+    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name })}}"
+  register: _ec2_igw_created
+  when: aws_vpc_with_subnets.create_gateway
+
 - name: Create VPC subnets.
   include_tasks:
     file: "subnet.yml"
@@ -23,3 +31,34 @@
   with_items: "{{ aws_vpc_with_subnets.security_groups }}"
   loop_control:
     loop_var: security_group
+
+- name: Gather Subnets information
+  ec2_vpc_subnet_info:
+    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
+    region: "{{ aws_vpc_with_subnets.region }}"
+    filters:
+      vpc-id: "{{ _ec2_vpc_created.vpc.id }}"
+  register: _ec2_subnets_info
+
+# Make sure we can be called several times in a row.
+- name: Reset subnet list.
+  set_fact:
+    _ec2_subnets_ids: []
+
+- name: Construct list of subnet ids.
+  set_fact:
+    _ec2_subnets_ids: "{{ _ec2_subnets_ids | default([]) + [subnet.subnet_id] }}"
+  with_items: "{{ _ec2_subnets_info.subnets }}"
+  loop_control:
+    loop_var: subnet
+
+- name: Set up public subnet route table
+  ec2_vpc_route_table:
+    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
+    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
+    region: "{{ aws_vpc_with_subnets.region }}"
+    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name })}}"
+    subnets: "{{ _ec2_subnets_ids }}"
+    routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ _ec2_igw_created.gateway_id }}"

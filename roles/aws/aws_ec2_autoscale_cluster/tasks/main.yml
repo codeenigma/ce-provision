@@ -1,0 +1,116 @@
+- name: Create cluster's VPC
+  include_role:
+    name: aws/aws_vpc_with_subnets
+  vars:
+    _aws_vpc_with_subnets_cidr_base: "{{ aws_ec2_autoscale_cluster.cidr_base }}"
+    aws_vpc_with_subnets:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      state: "{{ aws_ec2_autoscale_cluster.state }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.security_groups }}"
+
+- name: Gather AMI image from name.
+  ec2_ami_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    owners: self
+    filters:
+      name: "{{ aws_ec2_autoscale_cluster.ami_name }}"
+  register: aws_ec2_autoscale_cluster_image
+
+- name: Register latest AMI image.
+  set_fact: 
+    aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
+
+- name: Create Launch Configuration
+  ec2_lc:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    security_groups:
+      - sg-0cd0bfd85ed07bb0c
+    instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
+    volumes:
+      - device_name: /dev/xvda
+        volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
+  register: _aws_ec2_lc_created
+
+- name: Gather VPC information
+  ec2_vpc_net_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
+  register: _aws_ec2_vpc
+
+- name: Gather Subnets information
+  ec2_vpc_subnet_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      vpc-id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+  register: _aws_ec2_subnets
+
+- name: Construct list of subnet ids.
+  set_fact:
+    _aws_ec2_subnets_ids: "{{ _aws_ec2_subnets_ids | default([]) + [subnet.subnet_id] }}"
+  with_items: "{{ _aws_ec2_subnets.subnets }}"
+  loop_control:
+    loop_var: subnet
+
+- name: Create a Target group for port 80
+  elb_target_group:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    launch_config_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    replace_all_instances: yes
+    min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
+    max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
+    protocol: http
+    port: 80
+    vpc_id: vpc-01234567
+    state: present
+
+- name: Create Autoscale group
+  ec2_asg:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    launch_config_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    replace_all_instances: yes
+    min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
+    max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
+    availability_zones: [ 'us-west-1b', 'us-west-1c' ]
+    vpc_zone_identifier: "{{ _aws_ec2_subnets_ids }}"
+  register: _aws_ec2_asg_created
+
+- name: Create ELB
+  elb_application_lb:
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+    subnets: "{{ _aws_ec2_subnets_ids }}"
+    security_groups:
+      - sg-0cd0bfd85ed07bb0c
+    listeners:
+      - Protocol: HTTP
+        Port: 80
+        DefaultActions:
+          - Type: forward
+            TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+  # register: _aws_ec2_elb_created
+
+# - debug:
+#     msg: "{{ _aws_ec2_subnets_ids }}"

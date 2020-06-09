@@ -1,0 +1,81 @@
+### {{ ansible_managed }}
+######### Default block.
+
+rewrite ^/index.php/(/|$) /$1  permanent;
+
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^ /index.php$is_args$args;
+}
+#  PHP fastcgi pass.
+location @phpprocess {
+    include fastcgi_params;
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;    
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    fastcgi_pass {{ nginx.php_fastcgi_backend }};
+}
+
+# Rewrite any request not whitelisted below, 
+# so they get processed through the app level (and 404).
+location / {
+    try_files @rewrite /index.php;
+}
+
+############ Blacklist block.
+# Most of those should not be in the webroot in the first place,
+# but we still provide a safety net.
+
+# Private files protection.
+location ~* ^/media/files/ {
+    deny    all;
+}
+
+
+############ Whitelist block.
+
+# Index file.
+location ~ index\.php(/|$){
+    try_files @phpprocess @phpprocess;
+}
+
+# Allow php in bundles.
+location ~ /app/bundles/.*/Assets/.*\.php(/|$) {
+    try_files @phpprocess @phpprocess;
+}
+
+# Allow Assets in bundles.
+location ~ /app/bundles/.*/Assets/ {
+    try_files $uri @rewrite;
+}
+
+# Allow php in plugins.
+location ~ /(addons|plugins)/.*/Assets/.*\.php(/|$) {
+    try_files @phpprocess @phpprocess;
+}
+
+# Allow Assets in plugins.
+location ~ /(addons|plugins)/.*/Assets/ {
+    try_files $uri @rewrite;
+}
+
+# Allow index_dev/upgrade for local stack.
+{% if is_local is defined and is_local %}
+location ~ ^/(index_dev|upgrade)\.php$ {
+    try_files @phpprocess @phpprocess;
+}
+{% endif %}
+
+# Core and contrib assets can be pretty much anywhere.
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot)$ {
+    try_files $uri @rewrite;
+}
+
+# Allow Let's Encrypt RFC 5785 ACME protocol.
+location ~* ^/.well-known/ {
+    try_files $uri =404;
+}
+
+# Allow robots.txt.
+location = /robots.txt {
+    try_files $uri @rewrite;
+}

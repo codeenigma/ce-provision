@@ -1,5 +1,4 @@
 ---
-
 - name: Gather AMI image from name.
   ec2_ami_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -10,9 +9,10 @@
   register: aws_ec2_with_eip_image
 
 - name: Register latest AMI image.
-  set_fact: 
+  set_fact:
     aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
+#@todo https://github.com/ansible/ansible/issues/54174
 - name: Create EC2 instance.
   ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -40,33 +40,32 @@
     filters:
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
   register: aws_ec2_with_eip_instances_eip
-- debug:
-    msg: "{{ aws_ec2_with_eip_instances_eip }}"
 
-- name: Generate Terraform template.
-  template:
-    src: eip.tf.j2
-    dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+# - name: Generate Terraform template.
+#   template:
+#     src: eip.tf.j2
+#     dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
+#   when: not aws_ec2_with_eip_instances_eip.addresses
 
-- name: Init Terraform.
-  command:
-    cmd: terraform init
-    chdir: "{{ _ansible_provision_build_tmp_dir }}"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+# - name: Init Terraform.
+#   command:
+#     cmd: terraform init
+#     chdir: "{{ _ansible_provision_build_tmp_dir }}"
+#   when: not aws_ec2_with_eip_instances_eip.addresses
 
-- name: Create EIP with Terraform if we don't have one.
-  command:
-    cmd: terraform apply -auto-approve
-    chdir: "{{ _ansible_provision_build_tmp_dir }}"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+# - name: Create EIP with Terraform if we don't have one.
+#   command:
+#     cmd: terraform apply -auto-approve
+#     chdir: "{{ _ansible_provision_build_tmp_dir }}"
+#   when: not aws_ec2_with_eip_instances_eip.addresses
 
-#@todo Deletion.
 - name: Associate Elastic IP.
   ec2_eip:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
+    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip | default(omit) }}"
+    private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
     in_vpc: yes
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
