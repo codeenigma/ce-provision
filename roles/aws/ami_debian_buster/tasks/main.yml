@@ -19,7 +19,8 @@
 - name: Delete existing image.
   include_tasks: delete.yml
   when: 
-    - ami_debian_buster.operation == 'create' or ami_debian_buster.operation == 'delete'
+#    - ami_debian_buster.operation == 'create' or ami_debian_buster.operation == 'delete'
+    - ami_debian_buster.operation == 'delete'
 
 - name: Create a new image.
   include_tasks: create.yml
