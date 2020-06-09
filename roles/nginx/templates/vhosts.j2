@@ -24,5 +24,9 @@ server {
     root "{{ domain.webroot }}";
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
     include "/etc/nginx/conf.d/_common";
+{% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
+    auth_basic "Restricted content";
+    auth_basic_user_file /etc/nginx/passwords/{{ domain.server_name }}.htpasswd;
+{% endif %}
 }
 {% endfor %}

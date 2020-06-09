@@ -28,6 +28,10 @@ nginx:
       ssl_handling: ssl_selfsigned
       ratelimitingcrawlers: yes
       is_default: yes
+      basic_auth:
+        auth_enabled: yes
+        auth_user: "{{ project_name }}"
+        auth_pass: "P3nguin!"
       servers:
         - port: 80
           ssl: no

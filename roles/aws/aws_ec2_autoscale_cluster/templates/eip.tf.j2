@@ -1,0 +1,11 @@
+provider "aws" {
+  region = "{{ aws_ec2_with_eip.region }}"
+  profile = "{{ aws_ec2_with_eip.aws_profile }}"
+}
+resource "aws_eip" "{{ aws_ec2_with_eip.instance_name | regex_replace('[^A-z0-9]', '_') }}" {
+  vpc = true
+  instance = "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
+  tags = {
+    "Name" = "{{ aws_ec2_with_eip.instance_name }}"
+  }
+}

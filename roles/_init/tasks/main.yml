@@ -74,4 +74,8 @@
         - "{{ playbook_dir}}/templates"
         - "{{ _ansible_provision_build_tmp_dir }}/extra/templates"
         - "{{ _ansible_provision_base_dir }}/config/templates"
-        - ""
+
+  - name: Add defaults lookup paths.
+    set_fact:
+      ansible_provision_search_paths_template: "{{ ansible_provision_search_paths_template + [ item + '/templates' ] }}"
+    with_items: "{{ ansible_search_path }}"
