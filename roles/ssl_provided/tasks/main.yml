@@ -11,11 +11,11 @@
 
 - name: Define key path.
   set_fact:
-    _ssl_current_key_path: "{{ _ssl_base_path }}/{{ ssl_provided.domain }}.key"
+    _ssl_current_key_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.key"
 
 - name: Define cert path.
   set_fact:
-    _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ ssl_provided.domain }}.cert"
+    _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.cert"
 
 - name: Check if we have an existing SSL key.
   stat:
@@ -24,7 +24,7 @@
 
 - name: Copy public cert file to destination
   copy:
-    content: "{{ ssl_provided.cert }}"
+    content: "{{ ssl.cert }}"
     dest: "{{ _ssl_current_cert_path }}"
     owner: root
     group: root
@@ -33,7 +33,7 @@
 
 - name: Copy private key file to destination
   copy:
-    content: "{{ ssl_provided.private_key }}"
+    content: "{{ ssl.private_key }}"
     dest: "{{ _ssl_current_key_path }}"
     owner: root
     group: root
@@ -42,4 +42,4 @@
 
 - name: Add key/cert pairs to know paths information.
   set_fact:
-    _ssl_paths: "{{ _ssl_paths | combine({ ssl_provided.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    _ssl_paths: "{{ _ssl_paths | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"

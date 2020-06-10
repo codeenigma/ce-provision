@@ -2,7 +2,7 @@
 
 _ssl_paths: {}
 
-ssl_provided:
+ssl:
   domain: 'www.example.com'
   cert: |
     -----BEGIN CERTIFICATE-----
