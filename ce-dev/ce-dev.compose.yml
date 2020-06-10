@@ -3,7 +3,7 @@ x-ce_dev:
   registry: localhost:5000
   project_name: provision
   provision: 
-    - ce-dev/ansible/provision.yml
+    - ce-dev/ansible/setup.yml
   unison: false
 services:
   controller:

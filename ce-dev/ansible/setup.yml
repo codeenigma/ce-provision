@@ -1,0 +1,12 @@
+---
+
+- hosts: provision-controller
+  become: yes
+  vars_files:
+    - common.yml
+  vars:
+    - domain_name: provision-controller.local
+    - project_name: provision
+  tasks:
+    - import_role:
+        name: ansible_provision
