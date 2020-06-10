@@ -1,2 +1,4 @@
 .ansible
 docker-compose.yml
+ansible/local/*
+!ansible/local/.gitkeep
