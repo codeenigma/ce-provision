@@ -7,7 +7,7 @@
 
 - name: define SSL base path.
   set_fact:
-    _ssl_base_path: '/etc/letsencrypt/live/{{ ssl_letsencrypt.domain }}'
+    _ssl_base_path: '/etc/letsencrypt/live/{{ ssl.domain }}'
 
 - name: define key path.
   set_fact:
@@ -26,14 +26,14 @@
   service:
     name: "{{ ssl_service }}"
     state: stopped
-  with_items: "{{ ssl_letsencrypt.services }}"
+  with_items: "{{ ssl.services }}"
   loop_control:
     loop_var: ssl_service
   when: 
     - not letsencrypt_cert.stat.exists
 
 - name: Register certificate if needed.
-  command: "/usr/bin/certbot certonly -n --cert-name {{ ssl_letsencrypt.domain }} --standalone --preferred-challenges http -d {{ ssl_letsencrypt.domain }} --agree-tos -m {{ ssl_letsencrypt.email }}"
+  command: "/usr/bin/certbot certonly -n --cert-name {{ ssl.domain }} --standalone --preferred-challenges http -d {{ ssl.domain }} --agree-tos -m {{ ssl.email }}"
   when: 
     - not letsencrypt_cert.stat.exists
 
@@ -41,7 +41,7 @@
   service:
     name: "{{ ssl_service }}"
     state: started
-  with_items: "{{ ssl_letsencrypt.services }}"
+  with_items: "{{ ssl.services }}"
   loop_control:
     loop_var: ssl_service
   when: 
@@ -49,4 +49,4 @@
 
 - name: Add key/cert pairs to know paths information.
   set_fact:
-    _ssl_paths: "{{ _ssl_paths | combine({ ssl_letsencrypt.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    _ssl_paths: "{{ _ssl_paths | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
