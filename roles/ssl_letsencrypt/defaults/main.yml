@@ -1,5 +1,5 @@
 ---
-ssl:
+ssl_letsencrypt:
   domain: 'www.example.com'
   email: admin@example.com
   services: ['nginx']
