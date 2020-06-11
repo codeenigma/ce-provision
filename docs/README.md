@@ -34,6 +34,8 @@ Provides a wrapper for installing packages through apt.
 
 ### [Gitlab](roles/gitlab/README.md)
 
+### [Gitlab Runner](roles/gitlab_runner/README.md)
+Install the Gitlab Runner binary from .deb package.
 ### [GPG Key](roles/gpg_key/README.md)
 Generates a passwordless GPG key for a given user or users.
 ### [HA Proxy](roles/haproxy/README.md)

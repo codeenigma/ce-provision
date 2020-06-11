@@ -1,0 +1,15 @@
+---
+
+- name: Add repository key for Gitlab Runner.
+  apt_key: url=https://packages.gitlab.com/runner/gitlab-runner/gpgkey state=present
+  
+- name: Add repository for Gitlab Runner.
+  apt_repository: repo='deb https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main' state=present
+
+- name: Add source repository for Gitlab Runner.
+  apt_repository: repo='deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main' state=present
+
+- name: Ensure Gitlab Runner is installed.
+  apt:
+    pkg: "gitlab-runner"
+    state: present
