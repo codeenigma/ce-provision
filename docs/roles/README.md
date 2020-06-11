@@ -15,6 +15,8 @@ Creates an image from Debian Buster base with Packer, provisioned with an Ansibl
 ### [Amazon credentials](aws/aws_credentials/README.md)
 Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 
+### [AMI Debian Buster](aws/aws_ec2_autoscale_cluster/README.md)
+Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
 ### [AMI Debian Buster](aws/aws_ec2_with_eip/README.md)
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
 ### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
@@ -31,6 +33,8 @@ Provides a wrapper for installing packages through apt.
 
 ## [Gitlab](gitlab/README.md)
 
+## [Gitlab Runner](gitlab_runner/README.md)
+Install the Gitlab Runner binary from .deb package.
 ## [GPG Key](gpg_key/README.md)
 Generates a passwordless GPG key for a given user or users.
 ## [HA Proxy](haproxy/README.md)
