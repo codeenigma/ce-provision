@@ -1,5 +1,3 @@
----
-
 - name: Ensure "locales" is installed.
   apt:
     pkg: "locales"
@@ -19,13 +17,13 @@
     dest: "/etc/default/locale"
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Generates locales.
   command: "/usr/sbin/locale-gen"
   when: locales_gen_changed.changed
-  
+
 - name: Set timezone
   timezone:
     name: "{{ locales.timezone }}"
