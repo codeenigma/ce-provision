@@ -1,5 +1,9 @@
 ### {{ ansible_managed }}
 
+add_header Referrer-Policy origin always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-XSS-Protection "1; mode=block" always;
+
 # Generic rewrite rule.
 location @rewrite {
     rewrite ^ /index.php?$query_string;
@@ -26,7 +30,8 @@ location / {
     try_files @rewrite /index.php;
 }
 
-############ Whitelist block.
+
+############ Allow block.
 
 ## only allow accessing the following php files
 location ~ ^/(index|matomo|piwik|js/index|plugins/HeatmapSessionRecording/configs)\.php {
@@ -57,12 +62,12 @@ location ~ js/container_.*_preview\.js$ {
     add_header Cache-Control 'private, no-cache, no-store';
 }
 
-############ Blacklist block.
+############ Block list.
 
 ## disable all access to the following directories
 location ~ /(config|tmp|core|lang) {
     deny all;
-    return 404; # replace with 404 to not show these directories exist
+    return 403;
 }
 
 location ~ /\.ht {
