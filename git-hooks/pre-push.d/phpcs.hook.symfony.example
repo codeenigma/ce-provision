@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# Rename to phpcs.hook and alter to your needs.
+GIT_DIR=$(git rev-parse --show-toplevel 2> /dev/null)
+PHPCS_BIN="phpcs"
+PHPCS_LOCAL_BIN="$GIT_DIR/vendor/bin/phpcs"
+if [ -x "$PHPCS_LOCAL_BIN" ]; then
+  PHPCS_BIN=$PHPCS_LOCAL_BIN
+fi
+
+# Base branch to compare diff.
+BASE_BRANCH="prod"
+for file in $(git diff "$1/$BASE_BRANCH" --name-only --staged); do
+  if [ -f "$GIT_DIR/$file" ]; then
+    PHPCS_CMD="$PHPCS_BIN --warning-severity=0 --standard=Symfony --extensions=php,test,js,css,info,txt,md $GIT_DIR/$file"
+    ERRORS=$($PHPCS_CMD | wc -l)
+    if [ "$ERRORS" != "0" ]; then
+      $PHPCS_CMD
+      echo "Coding Standard violations detected. Can not proceed with push."
+      echo "If you really need to bypass this, use git push --no-verify."
+      exit 1
+    fi
+  fi
+done
+exit 0
+ 
