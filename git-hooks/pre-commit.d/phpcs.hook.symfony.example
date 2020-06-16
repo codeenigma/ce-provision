@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Rename to phpcs.hook and alter to your needs.
+GIT_DIR=$(git rev-parse --show-toplevel 2> /dev/null)
+PHPCS_BIN="phpcs"
+PHPCS_LOCAL_BIN="$GIT_DIR/vendor/bin/phpcs"
+if [ -x "$PHPCS_LOCAL_BIN" ]; then
+  PHPCS_BIN=$PHPCS_LOCAL_BIN
+fi
+
+for file in $(git diff --cached --name-only); do
+  PHPCS_CMD="$PHPCS_BIN --warning-severity=0 --standard=Symfony --extensions=php,test,js,css,info,txt,md $GIT_DIR/$file"
+  ERRORS=$($PHPCS_CMD | wc -l)
+  if [ "$ERRORS" != "0" ]; then
+    $PHPCS_CMD
+    echo "Coding Standard violations detected. Can not proceed with commit."
+    echo "If you really need to bypass this, use git commit --no-verify."
+    exit 1
+  fi
+done
+exit 0
+ 
