@@ -5,13 +5,15 @@ GIT_DIR=$(git rev-parse --show-toplevel 2> /dev/null)
 ROLES_LIST=$(cd "$GIT_DIR" && find roles/ -type d -name "tasks" -exec dirname {} \;)
 ANSIBLE_LINT="/home/ce-dev/.local/bin/ansible-lint"
 PROVISION_CONTAINER="provision-controller"
+CONTAINER_BASE_PATH="/home/ce-dev/ansible-provision"
 OS=$(uname -s)
 DOCKER_USER="ce-dev"
 if [ "$OS" = "Darwin" ]; then
-    DOCKER_CMD="docker exec --user ${DOCKER_USER} -i ${PROVISION_CONTAINER}"
+    DOCKER_BIN="docker"
 else
-    DOCKER_CMD="sudo docker exec --user ${DOCKER_USER} -i ${PROVISION_CONTAINER}"
+    DOCKER_BIN="sudo docker"
 fi
+DOCKER_CMD="$DOCKER_BIN exec --user $DOCKER_USER --workdir $CONTAINER_BASE_PATH -i $PROVISION_CONTAINER"
 
 # Base branch to compare diff.
 BASE_BRANCH="1.x"
@@ -21,7 +23,7 @@ for file in $(git diff "$1/$BASE_BRANCH" --name-only --staged); do
       case $file in
         "$ROLE"*)
           printf "\e[36m Running Ansible linter against the\e[1m %s\e[0m\e[36m role. \e[0m \n" "$ROLE"
-          ANSIBLE_LINT_CMD="$DOCKER_CMD $ANSIBLE_LINT /home/ce-dev/ansible-provision/$ROLE"
+          ANSIBLE_LINT_CMD="$DOCKER_CMD $ANSIBLE_LINT $CONTAINER_BASE_PATH/$ROLE"
           ERRORS=$($ANSIBLE_LINT_CMD | wc -l)
           if [ "$ERRORS" != "0" ]; then
             $ANSIBLE_LINT_CMD
