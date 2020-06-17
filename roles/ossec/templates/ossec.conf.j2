@@ -74,6 +74,7 @@
 {% endfor %}
 {% endif %}
 
+{% if not ossec.client %}
 {% for item in ossec.remote.connection %}
   <remote>
     <connection>{{ item }}</connection>
@@ -84,6 +85,7 @@
     <log_alert_level>{{ ossec.alerts.log_alert_level }}</log_alert_level>
     <email_alert_level>{{ ossec.alerts.email_alert_level }}</email_alert_level>
   </alerts>
+{% endif %}
 
 {% for item in ossec.localfile %}
   <localfile>
@@ -92,9 +94,11 @@
   </localfile>
 
 {% endfor %}
+{% if not ossec.client %}
   <rules>
 {% for item in ossec.rules %}
     <include>{{ item }}</include>
 {% endfor %}
   </rules>
+{% endif %}
 </ossec_config>
