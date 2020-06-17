@@ -1,9 +1,7 @@
 ---
-# tasks file for clamav
-
 - name: Ensure ClamAV packages are installed
   apt:
-    pkg: ['clamav-daemon']
+    pkg: ["clamav-daemon"]
     state: present
     update_cache: yes
     cache_valid_time: 240
@@ -19,4 +17,4 @@
     - restart clamav
 
 - pause:
-    minutes: 1 
+    minutes: 1
