@@ -41,23 +41,23 @@
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
   register: aws_ec2_with_eip_instances_eip
 
-# - name: Generate Terraform template.
-#   template:
-#     src: eip.tf.j2
-#     dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
-#   when: not aws_ec2_with_eip_instances_eip.addresses
+- name: Generate Terraform template.
+  template:
+    src: eip.tf.j2
+    dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
+  when: not aws_ec2_with_eip_instances_eip.addresses
 
-# - name: Init Terraform.
-#   command:
-#     cmd: terraform init
-#     chdir: "{{ _ansible_provision_build_tmp_dir }}"
-#   when: not aws_ec2_with_eip_instances_eip.addresses
+- name: Init Terraform.
+  command:
+    cmd: terraform init
+    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+  when: not aws_ec2_with_eip_instances_eip.addresses
 
-# - name: Create EIP with Terraform if we don't have one.
-#   command:
-#     cmd: terraform apply -auto-approve
-#     chdir: "{{ _ansible_provision_build_tmp_dir }}"
-#   when: not aws_ec2_with_eip_instances_eip.addresses
+- name: Create EIP with Terraform if we don't have one.
+  command:
+    cmd: terraform apply -auto-approve
+    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+  when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Associate Elastic IP.
   ec2_eip:
