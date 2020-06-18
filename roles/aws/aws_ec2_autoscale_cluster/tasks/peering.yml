@@ -1,0 +1,72 @@
+# @todo cross-owner
+- name: Gather peer instance info.
+  ec2_instance_info:
+    filters:
+      "tag:Name": "{{ peering.name }}"
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ peering.region }}"
+  register: _aws_ec2_autoscale_cluster_peer_instance
+
+- name: Gather peer VPC information
+  ec2_vpc_net_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ peering.region }}"
+    vpc_ids: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
+  register: _aws_ec2_autoscale_cluster_peer_vpc
+
+- name: Create local VPC peering Connection
+  ec2_vpc_peer:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    vpc_id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+    peer_region: "{{ peering.region }}"
+    peer_vpc_id: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+  register: _aws_ec2_autoscale_cluster_peer_connection
+
+- name: Accept VPC peering request.
+  ec2_vpc_peer:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    peering_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
+    state: accept # @todo this only works for state present
+
+- name: Get main route table info.
+  ec2_vpc_route_table_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ peering.region }}"
+    filters:
+      "vpc-id": "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
+      "association.main": "true"
+  register: _aws_ec2_autoscale_cluster_peer_route_table
+
+- name: Reset existing routes.
+  set_fact:
+    _aws_ec2_autoscale_cluster_peer_routes: "{{ [] }}"
+
+- name: Gather existing routes.
+  set_fact:
+    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes | default([]) + [ { 'dest': route.destination_cidr_block, 'gateway_id': route.gateway_id } ] }}"
+  when:
+    - route.gateway_id is defined
+    - not route.gateway_id == 'local'
+  with_items: "{{ _aws_ec2_autoscale_cluster_peer_route_table.route_tables[0].routes }}"
+  loop_control:
+    loop_var: route
+
+- name: Gather subnets CIDR block routes.
+  set_fact:
+    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes + [ { 'dest': subnet.cidr, 'vpc_peering_connection_id': _aws_ec2_autoscale_cluster_peer_connection.peering_id } ] }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.subnets }}"
+  loop_control:
+    loop_var: subnet
+
+- name: Add peering to route table.
+  ec2_vpc_route_table:
+    route_table_id: "{{ _aws_ec2_autoscale_cluster_peer_route_table.route_tables[0].id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    lookup: id
+    routes: "{{ _aws_ec2_autoscale_cluster_peer_routes }}"

@@ -1,5 +1,4 @@
 ---
-
 - name: Check if an AMI image already exists.
   ec2_ami_info:
     profile: "{{ ami_debian_buster.aws_profile }}"
@@ -10,19 +9,19 @@
   register: debian_buster_ami_base_image
 
 - name: Register latest custom AMI image.
-  set_fact: 
+  set_fact:
     debian_buster_ami_base_image_latest: "{{ debian_buster_ami_base_image.images | sort(attribute='creation_date') | last }}"
-  when: 
+  when:
     - debian_buster_ami_base_image.images is defined
     - debian_buster_ami_base_image.images
 
 - name: Delete existing image.
   include_tasks: delete.yml
-  when: 
-#    - ami_debian_buster.operation == 'create' or ami_debian_buster.operation == 'delete'
+  when:
+    #    - ami_debian_buster.operation == 'create' or ami_debian_buster.operation == 'delete'
     - ami_debian_buster.operation == 'delete'
 
 - name: Create a new image.
   include_tasks: create.yml
-  when: 
+  when:
     - ami_debian_buster.operation == 'create' or (ami_debian_buster.operation == 'ensure' and not debian_buster_ami_base_image_latest.image_id is defined)
