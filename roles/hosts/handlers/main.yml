@@ -1,0 +1,6 @@
+---
+
+- name: restart hosts
+  service:
+    name: ncsd
+    state: restarted
