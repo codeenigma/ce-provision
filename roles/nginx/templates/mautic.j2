@@ -1,8 +1,6 @@
 ### {{ ansible_managed }}
 ######### Default block.
 
-rewrite ^/index.php/(/|$) /$1  permanent;
-
 # Generic rewrite rule.
 location @rewrite {
     rewrite ^ /index.php$is_args$args;
@@ -14,6 +12,9 @@ location @phpprocess {
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
     fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
+
+# Avoid a redirect loop.
+rewrite ^/s/saml/(.*) /index.php/s/saml/$1;
 
 # Rewrite any request not whitelisted below, 
 # so they get processed through the app level (and 404).
