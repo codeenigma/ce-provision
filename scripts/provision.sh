@@ -17,6 +17,8 @@ usage(){
   echo '--force: bypass the md5 checks on playbooks and play them regardless.'
   echo '--dry-run: Do not perform any action but run the playbooks in --check mode.'
   echo '--verbose: Detailled informations. This can potentially leak sensitive information in the output'
+  echo '--own-branch: Branch to use for the main stack repository'
+  echo '--config-branch: Branch to use for the main stack config repository'
 }
 
 # Common processing.
