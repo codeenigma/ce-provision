@@ -3,27 +3,26 @@
 
 # Generic rewrite rule.
 location @rewrite {
-    rewrite ^ /index.php$is_args$args;
+    rewrite ^/(.*) /index.php/$1$is_args$args;
 }
+
 #  PHP fastcgi pass.
 location @phpprocess {
     include fastcgi_params;
     fastcgi_split_path_info ^(.+\.php)(/.+)$;    
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT $realpath_root;
     fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
 
-# Avoid a redirect loop.
-rewrite ^/s/saml/(.*) /index.php/s/saml/$1;
-
-# Rewrite any request not whitelisted below, 
+# Rewrite any request not allowed below, 
 # so they get processed through the app level (and 404).
 location / {
-    try_files @rewrite /index.php;
+    try_files @rewrite @rewrite;
 }
 
-############ Blacklist block.
-# Most of those should not be in the webroot in the first place,
+############ Blocklist.
+# This should not be in the webroot in the first place,
 # but we still provide a safety net.
 
 # Private files protection.
@@ -32,7 +31,7 @@ location ~* ^/media/files/ {
 }
 
 
-############ Whitelist block.
+############ Allow block.
 
 # Index file.
 location ~ index\.php(/|$){

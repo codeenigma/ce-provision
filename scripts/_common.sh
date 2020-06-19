@@ -58,6 +58,14 @@ parse_options(){
       "--verbose")
           VERBOSE="yes"
         ;;
+      "--own-branch")
+          shift
+          git_checkout_own_dir "$1"
+        ;;
+      "--config-branch")
+          shift
+          git_checkout_config_dir "$1"
+        ;;
         *)
         usage
         exit 1
@@ -113,4 +121,24 @@ ansible_play(){
   fi
   $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
   return $?
+}
+
+# Update repository.
+# @param $1 absolute path to local repo.
+# @param $2 branch to checkout.
+git_checkout(){
+  git -C "$1" checkout "$2"
+  git -C "$1" pull origin "$2"
+}
+
+# Update own repository.
+# @param $1 branch to checkout.
+git_checkout_own_dir(){
+  git_checkout "$OWN_DIR" "$1"
+}
+
+# Update own repository.
+# @param $1 branch to checkout.
+git_checkout_config_dir(){
+  git_checkout "$OWN_DIR/config" "$1"
 }
