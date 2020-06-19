@@ -15,7 +15,7 @@
   include_tasks: ossec-client.yml
   when: ossec.client
 
-- name: Copy OSSEC configuration 
+- name: Copy OSSEC configuration
   template:
     src: ossec.conf.j2
     dest: "/var/ossec/etc/ossec.conf"
