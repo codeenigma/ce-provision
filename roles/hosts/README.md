@@ -8,7 +8,6 @@ Forked from https://github.com/bertvv/ansible-role-hosts
 <!--ROLEVARS-->
 ## Default variables
 ```yaml
-# roles/hosts/defaults/main.yml
 ---
 
 hosts_playbook_version: "1.0.1"
@@ -21,6 +20,9 @@ hosts_add_basic_ipv6: true
 
 # If set to true, an entry for every host managed by Ansible is added. Remark that this makes `hosts_add_default_ipv4` unnecessary, as it will be added as wel by this setting.
 hosts_add_ansible_managed_hosts: false
+
+# Default hosts entries; controlled in config repo
+_default_hosts_entries: []
 
 # Custom hosts entries to be added
 hosts_entries: []

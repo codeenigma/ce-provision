@@ -20,10 +20,10 @@ ff02::2  ip6-allrouters
 {{ hostvars[host][hosts_ansible_network_interface][hosts_ip_protocol]['address'] }} {{ hostvars[host]['ansible_fqdn'] }} {{ hostvars[host]['ansible_hostname'] }}
 {% endfor %}
 {% endif %}
-{% if hosts_entries|length != 0 %}
+{% if _hosts_entries|length != 0 %}
 
 # Custom entries
-{% for host in hosts_entries %}
+{% for host in _hosts_entries %}
 {{ host.ip }}  {{ host.name }} {{ host.aliases | default('') | join(' ') }}
 {% endfor %}
 {% endif %}
