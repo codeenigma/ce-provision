@@ -1,5 +1,9 @@
 ---
 
+- name: Define hosts entries.
+  set_fact:
+    _hosts_entries: "{{ hosts_entries + _default_hosts_entries }}"
+
 - name: Install custom hosts file
   template:
     src: etc_hosts.j2
