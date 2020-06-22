@@ -1,10 +1,12 @@
 <ossec_config>
-  <global>
 {% if ossec.client %}
-    <client>
-      <server-ip>{{ ossec.serverip }}</server-ip>
-    </client>
-{% else %}
+  <client>
+    <server-ip>{{ ossec.serverip }}</server-ip>
+  </client>
+
+{% endif %}
+  <global>
+{% if not ossec.client %}
     <email_notification>{{ ossec.global.email_notification }}</email_notification>
     <email_to>{{ ossec.global.email_to }}</email_to>
     <smtp_server>{{ ossec.global.smtp_server }}</smtp_server>
