@@ -1,5 +1,6 @@
 *.retry
 *.pyc
+*.orig
 /data
 /build
 /config
