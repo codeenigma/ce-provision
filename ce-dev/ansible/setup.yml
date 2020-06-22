@@ -10,3 +10,12 @@
   tasks:
     - import_role:
         name: ansible_provision
+    - name: Remove example git hooks.
+      file:
+        path: "/home/ce-dev/ansible-provision/.git/hooks"
+        state: absent
+    - name: Create git-hooks link.
+      file:
+        src: "../git-hooks"
+        dest: "/home/ce-dev/ansible-provision/.git/hooks"
+        state: link
