@@ -1,0 +1,14 @@
+---
+# Spin up a "blank" instance.
+- hosts: provision-target
+  become: yes
+  vars_files:
+    - ../../common.yml
+    - vars.yml
+  tasks:
+    - import_role:
+        name: _init
+    - import_role:
+        name: _meta/common_base
+    - import_role:
+        name: _exit
