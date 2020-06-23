@@ -1,5 +1,3 @@
----
-
 - name: Generate Name tag.
   set_fact:
     _vpc_security_group_name: "{{ aws_vpc_with_subnets.name }}-{{ security_group.name }}"

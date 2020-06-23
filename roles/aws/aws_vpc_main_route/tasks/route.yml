@@ -1,0 +1,13 @@
+- name: Normalize route.
+  set_fact:
+    _aws_vpc_main_route_route:
+      dest: "{{ route.destination_cidr_block }}"
+      gateway_id: "{{ route.gateway_id | default(omit) }}"
+      network_interface_id: "{{ route.network_interface_id | default(omit) }}"
+      vpc_peering_connection_id: "{{ route.vpc_peering_connection_id | default(omit) }}"
+      instance_id: "{{ route.instance_id | default(omit) }}"
+
+- name: Add route to the list.
+  set_fact:
+    aws_vpc_main_route_routes: "{{ aws_vpc_main_route_routes | combine( { _aws_vpc_main_route_route.dest:  _aws_vpc_main_route_route } ) }}"
+  when: ( route.gateway_id is undefined or route.gateway_id != 'local' )
