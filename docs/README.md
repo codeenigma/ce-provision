@@ -40,6 +40,9 @@ Install the Gitlab Runner binary from .deb package.
 Generates a passwordless GPG key for a given user or users.
 ### [HA Proxy](roles/haproxy/README.md)
 
+### [Managed /etc/hosts](roles/hosts/README.md)
+Forked from https://github.com/bertvv/ansible-role-hosts
+
 ### [Jenkins](roles/jenkins/README.md)
 
 ### ["Meta" roles that group individual roles together.](roles/meta/README.md)

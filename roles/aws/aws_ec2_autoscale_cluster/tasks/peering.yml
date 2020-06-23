@@ -32,41 +32,31 @@
     peering_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
     state: accept # @todo this only works for state present
 
-- name: Get main route table info.
-  ec2_vpc_route_table_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ peering.region }}"
-    filters:
-      "vpc-id": "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
-      "association.main": "true"
-  register: _aws_ec2_autoscale_cluster_peer_route_table
-
-- name: Reset existing routes.
+- name: Add/replace subnets CIDR block routes.
   set_fact:
-    _aws_ec2_autoscale_cluster_peer_routes: "{{ [] }}"
-
-- name: Gather existing routes.
-  set_fact:
-    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes | default([]) + [ { 'dest': route.destination_cidr_block, 'gateway_id': route.gateway_id } ] }}"
-  when:
-    - route.gateway_id is defined
-    - not route.gateway_id == 'local'
-  with_items: "{{ _aws_ec2_autoscale_cluster_peer_route_table.route_tables[0].routes }}"
-  loop_control:
-    loop_var: route
-
-- name: Gather subnets CIDR block routes.
-  set_fact:
-    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes + [ { 'dest': subnet.cidr, 'vpc_peering_connection_id': _aws_ec2_autoscale_cluster_peer_connection.peering_id } ] }}"
+    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes | default([]) + [ { 'dest': subnet.cidr, 'vpc_peering_connection_id': _aws_ec2_autoscale_cluster_peer_connection.peering_id } ] }}"
   with_items: "{{ aws_ec2_autoscale_cluster.subnets }}"
   loop_control:
     loop_var: subnet
 
-- name: Add peering to route table.
-  ec2_vpc_route_table:
-    route_table_id: "{{ _aws_ec2_autoscale_cluster_peer_route_table.route_tables[0].id }}"
-    vpc_id: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    lookup: id
-    routes: "{{ _aws_ec2_autoscale_cluster_peer_routes }}"
+- name: Update peer route table.
+  include_role:
+    name: aws/aws_vpc_main_route
+  vars:
+    aws_vpc_main_route:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ peering.region }}"
+      vpc_id: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
+      routes: "{{ _aws_ec2_autoscale_cluster_peer_routes }}"
+
+- name: Update reverse peer route table.
+  include_role:
+    name: aws/aws_vpc_main_route
+  vars:
+    aws_vpc_main_route:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      vpc_id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+      routes:
+        - dest: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].private_ip_address }}/32"
+          vpc_peering_connection_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
