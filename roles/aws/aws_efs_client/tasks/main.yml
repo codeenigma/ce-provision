@@ -1,0 +1,13 @@
+- name: Install NFS client
+  apt:
+    name: nfs-common
+    state: present
+- name: Install EWS EFS utils
+  apt:
+    deb: "https://github.com/codeenigma/aws-efs-utils-deb-builder/releases/download/v{{ aws_efs_client.version }}/amazon-efs-utils-{{ aws_efs_client.version }}.deb"
+
+- name: Create fstab entries.
+  include_tasks: fstab.yml
+  with_items: "{{ aws_efs_client.mounts }}"
+  loop_control:
+    loop_var: mount

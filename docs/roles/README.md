@@ -19,6 +19,9 @@ Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 
 ### [AMI Debian Buster](aws/aws_ec2_with_eip/README.md)
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+### [EFS client](aws/aws_efs_client/README.md)
+Mounts EFS volume(s) to specific mount point(s).
+It uses the "Name" tag for a given volume to retrieve the volume path.
 ### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
 Creates a key pair for the current "provision user"
 ### [Update main route for a given VPC](aws/aws_vpc_main_route/README.md)
