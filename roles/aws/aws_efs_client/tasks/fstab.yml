@@ -12,6 +12,6 @@
   mount:
     fstype: efs
     opts: "{{ mount.opts }}"
-    src: "{{ aws_efs_client_efs_volume.efs[0].mount_point }}"
+    src: "{{ aws_efs_client_efs_volume.efs[0].filesystem_address }}"
     path: "{{ mount.path }}"
     state: "{{ mount.state }}"
