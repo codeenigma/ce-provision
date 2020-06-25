@@ -19,6 +19,9 @@ Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
 ### [AMI Debian Buster](aws/aws_ec2_with_eip/README.md)
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+### [EFS client](aws/aws_efs_client/README.md)
+Mounts EFS volume(s) to specific mount point(s).
+It uses the "Name" tag for a given volume to retrieve the volume path.
 ### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
 Creates a key pair for the current "provision user"
 ### [VPC](aws/aws_vpc_with_subnets/README.md)
@@ -38,6 +41,9 @@ Install the Gitlab Runner binary from .deb package.
 ## [GPG Key](gpg_key/README.md)
 Generates a passwordless GPG key for a given user or users.
 ## [HA Proxy](haproxy/README.md)
+
+## [Managed /etc/hosts](hosts/README.md)
+Forked from https://github.com/bertvv/ansible-role-hosts
 
 ## [Jenkins](jenkins/README.md)
 
