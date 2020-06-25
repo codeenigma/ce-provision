@@ -15,8 +15,8 @@ Creates an image from Debian Buster base with Packer, provisioned with an Ansibl
 ### [Amazon credentials](aws/aws_credentials/README.md)
 Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 
-### [AMI Debian Buster](aws/aws_ec2_autoscale_cluster/README.md)
-Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+### [Autoscale cluster](aws/aws_ec2_autoscale_cluster/README.md)
+
 ### [AMI Debian Buster](aws/aws_ec2_with_eip/README.md)
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
 ### [EFS client](aws/aws_efs_client/README.md)
@@ -24,6 +24,8 @@ Mounts EFS volume(s) to specific mount point(s).
 It uses the "Name" tag for a given volume to retrieve the volume path.
 ### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
 Creates a key pair for the current "provision user"
+### [Update main route for a given VPC](aws/aws_vpc_main_route/README.md)
+This will add/update routes on the "main" route table for a given VPC, leaving existing routes for different CIDR blocks intact.
 ### [VPC](aws/aws_vpc_with_subnets/README.md)
 Creates a VPC and associated subnets.
 ## [Extra packages](ce_dev/README.md)

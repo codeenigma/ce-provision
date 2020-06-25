@@ -31,16 +31,16 @@ aws_vpc_with_subnets:
       cidr: "{{ _aws_vpc_with_subnets_cidr_base }}.64/26"
     - az: c
       cidr: "{{ _aws_vpc_with_subnets_cidr_base }}.128/26"
-  security_groups:
-    - name: web - open
-      description: Allow all incoming traffic on ports 80 and 443
-      rules:
-        - proto: tcp
-          ports:
-            - 80
-            - 443
-          cidr_ip: 0.0.0.0/0
-          rule_desc: Allow all incoming traffic on ports 80 and 443 
+  security_groups: []
+    # - name: web - open
+    #   description: Allow all incoming traffic on ports 80 and 443
+    #   rules:
+    #     - proto: tcp
+    #       ports:
+    #         - 80
+    #         - 443
+    #       cidr_ip: 0.0.0.0/0
+    #       rule_desc: Allow all incoming traffic on ports 80 and 443 
 
 ```
 

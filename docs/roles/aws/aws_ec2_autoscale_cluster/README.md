@@ -1,5 +1,5 @@
-# AMI Debian Buster
-Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+# Autoscale cluster
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -30,13 +30,16 @@ key_name: "{{ ansible_provision.username }}@{{ ansible_hostname }}" # This needs
 ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
 ami_owner: self # Default to self-created image.
 root_volume_size: 40
-instance_type: t2.micro
 ami_playbook_file: "{{ playbook_dir }}/ami.yml"
 min_size: 4
 max_size: 8
 security_groups: []
 tags:
 Name: "example"
+# Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
+peering:
+- name: utility-server.example.com
+region: eu-west-3
 
 ```
 
