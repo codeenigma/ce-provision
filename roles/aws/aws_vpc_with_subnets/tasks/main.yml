@@ -14,20 +14,17 @@
     region: "{{ aws_vpc_with_subnets.region }}"
     vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
     state: present
-    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name })}}"
+    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name }) }}"
   register: _ec2_igw_created
-  when: aws_vpc_with_subnets.create_gateway
 
 - name: Create VPC subnets.
-  include_tasks:
-    file: "subnet.yml"
+  include_tasks: "subnet.yml"
   with_items: "{{ aws_vpc_with_subnets.subnets }}"
   loop_control:
     loop_var: subnet
 
 - name: Create VPC Security groups.
-  include_tasks:
-    file: "security_group.yml"
+  include_tasks: "security_group.yml"
   with_items: "{{ aws_vpc_with_subnets.security_groups }}"
   loop_control:
     loop_var: security_group
@@ -52,12 +49,23 @@
   loop_control:
     loop_var: subnet
 
-- name: Set up public subnet route table
+- name: Get main route table info.
+  ec2_vpc_route_table_info:
+    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
+    region: "{{ aws_vpc_with_subnets.region }}"
+    filters:
+      "vpc-id": "{{ _ec2_vpc_created.vpc.id }}"
+      "association.main": "true"
+  register: _aws_vpc_with_subnets_main_route
+
+- name: Set up public subnet route table.
   ec2_vpc_route_table:
+    route_table_id: "{{ _aws_vpc_with_subnets_main_route.route_tables[0].id }}"
     vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
     profile: "{{ aws_vpc_with_subnets.aws_profile }}"
     region: "{{ aws_vpc_with_subnets.region }}"
-    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name })}}"
+    lookup: id
+    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name }) }}"
     subnets: "{{ _ec2_subnets_ids }}"
     routes:
       - dest: 0.0.0.0/0
