@@ -1,5 +1,5 @@
 ---
 
 dependencies:
-  - role: python-boto3
+  - role: python-boto
   - role: ansible
