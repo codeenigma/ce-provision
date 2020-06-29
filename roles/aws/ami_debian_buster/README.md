@@ -2,7 +2,7 @@
 Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
 
 ## Dependencies
-This requires Boto3 and Packer on the "provisioning" server.
+This requires boto and Packer on the "provisioning" server.
 
 <!--TOC-->
 <!--ENDTOC-->

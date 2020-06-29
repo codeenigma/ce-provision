@@ -1,0 +1,41 @@
+- name: Create DB subnet
+  rds_subnet_group:
+    name: "{{ aws_rds.name }}"
+    state: "{{ aws_rds.state }}"
+    subnets: "{{ aws_rds.subnets }}"
+    region: "{{ aws_rds.region }}"
+    profile: "{{ aws_rds.aws_profile }}"
+    description: "{{ aws_rds.description }}"
+  register: _aws_rds_rds_subnet_group
+
+- name: Create RDS instance
+  rds_instance:
+    db_instance_identifier: "{{ aws_rds.name }}"
+    db_instance_class: "{{ aws_rds.db_instance_class }}"
+    #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
+    master_username: "{{ aws_rds.master_username }}"
+    master_user_password: "{{ aws_rds.master_user_password }}"
+    state: "{{ aws_rds.state }}"
+    #preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
+    engine: "{{ aws_rds.engine }}"
+    #db_parameter_group_name: undefined # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
+    copy_tags_to_snapshot: yes
+    #character_set_name: undefined # not required. The character set to associate with the DB cluster.
+    #multi_az: undefined # not required. Specifies if the DB instance is a Multi-AZ deployment. Mutually exclusive with I(availability_zone).
+    db_subnet_group_name: "{{ _aws_rds_rds_subnet_group.subnet_group.name }}"
+    #auto_minor_version_upgrade: undefined # not required. Whether minor version upgrades are applied automatically to the DB instance during the maintenance window.
+    force_update_password: false # not required. Set to True to update your cluster password with I(master_user_password). Since comparing passwords to determine if it needs to be updated is not possible this is set to False by default to allow idempotence.
+    publicly_accessible: false
+    #enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
+    allocated_storage: “{{ aws_rds.allocated_storage }}“
+    max_allocated_storage: “{{ aws_rds.max_allocated_storage }}“
+    #vpc_security_group_ids: undefined # not required. A list of EC2 VPC security groups to associate with the DB cluster.
+    profile: "{{ aws_rds.aws_profile }}"
+    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    allow_major_version_upgrade: false
+    #storage_encrypted: undefined # not required. Whether the DB instance is encrypted.
+    apply_immediately: true
+    wait: true
+    region: "{{ aws_rds.region }}"
+    engine_version: "{{ aws_rds.engine_version | default(ommit) }}"
+    #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
