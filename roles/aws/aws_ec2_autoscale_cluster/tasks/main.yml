@@ -35,19 +35,19 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
       "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
-  register: _aws_ec2_vpc
+  register: _aws_ec2_autoscale_cluster_vpc
 
 - name: Gather Subnets information
   ec2_vpc_subnet_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
-      vpc-id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   register: _aws_ec2_subnets
 
 - name: Construct list of subnet ids.
   set_fact:
-    _aws_ec2_subnets_ids: "{{ _aws_ec2_subnets_ids | default([]) + [subnet.subnet_id] }}"
+    _aws_ec2_autoscale_cluster_subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids | default([]) + [subnet.subnet_id] }}"
   with_items: "{{ _aws_ec2_subnets.subnets }}"
   loop_control:
     loop_var: subnet
@@ -58,6 +58,21 @@
   with_items: "{{ _aws_ec2_subnets.subnets }}"
   loop_control:
     loop_var: subnet
+
+- name: Create RDS instance
+  include_role:
+    name: aws/aws_rds
+  vars:
+    aws_rds:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      instance_type: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
+      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      description: "{{ aws_ec2_autoscale_cluster.name }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      engine: "{{ aws_ec2_autoscale_cluster.rds.engine }}"
+      engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
 
 - name: Create EFS volume
   efs:
@@ -99,7 +114,7 @@
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
-      vpc-id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   register: _aws_ec2_autoscale_cluster_sg_info
 
 - name: Construct list of sg ids.
@@ -117,7 +132,7 @@
     key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
-    vpc_id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
     security_groups: "{{ _aws_ec2_sg_ids }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     volumes:
@@ -134,7 +149,7 @@
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     protocol: http
     port: 80
-    vpc_id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   register: _aws_ec2_target_group_created
 
 - name: Create Autoscale group
@@ -144,12 +159,12 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: yes
+    replace_all_instances: no
     wait_for_instances: no
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
-    vpc_zone_identifier: "{{ _aws_ec2_subnets_ids }}"
+    vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     target_group_arns:
       - "{{ _aws_ec2_target_group_created.target_group_arn }}"
   register: _aws_ec2_asg_created
@@ -161,7 +176,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-    subnets: "{{ _aws_ec2_subnets_ids }}"
+    subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     security_groups: "{{ _aws_ec2_sg_ids }}"
     listeners:
       - Protocol: HTTP
