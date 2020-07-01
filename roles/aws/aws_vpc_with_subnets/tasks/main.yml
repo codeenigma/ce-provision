@@ -6,16 +6,7 @@
     region: "{{ aws_vpc_with_subnets.region }}"
     tags: "{{ aws_vpc_with_subnets.tags }}"
     state: "{{ aws_vpc_with_subnets.state }}"
-  register: _ec2_vpc_created
-
-- name: Create IGW
-  ec2_vpc_igw:
-    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
-    region: "{{ aws_vpc_with_subnets.region }}"
-    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
-    state: present
-    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name }) }}"
-  register: _ec2_igw_created
+  register: _aws_vpc_with_subnets_vpc
 
 - name: Create VPC subnets.
   include_tasks: "subnet.yml"
@@ -29,44 +20,21 @@
   loop_control:
     loop_var: security_group
 
+- name: Create VPC IGW.
+  include_tasks: "igw.yml"
+
 - name: Gather Subnets information
   ec2_vpc_subnet_info:
     profile: "{{ aws_vpc_with_subnets.aws_profile }}"
     region: "{{ aws_vpc_with_subnets.region }}"
     filters:
-      vpc-id: "{{ _ec2_vpc_created.vpc.id }}"
-  register: _ec2_subnets_info
+      vpc-id: "{{ _aws_vpc_with_subnets_vpc.vpc.id }}"
+  register: _aws_vpc_with_subnets_subnets
+  when: aws_vpc_with_subnets.nat_ipv4
 
-# Make sure we can be called several times in a row.
-- name: Reset subnet list.
-  set_fact:
-    _ec2_subnets_ids: []
-
-- name: Construct list of subnet ids.
-  set_fact:
-    _ec2_subnets_ids: "{{ _ec2_subnets_ids | default([]) + [subnet.subnet_id] }}"
-  with_items: "{{ _ec2_subnets_info.subnets }}"
+- name: Create VPC ipv4 gateway.
+  include_tasks: "gateway.ipv4.nat.yml"
+  with_items: "{{ _aws_vpc_with_subnets_subnets.subnets }}"
   loop_control:
     loop_var: subnet
-
-- name: Get main route table info.
-  ec2_vpc_route_table_info:
-    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
-    region: "{{ aws_vpc_with_subnets.region }}"
-    filters:
-      "vpc-id": "{{ _ec2_vpc_created.vpc.id }}"
-      "association.main": "true"
-  register: _aws_vpc_with_subnets_main_route
-
-- name: Set up public subnet route table.
-  ec2_vpc_route_table:
-    route_table_id: "{{ _aws_vpc_with_subnets_main_route.route_tables[0].id }}"
-    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
-    profile: "{{ aws_vpc_with_subnets.aws_profile }}"
-    region: "{{ aws_vpc_with_subnets.region }}"
-    lookup: id
-    tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': aws_vpc_with_subnets.name }) }}"
-    subnets: "{{ _ec2_subnets_ids }}"
-    routes:
-      - dest: 0.0.0.0/0
-        gateway_id: "{{ _ec2_igw_created.gateway_id }}"
+  when: aws_vpc_with_subnets.nat_ipv4

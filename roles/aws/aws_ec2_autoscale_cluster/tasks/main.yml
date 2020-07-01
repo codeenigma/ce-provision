@@ -19,7 +19,6 @@
     name: aws/aws_vpc_with_subnets
   vars:
     aws_vpc_with_subnets:
-      create_gateway: yes
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -28,6 +27,7 @@
       security_groups: "{{ aws_ec2_autoscale_cluster.security_groups + [ _aws_ec2_autoscale_cluster_internal_security_group ] }}"
       cidr_block: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
       subnets: "{{ aws_ec2_autoscale_cluster.subnets }}"
+      nat_ipv4: yes
 
 - name: Gather VPC information
   ec2_vpc_net_info:
@@ -43,19 +43,19 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
       vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-  register: _aws_ec2_subnets
+  register: _aws_ec2_autoscale_cluster_subnets
 
 - name: Construct list of subnet ids.
   set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids | default([]) + [subnet.subnet_id] }}"
-  with_items: "{{ _aws_ec2_subnets.subnets }}"
+  with_items: "{{ _aws_ec2_autoscale_cluster_subnets.subnets }}"
   loop_control:
     loop_var: subnet
 
 - name: Construct list of EFS targets.
   set_fact:
     _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets | default([]) + [ { 'subnet_id': subnet.subnet_id } ] }}"
-  with_items: "{{ _aws_ec2_subnets.subnets }}"
+  with_items: "{{ _aws_ec2_autoscale_cluster_subnets.subnets }}"
   loop_control:
     loop_var: subnet
 
@@ -73,6 +73,10 @@
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       engine: "{{ aws_ec2_autoscale_cluster.rds.engine }}"
       engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
+      allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
+      max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
+      master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
+      master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
 
 - name: Create EFS volume
   efs:

@@ -1,0 +1,7 @@
+- name: Update main VPC route.
+  include_tasks: vpc.yml
+  when: ( aws_vpc_route.subnet_id is not defined or aws_vpc_route.subnet_id | length < 1 )
+
+- name: Update subnet route.
+  include_tasks: subnet.yml
+  when: ( aws_vpc_route.subnet_id is defined and aws_vpc_route.subnet_id | length > 0 )

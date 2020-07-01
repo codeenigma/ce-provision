@@ -9,7 +9,7 @@
     region: "{{ aws_vpc_with_subnets.region }}"
     tags: "{{ aws_vpc_with_subnets.tags | combine({ 'Name': _vpc_security_group_name }) }}"
     state: "{{ aws_vpc_with_subnets.state }}"
-    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
+    vpc_id: "{{ _aws_vpc_with_subnets_vpc.vpc.id }}"
     description: "{{ security_group.description }}"
     rules: "{{ security_group.rules }}"
     rules_egress: "{{ security_group.rules_egress | default(omit) }}"

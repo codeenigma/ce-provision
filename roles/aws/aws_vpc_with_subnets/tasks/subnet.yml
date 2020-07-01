@@ -2,7 +2,7 @@
 
 - name: Generate Name tag.
   set_fact:
-    _vpc_subnet_name_tag: { Name: "{{ aws_vpc_with_subnets.name }}-{{ subnet.az }}"}
+    _vpc_subnet_name_tag: { 'Name': "{{ aws_vpc_with_subnets.name }}-{{ subnet.az }}" }
 
 - name: Generate subnet tags.
   set_fact:
@@ -16,5 +16,5 @@
     tags: "{{ _vpc_subnet_tags }}"
     az: "{{ aws_vpc_with_subnets.region }}{{ subnet.az }}"
     state: "{{ aws_vpc_with_subnets.state }}"
-    vpc_id: "{{ _ec2_vpc_created.vpc.id }}"
+    vpc_id: "{{ _aws_vpc_with_subnets_vpc.vpc.id }}"
     assign_instances_ipv6: "{{ aws_vpc_with_subnets.assign_instances_ipv6 }}"

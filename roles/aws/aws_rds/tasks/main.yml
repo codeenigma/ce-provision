@@ -27,8 +27,8 @@
     force_update_password: false # not required. Set to True to update your cluster password with I(master_user_password). Since comparing passwords to determine if it needs to be updated is not possible this is set to False by default to allow idempotence.
     publicly_accessible: false
     #enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
-    allocated_storage: “{{ aws_rds.allocated_storage }}“
-    max_allocated_storage: “{{ aws_rds.max_allocated_storage }}“
+    allocated_storage: "{{ aws_rds.allocated_storage }}"
+    max_allocated_storage: "{{ aws_rds.max_allocated_storage }}"
     #vpc_security_group_ids: undefined # not required. A list of EC2 VPC security groups to associate with the DB cluster.
     profile: "{{ aws_rds.aws_profile }}"
     tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"

@@ -6,7 +6,7 @@ This will add/update routes on the "main" route table for a given VPC, leaving e
 <!--ROLEVARS-->
 ## Default variables
 ```yaml
-aws_vpc_main_route:
+aws_vpc_route:
   aws_profile: default
   region: eu-west-3
   # tags:
