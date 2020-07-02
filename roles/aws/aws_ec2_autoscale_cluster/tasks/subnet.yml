@@ -25,9 +25,18 @@
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
-      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
       tag:Name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
   register: _aws_ec2_autoscale_cluster_subnet
+
+- name: Gather public subnet information
+  ec2_vpc_subnet_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      tag:Name: "{{ subnet.public_subnet }}"
+  register: _aws_ec2_autoscale_cluster_public_subnet
 
 - name: Add subnet id to the ids list.
   set_fact:
@@ -36,3 +45,7 @@
 - name: Add subnet to the list of EFS targets.
   set_fact:
     _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id } ] }}"
+
+- name: Add public subnet to the list.
+  set_fact:
+    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_public_subnet.subnets[0].subnet_id ] }}"

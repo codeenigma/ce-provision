@@ -2,33 +2,6 @@
   set_fact:
     _aws_ec2_autoscale_cluster_unique_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ ansible_date_time.iso8601_basic_short }}"
 
-# #@todo Not sure we need this, the default SG should do this already.
-# - name: Define internal security group.
-#   set_fact:
-#     _aws_ec2_autoscale_cluster_internal_security_group:
-#       name: "{{ aws_ec2_autoscale_cluster.name }}"
-#       description: Allow internal traffic within the VPC
-#       rules:
-#         - proto: all
-#           ports: -1
-#           cidr_ip: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
-#           rule_desc: Allow internal traffic within the VPC
-
-# - name: Create cluster's VPC
-#   include_role:
-#     name: aws/aws_vpc_with_subnets
-#   vars:
-#     aws_vpc_with_subnets:
-#       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-#       region: "{{ aws_ec2_autoscale_cluster.region }}"
-#       name: "{{ aws_ec2_autoscale_cluster.name }}"
-#       state: "{{ aws_ec2_autoscale_cluster.state }}"
-#       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-#       security_groups: "{{ aws_ec2_autoscale_cluster.security_groups + [ _aws_ec2_autoscale_cluster_internal_security_group ] }}"
-#       cidr_block: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
-#       subnets: "{{ aws_ec2_autoscale_cluster.subnets }}"
-#       nat_ipv4: yes
-
 - name: Gather VPC information
   ec2_vpc_net_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -52,6 +25,7 @@
   set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: []
     _aws_ec2_autoscale_cluster_efs_targets: []
+    _aws_ec2_autoscale_cluster_public_subnets_ids: []
 
 - name: Create private subnets.
   include_tasks: subnet.yml
@@ -113,21 +87,6 @@
   set_fact:
     aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
 
-# - name: Gather security groups info.
-#   ec2_group_info:
-#     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-#     region: "{{ aws_ec2_autoscale_cluster.region }}"
-#     filters:
-#       vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-#   register: _aws_ec2_autoscale_cluster_sg_info
-
-# - name: Construct list of sg ids.
-#   set_fact:
-#     _aws_ec2_sg_ids: "{{ _aws_ec2_sg_ids | default([]) + [security_group.group_id] }}"
-#   with_items: "{{ _aws_ec2_autoscale_cluster_sg_info.security_groups }}"
-#   loop_control:
-#     loop_var: security_group
-
 - name: Create Launch Configuration
   ec2_lc:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -137,8 +96,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-    security_groups:
-      - sg-03cf4f0481af10c54
+    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     volumes:
       - device_name: /dev/xvda
@@ -181,9 +139,8 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-    subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
-    security_groups:
-      - sg-03cf4f0481af10c54
+    subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
     listeners:
       - Protocol: HTTP
         Port: 80
