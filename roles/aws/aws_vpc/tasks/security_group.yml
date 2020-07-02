@@ -1,6 +1,6 @@
 - name: Create Security Group.
   ec2_group:
-    name: "{{ _vpc_security_group_name }}"
+    name: "{{ security_group.name }}"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
     tags: "{{ aws_vpc.tags | combine({ 'Name': security_group.name }) }}"
