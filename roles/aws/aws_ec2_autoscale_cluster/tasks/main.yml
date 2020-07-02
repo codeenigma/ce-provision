@@ -88,30 +88,30 @@
     targets: "{{ _aws_ec2_autoscale_cluster_efs_targets }}"
   register: _aws_ec2_autoscale_cluster_efs
 
-# - name: Create new AMI.
-#   include_role:
-#     name: aws/ami_debian_buster
-#   vars:
-#     ami_debian_buster:
-#       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-#       region: "{{ aws_ec2_autoscale_cluster.region }}"
-#       instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
-#       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-#       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
-#       operation: create
+- name: Create new AMI.
+  include_role:
+    name: aws/ami_debian_buster
+  vars:
+    ami_debian_buster:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
+      ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+      playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
+      operation: create
 
-# - name: Gather AMI image from name.
-#   ec2_ami_info:
-#     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-#     region: "{{ aws_ec2_autoscale_cluster.region }}"
-#     owners: self
-#     filters:
-#       name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-#   register: aws_ec2_autoscale_cluster_image
+- name: Gather AMI image from name.
+  ec2_ami_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    owners: self
+    filters:
+      name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+  register: aws_ec2_autoscale_cluster_image
 
-# - name: Register latest AMI image.
-#   set_fact:
-#     aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
+- name: Register latest AMI image.
+  set_fact:
+    aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Gather security groups info.
   ec2_group_info:
@@ -132,8 +132,7 @@
   ec2_lc:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-    # image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
-    image_id: "ami-052033496099c997e"
+    image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
     key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
