@@ -58,7 +58,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
       subnet_id: "{{ subnet.subnet_id }}"
-      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': subnet.tags.Name } )}}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': subnet.tags.Name } ) }}"
       routes:
         - dest: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].private_ip_address }}/32"
           vpc_peering_connection_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
