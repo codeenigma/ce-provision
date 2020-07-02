@@ -6,7 +6,7 @@
       cidr_block: "{{ subnet.cidr_block }}"
       nat_ipv4: yes
       assign_instances_ipv6: no
-    
+
 - name: Create private subnet.
   include_role:
     name: aws/aws_vpc_subnet

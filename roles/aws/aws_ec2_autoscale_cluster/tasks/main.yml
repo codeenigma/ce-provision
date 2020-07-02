@@ -58,7 +58,7 @@
   with_items: "{{ aws_ec2_autoscale_cluster.subnets }}"
   loop_control:
     loop_var: subnet
-          
+
 - name: Create RDS instance
   include_role:
     name: aws/aws_rds
@@ -189,7 +189,6 @@
         DefaultActions:
           - Type: forward
             TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
-
 # - name: Create peering VPC connections
 #   include_tasks: peering.yml
 #   with_items: "{{ aws_ec2_autoscale_cluster.peering }}"
