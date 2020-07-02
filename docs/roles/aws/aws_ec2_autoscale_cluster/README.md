@@ -6,25 +6,19 @@
 <!--ROLEVARS-->
 ## Default variables
 ```yaml
-# This is used to construct:
-# - the base cidr_block as {{ cidr_base }}.0/16
-# - subnets cidr_block as
-#   a {{ cidr_base }}.0/26
-#   b {{ cidr_base }}.64/26
-#   c {{ cidr_base }}.128/26
-_aws_ec2_autoscale_cluster_cidr_base: "10.0.0"
 aws_ec2_autoscale_cluster:
 aws_profile: default
 region: eu-west-3
 name: "example"
-cidr_block: "{{ _aws_ec2_autoscale_cluster_cidr_base }}.0/24"
+vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
+# vpc_name: example-vpc
 subnets:
 # - az: a
-#   cidr: "{{ _aws_ec2_autoscale_cluster_cidr_base }}.0/26"
+#   cidr: "10.0.3.0/26"
 - az: b
-cidr: "{{ _aws_ec2_autoscale_cluster_cidr_base }}.64/26"
+cidr_block: "10.0.3.64/26"
 - az: c
-cidr: "{{ _aws_ec2_autoscale_cluster_cidr_base }}.128/26"
+cidr_block: "10.0.3.128/26"
 instance_type: t2.micro
 key_name: "{{ ansible_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
 ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
@@ -46,6 +40,10 @@ rds: no # wether to create an instance.
 db_instance_class: db.m5.large
 engine: mariadb
 #engine_version: 5.7.9
+allocated_storage: 100 # Initial size in GB. Minimum is 100.
+max_allocated_storage: 1000 # Max size in GB for autoscaling.
+master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
+master_user_password: hellothere
 ```
 
 <!--ENDROLEVARS-->

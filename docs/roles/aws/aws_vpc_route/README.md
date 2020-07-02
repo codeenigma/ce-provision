@@ -6,12 +6,15 @@ This will add/update routes on the "main" route table for a given VPC, leaving e
 <!--ROLEVARS-->
 ## Default variables
 ```yaml
-aws_vpc_main_route:
+# @todo Support associating route with several subnets.
+aws_vpc_route:
 aws_profile: default
 region: eu-west-3
+# Beware when calling this on "peering" routes, not to override tags with the target peer's one.
 # tags:
 #   Name: "example"
 vpc_id: vpc-XXX
+# subnet_id: subnet-XXX # Optional. If omitted, the role will target the "main" route for the VPC. Else a route will be created for the subnets.
 # See https://docs.ansible.com/ansible/latest/modules/ec2_vpc_route_table_module.html#parameter-routes
 routes:
 - dest: "10.0.0.0/16" # CIDR block for the route.

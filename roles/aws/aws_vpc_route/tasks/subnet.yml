@@ -7,15 +7,6 @@
       "association.subnet-id": "{{ aws_vpc_route.subnet_id }}"
   register: _aws_vpc_route_route_table
 
-- name: Gather Subnets information
-  ec2_vpc_subnet_info:
-    profile: "{{ aws_vpc_route.aws_profile }}"
-    region: "{{ aws_vpc_route.region }}"
-    filters:
-      vpc-id: "{{ aws_vpc_route.vpc_id }}"
-      subnet-id: "{{ aws_vpc_route.subnet_id }}"
-  register: _aws_vpc_route_subnets
-
 - name: Reset existing routes.
   set_fact:
     _aws_vpc_route_routes: "{{ {} }}"

@@ -1,0 +1,15 @@
+- name: Create VPC subnet.
+  ec2_vpc_subnet:
+    profile: "{{ aws_vpc_subnet.aws_profile }}"
+    cidr: "{{ subnet.cidr_block }}"
+    region: "{{ aws_vpc_subnet.region }}"
+    tags: "{{ aws_vpc_subnet.tags | combine( { 'Name': subnet.name } ) }}"
+    az: "{{ aws_vpc_subnet.region }}{{ subnet.az }}"
+    state: "{{ aws_vpc_subnet.state }}"
+    vpc_id: "{{ _aws_vpc_subnet_vpc_id }}"
+    assign_instances_ipv6: "{{ subnet.assign_instances_ipv6 | default('no')}}"
+  register: _aws_vpc_subnet_subnet
+
+- name: Create VPC ipv4 gateway.
+  include_tasks: "gateway.ipv4.nat.yml"
+  when: subnet.nat_ipv4 is defined and subnet.nat_ipv4
