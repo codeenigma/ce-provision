@@ -7,7 +7,7 @@
     az: "{{ aws_vpc_subnet.region }}{{ subnet.az }}"
     state: "{{ aws_vpc_subnet.state }}"
     vpc_id: "{{ _aws_vpc_subnet_vpc_id }}"
-    assign_instances_ipv6: "{{ subnet.assign_instances_ipv6 | default('no')}}"
+    assign_instances_ipv6: "{{ subnet.assign_instances_ipv6 | default('no') }}"
   register: _aws_vpc_subnet_subnet
 
 - name: Create VPC ipv4 gateway.
