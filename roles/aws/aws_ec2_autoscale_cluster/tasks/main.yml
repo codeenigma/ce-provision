@@ -2,62 +2,81 @@
   set_fact:
     _aws_ec2_autoscale_cluster_unique_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ ansible_date_time.iso8601_basic_short }}"
 
-#@todo Not sure we need this, the default SG should do this already.
-- name: Define internal security group.
-  set_fact:
-    _aws_ec2_autoscale_cluster_internal_security_group:
-      name: "{{ aws_ec2_autoscale_cluster.name }}"
-      description: Allow internal traffic within the VPC
-      rules:
-        - proto: all
-          ports: -1
-          cidr_ip: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
-          rule_desc: Allow internal traffic within the VPC
+# #@todo Not sure we need this, the default SG should do this already.
+# - name: Define internal security group.
+#   set_fact:
+#     _aws_ec2_autoscale_cluster_internal_security_group:
+#       name: "{{ aws_ec2_autoscale_cluster.name }}"
+#       description: Allow internal traffic within the VPC
+#       rules:
+#         - proto: all
+#           ports: -1
+#           cidr_ip: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
+#           rule_desc: Allow internal traffic within the VPC
 
-- name: Create cluster's VPC
-  include_role:
-    name: aws/aws_vpc_with_subnets
-  vars:
-    aws_vpc_with_subnets:
-      create_gateway: yes
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
-      name: "{{ aws_ec2_autoscale_cluster.name }}"
-      state: "{{ aws_ec2_autoscale_cluster.state }}"
-      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.security_groups + [ _aws_ec2_autoscale_cluster_internal_security_group ] }}"
-      cidr_block: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
-      subnets: "{{ aws_ec2_autoscale_cluster.subnets }}"
+# - name: Create cluster's VPC
+#   include_role:
+#     name: aws/aws_vpc_with_subnets
+#   vars:
+#     aws_vpc_with_subnets:
+#       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+#       region: "{{ aws_ec2_autoscale_cluster.region }}"
+#       name: "{{ aws_ec2_autoscale_cluster.name }}"
+#       state: "{{ aws_ec2_autoscale_cluster.state }}"
+#       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+#       security_groups: "{{ aws_ec2_autoscale_cluster.security_groups + [ _aws_ec2_autoscale_cluster_internal_security_group ] }}"
+#       cidr_block: "{{ aws_ec2_autoscale_cluster.cidr_block }}"
+#       subnets: "{{ aws_ec2_autoscale_cluster.subnets }}"
+#       nat_ipv4: yes
 
 - name: Gather VPC information
   ec2_vpc_net_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
-      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
-  register: _aws_ec2_vpc
+      "tag:Name": "{{ aws_ec2_autoscale_cluster.vpc_name }}"
+  register: _aws_ec2_autoscale_cluster_vpc
+  when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
 
-- name: Gather Subnets information
-  ec2_vpc_subnet_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    filters:
-      vpc-id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
-  register: _aws_ec2_subnets
-
-- name: Construct list of subnet ids.
+- name: Set the VPC id from name.
   set_fact:
-    _aws_ec2_subnets_ids: "{{ _aws_ec2_subnets_ids | default([]) + [subnet.subnet_id] }}"
-  with_items: "{{ _aws_ec2_subnets.subnets }}"
+    _aws_ec2_autoscale_cluster_vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
+  when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
+
+- name: Use provided VPC id.
+  set_fact:
+    _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
+  when: ( aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0 )
+
+- name: Reset subnets lists.
+  set_fact:
+    _aws_ec2_autoscale_cluster_subnets_ids: []
+    _aws_ec2_autoscale_cluster_efs_targets: []
+
+- name: Create private subnets.
+  include_tasks: subnet.yml
+  with_items: "{{ aws_ec2_autoscale_cluster.subnets }}"
   loop_control:
     loop_var: subnet
 
-- name: Construct list of EFS targets.
-  set_fact:
-    _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets | default([]) + [ { 'subnet_id': subnet.subnet_id } ] }}"
-  with_items: "{{ _aws_ec2_subnets.subnets }}"
-  loop_control:
-    loop_var: subnet
+- name: Create RDS instance
+  include_role:
+    name: aws/aws_rds
+  vars:
+    aws_rds:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      instance_type: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
+      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      description: "{{ aws_ec2_autoscale_cluster.name }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      engine: "{{ aws_ec2_autoscale_cluster.rds.engine }}"
+      engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
+      allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
+      max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
+      master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
+      master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
 
 - name: Create EFS volume
   efs:
@@ -69,37 +88,37 @@
     targets: "{{ _aws_ec2_autoscale_cluster_efs_targets }}"
   register: _aws_ec2_autoscale_cluster_efs
 
-- name: Create new AMI.
-  include_role:
-    name: aws/ami_debian_buster
-  vars:
-    ami_debian_buster:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
-      instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
-      ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-      playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
-      operation: create
+# - name: Create new AMI.
+#   include_role:
+#     name: aws/ami_debian_buster
+#   vars:
+#     ami_debian_buster:
+#       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+#       region: "{{ aws_ec2_autoscale_cluster.region }}"
+#       instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
+#       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+#       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
+#       operation: create
 
-- name: Gather AMI image from name.
-  ec2_ami_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    owners: self
-    filters:
-      name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-  register: aws_ec2_autoscale_cluster_image
+# - name: Gather AMI image from name.
+#   ec2_ami_info:
+#     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+#     region: "{{ aws_ec2_autoscale_cluster.region }}"
+#     owners: self
+#     filters:
+#       name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+#   register: aws_ec2_autoscale_cluster_image
 
-- name: Register latest AMI image.
-  set_fact:
-    aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
+# - name: Register latest AMI image.
+#   set_fact:
+#     aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Gather security groups info.
   ec2_group_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
-      vpc-id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   register: _aws_ec2_autoscale_cluster_sg_info
 
 - name: Construct list of sg ids.
@@ -113,11 +132,12 @@
   ec2_lc:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-    image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    # image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    image_id: "ami-052033496099c997e"
     key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
-    vpc_id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
     security_groups: "{{ _aws_ec2_sg_ids }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     volumes:
@@ -134,7 +154,7 @@
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     protocol: http
     port: 80
-    vpc_id: "{{ _aws_ec2_vpc.vpcs[0].vpc_id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   register: _aws_ec2_target_group_created
 
 - name: Create Autoscale group
@@ -144,12 +164,12 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: yes
+    replace_all_instances: no
     wait_for_instances: no
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
-    vpc_zone_identifier: "{{ _aws_ec2_subnets_ids }}"
+    vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     target_group_arns:
       - "{{ _aws_ec2_target_group_created.target_group_arn }}"
   register: _aws_ec2_asg_created
@@ -161,7 +181,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-    subnets: "{{ _aws_ec2_subnets_ids }}"
+    subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     security_groups: "{{ _aws_ec2_sg_ids }}"
     listeners:
       - Protocol: HTTP
@@ -169,9 +189,8 @@
         DefaultActions:
           - Type: forward
             TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
-
-- name: Create peering VPC connections
-  include_tasks: peering.yml
-  with_items: "{{ aws_ec2_autoscale_cluster.peering }}"
-  loop_control:
-    loop_var: peering
+# - name: Create peering VPC connections
+#   include_tasks: peering.yml
+#   with_items: "{{ aws_ec2_autoscale_cluster.peering }}"
+#   loop_control:
+#     loop_var: peering

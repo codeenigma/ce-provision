@@ -24,9 +24,13 @@ Mounts EFS volume(s) to specific mount point(s).
 It uses the "Name" tag for a given volume to retrieve the volume path.
 ### [AWS key pair.](aws/aws_provision_ec2_keypair/README.md)
 Creates a key pair for the current "provision user"
-### [Update main route for a given VPC](aws/aws_vpc_main_route/README.md)
+### [AWS RDS](aws/aws_rds/README.md)
+Creates an RDS instance and associated ressources.
+### [VPC](aws/aws_vpc/README.md)
+Creates a VPC and associated subnets.
+### [Update main route for a given VPC](aws/aws_vpc_route/README.md)
 This will add/update routes on the "main" route table for a given VPC, leaving existing routes for different CIDR blocks intact.
-### [VPC](aws/aws_vpc_with_subnets/README.md)
+### [VPC](aws/aws_vpc_subnet/README.md)
 Creates a VPC and associated subnets.
 ## [Extra packages](ce_dev/README.md)
 Provides a wrapper for installing packages through apt.
