@@ -41,7 +41,7 @@
 			[ 
         {% if ansible_verbosity >= 1 %}}
         "-vvvv",
-        {% fi %}}
+        {% endif %}}
 				"--extra-vars", 
 				"{ _ansible_provision_base_dir: {{ _ansible_provision_base_dir }}, _ansible_provision_build_dir: {{ _ansible_provision_build_dir }}, _ansible_provision_build_tmp_dir: {{ _ansible_provision_build_tmp_dir }}, _ansible_provision_data_dir: {{ _ansible_provision_data_dir }}, _ansible_provision_build_id: {{ _ansible_provision_build_id }}, _ansible_provision_force_play: yes}"
 			 ]
