@@ -117,7 +117,7 @@ ansible_play(){
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
   fi
   if [ "$VERBOSE" = "yes" ]; then
-    ANSIBLE_CMD="$ANSIBLE_CMD --verbose"
+    ANSIBLE_CMD="$ANSIBLE_CMD -vvvv"
   fi
   $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
   return $?
