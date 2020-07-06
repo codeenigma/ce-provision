@@ -31,6 +31,7 @@
       "type": "ansible",
       "playbook_file": "{{ ami_debian_buster.playbook_file }}",
       "inventory_directory": "{{ _ansible_provision_base_dir }}/hosts",
+      "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/id_rsa.pub",
       "ansible_env_vars": 
       [ 
         "ANSIBLE_FORCE_COLOR=True", 
