@@ -1,14 +1,12 @@
----
-
 - name: Add repository key for Ansible.
-  apt_key: 
+  apt_key:
     id: 93C4A3FD7BB9C367
     keyserver: keyserver.ubuntu.com
     state: present
 
 - name: Add repository for Ansible.
-  apt_repository: 
-    repo: 'deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main'
+  apt_repository:
+    repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
     state: present
 
 - name: Ensure Ansible is installed.
