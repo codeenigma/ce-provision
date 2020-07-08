@@ -1,5 +1,3 @@
----
-
 - name: Create the deploy group.
   group:
     name: "{{ ansible_deploy.username }}"
@@ -15,7 +13,7 @@
     create_home: yes
     generate_ssh_key: yes
     home: "/home/{{ ansible_deploy.username }}"
-    password: '*'
+    password: "*"
     ssh_key_bits: 4096
     ssh_key_comment: "{{ ansible_deploy.username }}@{{ ansible_host }}"
     system: yes
@@ -28,7 +26,7 @@
 
 - name: Ensure deploy scripts are presents.
   git:
-    repo: "{{ ansible_deploy.own_repository | default('https://github.com/codeenigma/ansible-deploy.git')}}"
+    repo: "{{ ansible_deploy.own_repository | default('https://github.com/codeenigma/ansible-deploy.git') }}"
     dest: "{{ ansible_deploy.local_dir }}"
     version: "{{ ansible_deploy.own_repository_branch  | default('master') }}"
     update: yes
@@ -41,6 +39,7 @@
     repo: "{{ ansible_deploy.config_repository }}"
     accept_hostkey: yes
     dest: "{{ _ansible_provision_build_tmp_dir }}/config"
+    version: "{{ ansible_deploy.config_repository_branch  | default('master') }}"
   become: no
   delegate_to: localhost
   when: ansible_deploy.config_repository is defined and ansible_deploy.config_repository
