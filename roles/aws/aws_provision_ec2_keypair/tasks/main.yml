@@ -3,6 +3,6 @@
 - name: Create EC2 key pair.
   ec2_key:
     name: "{{ aws_provision_ec2_keypair.key_name }}"
-    key_material: "{{ lookup('file', '/home/{{ ansible_provision.username }}/.ssh/id_rsa.pub') }}"
+    key_material: "{{ lookup('file', '/home/{{ ce_provision.username }}/.ssh/id_rsa.pub') }}"
     profile: "{{ aws_provision_ec2_keypair.aws_profile }}"
     region: "{{ aws_provision_ec2_keypair.region }}"

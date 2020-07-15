@@ -3,17 +3,17 @@
   set_fact:
     ansible_provision_extra_vars_computed: "{{ ansible_provision_extra_vars_computed | default({}) | combine({item.name: lookup('vars', item.name)}, recursive=True) }}"
   when:
-    - ansible_provision.extra_repository
-    - ansible_provision.extra_repository_vars_file
-    - ansible_provision.extra_repository_allowed_vars is defined
+    - ce_provision.extra_repository
+    - ce_provision.extra_repository_vars_file
+    - ce_provision.extra_repository_allowed_vars is defined
     - lookup('vars', item.name, default=null)
-  loop: "{{ ansible_provision.extra_repository_allowed_vars }}"
+  loop: "{{ ce_provision.extra_repository_allowed_vars }}"
 
 - name: Generate/Update custom vars file.
   local_action:
     module: template
     src: vars.j2
-    dest: "{{ _ansible_provision_build_tmp_dir }}/extra/{{ ansible_provision.extra_repository_vars_file }}"
+    dest: "{{ _ansible_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
   when: ansible_provision_extra_vars_computed is defined
 
 - name: Stat newly generated configuration.
@@ -35,7 +35,7 @@
 - name: Push newly generated configuration.
   local_action:
     module: command
-    cmd: "git push origin {{ ansible_provision.extra_repository_branch }}"
+    cmd: "git push origin {{ ce_provision.extra_repository_branch }}"
     args:
       chdir: "{{ _ansible_provision_build_tmp_dir }}/extra"
   when: ansible_provision_extra_vars_computed is defined

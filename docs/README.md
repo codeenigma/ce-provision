@@ -1,4 +1,4 @@
-# ansible-provision
+# ce-provision
 A set of Ansible roles and wrapper scripts to configure remote (Debian) machines.
 ## Overview
 The "stack" from this repo is to be installed on a "controller" server/runner, to be used in conjonction with a CI/CD tool (Jenkins, Gitlab, Travis, ...).
@@ -8,7 +8,7 @@ When triggered from a deployment tool, the stack will clone the codebase and "pl
 <!--TOC-->
 ## [Install](install/README.md)
 You can install either:
-- through [ansible-provision](https://github.com/codeenigma/ansible-provision)
+- through [ce-provision](https://github.com/codeenigma/ce-provision)
 - manually by running a local playbook
 - with Docker (soon)
 
@@ -19,7 +19,7 @@ Ansible roles and group of roles that constitute the deploy stack.
 ### [Ansible](roles/ansible/README.md)
 ### [ansible-deploy](roles/ansible_deploy/README.md)
 Installs Code Enigma's deploy stack on a server.
-### [ansible-provision](roles/ansible_provision/README.md)
+### [ce-provision](roles/ce_provision/README.md)
 Installs Code Enigma's infrastructure management stack on a server.
 ### [Extra packages](roles/apt_extra_packages/README.md)
 Provides a wrapper for installing packages through apt.

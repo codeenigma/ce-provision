@@ -1,15 +1,23 @@
+# ce-provision
+Installs Code Enigma's infrastructure management stack on a server.
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 
 _ansible_provision:
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
 
-ansible_provision:
+ce_provision:
   username: "{{ _ansible_provision.username }}"
   # Main repo.
-  own_repository: "https://github.com/codeenigma/ansible-provision.git"
+  own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "master"
   # Destination.
-  local_dir: "/home/{{ _ansible_provision.username }}/ansible-provision"
+  local_dir: "/home/{{ _ansible_provision.username }}/ce-provision"
   # Private config repo.
   config_repository: ""
   config_repository_branch: "master"
@@ -20,3 +28,6 @@ ansible_provision:
   extra_repository_allowed_vars: []
   # List of additional groups to add the user to.
   groups: ''
+```
+
+<!--ENDROLEVARS-->
