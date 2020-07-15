@@ -112,7 +112,7 @@ cleanup_build_tmp_dir(){
 }
 # Trigger actual Ansible job.
 ansible_play(){
-  ANSIBLE_CMD="/usr/bin/ansible-playbook /$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  ANSIBLE_CMD="/usr/bin/ansible-playbook $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
   if [ "$DRY_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
   fi
