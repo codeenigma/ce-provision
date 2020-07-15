@@ -24,7 +24,11 @@ ListenAddress {{ address }}
 #HostKey /etc/ssh/ssh_host_rsa_key
 #HostKey /etc/ssh/ssh_host_ecdsa_key
 #HostKey /etc/ssh/ssh_host_ed25519_key
-HostKey {{ sshd.HostKey }}
+{% for key in sshd.HostKey %}
+{% if key|length %}
+HostKey {{ key }}
+{% endif %}
+{% endfor %}
 
 # Ciphers and keying
 #RekeyLimit default none
