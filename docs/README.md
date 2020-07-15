@@ -17,7 +17,7 @@ While you can re-use/fork roles or call playbooks directly from your deployment 
 ## [Roles](roles/README.md)
 Ansible roles and group of roles that constitute the deploy stack.
 ### [Ansible](roles/ansible/README.md)
-### [ansible-deploy](roles/ansible_deploy/README.md)
+### [ce-deploy](roles/ce_deploy/README.md)
 Installs Code Enigma's deploy stack on a server.
 ### [ce-provision](roles/ce_provision/README.md)
 Installs Code Enigma's infrastructure management stack on a server.

@@ -3,14 +3,14 @@
 - name: Generate Packer template.
   template:
     src: packer.json.j2
-    dest: "{{ _ansible_provision_build_tmp_dir }}/packer.json"
+    dest: "{{ _ce_provision_build_tmp_dir }}/packer.json"
 
 - name: Inspect Packer configuration.
   command:
-    cmd: "packer inspect {{ _ansible_provision_build_tmp_dir }}/packer.json"
-    chdir: "{{ _ansible_provision_base_dir }}"
+    cmd: "packer inspect {{ _ce_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ce_provision_base_dir }}"
 
 - name: Build AMI.
   command:
-    cmd: "packer build {{ _ansible_provision_build_tmp_dir }}/packer.json"
-    chdir: "{{ _ansible_provision_base_dir }}"
+    cmd: "packer build {{ _ce_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ce_provision_base_dir }}"

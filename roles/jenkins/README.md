@@ -24,7 +24,7 @@ jenkins:
   keystore_pass: "cleartext"
   user: "jenkins"
   adminuser: "admin"
-  adminpass: "{{ lookup('password', _ansible_provision_data_dir + '/' + inventory_hostname + '/jenkins-adminpass') }}"
+  adminpass: "{{ lookup('password', _ce_provision_data_dir + '/' + inventory_hostname + '/jenkins-adminpass') }}"
  # security: basic | ldap 
   security: "basic"
   plugins:

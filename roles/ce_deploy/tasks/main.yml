@@ -38,7 +38,7 @@
   git:
     repo: "{{ ce_deploy.config_repository }}"
     accept_hostkey: yes
-    dest: "{{ _ansible_provision_build_tmp_dir }}/config"
+    dest: "{{ _ce_provision_build_tmp_dir }}/config"
     version: "{{ ce_deploy.config_repository_branch  | default('master') }}"
   become: no
   delegate_to: localhost
@@ -46,7 +46,7 @@
 
 - name: Synchronize config directory.
   synchronize:
-    src: "{{ _ansible_provision_build_tmp_dir }}/config"
+    src: "{{ _ce_provision_build_tmp_dir }}/config"
     dest: "{{ ce_deploy.local_dir }}/"
     delete: yes
     rsync_opts:

@@ -24,11 +24,11 @@
     - name: Check if we have a config directory.
       stat:
         path: "{{ ce_provision.local_dir }}/config"
-      register: ansible_provision_config_repo
+      register: ce_provision_config_repo
 
     - name: Register config repository.
       set_fact:
-        ansible_provision_has_config_repo: "{{ 'yes' if ansible_provision_config_repo.stat.isdir is defined and ansible_provision_config_repo.stat.isdir else 'no' }}"
+        ce_provision_has_config_repo: "{{ 'yes' if ce_provision_config_repo.stat.isdir is defined and ce_provision_config_repo.stat.isdir else 'no' }}"
 
     - name: Remove defaults folders.
       file:
@@ -37,7 +37,7 @@
       with_items:
         - hosts
         - ansible.cfg
-      when: ansible_provision_has_config_repo
+      when: ce_provision_has_config_repo
 
     - name: Symlink config folders to /etc/ansible.
       file:
@@ -47,7 +47,7 @@
       with_items:
         - hosts
         - ansible.cfg
-      when: ansible_provision_has_config_repo
+      when: ce_provision_has_config_repo
 
     - name: Create data dir.
       file:

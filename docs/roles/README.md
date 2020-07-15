@@ -2,7 +2,7 @@
 Ansible roles and group of roles that constitute the deploy stack.
 <!--TOC-->
 ## [Ansible](ansible/README.md)
-## [ansible-deploy](ansible_deploy/README.md)
+## [ce-deploy](ce_deploy/README.md)
 Installs Code Enigma's deploy stack on a server.
 ## [ce-provision](ce_provision/README.md)
 Installs Code Enigma's infrastructure management stack on a server.

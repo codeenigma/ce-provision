@@ -33,7 +33,7 @@
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
   set_fact:
-    ansible_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
+    ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
 
 - name: Ensure Git is installed.
   apt:
@@ -70,7 +70,7 @@
     dest: "{{ ce_provision.local_dir }}/config"
   become: yes
   become_user: "{{ ce_provision.username }}"
-  when: ansible_provision_has_config_repo
+  when: ce_provision_has_config_repo
 
 - name: Create defaults folders.
   file:
@@ -78,13 +78,13 @@
     state: directory
   with_items:
     - hosts
-  when: not ansible_provision_has_config_repo
+  when: not ce_provision_has_config_repo
 
 - name: Create default config.
   copy:
     src: ansible.cfg
     dest: "{{ ce_provision.local_dir }}/ansible.cfg"
-  when: not ansible_provision_has_config_repo
+  when: not ce_provision_has_config_repo
 
 - name: Symlink config folders to /etc/ansible.
   file:
@@ -96,7 +96,7 @@
     - files
     - templates
     - ansible.cfg
-  when: ansible_provision_has_config_repo
+  when: ce_provision_has_config_repo
 
 - name: Create data dir.
   file:
