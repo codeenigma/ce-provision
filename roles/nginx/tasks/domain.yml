@@ -1,6 +1,7 @@
 - name: Generates SSL keys.
   include_role:
     name: "{{ domain.ssl_handling }}"
+  when: domain.ssl_handling is defined and domain.ssl_handling
   vars:
     ssl:
       domain: "{{ domain.server_name }}"
