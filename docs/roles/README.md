@@ -2,10 +2,6 @@
 Ansible roles and group of roles that constitute the deploy stack.
 <!--TOC-->
 ## [Ansible](ansible/README.md)
-## [ce-deploy](ce_deploy/README.md)
-Installs Code Enigma's deploy stack on a server.
-## [ce-provision](ce_provision/README.md)
-Installs Code Enigma's infrastructure management stack on a server.
 ## [Extra packages](apt_extra_packages/README.md)
 Provides a wrapper for installing packages through apt.
 ## [AWS tools roles](aws/README.md)
@@ -28,8 +24,12 @@ Creates a key pair for the current "provision user"
 This will add/update routes on the "main" route table for a given VPC, leaving existing routes for different CIDR blocks intact.
 ### [VPC](aws/aws_vpc_with_subnets/README.md)
 Creates a VPC and associated subnets.
+## [ce-deploy](ce_deploy/README.md)
+Installs Code Enigma's deploy stack on a server.
 ## [Extra packages](ce_dev/README.md)
 Provides a wrapper for installing packages through apt.
+## [ce-provision](ce_provision/README.md)
+Installs Code Enigma's infrastructure management stack on a server.
 ## [ClamAV Clamscan](clamav_clamscan/README.md)
 
 ## [ClamAV Daemon](clamav_daemon/README.md)
@@ -207,4 +207,6 @@ Author Information
 An optional section for the role authors to include contact information, or a website (HTML is not allowed).
 ## [SSHD](ssh_server/README.md)
 
+## [SSL](ssl/README.md)
+Manages SSL certificates.
 <!--ENDTOC-->

@@ -26,7 +26,7 @@ ClientAliveCountMax: 3
 ClientAliveInterval: 60
 Compression: "delayed"
 GatewayPorts: "no"
-HostKey: "/etc/ssh/ssh_host_rsa_key"
+HostKey: []
 LoginGraceTime: "2m"
 LogLevel: "INFO"
 MaxAuthTries: 6
@@ -41,7 +41,7 @@ PrintMotd: "no"
 PubkeyAuthentication: "yes"
 RekeyLimit: "default none"
 StrictModes: "yes"
-Subsystem_sftp:	"internal-sftp"
+Subsystem_sftp: "internal-sftp"
 SyslogFacility: "AUTH"
 TCPKeepAlive: "yes"
 UseDNS: "no"

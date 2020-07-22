@@ -26,7 +26,7 @@ sshd:
   ClientAliveInterval: 60
   Compression: "delayed"
   GatewayPorts: "no"
-  HostKey: "/etc/ssh/ssh_host_rsa_key"
+  HostKey: []
   LoginGraceTime: "2m"
   LogLevel: "INFO"
   MaxAuthTries: 6
@@ -41,7 +41,7 @@ sshd:
   PubkeyAuthentication: "yes"
   RekeyLimit: "default none"
   StrictModes: "yes"
-  Subsystem_sftp:	"internal-sftp"
+  Subsystem_sftp: "internal-sftp"
   SyslogFacility: "AUTH"
   TCPKeepAlive: "yes"
   UseDNS: "no"
@@ -49,16 +49,16 @@ sshd:
   X11DisplayOffset: 10
   X11Forwarding: "yes"
   X11UseLocalhost: "yes"
-  # Define some defaults "special" groups. 
+  # Define some defaults "special" groups.
   groups: []
   # groups:
   #   # Define a group that is allowed to use password authentication.
   #   - name: passwordonly
-  #     settings: 
+  #     settings:
   #       PasswordAuthentication: "yes"
   #   # Define a group that is allowed to use password authentication and restricted to SFTP use.
   #   - name: sftpusers
-  #     settings: 
+  #     settings:
   #       PasswordAuthentication: "yes"
   #       AuthenticationMethods: "password"
   #       ChrootDirectory: "%h/documents"
@@ -72,7 +72,7 @@ sshd:
   #       - example1
   #       - user4
   #       - another
-  #     settings: 
+  #     settings:
   #       PasswordAuthentication: "no"
   #       AuthenticationMethods: publickey
 

@@ -25,7 +25,9 @@ nginx:
       error_log_level:  "notice"
       webroot:  "/var/www/html"
       project_type:  "flat"
-      ssl_handling: ssl_selfsigned
+      ssl: # @see the 'ssl' role.
+        domain: "{{ domain_name }}"
+        handling: selfsigned
       ratelimitingcrawlers: yes
       is_default: yes
       basic_auth:

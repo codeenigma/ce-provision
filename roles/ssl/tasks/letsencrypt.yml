@@ -1,5 +1,3 @@
----
-
 - name: Ensure Certbot is installed.
   apt:
     pkg: certbot
@@ -49,4 +47,4 @@
 
 - name: Add key/cert pairs to know paths information.
   set_fact:
-    _ssl_paths: "{{ _ssl_paths | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"

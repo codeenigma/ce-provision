@@ -16,8 +16,8 @@ server {
     rewrite ^ https://{{ domain.server_name }}$request_uri? permanent;
 {% endif %}
 {% if server.ssl %}
-    ssl_certificate {{ _ssl_paths[domain.server_name].certificate }};
-    ssl_certificate_key {{ _ssl_paths[domain.server_name].key }};
+    ssl_certificate {{ ssl_facts[domain.ssl.domain].certificate }};
+    ssl_certificate_key {{ ssl_facts[domain.ssl.domain].key }};
 {% endif %}
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
     access_log {{ domain.access_log }};

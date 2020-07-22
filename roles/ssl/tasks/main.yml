@@ -1,0 +1,6 @@
+- name: Init facts.
+  set_fact:
+    ssl_facts: "{{ ssl_facts | default({}) }}"
+
+- name: Generates SSL keys.
+  include_tasks: "{{ ssl.handling }}.yml"
