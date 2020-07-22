@@ -4,11 +4,6 @@ addons:
     - git
     - ansible
     - yamllint
-before_install:
- - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
- - wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 -O /tmp/mkcert
- - sudo mv /tmp/mkcert /usr/local/bin
- - sudo chmod +x /usr/local/bin/mkcert
 jobs:
   include:
   - stage: Lint
