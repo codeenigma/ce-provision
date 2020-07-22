@@ -3,7 +3,20 @@ addons:
     packages:
     - git
     - ansible
-script:
-  - cp install/example.vars.yml install/vars.yml
-  - sed -i "s/ \"provision\"/ $(whoami)/g" install/vars.yml
-  - ansible-playbook install/self-update.yml --extra-vars="@install/vars.yml"
+    - yamllint
+before_install:
+ - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+ - wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 -O /tmp/mkcert
+ - sudo mv /tmp/mkcert /usr/local/bin
+ - sudo chmod +x /usr/local/bin/mkcert
+jobs:
+  include:
+  - stage: Lint
+    os: linux
+    script: yamllint roles
+  - stage: Install
+    os: linux
+    script:
+      - cp install/example.vars.yml install/vars.yml
+      - sed -i "s/ \"provision\"/ $(whoami)/g" install/vars.yml
+      - ansible-playbook install/self-update.yml --extra-vars="@install/vars.yml"
