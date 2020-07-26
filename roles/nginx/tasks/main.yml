@@ -46,10 +46,20 @@
     - symfony4
     - wordpress
 
-- name: Ensure default nginx catch-all is not present
+- name: Ensure log dir exists.
   file:
-    path: "/etc/nginx/sites-enabled/default"
+    path: "/var/log/nginx"
+    state: directory
+
+- name: Remove existing vhosts
+  file:
+    path: "/etc/nginx/sites-enabled"
     state: absent
+
+- name: Recreate vhosts folder
+  file:
+    path: "/etc/nginx/sites-enabled"
+    state: directory
 
 - name: Generates AWS Cloudwatch default config.
   template:
