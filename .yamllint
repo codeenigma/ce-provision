@@ -7,7 +7,7 @@ rules:
   brackets: {max-spaces-inside: 1, level: error}
   colons: {max-spaces-after: -1, level: error}
   commas: {max-spaces-after: -1, level: error}
-  comments: enable
+  comments: disable
   comments-indentation: enable
   document-start: enable
   empty-lines: {max: 3, level: error}

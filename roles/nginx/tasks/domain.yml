@@ -1,3 +1,4 @@
+---
 - name: Generates SSL keys.
   include_role:
     name: ssl

@@ -1,3 +1,4 @@
+---
 - name: Normalize route.
   set_fact:
     _aws_vpc_main_route_route:

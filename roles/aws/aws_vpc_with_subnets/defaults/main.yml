@@ -13,7 +13,7 @@ aws_vpc_with_subnets:
   name: example-vpc-2
   cidr_block: "{{ _aws_vpc_with_subnets_cidr_base }}.0/24"
   tags:
-    #Type: "util"
+  #  Type: "util"
   state: present
   assign_instances_ipv6: no
   create_gateway: yes

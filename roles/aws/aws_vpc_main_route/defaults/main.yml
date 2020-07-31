@@ -1,3 +1,4 @@
+---
 aws_vpc_main_route:
   aws_profile: default
   region: eu-west-3
