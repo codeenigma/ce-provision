@@ -1,3 +1,4 @@
+---
 - name: Ensure "locales" is installed.
   apt:
     pkg: "locales"
