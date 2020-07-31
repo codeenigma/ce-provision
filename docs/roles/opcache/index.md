@@ -9,8 +9,8 @@ Installs and configures gordalina's cache tool: https://github.com/gordalina/cac
 # defaults file for opcache
 
 opcache:
-host: ''
-port: ''
+  host: ''
+  port: ''
 
 ```
 
