@@ -1,5 +1,4 @@
 ---
-
 - name: Install additional extra packages.
   apt:
     pkg: "{{ apt_extra_packages | list }}"

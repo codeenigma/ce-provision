@@ -1,7 +1,6 @@
 ---
-
 - name: Find overrides
-  find: 
+  find:
     paths: "{{ template_override_path }}"
     file_type: file
     recurse: yes

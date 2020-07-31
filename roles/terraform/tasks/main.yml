@@ -1,5 +1,4 @@
 ---
-
 - name: Fetch and extract Terraform zip.
   unarchive:
     src: "https://releases.hashicorp.com/terraform/{{ terraform.version }}/terraform_{{ terraform.version }}_linux_amd64.zip"

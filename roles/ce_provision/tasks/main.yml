@@ -1,5 +1,4 @@
 ---
-
 - name: Create the provision group for provisioning.
   group:
     name: "{{ ce_provision.username }}"
@@ -25,7 +24,7 @@
     uid: "{{ ce_provision.uid | default(omit) }}"
     generate_ssh_key: yes
     home: "/home/{{ ce_provision.username }}"
-    password: '*'
+    password: "*"
     ssh_key_bits: 4096
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
     system: yes

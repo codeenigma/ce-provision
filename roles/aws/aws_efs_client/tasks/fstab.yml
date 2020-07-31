@@ -1,3 +1,4 @@
+---
 - name: Gather EFS information.
   efs_info:
     profile: "{{ aws_efs_client.aws_profile }}"

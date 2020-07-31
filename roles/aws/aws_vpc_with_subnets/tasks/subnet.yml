@@ -1,8 +1,8 @@
 ---
-
 - name: Generate Name tag.
   set_fact:
-    _vpc_subnet_name_tag: { Name: "{{ aws_vpc_with_subnets.name }}-{{ subnet.az }}"}
+    _vpc_subnet_name_tag:
+      { Name: "{{ aws_vpc_with_subnets.name }}-{{ subnet.az }}" }
 
 - name: Generate subnet tags.
   set_fact:

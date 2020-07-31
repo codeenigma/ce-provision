@@ -1,3 +1,4 @@
+---
 - name: Add repository key for Ansible.
   apt_key:
     id: 93C4A3FD7BB9C367

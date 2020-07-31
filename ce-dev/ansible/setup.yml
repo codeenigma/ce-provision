@@ -1,5 +1,4 @@
 ---
-
 - hosts: provision-controller
   become: yes
   vars_files:

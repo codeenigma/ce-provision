@@ -1,5 +1,4 @@
 ---
-
 - name: Install deb for AWS CloudWatch agent.
   apt:
     deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb"

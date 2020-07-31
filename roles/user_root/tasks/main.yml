@@ -1,5 +1,4 @@
 ---
-
 - name: Randomize root password.
   user:
     name: root

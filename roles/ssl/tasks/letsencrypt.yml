@@ -5,7 +5,7 @@
 
 - name: define SSL base path.
   set_fact:
-    _ssl_base_path: '/etc/letsencrypt/live/{{ ssl.domain }}'
+    _ssl_base_path: "/etc/letsencrypt/live/{{ ssl.domain }}"
 
 - name: define key path.
   set_fact:
@@ -13,7 +13,7 @@
 
 - name: define cert path.
   set_fact:
-    _ssl_current_cert_path: "{{ _ssl_base_path }}/fullchain.pem"    
+    _ssl_current_cert_path: "{{ _ssl_base_path }}/fullchain.pem"
 
 - name: Check if we have a certificate.
   stat:
@@ -27,12 +27,12 @@
   with_items: "{{ ssl.services }}"
   loop_control:
     loop_var: ssl_service
-  when: 
+  when:
     - not letsencrypt_cert.stat.exists
 
 - name: Register certificate if needed.
   command: "/usr/bin/certbot certonly -n --cert-name {{ ssl.domain }} --standalone --preferred-challenges http -d {{ ssl.domain }} --agree-tos -m {{ ssl.email }}"
-  when: 
+  when:
     - not letsencrypt_cert.stat.exists
 
 - name: Restart services.
@@ -42,7 +42,7 @@
   with_items: "{{ ssl.services }}"
   loop_control:
     loop_var: ssl_service
-  when: 
+  when:
     - not letsencrypt_cert.stat.exists
 
 - name: Add key/cert pairs to know paths information.

@@ -1,5 +1,4 @@
 ---
-
 - name: Add key for LinOTP repository.
   apt_key: keyserver=http://packages.codeenigma.com/debian/codeenigma.pub id=A344A0826FD987C6 state=present
 
@@ -8,8 +7,8 @@
 
 - name: Ensure libpam-linotp is installed.
   apt:
-   pkg: libpam-linotp
-   state: present
+    pkg: libpam-linotp
+    state: present
 
 - name: Generate LinOTP config.
   template:
@@ -19,23 +18,23 @@
 - name: Enable LinOTP for sudo.
   lineinfile:
     path: /etc/pam.d/sudo
-    insertbefore: '^@include common-auth'
-    line: '@include common-linotp'
+    insertbefore: "^@include common-auth"
+    line: "@include common-linotp"
     state: present
   when: pam_linotp.sudo
 
 - name: Enable LinOTP for su.
   lineinfile:
     path: /etc/pam.d/su
-    insertbefore: '^@include common-auth'
-    line: '@include common-linotp'
+    insertbefore: "^@include common-auth"
+    line: "@include common-linotp"
     state: present
   when: pam_linotp.su
 
 - name: Enable LinOTP for ssh.
   lineinfile:
     path: /etc/pam.d/sshd
-    insertbefore: '^@include common-auth'
-    line: '@include common-linotp'
+    insertbefore: "^@include common-auth"
+    line: "@include common-linotp"
     state: present
   when: pam_linotp.ssh

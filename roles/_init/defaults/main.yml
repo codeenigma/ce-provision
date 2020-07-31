@@ -1,5 +1,4 @@
 ---
-
 _ce_provision:
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
 

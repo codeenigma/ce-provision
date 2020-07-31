@@ -1,5 +1,4 @@
 ---
-
 - name: Generate outbound rules
   ufw:
     port: "{{ outbound.port }}"

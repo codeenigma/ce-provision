@@ -3,7 +3,7 @@
 
 - name: Ensure OSSEC is installed.
   apt:
-    pkg: ['ossec-hids-server']
+    pkg: ["ossec-hids-server"]
     state: present
     update_cache: yes
 

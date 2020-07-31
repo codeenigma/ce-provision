@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure OpenSSH server is present.
   apt:
     pkg: [openssh-server]
@@ -44,7 +43,7 @@
   when: sshd.users | length
 
 # - name: Trigger overrides
-#   include_role: 
+#   include_role:
 #     name: _overrides
 
 - name: Restart SSH service.

@@ -1,5 +1,4 @@
 ---
-
 _ce_provision:
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
 
@@ -19,4 +18,4 @@ ce_provision:
   extra_repository_vars_file: "custom.yml"
   extra_repository_allowed_vars: []
   # List of additional groups to add the user to.
-  groups: ''
+  groups: ""

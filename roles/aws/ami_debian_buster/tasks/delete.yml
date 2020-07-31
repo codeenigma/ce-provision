@@ -1,5 +1,4 @@
 ---
-
 - name: De-register existing image, if any.
   ec2_ami:
     image_id: "{{ debian_buster_ami_base_image_latest.image_id }}"

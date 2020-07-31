@@ -1,3 +1,4 @@
+---
 ssl:
   domain: www.example.com
   # Handling for certs, can be one of:
@@ -20,16 +21,15 @@ ssl:
     -----BEGIN PRIVATE KEY-----
     79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
     6XoQQlb5mYuLKCzAZws9uceeVH+z
-    -----END PRIVATE KEY----- 
+    -----END PRIVATE KEY-----
   # For "letsencrypt" handling.
   email: admin@example.com
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
-  # eg; 
+  # eg;
   # services:
   #   - nginx
   services: []
-
 ############ Facts
 # ssl_facts
 # A dict of domain names with key/cert destination paths.

@@ -1,5 +1,4 @@
 ---
-
 user_root:
   # SSH pub keys.
   authorized_keys: []

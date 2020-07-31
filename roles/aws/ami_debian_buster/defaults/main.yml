@@ -1,5 +1,4 @@
 ---
-
 ami_debian_buster:
   aws_profile: default
   region: us-east-2

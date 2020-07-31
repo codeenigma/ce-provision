@@ -1,5 +1,4 @@
 ---
-
 - name: Check if we already have an AWS cli bin.
   stat:
     path: "/usr/local/bin/aws"

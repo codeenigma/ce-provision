@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure rkhunter is installed.
   apt:
     pkg: "rkhunter"

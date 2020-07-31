@@ -1,5 +1,4 @@
 ---
-
 aws_ec2_with_eip:
   aws_profile: default
   region: eu-west-3

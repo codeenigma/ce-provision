@@ -1,3 +1,4 @@
+---
 # This is used to construct:
 # - the base cidr_block as {{ cidr_base }}.0/16
 # - subnets cidr_block as
@@ -23,7 +24,8 @@ aws_vpc_with_subnets:
       cidr: "{{ _aws_vpc_with_subnets_cidr_base }}.64/26"
     - az: c
       cidr: "{{ _aws_vpc_with_subnets_cidr_base }}.128/26"
-  security_groups: []
+  security_groups:
+    []
     # - name: web - open
     #   description: Allow all incoming traffic on ports 80 and 443
     #   rules:
@@ -32,4 +34,4 @@ aws_vpc_with_subnets:
     #         - 80
     #         - 443
     #       cidr_ip: 0.0.0.0/0
-    #       rule_desc: Allow all incoming traffic on ports 80 and 443 
+    #       rule_desc: Allow all incoming traffic on ports 80 and 443

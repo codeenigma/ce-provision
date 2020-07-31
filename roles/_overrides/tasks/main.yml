@@ -1,5 +1,4 @@
 ---
-
 - name: Define override paths.
   set_fact:
     _template_override_paths: "{{ template_override._paths_defaults + template_override.paths }}"
@@ -8,4 +7,4 @@
   include_tasks: override.yml
   with_items: "{{ _template_override_paths }}"
   loop_control:
-    loop_var: template_override_path    
+    loop_var: template_override_path

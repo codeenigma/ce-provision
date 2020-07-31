@@ -1,9 +1,8 @@
 ---
-
 rkhunter:
   report_email_recipient: system@example.com
   warning_email_recipient: ""
-  disable_tests: 'suspscan hidden_procs deleted_files packet_cap_apps apps os_specific'
+  disable_tests: "suspscan hidden_procs deleted_files packet_cap_apps apps os_specific"
   scriptwhitelist:
     - /bin/egrep
     - /bin/fgrep

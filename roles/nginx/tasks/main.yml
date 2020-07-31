@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure nginx is installed.
   apt:
     name:
@@ -21,7 +20,7 @@
   file:
     path: /etc/nginx/passwords
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Copy project type-specific configuration in place.
   template:
@@ -75,7 +74,7 @@
     loop_var: domain
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Ensure Nginx is restarted.

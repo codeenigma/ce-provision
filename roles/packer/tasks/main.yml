@@ -1,5 +1,4 @@
 ---
-
 - name: Fetch and extract Packer zip.
   unarchive:
     src: https://releases.hashicorp.com/packer/{{ packer.version }}/packer_{{ packer.version }}_linux_amd64.zip

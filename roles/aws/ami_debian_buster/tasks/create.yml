@@ -1,5 +1,4 @@
 ---
-
 - name: Generate Packer template.
   template:
     src: packer.json.j2

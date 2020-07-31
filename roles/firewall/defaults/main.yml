@@ -1,17 +1,15 @@
 ---
-
 # rules:
 #   - { [port: ""] [rule: allow] [proto: any] [from_ip: any] [to_ip: any] [comment: 'rule comment']}
 #
 # https://docs.ansible.com/ansible/latest/modules/ufw_module.html#parameters
-# 
-
+#
 
 firewall:
   # Define any custom rule.
   rules: []
-    # - { to_ip: any, direction: out, port: '123', rule: 'allow', proto: udp, comment: 'Allow outgoing NTP' }
-    # - { from_ip: any, direction: in, port: '53', rule: 'allow', comment: 'Allow DNS' }
+  # - { to_ip: any, direction: out, port: '123', rule: 'allow', proto: udp, comment: 'Allow outgoing NTP' }
+  # - { from_ip: any, direction: in, port: '53', rule: 'allow', comment: 'Allow DNS' }
 
   input_policy: DROP
   output_policy: ACCEPT

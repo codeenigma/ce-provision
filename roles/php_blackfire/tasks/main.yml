@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure Blackfire agent is not installed.
   apt:
     pkg: "blackfire-agent"
@@ -60,11 +59,11 @@
     group: vagrant
     mode: 0644
   when:
-  - blackfire.enable
-  - is_local is defined and is_local
+    - blackfire.enable
+    - is_local is defined and is_local
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Ensure Blackfire is restarted.

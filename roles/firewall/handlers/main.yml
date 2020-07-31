@@ -1,5 +1,4 @@
 ---
-
 - name: enable firewall
   ufw:
     state: enabled

@@ -1,7 +1,6 @@
 ---
-
 ldap_client:
-  endpoints: ['']
+  endpoints: [""]
   lookup_base: ""
   lookup_user: ""
   binddn: ""
@@ -17,7 +16,7 @@ jenkins:
   user: "jenkins"
   adminuser: "admin"
   adminpass: "{{ lookup('password', _ce_provision_data_dir + '/' + inventory_hostname + '/jenkins-adminpass') }}"
- # security: basic | ldap 
+  # security: basic | ldap
   security: "basic"
   plugins:
     - ldap

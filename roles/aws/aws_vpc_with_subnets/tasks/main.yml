@@ -1,3 +1,4 @@
+---
 - name: Create VPC.
   ec2_vpc_net:
     profile: "{{ aws_vpc_with_subnets.aws_profile }}"

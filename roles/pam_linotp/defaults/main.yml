@@ -1,5 +1,4 @@
 ---
-
 pam_linotp:
   # LinOTP endpoint.
   endpoint: ""

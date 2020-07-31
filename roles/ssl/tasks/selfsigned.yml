@@ -1,8 +1,7 @@
 ---
-
 - name: define SSL base path.
   set_fact:
-    _ssl_base_path: '/etc/ssl/selfsigned'
+    _ssl_base_path: "/etc/ssl/selfsigned"
 
 - name: Create SSL directory.
   file:

@@ -24,7 +24,7 @@
     pkg: "mysql-server"
     state: present
     update_cache: yes
-    
+
 - name: Copy MySQL overriding configuration in place.
   template:
     src: mysql_dev.cnf.j2
@@ -34,7 +34,7 @@
     mode: 0644
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Restart mysql.

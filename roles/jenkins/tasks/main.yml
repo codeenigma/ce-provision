@@ -1,5 +1,4 @@
 ---
-
 - name: Add repository key for Jenkins.
   apt_key: url=https://pkg.jenkins.io/debian/jenkins.io.key state=present
 
@@ -68,7 +67,7 @@
   file:
     path: "/var/lib/jenkins/init.groovy.d"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Check if groovy security file exists
   stat:
@@ -100,7 +99,7 @@
 
 - name: Add Jenkins cert renewal job
   template:
-    src: 'jenkins-cert-renewal.sh.j2'
+    src: "jenkins-cert-renewal.sh.j2"
     dest: /etc/cron.daily/jenkins-cert-renewal
     mode: 0755
 

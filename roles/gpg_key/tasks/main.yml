@@ -1,5 +1,4 @@
 ---
-
 - name: Generate GPG key.
   include_tasks: gpg.yml
   with_items: "{{ gpg_key }}"

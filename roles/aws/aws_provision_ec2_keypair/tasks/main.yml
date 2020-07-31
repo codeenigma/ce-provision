@@ -1,5 +1,4 @@
 ---
-
 - name: Create EC2 key pair.
   ec2_key:
     name: "{{ aws_provision_ec2_keypair.key_name }}"

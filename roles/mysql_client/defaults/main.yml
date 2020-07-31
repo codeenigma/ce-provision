@@ -1,5 +1,5 @@
 ---
-#@todo do we want to support percona client ?
+# @todo do we want to support percona client ?
 mysql_client:
   client: "mysql-client"
   host: "rds.example.com"

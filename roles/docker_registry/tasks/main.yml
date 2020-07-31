@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure compose folder exists.
   file:
     path: /opt/docker_registry

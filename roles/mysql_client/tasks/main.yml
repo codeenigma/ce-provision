@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure mariadb-client is installed.
   apt:
     pkg: ["mariadb-client", "python-pymysql"]
@@ -16,5 +15,5 @@
     mode: 0600
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides

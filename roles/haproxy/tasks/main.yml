@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure haproxy is installed.
   apt:
     pkg: haproxy
@@ -25,7 +24,7 @@
     force: yes
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Ensure HAProxy is restarted.

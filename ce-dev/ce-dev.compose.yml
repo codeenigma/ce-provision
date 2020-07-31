@@ -2,7 +2,7 @@ version: "3.7"
 x-ce_dev:
   registry: localhost:5000
   project_name: provision
-  provision: 
+  provision:
     - ce-dev/ansible/setup.yml
   unison: false
 services:

@@ -1,3 +1,4 @@
+---
 - name: Create the deploy group.
   group:
     name: "{{ ce_deploy.username }}"
@@ -30,7 +31,8 @@
     dest: "{{ ce_deploy.local_dir }}"
     version: "{{ ce_deploy.own_repository_branch  | default('master') }}"
     update: yes
-    accept_hostkey: yes #@todo?
+    # @todo?
+    accept_hostkey: yes
   become: yes
   become_user: "{{ ce_deploy.username }}"
 
@@ -60,6 +62,7 @@
 
 - name: Register config repository.
   set_fact:
+    key_value: ce_deploy_has_config_repo
     ce_deploy_has_config_repo: "{{ 'yes' if ce_deploy_config_repo.stat.isdir is defined and ce_deploy_config_repo.stat.isdir else 'no' }}"
 
 - name: Create defaults folders.

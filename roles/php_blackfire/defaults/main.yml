@@ -1,8 +1,7 @@
 ---
-
 blackfire:
   enable: no
-  agent_server_id: ''
-  agent_server_token: ''
-  agent_client_id: ''
-  agent_client_token: ''
+  agent_server_id: ""
+  agent_server_token: ""
+  agent_client_id: ""
+  agent_client_token: ""

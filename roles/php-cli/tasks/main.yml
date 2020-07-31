@@ -1,5 +1,4 @@
 ---
-
 - name: Install PHP packages.
   apt:
     pkg:
@@ -51,5 +50,5 @@
     name: php_composer
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides

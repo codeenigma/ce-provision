@@ -1,5 +1,4 @@
 ---
-
 - name: Fetch docker-compose.
   get_url:
     url: https://github.com/docker/compose/releases/download/{{ docker_compose.version }}/docker-compose-Linux-x86_64

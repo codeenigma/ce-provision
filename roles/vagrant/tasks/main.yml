@@ -1,5 +1,4 @@
 ---
-
 - name: Install Vagrant from vagrantup.com.
   apt:
     deb: "https://releases.hashicorp.com/vagrant/{{ vagrant.version }}/vagrant_{{ vagrant.version }}_x86_64.deb"

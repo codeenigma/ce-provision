@@ -1,5 +1,4 @@
 ---
-
 - name: Install Selenium dependencies.
   apt:
     pkg:
@@ -98,7 +97,7 @@
     group: "{{ user_deploy.username }}"
     mode: 0700
   when: selenium.display_manager == "VNC"
-  
+
 - name: Fix VNC password file permissions.
   file:
     dest: "/home/{{ user_deploy.username }}/.vnc/passwd"

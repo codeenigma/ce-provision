@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure user .aws directory.
   file:
     path: "/home/{{ user_creds.user }}/.aws"

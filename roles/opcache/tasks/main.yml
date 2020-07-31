@@ -8,22 +8,22 @@
     dest: /usr/local/bin/cachetool
     owner: root
     group: root
-    mode: '0755'
+    mode: "0755"
 
 - name: Get php-fpm host
-  shell: 
+  shell:
     cmd: "netstat -anp | grep php-fpm | grep tcp | awk '{print $4}' | cut -d: -f1"
   register: _phpfpm_host
 
 - name: Get php-fpm port
-  shell: 
+  shell:
     cmd: "netstat -anp | grep php-fpm | grep tcp | awk '{print $4}' | cut -d: -f2"
   register: _phpfpm_port
-    
+
 - name: Copy cachetool config
   template:
     src: cachetool.j2
     dest: /etc/cachetool.yml
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"

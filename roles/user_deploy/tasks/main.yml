@@ -1,6 +1,5 @@
 ---
-
 - include_role:
     name: user_ansible
-  vars: 
+  vars:
     user_ansible: "{{ user_deploy }}"

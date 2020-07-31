@@ -1,3 +1,4 @@
+---
 - name: Define unique name for resources.
   set_fact:
     _aws_ec2_autoscale_cluster_unique_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ ansible_date_time.iso8601_basic_short }}"
