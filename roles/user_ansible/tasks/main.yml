@@ -24,7 +24,8 @@
     create_home: true
     home: "/home/{{ user_ansible.username }}"
     password: "*"
-    groups: "{{ user_ansible.groups }}"
+    groups:
+      - "{{ user_ansible.groups }}"
 
 - name: Add user to sudoers.
   template:

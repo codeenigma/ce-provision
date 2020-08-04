@@ -1,7 +1,8 @@
 ---
 - name: Find overrides
   find:
-    paths: "{{ template_override_path }}"
+    paths:
+      - "{{ template_override_path }}"
     file_type: file
     recurse: true
   register: template_overrides

@@ -8,7 +8,8 @@
   user:
     name: cwagent
     group: cwagent
-    groups: adm
+    groups:
+      - adm
     append: true
 
 - name: Ensure cwagent user .aws directory.

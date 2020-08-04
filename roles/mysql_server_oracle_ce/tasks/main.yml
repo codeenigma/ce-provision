@@ -62,7 +62,7 @@
     path: /var/run/mysqld
     owner: mysql
     group: mysql
-    mode: 0777
+    mode: "0777"
     recurse: true
 
 - name: Workaround Docker overlayFS issue.
