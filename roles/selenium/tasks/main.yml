@@ -7,7 +7,7 @@
       - xvfb
       - xterm
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Install VNC.
@@ -34,13 +34,13 @@
   unarchive:
     src: "https://github.com/mozilla/geckodriver/releases/download/v{{ selenium.gecko_version }}/geckodriver-v{{ selenium.gecko_version }}-linux64.tar.gz"
     dest: /opt/selenium
-    remote_src: yes
+    remote_src: true
 
 - name: Download ChromeDriver
   unarchive:
     src: "https://chromedriver.storage.googleapis.com/{{ selenium.chrome_version }}/chromedriver_linux64.zip"
     dest: /opt/selenium
-    remote_src: yes
+    remote_src: true
 
 - name: Install init.d service.
   template:
@@ -57,7 +57,7 @@
     owner: root
     group: root
     mode: 0555
-    force: yes
+    force: true
 
 - name: Create selenium stop script.
   template:

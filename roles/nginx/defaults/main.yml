@@ -16,7 +16,7 @@ nginx:
   # We can only have one backend, due to the way we use "common" templates.
   # Moving this per domain means instead having templates per project type.
   php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.','') }}"
-  ratelimitingcrawlers: no
+  ratelimitingcrawlers: false
   client_max_body_size: "700M"
   domains:
     - server_name: "{{ domain_name }}"
@@ -28,19 +28,19 @@ nginx:
       ssl: # @see the 'ssl' role.
         domain: "{{ domain_name }}"
         handling: selfsigned
-      ratelimitingcrawlers: yes
-      is_default: yes
+      ratelimitingcrawlers: true
+      is_default: true
       basic_auth:
-        auth_enabled: yes
+        auth_enabled: true
         auth_user: "{{ project_name }}"
         auth_pass: "P3nguin!"
       servers:
         - port: 80
-          ssl: no
-          https_redirect: yes
+          ssl: false
+          https_redirect: true
         - port: 443
-          ssl: yes
-          https_redirect: no
+          ssl: true
+          https_redirect: false
       upstreams: []
       # upstreams:
       #   - name: 'backend_example'

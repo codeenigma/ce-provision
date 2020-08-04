@@ -9,12 +9,12 @@
     name: cwagent
     group: cwagent
     groups: adm
-    append: yes
+    append: true
 
 - name: Ensure cwagent user .aws directory.
   file:
     path: /home/cwagent/.aws
-    recurse: yes
+    recurse: true
     owner: cwagent
     group: cwagent
 

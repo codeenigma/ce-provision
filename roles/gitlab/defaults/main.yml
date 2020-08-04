@@ -12,7 +12,7 @@ gitlab:
   ssl_handling: "ssl_selfsigned"
   unicorn_worker_processes: 2
   initial_root_password: ""
-  ldap: no
+  ldap: false
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
   ldap_lookup_base: "{{ ldap_client.lookup_base }}"
   ldap_binddn: "{{ ldap_client.binddn }}"

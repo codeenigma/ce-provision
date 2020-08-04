@@ -12,11 +12,11 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
 
 - name: Update apt cache.
   apt:
-    update_cache: yes
+    update_cache: true
 
 - name: Install PHP packages.
   apt:

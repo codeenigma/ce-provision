@@ -5,7 +5,7 @@
   apt:
     pkg: ["clamav"]
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Copy clamscan report config

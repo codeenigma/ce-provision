@@ -3,7 +3,7 @@
   apt:
     pkg: haproxy
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Create HAProxy SSL folder.
@@ -21,7 +21,7 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
 
 - name: Trigger overrides
   include_role:

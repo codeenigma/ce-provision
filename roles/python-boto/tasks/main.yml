@@ -3,5 +3,5 @@
   apt:
     pkg: ["python-boto", "python-boto3"]
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240

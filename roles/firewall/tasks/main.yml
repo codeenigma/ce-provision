@@ -3,7 +3,7 @@
   apt:
     pkg: ["ufw"]
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Replace Default UFW Config
@@ -18,12 +18,12 @@
 - name: Gather facts from the controller/provisioner.
   setup:
   delegate_to: "localhost"
-  delegate_facts: yes
+  delegate_facts: true
 
 - name: Gather facts from the utility server.
   setup:
   delegate_to: "{{ user_deploy.utility_host }}"
-  delegate_facts: yes
+  delegate_facts: true
   when:
     - user_deploy is defined
     - user_deploy.utility_host is defined

@@ -2,13 +2,13 @@
 - name: Create the provision group for provisioning.
   group:
     name: "{{ ce_provision.username }}"
-    system: yes
+    system: true
 
 - name: Create additional groups.
   group:
     name: "{{ group }}"
     state: present
-    system: yes
+    system: true
   with_items: "{{ ce_provision.groups }}"
   loop_control:
     loop_var: group
@@ -19,15 +19,15 @@
     name: "{{ ce_provision.username }}"
     comment: Provisioning user
     shell: /bin/bash
-    create_home: yes
+    create_home: true
     group: "{{ ce_provision.username }}"
     uid: "{{ ce_provision.uid | default(omit) }}"
-    generate_ssh_key: yes
+    generate_ssh_key: true
     home: "/home/{{ ce_provision.username }}"
     password: "*"
     ssh_key_bits: 4096
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
-    system: yes
+    system: true
     groups: "{{ ce_provision.groups }}"
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
@@ -43,13 +43,13 @@
 - name: Setup Git identity.
   command:
     cmd: "git config --global user.name {{ ce_provision.username }}"
-  become: yes
+  become: true
   become_user: "{{ ce_provision.username }}"
 
 - name: Setup Git identity email.
   command:
     cmd: "git config --global user.email {{ ce_provision.username }}@{{ domain_name }}"
-  become: yes
+  become: true
   become_user: "{{ ce_provision.username }}"
 
 - name: Ensure provision scripts are presents.
@@ -57,17 +57,17 @@
     repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git')}}"
     dest: "{{ ce_provision.local_dir }}"
     version: "{{ ce_provision.own_repository_branch  | default('master') }}"
-    update: yes
-    accept_hostkey: yes #@todo?
-  become: yes
+    update: true
+    accept_hostkey: true #@todo?
+  become: true
   become_user: "{{ ce_provision.username }}"
 
 - name: Checkout config directory.
   git:
     repo: "{{ ce_provision.config_repository }}"
-    accept_hostkey: yes
+    accept_hostkey: true
     dest: "{{ ce_provision.local_dir }}/config"
-  become: yes
+  become: true
   become_user: "{{ ce_provision.username }}"
   when: ce_provision_has_config_repo
 
@@ -107,4 +107,4 @@
     path: "/home/{{ ce_provision.username }}"
     state: directory
     owner: "{{ ce_provision.username }}"
-    recurse: yes
+    recurse: true

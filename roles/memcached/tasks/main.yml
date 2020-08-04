@@ -20,4 +20,4 @@
   service:
     name: memcached
     state: restarted
-    enabled: yes
+    enabled: true

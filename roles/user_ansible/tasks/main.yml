@@ -2,13 +2,13 @@
 - name: Create the system group.
   group:
     name: "{{ user_ansible.username }}"
-    system: yes
+    system: true
 
 - name: Create additional groups.
   group:
     name: "{{ group }}"
     state: present
-    system: yes
+    system: true
   with_items: "{{ user_ansible.groups }}"
   loop_control:
     loop_var: group
@@ -20,8 +20,8 @@
     shell: /bin/bash
     group: "{{ user_ansible.username }}"
     uid: "{{ user_ansible.uid | default(omit) }}"
-    system: yes
-    create_home: yes
+    system: true
+    create_home: true
     home: "/home/{{ user_ansible.username }}"
     password: "*"
     groups: "{{ user_ansible.groups }}"
@@ -47,7 +47,7 @@
   fetch:
     src: "/home/{{ user_ansible.utility_username }}/.ssh/id_rsa.pub"
     dest: "{{ _ce_provision_build_tmp_dir }}/authorized_keys"
-    flat: yes
+    flat: true
   delegate_to: "{{ user_ansible.utility_host }}"
 
 - name: Copy public key to target.

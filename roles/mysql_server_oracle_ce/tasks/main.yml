@@ -17,13 +17,13 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
 
 - name: Ensure mysql is installed.
   apt:
     pkg: "mysql-server"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Copy MySQL overriding configuration in place.
   template:
@@ -55,7 +55,7 @@
     path: /var/lib/mysql
     owner: mysql
     group: mysql
-    recurse: yes
+    recurse: true
 
 - name: Ensure mysql can write PID/lock.
   file:
@@ -63,7 +63,7 @@
     owner: mysql
     group: mysql
     mode: 0777
-    recurse: yes
+    recurse: true
 
 - name: Workaround Docker overlayFS issue.
   shell: >

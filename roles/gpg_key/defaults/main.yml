@@ -1,7 +1,7 @@
 ---
 gpg_key:
   - username: example # Must exist already on the server.
-    publish: no # Whether to publish to HKS public servers.
+    publish: false # Whether to publish to HKS public servers.
     key_type: "RSA"
     key_length: 4096
     email: example@example.com

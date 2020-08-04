@@ -2,7 +2,7 @@
 - name: Create the deploy group.
   group:
     name: "{{ ce_deploy.username }}"
-    system: yes
+    system: true
 
 - name: Create the deploy user for deployments.
   user:
@@ -11,13 +11,13 @@
     shell: /bin/bash
     group: "{{ ce_deploy.username }}"
     uid: "{{ ce_deploy.uid | default(omit) }}"
-    create_home: yes
-    generate_ssh_key: yes
+    create_home: true
+    generate_ssh_key: true
     home: "/home/{{ ce_deploy.username }}"
     password: "*"
     ssh_key_bits: 4096
     ssh_key_comment: "{{ ce_deploy.username }}@{{ ansible_host }}"
-    system: yes
+    system: true
     groups: "{{ ce_deploy.groups }}"
 
 - name: Ensure Git is installed.
@@ -30,19 +30,19 @@
     repo: "{{ ce_deploy.own_repository | default('https://github.com/codeenigma/ce-deploy.git') }}"
     dest: "{{ ce_deploy.local_dir }}"
     version: "{{ ce_deploy.own_repository_branch  | default('master') }}"
-    update: yes
+    update: true
     # @todo?
-    accept_hostkey: yes
-  become: yes
+    accept_hostkey: true
+  become: true
   become_user: "{{ ce_deploy.username }}"
 
 - name: Checkout config directory.
   git:
     repo: "{{ ce_deploy.config_repository }}"
-    accept_hostkey: yes
+    accept_hostkey: true
     dest: "{{ _ce_provision_build_tmp_dir }}/config"
     version: "{{ ce_deploy.config_repository_branch  | default('master') }}"
-  become: no
+  become: false
   delegate_to: localhost
   when: ce_deploy.config_repository is defined and ce_deploy.config_repository
 
@@ -50,7 +50,7 @@
   synchronize:
     src: "{{ _ce_provision_build_tmp_dir }}/config"
     dest: "{{ ce_deploy.local_dir }}/"
-    delete: yes
+    delete: true
     rsync_opts:
       - "--chown={{ ce_deploy.username }}:{{ ce_deploy.username }}"
   when: ce_deploy.config_repository is defined and ce_deploy.config_repository
@@ -108,4 +108,4 @@
     path: "{{ ce_deploy.local_dir }}"
     state: directory
     owner: "{{ ce_deploy.username }}"
-    recurse: yes
+    recurse: true

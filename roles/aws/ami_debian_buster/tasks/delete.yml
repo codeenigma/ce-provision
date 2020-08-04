@@ -3,7 +3,7 @@
   ec2_ami:
     image_id: "{{ debian_buster_ami_base_image_latest.image_id }}"
     region: "{{ ami_debian_buster.region }}"
-    delete_snapshot: yes
+    delete_snapshot: true
     state: absent
   when:
     - debian_buster_ami_base_image_latest.image_id is defined

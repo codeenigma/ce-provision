@@ -6,8 +6,8 @@ haproxy:
   template: "haproxy-ssl-passthru"
   ssl_handling: "{{ _haproxy.ssl_handling }}"
   listen_bind_address: "0.0.0.0"
-  listen_https: yes
-  listen_http: no
+  listen_https: true
+  listen_http: false
   default_backend: default
   backends:
     - name: default

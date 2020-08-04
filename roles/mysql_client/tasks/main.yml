@@ -3,7 +3,7 @@
   apt:
     pkg: ["mariadb-client", "python-pymysql"]
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Copy debian.cnf credentials file.

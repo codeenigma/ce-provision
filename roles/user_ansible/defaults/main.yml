@@ -6,6 +6,6 @@ user_ansible:
   utility_host: "localhost"
   utility_username: ""
   sudoer:
-    no
+    false
     # List of additional groups to add the user to.
   groups: ""

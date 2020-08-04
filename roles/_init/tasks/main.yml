@@ -12,12 +12,12 @@
     module: copy
     content: ""
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
-    force: no
+    force: false
 
 - name: Compute current playbook md5
   shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
   args:
-    warn: no
+    warn: false
   delegate_to: "localhost"
   register: current_play_dir_md5
 

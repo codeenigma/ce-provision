@@ -3,14 +3,14 @@
   apt:
     pkg: "blackfire-agent"
     state: absent
-    purge: yes
+    purge: true
   when: not blackfire.enable
 
 - name: Ensure Blackfire probe is not installed.
   apt:
     pkg: "blackfire-php"
     state: absent
-    purge: yes
+    purge: true
   when: not blackfire.enable
 
 - name: Ensure Blackfire local startup is not present.
@@ -31,7 +31,7 @@
   apt:
     pkg: "blackfire-agent"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
   when: blackfire.enable
 
@@ -48,7 +48,7 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
   when: blackfire.enable
 
 - name: Generate agent CLI configuration.

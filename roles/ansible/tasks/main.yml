@@ -14,9 +14,9 @@
   apt:
     pkg: ["ansible", "python-pip"]
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install ansible-lint.
   command:
     cmd: pip install ansible-lint
-  become: no
+  become: false

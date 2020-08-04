@@ -20,7 +20,7 @@
     name: aws/aws_vpc_with_subnets
   vars:
     aws_vpc_with_subnets:
-      create_gateway: yes
+      create_gateway: true
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -145,8 +145,8 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: yes
-    wait_for_instances: no
+    replace_all_instances: true
+    wait_for_instances: false
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"

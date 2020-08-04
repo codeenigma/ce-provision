@@ -23,6 +23,6 @@
   user:
     name: admin
     state: absent
-    remove: yes
-    force: yes
+    remove: true
+    force: true
   when: user_root.delete_admin

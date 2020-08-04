@@ -14,4 +14,4 @@
   apt:
     pkg: ["docker-ce", "docker-ce-cli"]
     state: present
-    update_cache: yes
+    update_cache: true

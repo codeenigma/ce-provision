@@ -4,7 +4,7 @@
     profile: "{{ aws_efs_client.aws_profile }}"
     region: "{{ aws_efs_client.region }}"
     name: "{{ mount.src }}"
-  become: yes
+  become: true
   become_user: "{{ user_provision.username }}"
   delegate_to: "{{ user_provision.utility_host }}"
   register: aws_efs_client_efs_volume

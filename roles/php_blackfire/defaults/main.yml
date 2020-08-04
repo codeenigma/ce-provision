@@ -1,6 +1,6 @@
 ---
 blackfire:
-  enable: no
+  enable: false
   agent_server_id: ""
   agent_server_token: ""
   agent_client_id: ""

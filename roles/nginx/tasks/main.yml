@@ -5,7 +5,7 @@
       - nginx
       - python-passlib
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Copy main nginx config.
@@ -29,7 +29,7 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
   with_items:
     - _common
     - custom

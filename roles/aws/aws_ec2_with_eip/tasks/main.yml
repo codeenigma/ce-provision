@@ -21,7 +21,7 @@
     region: "{{ aws_ec2_with_eip.region }}"
     image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
-    wait: yes
+    wait: true
     vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
@@ -66,6 +66,6 @@
     device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
     public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip | default(omit) }}"
     private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
-    in_vpc: yes
+    in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"

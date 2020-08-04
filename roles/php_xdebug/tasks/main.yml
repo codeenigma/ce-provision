@@ -3,7 +3,7 @@
   apt:
     pkg: php-xdebug
     state: absent
-    purge: yes
+    purge: true
   when:
     - not xdebug.cli
     - not xdebug.fpm
@@ -28,7 +28,7 @@
   apt:
     pkg: php-xdebug
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
   when: xdebug.cli or xdebug.fpm
 #@todo Maybe use sticky bit ?

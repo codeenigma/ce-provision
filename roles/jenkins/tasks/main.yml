@@ -9,7 +9,7 @@
   apt:
     pkg: "jenkins"
     state: present
-    update_cache: yes
+    update_cache: true
   register: aptoutput
 
 - name: Generates SSL keys.
@@ -94,7 +94,7 @@
 - name: Download Jenkins CLI
   get_url:
     url: "https://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
-    validate_certs: no
+    validate_certs: false
     dest: /opt/jenkins-cli.jar
 
 - name: Add Jenkins cert renewal job
@@ -105,12 +105,12 @@
 
 - name: Install Jenkins Plugins
   command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
-  become: yes
+  become: true
   become_user: "{{ jenkins.user }}"
   register: pluginoutput
 
 - name: Safe restart jenkins
   command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
-  become: yes
+  become: true
   become_user: "{{ jenkins.user }}"
   when: pluginoutput.changed

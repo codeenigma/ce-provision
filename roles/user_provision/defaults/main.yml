@@ -5,5 +5,5 @@ user_provision:
   # Local username of the system user.
   utility_host: "localhost"
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
-  sudoer: yes
+  sudoer: true
   groups: ""

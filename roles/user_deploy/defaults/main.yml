@@ -5,6 +5,6 @@ user_deploy:
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
-  sudoer: no
+  sudoer: false
   # List of additional groups to add the user to.
   groups: ""

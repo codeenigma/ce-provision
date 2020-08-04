@@ -3,8 +3,8 @@ redis:
   bind: 127.0.0.1
   port: 6379
   syslog_enable: "no"
-  save: yes
+  save: true
   maxmemory: 0
   maxmemory_policy: noeviction
   appendfsync: everysec
-  vm_overcommit_memory: no
+  vm_overcommit_memory: false

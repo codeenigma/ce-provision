@@ -15,8 +15,8 @@ aws_vpc_with_subnets:
   tags:
   #  Type: "util"
   state: present
-  assign_instances_ipv6: no
-  create_gateway: yes
+  assign_instances_ipv6: false
+  create_gateway: true
   subnets:
     # - az: a
     #   cidr: "{{ _aws_vpc_with_subnets_cidr_base }}.0/26"

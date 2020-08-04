@@ -5,7 +5,7 @@
   apt:
     pkg: "mariadb-server"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Copy MySQL overriding configuration in place.
   template:
@@ -23,7 +23,7 @@
   service:
     name: mysql
     state: restarted
-    enabled: yes
+    enabled: true
 
 - name: Update MySQL root password.
   shell: >
@@ -40,7 +40,7 @@
     path: /var/lib/mysql
     owner: mysql
     group: mysql
-    recurse: yes
+    recurse: true
 
 - name: Ensure mysql can write PID/lock.
   file:
@@ -48,7 +48,7 @@
     owner: mysql
     group: mysql
     mode: "0777"
-    recurse: yes
+    recurse: true
 
 - name: Workaround Docker overlayFS issue.
   shell: >
@@ -58,4 +58,4 @@
   service:
     name: mysql
     state: started
-    enabled: yes
+    enabled: true

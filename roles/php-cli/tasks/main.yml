@@ -36,7 +36,7 @@
   template:
     src: php.cli.ini.j2
     dest: "/etc/php/{{ version }}/cli/php.ini"
-    force: yes
+    force: true
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
