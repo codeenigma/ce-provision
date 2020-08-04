@@ -16,7 +16,7 @@ jobs:
         - pip install ansible-lint
       script:
         - yamllint roles
-        - shellcheck scripts/*.sh
+        - cd scripts && shellcheck *.sh
     - name: Documentation (push)
       if: branch = '1.x'
       addons:
