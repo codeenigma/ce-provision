@@ -122,8 +122,8 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: no
-    wait_for_instances: no
+    replace_all_instances: false
+    wait_for_instances: false
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"

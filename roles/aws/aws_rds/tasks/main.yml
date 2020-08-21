@@ -19,7 +19,7 @@
     #preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
     engine: "{{ aws_rds.engine }}"
     #db_parameter_group_name: undefined # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
-    copy_tags_to_snapshot: yes
+    copy_tags_to_snapshot: true
     #character_set_name: undefined # not required. The character set to associate with the DB cluster.
     #multi_az: undefined # not required. Specifies if the DB instance is a Multi-AZ deployment. Mutually exclusive with I(availability_zone).
     db_subnet_group_name: "{{ _aws_rds_rds_subnet_group.subnet_group.name }}"
