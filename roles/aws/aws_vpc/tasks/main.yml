@@ -1,0 +1,37 @@
+- name: Create VPC.
+  ec2_vpc_net:
+    profile: "{{ aws_vpc.aws_profile }}"
+    name: "{{ aws_vpc.name }}"
+    cidr_block: "{{ aws_vpc.cidr_block }}"
+    region: "{{ aws_vpc.region }}"
+    tags: "{{ aws_vpc.tags }}"
+    state: "{{ aws_vpc.state }}"
+  register: _aws_vpc_vpc
+
+- name: Create VPC Security groups.
+  include_tasks: "security_group.yml"
+  with_items: "{{ aws_vpc.security_groups }}"
+  loop_control:
+    loop_var: security_group
+
+- name: Create IGW
+  ec2_vpc_igw:
+    profile: "{{ aws_vpc.aws_profile }}"
+    region: "{{ aws_vpc.region }}"
+    vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
+    state: present
+    tags: "{{ aws_vpc.tags | combine({ 'Name': aws_vpc.name }) }}"
+  register: _aws_vpc_gateway
+
+- name: Update Main route table.
+  include_role:
+    name: aws/aws_vpc_route
+  vars:
+    aws_vpc_route:
+      aws_profile: "{{ aws_vpc.aws_profile }}"
+      region: "{{ aws_vpc.region }}"
+      vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
+      tags: "{{ aws_vpc.tags }}"
+      routes:
+      - dest: 0.0.0.0/0
+        gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
