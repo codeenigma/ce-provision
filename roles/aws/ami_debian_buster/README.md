@@ -10,7 +10,6 @@ This requires boto and Packer on the "provisioning" server.
 ## Default variables
 ```yaml
 ---
-
 ami_debian_buster:
   aws_profile: default
   region: us-east-2
@@ -23,6 +22,7 @@ ami_debian_buster:
   # - delete: Delete image and snapshots.
   #@todo find better names.
   operation: ensure
+
 ```
 
 <!--ENDROLEVARS-->

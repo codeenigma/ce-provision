@@ -32,7 +32,7 @@ sshd:
   PubkeyAuthentication: "yes"
   RekeyLimit: "default none"
   StrictModes: "yes"
-  Subsystem_sftp:	"internal-sftp"
+  Subsystem_sftp: "internal-sftp"
   SyslogFacility: "AUTH"
   TCPKeepAlive: "yes"
   UseDNS: "no"

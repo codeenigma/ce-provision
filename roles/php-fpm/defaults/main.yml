@@ -8,16 +8,16 @@ php:
     display_errors: "{% if env_type == 'prod' %}Off{% else %}On{% endif %}"
     display_startup_errors: "{% if env_type == 'prod' %}Off{% else %}On{% endif %}"
     html_errors: "{% if env_type == 'prod' %}Off{% else %}On{% endif %}"
-    engine: On
-    short_open_tag: Off
+    engine: "On"
+    short_open_tag: "Off"
     max_execution_time: 120
     max_input_time: 60
     max_input_nesting_level: 64
     max_input_vars: 1000
     memory_limit: 256M
     log_errors_max_len: 1024
-    ignore_repeated_errors: Off
-    ignore_repeated_source: Off
+    ignore_repeated_errors: "Off"
+    ignore_repeated_source: "Off"
     post_max_size: 200M
     upload_max_filesize: 200M
     max_file_uploads: 20

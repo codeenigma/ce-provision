@@ -20,7 +20,7 @@ aws_ec2_autoscale_cluster:
     - az: c
       cidr_block: "10.0.3.128/26"
   instance_type: t2.micro
-  key_name: "{{ ansible_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
+  key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   root_volume_size: 40

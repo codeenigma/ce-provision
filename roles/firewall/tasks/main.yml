@@ -1,10 +1,9 @@
 ---
-
 - name: Install UFW
   apt:
     pkg: ["ufw"]
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Replace Default UFW Config
@@ -19,13 +18,13 @@
 - name: Gather facts from the controller/provisioner.
   setup:
   delegate_to: "localhost"
-  delegate_facts: yes
+  delegate_facts: true
 
 - name: Gather facts from the utility server.
   setup:
   delegate_to: "{{ user_deploy.utility_host }}"
-  delegate_facts: yes
-  when: 
+  delegate_facts: true
+  when:
     - user_deploy is defined
     - user_deploy.utility_host is defined
     - not user_deploy.utility_host == 'localhost'
@@ -41,7 +40,7 @@
 - name: Gather allowed SSH hosts from utility server (IPV4).
   set_fact:
     _firewall_allow_ssh_ipv4: "{{ _firewall_allow_ssh_ipv4 + hostvars[user_deploy.utility_host]['ansible_all_ipv4_addresses'] }}"
-  when: 
+  when:
     - user_deploy is defined
     - user_deploy.utility_host is defined
     - not user_deploy.utility_host == 'localhost'
@@ -49,7 +48,7 @@
 - name: Gather allowed SSH hosts from utility server (IPV6).
   set_fact:
     _firewall_allow_ssh_ipv6: "{{ _firewall_allow_ssh_ipv6 + hostvars[user_deploy.utility_host]['ansible_all_ipv6_addresses'] }}"
-  when: 
+  when:
     - user_deploy is defined
     - user_deploy.utility_host is defined
     - not user_deploy.utility_host == 'localhost'
@@ -57,7 +56,7 @@
 - name: Gather allowed SSH hosts from utility domain name (IPV4).
   set_fact:
     _firewall_allow_ssh_ipv4: "{{ _firewall_allow_ssh_ipv4 + [ hostvars[inventory_hostname]['public_ip_address'] ] }}"
-  when: 
+  when:
     - user_deploy is defined
     - user_deploy.utility_host is defined
     - not user_deploy.utility_host == 'localhost'
@@ -66,7 +65,7 @@
 # - name: Gather allowed SSH hosts from utility domain name (IPV6).
 #   set_fact:
 #     _firewall_allow_ssh_ipv6: "{{ _firewall_allow_ssh_ipv6 + lookup('dig', user_deploy.utility_host, 'qtype=AAAA', wantlist=True) }}"
-#   when: 
+#   when:
 #     - user_deploy is defined
 #     - user_deploy.utility_host is defined
 #     - not user_deploy.utility_host == 'localhost'
@@ -106,14 +105,14 @@
   include_tasks: inbound.yml
   with_items: "{{ _firewall_inbound }}"
   loop_control:
-    loop_var: inbound    
+    loop_var: inbound
 
 - name: Allow firewall outbound rules
   include_tasks: outbound.yml
   with_items: "{{ _firewall_outbound }}"
   loop_control:
     loop_var: outbound
-    
+
 - name: Configure Additional Firewall Rules
 
   # https://docs.ansible.com/ansible/latest/modules/ufw_module.html#parameters

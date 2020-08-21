@@ -1,9 +1,8 @@
 ---
-
 - name: Ensure user .aws directory.
   file:
     path: "/home/{{ user_creds.user }}/.aws"
-    recurse: yes
+    recurse: true
     owner: "{{ user_creds.user }}"
     group: "{{ user_creds.user }}"
     state: directory

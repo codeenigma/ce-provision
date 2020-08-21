@@ -1,5 +1,4 @@
 ---
-
 hosts_playbook_version: "1.0.1"
 
 # If set to true, an entry for `ansible_hostname`, bound to the host's default IPv4 address is added added.
@@ -28,10 +27,10 @@ hosts_entries: []
 hosts_file_snippets: []
 
 # IP protocol to use
-hosts_ip_protocol: 'ipv4'
+hosts_ip_protocol: "ipv4"
 
 # Network interface to use
 hosts_network_interface: "{{ ansible_default_ipv4.interface }}"
 
 # Backup of previous host
-host_file_backup: no
+host_file_backup: false

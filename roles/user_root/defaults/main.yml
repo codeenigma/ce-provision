@@ -1,7 +1,6 @@
 ---
-
 user_root:
   # SSH pub keys.
   authorized_keys: []
   # Also delete the "admin" user that comes from Debian image.
-  delete_admin: yes
+  delete_admin: true

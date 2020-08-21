@@ -1,0 +1,4 @@
+---
+- name: Add key/cert pairs to know paths information.
+  set_fact:
+    ssl_facts: "{{ ssl_facts | combine({ ssl.domain:{ 'certificate': ssl.cert, 'key': ssl.key } }) }}"

@@ -1,16 +1,16 @@
 version: "3.7"
 x-ce_dev:
+  version: 1.x
   registry: localhost:5000
   project_name: provision
-  provision: 
+  provision:
     - ce-dev/ansible/setup.yml
-  unison: false
 services:
   controller:
     image: codeenigma/ce-dev-1.x
     x-ce_dev: {}
     volumes:
-      - ../:/home/ce-dev/ansible-provision
+      - ../:/home/ce-dev/ce-provision
   target:
     image: codeenigma/ce-dev-1.x
     x-ce_dev:

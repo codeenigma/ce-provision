@@ -12,5 +12,5 @@ What this will do is:
 ### Example
 This how you'd call the provision.sh script from Jenkins:
 ```
-/home/deploy/ansible-provision/scripts/provision.sh --repo "git@gitlab.com:example/myproject.git" --branch "dev" --playbook "myserver/server2.yml"
+/home/deploy/ce-provision/scripts/provision.sh --repo "git@gitlab.com:example/myproject.git" --branch "dev" --playbook "myserver/server2.yml"
 ```

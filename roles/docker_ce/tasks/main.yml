@@ -1,18 +1,17 @@
 ---
-
 - name: Remove potential older packages.
   apt:
-    pkg: ['docker', 'docker-engine', 'docker.io', 'containerd', 'runc']
+    pkg: ["docker", "docker-engine", "docker.io", "containerd", "runc"]
     state: absent
 
 - name: Add repository key for Docker.
   apt_key: url=https://download.docker.com/linux/debian/gpg state=present
-  
+
 - name: Add repository for Docker.
   apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/debian buster stable' state=present
 
 - name: Ensure Docker is installed.
   apt:
-    pkg: ['docker-ce', 'docker-ce-cli']
+    pkg: ["docker-ce", "docker-ce-cli"]
     state: present
-    update_cache: yes
+    update_cache: true

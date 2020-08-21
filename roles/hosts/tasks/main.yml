@@ -1,5 +1,4 @@
 ---
-
 - name: Define hosts entries.
   set_fact:
     _hosts_entries: "{{ hosts_entries + _default_hosts_entries }}"
@@ -22,7 +21,7 @@
 - name: Disable cloud-init manage_etc_hosts.
   lineinfile:
     path: "{{ cloud_init_file.stat.path }}"
-    regexp: 'manage_etc_hosts: true'
-    line: 'manage_etc_hosts: false'
+    regexp: "manage_etc_hosts: true"
+    line: "manage_etc_hosts: false"
   when:
     - cloud_init_file.stat.exists

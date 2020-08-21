@@ -1,8 +1,7 @@
 ---
-
 - name: Add repository key for Gitlab.
   apt_key: url=https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey state=present
-  
+
 - name: Add repository for Gitlab.
   apt_repository: repo='deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main' state=present
 
@@ -13,7 +12,7 @@
   apt:
     pkg: "gitlab-ce"
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Generates SSL keys.
   include_role:
@@ -27,7 +26,7 @@
   template:
     src: gitlab.rb.j2
     dest: /etc/gitlab/gitlab.rb
-      
+
 - name: Make sure run-parts dir exists.
   file:
     path: "/opt/run-parts"
@@ -36,7 +35,7 @@
     group: root
     mode: 0555
   when: is_local is defined and is_local
-      
+
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2
@@ -44,11 +43,11 @@
     owner: root
     group: root
     mode: 0555
-    force: yes
+    force: true
   when: is_local is defined and is_local
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Manually restart Gitlab/Docker.
@@ -73,11 +72,11 @@
 - name: Disable DSA keys
   shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(dsa_key_restriction: -1)'"
 
-- name: Disable ECDSA 
+- name: Disable ECDSA
   shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(ecdsa_key_restriction: -1)'"
 
-- name: Enforce at least 2048bits for RSA 
+- name: Enforce at least 2048bits for RSA
   shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(rsa_key_restriction: 2048)'"
 
-- name: Disable password auth over HTTP/S 
+- name: Disable password auth over HTTP/S
   shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(password_authentication_enabled_for_git: false)'"

@@ -21,7 +21,7 @@
     region: "{{ aws_ec2_with_eip.region }}"
     image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
-    wait: yes
+    wait: true
     vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
@@ -44,19 +44,19 @@
 - name: Generate Terraform template.
   template:
     src: eip.tf.j2
-    dest: "{{ _ansible_provision_build_tmp_dir }}/main.tf"
+    dest: "{{ _ce_provision_build_tmp_dir }}/main.tf"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Init Terraform.
   command:
     cmd: terraform init
-    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+    chdir: "{{ _ce_provision_build_tmp_dir }}"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Create EIP with Terraform if we don't have one.
   command:
     cmd: terraform apply -auto-approve
-    chdir: "{{ _ansible_provision_build_tmp_dir }}"
+    chdir: "{{ _ce_provision_build_tmp_dir }}"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Associate Elastic IP.
@@ -66,6 +66,6 @@
     device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
     public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip | default(omit) }}"
     private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
-    in_vpc: yes
+    in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"

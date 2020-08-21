@@ -1,9 +1,8 @@
 ---
-
 pam_linotp:
   # LinOTP endpoint.
   endpoint: ""
   # PAM policies.
-  su: yes
-  sudo: yes
-  ssh: yes
+  su: true
+  sudo: true
+  ssh: true

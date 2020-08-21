@@ -1,5 +1,4 @@
 ---
-
 - name: Generate inbound rules
   ufw:
     port: "{{ inbound.port }}"

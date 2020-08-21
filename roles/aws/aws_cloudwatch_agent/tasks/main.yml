@@ -1,5 +1,4 @@
 ---
-
 - name: Install deb for AWS CloudWatch agent.
   apt:
     deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb"
@@ -9,13 +8,14 @@
   user:
     name: cwagent
     group: cwagent
-    groups: adm
-    append: yes
+    groups:
+      - adm
+    append: true
 
 - name: Ensure cwagent user .aws directory.
   file:
     path: /home/cwagent/.aws
-    recurse: yes
+    recurse: true
     owner: cwagent
     group: cwagent
 

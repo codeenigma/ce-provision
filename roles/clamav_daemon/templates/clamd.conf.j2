@@ -93,7 +93,7 @@ LogSyslog yes
 #LocalSocketMode 660
 
 # Remove stale socket after unclean shutdown.
-# Default: yes
+# Default: true
 #FixStaleSocket yes
 
 # TCP port address.
@@ -179,7 +179,7 @@ TCPAddr {{ clamav_daemon.host }}
 #FollowFileSymlinks yes
 
 # Scan files and directories on other filesystems.
-# Default: yes
+# Default: true
 #CrossFilesystems yes
 
 # Perform a database check.
@@ -216,7 +216,7 @@ User clamav
 
 # Permit use of the ALLMATCHSCAN command. If set to no, clamd will reject
 # any ALLMATCHSCAN command as invalid.
-# Default: yes
+# Default: true
 #AllowAllMatchScan no
 
 # Detect Possibly Unwanted Applications.
@@ -240,7 +240,7 @@ User clamav
 # In some cases (eg. complex malware, exploits in graphic files, and others),
 # ClamAV uses special algorithms to provide accurate detection. This option
 # controls the algorithmic detection.
-# Default: yes
+# Default: true
 #AlgorithmicDetection yes
 
 # This option causes memory or nested map scans to dump the content to disk.
@@ -265,7 +265,7 @@ User clamav
 # required for decompression of popular executable packers such as UPX, FSG,
 # and Petite. If you turn off this option, the original files will still be
 # scanned, but without additional processing.
-# Default: yes
+# Default: true
 #ScanPE yes
 
 # Certain PE files contain an authenticode signature. By default, we check
@@ -282,7 +282,7 @@ User clamav
 # This option allows you to control the scanning of ELF files.
 # If you turn off this option, the original files will still be scanned, but
 # without additional processing.
-# Default: yes
+# Default: true
 #ScanELF yes
 
 # With this option clamav will try to detect broken executables (both PE and
@@ -299,7 +299,7 @@ User clamav
 # documents and .msi files.
 # If you turn off this option, the original files will still be scanned, but
 # without additional processing.
-# Default: yes
+# Default: true
 #ScanOLE2 yes
 
 # With this option enabled OLE2 files with VBA macros, which were not
@@ -310,13 +310,13 @@ User clamav
 # This option enables scanning within PDF files.
 # If you turn off this option, the original files will still be scanned, but
 # without decoding and additional processing.
-# Default: yes
+# Default: true
 #ScanPDF yes
 
 # This option enables scanning within SWF files.
 # If you turn off this option, the original files will still be scanned, but
 # without decoding and additional processing.
-# Default: yes
+# Default: true
 #ScanSWF yes
 
 
@@ -327,7 +327,7 @@ User clamav
 # Enable internal e-mail scanner.
 # If you turn off this option, the original files will still be scanned, but
 # without parsing individual messages/attachments.
-# Default: yes
+# Default: true
 #ScanMail yes
 
 # Scan RFC1341 messages split over many emails.
@@ -339,11 +339,11 @@ User clamav
 
 # With this option enabled ClamAV will try to detect phishing attempts by using
 # signatures.
-# Default: yes
+# Default: true
 #PhishingSignatures yes
 
 # Scan URLs found in mails for phishing attempts using heuristics.
-# Default: yes
+# Default: true
 #PhishingScanURLs yes
 
 # Always block SSL mismatches in URLs, even if the URL isn't in the database.
@@ -399,7 +399,7 @@ User clamav
 
 # With this option enabled the DLP module will search for valid
 # SSNs formatted as xxx-yy-zzzz
-# Default: yes
+# Default: true
 #StructuredSSNFormatNormal yes
 
 # With this option enabled the DLP module will search for valid
@@ -413,7 +413,7 @@ User clamav
 ##
 
 # Perform HTML normalisation and decryption of MS Script Encoder code.
-# Default: yes
+# Default: true
 # If you turn off this option, the original files will still be scanned, but
 # without additional processing.
 #ScanHTML yes
@@ -426,7 +426,7 @@ User clamav
 # ClamAV can scan within archives and compressed files.
 # If you turn off this option, the original files will still be scanned, but
 # without unpacking and additional processing.
-# Default: yes
+# Default: true
 #ScanArchive yes
 
 # Mark encrypted archives as viruses (Encrypted.Zip, Encrypted.RAR).
@@ -562,7 +562,7 @@ User clamav
 
 # With this option enabled ClamAV will load bytecode from the database. 
 # It is highly recommended you keep this option on, otherwise you'll miss detections for many new viruses.
-# Default: yes
+# Default: true
 #Bytecode yes
 
 # Set bytecode security level.

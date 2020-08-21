@@ -2,7 +2,7 @@
 # See https://github.com/ansible/ansible/issues/8603
 
 ldap_client:
-  endpoints: ['']
+  endpoints: [""]
   lookup_base: ""
   binddn: ""
   bindpw: ""
@@ -12,7 +12,7 @@ gitlab:
   ssl_handling: "ssl_selfsigned"
   unicorn_worker_processes: 2
   initial_root_password: ""
-  ldap: no
+  ldap: false
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
   ldap_lookup_base: "{{ ldap_client.lookup_base }}"
   ldap_binddn: "{{ ldap_client.binddn }}"
@@ -20,6 +20,6 @@ gitlab:
   nginx:
     listen_port: 8881
     listen_https: nil
-    client_max_body_size: '250m'
-    redirect_http_to_https: 'false'
+    client_max_body_size: "250m"
+    redirect_http_to_https: "false"
     redirect_http_to_https_port: 8881

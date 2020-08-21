@@ -2,30 +2,34 @@
 
 This will spin up some Docker containers to be able to run roles against.
 By default, it will create:
-- a "controller" container, which acts as the provisioning server. This "ansible-provision" repo is mounted at /home/ce-dev/ansible-provision, so all changes (to roles, etc) made from your host computer are directly available within the container
+
+- a "controller" container, which acts as the provisioning server. This "ce-provision" repo is mounted at /home/ce-dev/ce-provision, so all changes (to roles, etc) made from your host computer are directly available within the container
 - a blank target server, called **provision-target**
 
-
 ## Pre-requesites
+
 You'll need https://github.com/codeenigma/ce-dev installed.
 
 ## Usage
 
 ### 1. Generate the actual docker-compose file and start the containers
-```ce-dev init && ce-dev start```
+
+`ce-dev init && ce-dev start`
 
 ### 2. Provision the controller server
-```ce-dev provision```
+
+`ce-dev provision`
 
 This needs to be done first, so the deploy user can be correctly populated and the controller server is setup.
 
 ### 3. Amend the git remote(s)
-The setup step uses the standard repo path, https://github.com/codeenigma/ansible-provision.git which is not suitable for pushing/MR.
-You need to manually amend it to use the ssh version (or point it to your fork).
+
+The setup step uses the standard repo path, https://github.com/codeenigma/ce-provision.git which is not suitable for pushing/MR.
+You need to manually amend it to use the ssh version (or point it to your private fork).
 
 ```
 git remote remove origin
-git remote add origin git@github.com:codeenigma/ansible-provision.git
+git remote add origin git@github.com:codeenigma/ce-provision.git
 ```
 
 ### 4. Create your playbook(s)
@@ -38,13 +42,14 @@ Or you can include the 'common.yml' vars file, as it will set all the needed var
 
 ### 5. Run, amend/create your roles, rince and repeat
 
-```ce-dev shell```
+`ce-dev shell`
 
 Select the `provision-controller` instance to connect to. From there, you can run a playbook to provision the provision-target server. There are two ways to run playbooks.
-1. From the **~/ansible-provision** directory, run:
-```ansible-playbook ce-dev/ansible/local/provision-target.yml```
 
-1. Use the `provision.sh` wrapper script. As you're working locally, you can use the `--workspace` argument:
-```/bin/sh /home/ce-dev/ansible-provision/scripts/provision.sh --repo unused --branch master --workspace /home/ce-dev/ansible-provision --playbook ce-dev/ansible/local/provision-target.yml```
+1.  From the **~/ce-provision** directory, run:
+    `ansible-playbook ce-dev/ansible/local/provision-target.yml`
 
-    The `--repo` and `--branch` arguments are still mandatory, but they won't be used because you're passing in the `--workspace` argument as well, so you can pass through any value for those two arguments. The `--workspace` and `--playbook` arguments **must** create an absolute path to the playbook that you want to run.
+1.  Use the `provision.sh` wrapper script. As you're working locally, you can use the `--workspace` argument:
+    `/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh --repo unused --branch master --workspace /home/ce-dev/ce-provision --playbook ce-dev/ansible/local/provision-target.yml`
+
+        The `--repo` and `--branch` arguments are still mandatory, but they won't be used because you're passing in the `--workspace` argument as well, so you can pass through any value for those two arguments. The `--workspace` and `--playbook` arguments **must** create an absolute path to the playbook that you want to run.

@@ -1,17 +1,16 @@
 ---
-
 - name: Ensure Blackfire agent is not installed.
   apt:
     pkg: "blackfire-agent"
     state: absent
-    purge: yes
+    purge: true
   when: not blackfire.enable
 
 - name: Ensure Blackfire probe is not installed.
   apt:
     pkg: "blackfire-php"
     state: absent
-    purge: yes
+    purge: true
   when: not blackfire.enable
 
 - name: Ensure Blackfire local startup is not present.
@@ -32,7 +31,7 @@
   apt:
     pkg: "blackfire-agent"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
   when: blackfire.enable
 
@@ -49,7 +48,7 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
   when: blackfire.enable
 
 - name: Generate agent CLI configuration.
@@ -60,11 +59,11 @@
     group: vagrant
     mode: 0644
   when:
-  - blackfire.enable
-  - is_local is defined and is_local
+    - blackfire.enable
+    - is_local is defined and is_local
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Ensure Blackfire is restarted.

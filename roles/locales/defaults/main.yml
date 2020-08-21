@@ -8,4 +8,4 @@ locales:
 
   # Default locale to use.
   default: en_US.UTF-8
-  timezone: 'UTC'
+  timezone: "UTC"

@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure Redis is installed.
   apt:
     pkg: "redis-server"
@@ -29,11 +28,11 @@
   when: not redis.vm_overcommit_memory
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Restart Redis.
   service:
     name: redis-server
     state: restarted
-    enabled: yes
+    enabled: true

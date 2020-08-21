@@ -1,3 +1,4 @@
+---
 # @todo cross-owner
 - name: Gather peer instance info.
   ec2_instance_info:

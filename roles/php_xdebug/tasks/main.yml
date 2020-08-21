@@ -1,10 +1,9 @@
 ---
-
 - name: Ensure xdebug is not installed.
   apt:
     pkg: php-xdebug
     state: absent
-    purge: yes
+    purge: true
   when:
     - not xdebug.cli
     - not xdebug.fpm
@@ -29,7 +28,7 @@
   apt:
     pkg: php-xdebug
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
   when: xdebug.cli or xdebug.fpm
 #@todo Maybe use sticky bit ?
@@ -51,12 +50,12 @@
 
 - name: Set remote host (Default)
   set_fact: xdebug.remote_host = "127.0.0.1"
-  when: 
+  when:
     - xdebug.remote_host == 'auto'
 #@todo
 # - name: Set remote host (Docker for Mac)
 #   set_fact: xdebug.remote_host = "docker.for.mac.localhost"
-#   when: 
+#   when:
 #     - xdebug.remote_host == 'auto'
 #     - host_platform == 'mac_os'
 
@@ -64,13 +63,13 @@
   set_fact: xdebug.remote_connect_back = 1
   when:
     - xdebug.remote_host == 'auto'
-#@todo    
+#@todo
 # - name: Disable xdebug connect back (Docker for Mac)
 #   set_fact: xdebug.remote_connect_back = 0
 #   when:
 #     - xdebug.remote_connect_back == 'auto'
 #     - host_platform == 'mac_os'
-    
+
 - name: Copy xdebug configuration in place.
   template:
     src: 30-xdebug-dev.ini.j2

@@ -1,11 +1,11 @@
 ---
-
 user_ansible:
   # This sets both username and main group.
   username: ""
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: ""
-  sudoer: no
+  sudoer:
+    false
     # List of additional groups to add the user to.
-  groups: ''
+  groups: ""

@@ -1,5 +1,4 @@
 ---
-
 dependencies:
   - role: _meta/common_base
   - role: firewall
@@ -13,4 +12,3 @@ dependencies:
   - role: php-fpm
   - role: opcache
   - role: nginx
-  

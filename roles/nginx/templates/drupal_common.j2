@@ -22,7 +22,7 @@ location / {
 #    @todo
 #    limit_req zone=bots burst=5 nodelay;
     {% endif %}
-    try_files @rewrite /index.php;
+    try_files @rewrite /index.php?$query_string;
 }
 
 ############ Blacklist block.

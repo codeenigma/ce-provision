@@ -1,5 +1,4 @@
 ---
-
 - name: Install PHP packages.
   apt:
     pkg:
@@ -21,7 +20,7 @@
   template:
     dest: "/etc/php/{{ version }}/fpm/pool.d/www.conf"
     src: "www.conf.j2"
-    mode: 0555    
+    mode: 0555
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
@@ -31,7 +30,7 @@
     name: php_xdebug
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Restart FPM service.

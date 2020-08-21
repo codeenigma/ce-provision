@@ -1,26 +1,29 @@
 ---
-#@todo Configuration is for dev.
+# @todo Configuration is for dev.
 
 - name: Ensure mysql is installed.
   apt:
     pkg: "mariadb-server"
     state: present
-    update_cache: yes
-    
+    update_cache: true
+
 - name: Copy MySQL overriding configuration in place.
   template:
     src: mysql_dev.cnf.j2
     dest: "/etc/mysql/conf.d/zz_dev.cnf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Restart mysql.
-  service: name=mysql state=restarted enabled=yes
+  service:
+    name: mysql
+    state: restarted
+    enabled: true
 
 - name: Update MySQL root password.
   shell: >
@@ -37,19 +40,22 @@
     path: /var/lib/mysql
     owner: mysql
     group: mysql
-    recurse: yes
+    recurse: true
 
 - name: Ensure mysql can write PID/lock.
   file:
     path: /var/run/mysqld
     owner: mysql
     group: mysql
-    mode: 0777
-    recurse: yes
+    mode: "0777"
+    recurse: true
 
 - name: Workaround Docker overlayFS issue.
   shell: >
     find /var/lib/mysql -type f -exec touch {} \;
 
 - name: Restart mysql.
-  service: name=mysql state=started enabled=yes
+  service:
+    name: mysql
+    state: started
+    enabled: true

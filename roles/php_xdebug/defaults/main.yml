@@ -1,7 +1,7 @@
 ---
 xdebug:
-  cli: no
-  fpm: no
+  cli: false
+  fpm: false
   scream: 0
   max_nesting_level: 1024
   trace_enable_trigger: 1

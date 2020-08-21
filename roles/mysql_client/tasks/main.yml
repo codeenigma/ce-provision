@@ -1,10 +1,9 @@
 ---
-
 - name: Ensure mariadb-client is installed.
   apt:
     pkg: ["mariadb-client", "python-pymysql"]
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Copy debian.cnf credentials file.
@@ -16,5 +15,5 @@
     mode: 0600
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides

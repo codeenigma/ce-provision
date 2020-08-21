@@ -1,10 +1,9 @@
 ---
-
 dependencies:
   - role: _meta/common_base
   - role: ssh_server
   - role: user_provision
-  - role: ansible_deploy
+  - role: ce_deploy
   - role: gitlab
   - role: jenkins
   - role: docker_registry

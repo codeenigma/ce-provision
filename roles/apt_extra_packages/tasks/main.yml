@@ -1,9 +1,8 @@
 ---
-
 - name: Install additional extra packages.
   apt:
     pkg: "{{ apt_extra_packages | list }}"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
   when: apt_extra_packages | length

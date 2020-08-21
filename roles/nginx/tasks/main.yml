@@ -1,12 +1,11 @@
 ---
-
 - name: Ensure nginx is installed.
   apt:
     name:
       - nginx
       - python-passlib
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Copy main nginx config.
@@ -21,7 +20,7 @@
   file:
     path: /etc/nginx/passwords
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Copy project type-specific configuration in place.
   template:
@@ -30,7 +29,7 @@
     owner: root
     group: root
     mode: 0644
-    force: yes
+    force: true
   with_items:
     - _common
     - custom
@@ -46,10 +45,20 @@
     - symfony4
     - wordpress
 
-- name: Ensure default nginx catch-all is not present
+- name: Ensure log dir exists.
   file:
-    path: "/etc/nginx/sites-enabled/default"
+    path: "/var/log/nginx"
+    state: directory
+
+- name: Remove existing vhosts
+  file:
+    path: "/etc/nginx/sites-enabled"
     state: absent
+
+- name: Recreate vhosts folder
+  file:
+    path: "/etc/nginx/sites-enabled"
+    state: directory
 
 - name: Generates AWS Cloudwatch default config.
   template:
@@ -65,7 +74,7 @@
     loop_var: domain
 
 - name: Trigger overrides
-  include_role: 
+  include_role:
     name: _overrides
 
 - name: Ensure Nginx is restarted.

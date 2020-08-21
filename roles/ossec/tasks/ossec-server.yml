@@ -3,9 +3,9 @@
 
 - name: Ensure OSSEC is installed.
   apt:
-    pkg: ['ossec-hids-server']
+    pkg: ["ossec-hids-server"]
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Set ossec-watchdog cron
   copy:

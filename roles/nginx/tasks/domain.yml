@@ -1,15 +1,15 @@
+---
 - name: Generates SSL keys.
   include_role:
-    name: "{{ domain.ssl_handling }}"
+    name: ssl
+  when: domain.ssl is defined
   vars:
-    ssl:
-      domain: "{{ domain.server_name }}"
-      services: ['nginx']
+    ssl: "{{ domain.ssl }}"
 
 # If auth_enabled is defined and yes, and auth_pass is not defined or is defined but empty, generate a random password.
 - name: Generate random htauth password.
   set_fact:
-    _nginx_htauth_pass: "{{ lookup('password', _ansible_provision_data_dir + '/' + inventory_hostname + '/nginx-passwords/' + domain.server_name) }}"
+    _nginx_htauth_pass: "{{ lookup('password', _ce_provision_data_dir + '/' + inventory_hostname + '/nginx-passwords/' + domain.server_name) }}"
   when:
     - domain.basic_auth.auth_enabled is defined
     - domain.basic_auth.auth_enabled

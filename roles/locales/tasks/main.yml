@@ -1,8 +1,9 @@
+---
 - name: Ensure "locales" is installed.
   apt:
     pkg: "locales"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 240
 
 - name: Copy locales settings.

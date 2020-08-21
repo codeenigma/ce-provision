@@ -5,7 +5,7 @@
   unarchive:
     src: https://github.com/codeenigma/ce-dev/releases/download/1.0.9/ce-dev-v1.0.9-linux-x64.tar.gz
     dest: /opt/
-    remote_src: yes
+    remote_src: true
     mode: 0755
 
 - name: Link to binary.

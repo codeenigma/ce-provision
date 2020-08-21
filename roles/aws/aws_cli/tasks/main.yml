@@ -1,5 +1,4 @@
 ---
-
 - name: Check if we already have an AWS cli bin.
   stat:
     path: "/usr/local/bin/aws"
@@ -9,7 +8,7 @@
   unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: /tmp
-    remote_src: yes
+    remote_src: true
   when:
     - not aws_cli_bin.stat.exists
 

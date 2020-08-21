@@ -5,51 +5,51 @@
   tasks:
     - name: Ensure provision scripts are presents.
       git:
-        repo: "{{ ansible_provision.own_repository | default('https://github.com/codeenigma/ansible-provision.git')}}"
-        dest: "{{ ansible_provision.local_dir }}"
-        version: "{{ ansible_provision.own_repository_branch  | default('master') }}"
+        repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git')}}"
+        dest: "{{ ce_provision.local_dir }}"
+        version: "{{ ce_provision.own_repository_branch  | default('master') }}"
         update: yes
         accept_hostkey: yes
       become: yes
-      become_user: "{{ ansible_provision.username }}"
+      become_user: "{{ ce_provision.username }}"
 
     - name: Checkout config directory.
       git:
-        repo: "{{ ansible_provision.config_repository }}"
+        repo: "{{ ce_provision.config_repository }}"
         accept_hostkey: yes
-        dest: "{{ ansible_provision.local_dir }}/config"
+        dest: "{{ ce_provision.local_dir }}/config"
       become: yes
-      become_user: "{{ ansible_provision.username }}"
-      when: ansible_provision.config_repository is defined and ansible_provision.config_repository
+      become_user: "{{ ce_provision.username }}"
+      when: ce_provision.config_repository is defined and ce_provision.config_repository
     - name: Check if we have a config directory.
       stat:
-        path: "{{ ansible_provision.local_dir }}/config"
-      register: ansible_provision_config_repo
+        path: "{{ ce_provision.local_dir }}/config"
+      register: ce_provision_config_repo
 
     - name: Register config repository.
       set_fact:
-        ansible_provision_has_config_repo: "{{ 'yes' if ansible_provision_config_repo.stat.isdir is defined and ansible_provision_config_repo.stat.isdir else 'no' }}"
+        ce_provision_has_config_repo: "{{ 'yes' if ce_provision_config_repo.stat.isdir is defined and ce_provision_config_repo.stat.isdir else 'no' }}"
 
     - name: Remove defaults folders.
       file:
-        path: "{{ ansible_provision.local_dir }}/{{ item }}"
+        path: "{{ ce_provision.local_dir }}/{{ item }}"
         state: absent
       with_items:
         - hosts
         - ansible.cfg
-      when: ansible_provision_has_config_repo
+      when: ce_provision_has_config_repo
 
     - name: Symlink config folders to /etc/ansible.
       file:
-        dest: "{{ ansible_provision.local_dir }}/{{ item }}"
-        src: "{{ ansible_provision.local_dir }}/config/{{ item }}"
+        dest: "{{ ce_provision.local_dir }}/{{ item }}"
+        src: "{{ ce_provision.local_dir }}/config/{{ item }}"
         state: link
       with_items:
         - hosts
         - ansible.cfg
-      when: ansible_provision_has_config_repo
+      when: ce_provision_has_config_repo
 
     - name: Create data dir.
       file:
-        path: "{{ ansible_provision.local_dir }}/data"
+        path: "{{ ce_provision.local_dir }}/data"
         state: directory
