@@ -31,44 +31,46 @@
     update_cache: true
     cache_valid_time: 240
   when: xdebug.cli or xdebug.fpm
-#@todo Maybe use sticky bit ?
+
 - name: Create trace output folder.
   file:
     path: "{{ xdebug.trace_output_dir }}"
     state: directory
-    owner: www-data
-    group: www-data
   when: xdebug.cli or xdebug.fpm
 
 - name: Create profiler output folder.
   file:
     path: "{{ xdebug.profiler_output_dir }}"
     state: directory
-    owner: www-data
-    group: www-data
   when: xdebug.cli or xdebug.fpm
 
 - name: Set remote host (Default)
-  set_fact: xdebug.remote_host = "127.0.0.1"
+  set_fact:
+    xdebug.remote_host: "127.0.0.1"
   when:
     - xdebug.remote_host == 'auto'
-#@todo
-# - name: Set remote host (Docker for Mac)
-#   set_fact: xdebug.remote_host = "docker.for.mac.localhost"
-#   when:
-#     - xdebug.remote_host == 'auto'
-#     - host_platform == 'mac_os'
 
 - name: Enable xdebug connect back (Default)
-  set_fact: xdebug.remote_connect_back = 1
+  set_fact:
+    xdebug.remote_connect_back: "1"
   when:
     - xdebug.remote_host == 'auto'
-#@todo
-# - name: Disable xdebug connect back (Docker for Mac)
-#   set_fact: xdebug.remote_connect_back = 0
-#   when:
-#     - xdebug.remote_connect_back == 'auto'
-#     - host_platform == 'mac_os'
+
+- name: Set remote host (Docker for Mac)
+  set_fact:
+    xdebug.remote_host: "docker.for.mac.localhost"
+  when:
+    - xdebug.remote_host == "auto"
+    - ce_dev_host_platform is defined
+    - ce_dev_host_platform == "darwin"
+
+- name: Disable xdebug connect back (Docker for Mac)
+  set_fact:
+    xdebug.remote_connect_back: "0"
+  when:
+    - xdebug.remote_connect_back == 'auto'
+    - ce_dev_host_platform is defined
+    - ce_dev_host_platform == "darwin"
 
 - name: Copy xdebug configuration in place.
   template:
@@ -76,7 +78,7 @@
     dest: "/etc/php/{{ php.version }}/cli/conf.d/30-xdebug-dev.ini"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: xdebug.cli
 
 - name: Copy xdebug configuration in place.
@@ -85,5 +87,5 @@
     dest: "/etc/php/{{ php.version }}/fpm/conf.d/30-xdebug-dev.ini"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: xdebug.fpm
