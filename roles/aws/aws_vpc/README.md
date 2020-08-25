@@ -14,8 +14,9 @@ aws_vpc:
   tags:
     #Type: "util"
   state: present
-  assign_instances_ipv6: no
-  security_groups: []
+  assign_instances_ipv6: false
+  security_groups:
+    []
     # - name: web - open
     #   description: Allow all incoming traffic on ports 80 and 443
     #   rules:
@@ -24,7 +25,7 @@ aws_vpc:
     #         - 80
     #         - 443
     #       cidr_ip: 0.0.0.0/0
-    #       rule_desc: Allow all incoming traffic on ports 80 and 443 
+    #       rule_desc: Allow all incoming traffic on ports 80 and 443
 
 ```
 

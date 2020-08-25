@@ -42,7 +42,7 @@ aws_ec2_autoscale_cluster:
       region: eu-west-3
   # Associated RDS instance.
   rds:
-    rds: no # wether to create an instance.
+    rds: false # wether to create an instance.
     db_instance_class: db.m5.large
     engine: mariadb
     #engine_version: 5.7.9
