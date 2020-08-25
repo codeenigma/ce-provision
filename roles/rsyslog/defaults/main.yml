@@ -1,0 +1,7 @@
+---
+rsyslog:
+  listen_port: 514
+  # Either client or server.
+  role: client
+  # For clients, server name or IP.
+  server: my.server.example.com
