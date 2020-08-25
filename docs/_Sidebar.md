@@ -32,5 +32,6 @@
      - [MariaDB Client](/roles/mysql_client)
      - [opcache](/roles/opcache)
      - [defaults file for ossec](/roles/ossec)
+     - [PHP XDebug](/roles/php_xdebug)
      - [SSHD](/roles/ssh_server)
      - [SSL](/roles/ssl)
