@@ -1,0 +1,14 @@
+---
+- name: Copy rsyslog configuration in place.
+  template:
+    src: "rsyslog.{{ rsyslog.role }}.conf.j2"
+    dest: "/etc/rsyslog.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+
+- name: restart service.
+  service:
+    name: rsyslog
+    state: restarted

@@ -1,0 +1,6 @@
+---
+- name: Install "frontail" node.js package.
+  npm:
+    name: frontail
+    production: true
+    global: true
