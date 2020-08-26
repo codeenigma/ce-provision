@@ -24,8 +24,7 @@
     create_home: true
     home: "/home/{{ user_ansible.username }}"
     password: "*"
-    groups:
-      - "{{ user_ansible.groups }}"
+    groups: "{{ user_ansible.groups }}"
 
 - name: Add user to sudoers.
   template:
@@ -33,7 +32,7 @@
     dest: "/etc/sudoers.d/{{ user_ansible.username }}"
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
   when: user_ansible.sudoer
 
 - name: Create an .ssh folder.
@@ -42,7 +41,7 @@
     state: directory
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
-    mode: 0700
+    mode: "0700"
 
 - name: Fetch public key from utility server.
   fetch:
@@ -57,4 +56,4 @@
     dest: "/home/{{ user_ansible.username }}/.ssh/authorized_keys"
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
-    mode: 0644
+    mode: "0644"
