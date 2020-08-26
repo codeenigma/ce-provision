@@ -34,6 +34,7 @@
      - [NodeJS](/roles/nodejs)
      - [opcache](/roles/opcache)
      - [defaults file for ossec](/roles/ossec)
+     - [PHP XDebug](/roles/php_xdebug)
      - [Rsyslog](/roles/rsyslog)
      - [SSHD](/roles/ssh_server)
      - [SSL](/roles/ssl)
