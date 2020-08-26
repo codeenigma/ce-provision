@@ -6,6 +6,8 @@
   vars:
     - domain_name: provision-controller.local
     - project_name: provision
+    - apt_extra_packages:
+        - yamllint
   tasks:
     - import_role:
         name: ce_provision
