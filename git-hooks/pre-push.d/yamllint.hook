@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Rename to ansible-lint.hook and alter to your needs.
+PROVISION_CONTAINER="provision-controller"
+CONTAINER_BASE_PATH="/home/ce-dev/ce-provision"
+OS=$(uname -s)
+DOCKER_USER="ce-dev"
+if [ "$OS" = "Darwin" ]; then
+    DOCKER_BIN="docker"
+else
+    DOCKER_BIN="sudo docker"
+fi
+DOCKER_CMD="$DOCKER_BIN exec --user $DOCKER_USER --workdir $CONTAINER_BASE_PATH -i $PROVISION_CONTAINER"
+printf "\e[36m Running Yaml linter \n"
+YAML_LINT_CMD="$DOCKER_CMD yamllint roles"
+ERRORS=$($YAML_LINT_CMD | wc -l)
+if [ "$ERRORS" != "0" ]; then
+  $YAML_LINT_CMD
+  printf "\e[31mCoding Standard violations detected. Can not proceed with push.\e[0m\n"
+  echo "If you really need to bypass this, use git push --no-verify."
+  exit 1
+fi
+exit 0
