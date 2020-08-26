@@ -44,21 +44,29 @@
     state: directory
   when: xdebug.cli or xdebug.fpm
 
-- name: Set remote host (Default)
+- name: Set remote host (default)
   set_fact:
-    xdebug.remote_host: "127.0.0.1"
+    _xdebug_remote_host: "{{ xdebug.remote_host }}"
+
+- name: Enable xdebug connect back (default)
+  set_fact:
+    _xdebug_remote_connect_back: "{{ xdebug.remote_connect_back }}"
+
+- name: Set remote host (auto)
+  set_fact:
+    _xdebug_remote_host: "127.0.0.1"
   when:
     - xdebug.remote_host == 'auto'
 
-- name: Enable xdebug connect back (Default)
+- name: Enable xdebug connect back (auto)
   set_fact:
-    xdebug.remote_connect_back: "1"
+    _xdebug_remote_connect_back: "1"
   when:
-    - xdebug.remote_host == 'auto'
+    - xdebug.remote_connect_back == 'auto'
 
 - name: Set remote host (Docker for Mac)
   set_fact:
-    xdebug.remote_host: "docker.for.mac.localhost"
+    _xdebug_remote_host: "docker.for.mac.localhost"
   when:
     - xdebug.remote_host == "auto"
     - ce_dev_host_platform is defined
@@ -66,7 +74,7 @@
 
 - name: Disable xdebug connect back (Docker for Mac)
   set_fact:
-    xdebug.remote_connect_back: "0"
+    _xdebug_remote_connect_back: "0"
   when:
     - xdebug.remote_connect_back == 'auto'
     - ce_dev_host_platform is defined
@@ -75,17 +83,23 @@
 - name: Copy xdebug configuration in place.
   template:
     src: 30-xdebug-dev.ini.j2
-    dest: "/etc/php/{{ php.version }}/cli/conf.d/30-xdebug-dev.ini"
+    dest: "/etc/php/{{ version }}/cli/conf.d/30-xdebug-dev.ini"
     owner: root
     group: root
     mode: "0644"
   when: xdebug.cli
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
 
 - name: Copy xdebug configuration in place.
   template:
     src: 30-xdebug-dev.ini.j2
-    dest: "/etc/php/{{ php.version }}/fpm/conf.d/30-xdebug-dev.ini"
+    dest: "/etc/php/{{ php.version[0] }}/fpm/conf.d/30-xdebug-dev.ini"
     owner: root
     group: root
     mode: "0644"
   when: xdebug.fpm
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
