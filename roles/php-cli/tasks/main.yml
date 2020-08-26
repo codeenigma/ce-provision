@@ -41,14 +41,6 @@
   loop_control:
     loop_var: version
 
-- name: Setup xdebug.
-  include_role:
-    name: php_xdebug
-
 - name: Setup composer.
   include_role:
     name: php_composer
-
-- name: Trigger overrides
-  include_role:
-    name: _overrides
