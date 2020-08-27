@@ -25,7 +25,7 @@
     name: ssl
   when: gitlab.ssl is defined
   vars:
-    ssl: "{{ gitlab.ssl | combine('domain': gitlab.server_name )}}"
+    ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
 
 - name: Copy Gitlab configuration file.
   template:

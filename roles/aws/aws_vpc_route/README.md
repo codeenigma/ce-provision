@@ -20,7 +20,6 @@ aws_vpc_route:
     - dest: "10.0.0.0/16" # CIDR block for the route.
       gateway_id: igw-XXX
 
-
 ```
 
 <!--ENDROLEVARS-->
