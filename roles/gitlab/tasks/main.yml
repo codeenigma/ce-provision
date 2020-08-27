@@ -1,12 +1,18 @@
 ---
 - name: Add repository key for Gitlab.
-  apt_key: url=https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey state=present
+  apt_key:
+    url: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
+    state: present
 
 - name: Add repository for Gitlab.
-  apt_repository: repo='deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main' state=present
+  apt_repository:
+    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    state: present
 
 - name: Add source repository for Gitlab.
-  apt_repository: repo='deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main' state=present
+  apt_repository:
+    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    state: present
 
 - name: Ensure Gitlab is installed.
   apt:
@@ -16,11 +22,10 @@
 
 - name: Generates SSL keys.
   include_role:
-    name: "{{ gitlab.ssl_handling }}"
+    name: ssl
+  when: gitlab.ssl is defined
   vars:
-    ssl:
-      domain: "{{ gitlab.server_name }}"
-      services: []
+    ssl: "{{ gitlab.ssl | combine('domain': gitlab.server_name )}}"
 
 - name: Copy Gitlab configuration file.
   template:
@@ -33,7 +38,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0555
+    mode: "0555"
   when: is_local is defined and is_local
 
 - name: Copy startup script in place.
@@ -42,7 +47,7 @@
     dest: "/opt/run-parts/gitlab"
     owner: root
     group: root
-    mode: 0555
+    mode: "0555"
     force: true
   when: is_local is defined and is_local
 
