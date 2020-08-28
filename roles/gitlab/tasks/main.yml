@@ -1,12 +1,18 @@
 ---
 - name: Add repository key for Gitlab.
-  apt_key: url=https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey state=present
+  apt_key:
+    url: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
+    state: present
 
 - name: Add repository for Gitlab.
-  apt_repository: repo='deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main' state=present
+  apt_repository:
+    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    state: present
 
 - name: Add source repository for Gitlab.
-  apt_repository: repo='deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main' state=present
+  apt_repository:
+    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    state: present
 
 - name: Ensure Gitlab is installed.
   apt:
@@ -16,67 +22,67 @@
 
 - name: Generates SSL keys.
   include_role:
-    name: "{{ gitlab.ssl_handling }}"
+    name: ssl
+  when: gitlab.ssl is defined
   vars:
-    ssl:
-      domain: "{{ gitlab.server_name }}"
-      services: []
+    ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
 
 - name: Copy Gitlab configuration file.
   template:
     src: gitlab.rb.j2
     dest: /etc/gitlab/gitlab.rb
 
-- name: Make sure run-parts dir exists.
-  file:
-    path: "/opt/run-parts"
-    state: directory
-    owner: root
-    group: root
-    mode: 0555
-  when: is_local is defined and is_local
+- name: Let Gitlab know it's on Docker.
+  copy:
+    content: "gitlab-docker"
+    dest: "/opt/gitlab/embedded/service/gitlab-rails/INSTALLATION_TYPE"
+    mode: "0666"
+  when:
+    - is_local is defined
+    - is_local
 
 - name: Copy startup script in place.
   template:
-    src: startup.sh.j2
-    dest: "/opt/run-parts/gitlab"
+    src: docker-init.sh.j2
+    dest: "/opt/gitlab-init.sh"
     owner: root
     group: root
-    mode: 0555
+    mode: "0555"
     force: true
-  when: is_local is defined and is_local
+  when:
+    - is_local is defined
+    - is_local
+
+- name: Manually restart Gitlab/Docker.
+  command: "/bin/sh /opt/gitlab-init.sh"
+  when:
+    - is_local is defined
+    - is_local
 
 - name: Trigger overrides
   include_role:
     name: _overrides
 
-- name: Manually restart Gitlab/Docker.
-  shell: "/bin/run-parts /opt/run-parts"
-  when: is_local is defined and is_local
-
 - name: Stop Gitlab.
-  shell: /opt/gitlab/bin/gitlab-ctl stop
-  when: not is_local is defined or not is_local
+  command: /opt/gitlab/bin/gitlab-ctl stop
 
 - name: Reconfigure Gitlab.
-  shell: /opt/gitlab/bin/gitlab-ctl reconfigure
-  when: not is_local is defined or not is_local
+  command: /opt/gitlab/bin/gitlab-ctl reconfigure
 
 - name: Restart Gitlab.
-  shell: /opt/gitlab/bin/gitlab-ctl start
-  when: not is_local is defined or not is_local
+  command: /opt/gitlab/bin/gitlab-ctl start
 
 - name: Disable self-register feature
-  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(signup_enabled: false)'"
+  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(signup_enabled: false)'"
 
 - name: Disable DSA keys
-  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(dsa_key_restriction: -1)'"
+  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(dsa_key_restriction: -1)'"
 
 - name: Disable ECDSA
-  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(ecdsa_key_restriction: -1)'"
+  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(ecdsa_key_restriction: -1)'"
 
 - name: Enforce at least 2048bits for RSA
-  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(rsa_key_restriction: 2048)'"
+  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(rsa_key_restriction: 2048)'"
 
 - name: Disable password auth over HTTP/S
-  shell: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(password_authentication_enabled_for_git: false)'"
+  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(password_authentication_enabled_for_git: false)'"

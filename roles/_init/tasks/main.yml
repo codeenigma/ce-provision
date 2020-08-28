@@ -8,11 +8,12 @@
     current_play_md5_file: "{{ current_play_md5_file | regex_replace('[^A-z0-9]', '') }}"
 
 - name: Make sure file exists.
-  local_action:
-    module: copy
+  copy:
     content: ""
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
     force: false
+    mode: "0666"
+  delegate_to: localhost
 
 - name: Compute current playbook md5
   shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
@@ -36,11 +37,11 @@
     state: directory
 
 - name: Clone custom extra directory.
-  local_action:
-    module: git
+  git:
     repo: "{{ ce_provision.extra_repository }}"
     dest: "{{ _ce_provision_build_tmp_dir }}/extra"
     version: "{{ ce_provision.extra_repository_branch }}"
+  delegate_to: localhost
   when: ce_provision.extra_repository
 
 - name: Include custom variables.

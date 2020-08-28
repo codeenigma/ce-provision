@@ -986,9 +986,10 @@ nginx['redirect_http_to_https_port'] = {{ gitlab.nginx.redirect_http_to_https_po
 
 ##! if ssl_verify_client on, verification depth in the client certificates chain
 # nginx['ssl_verify_depth'] = "1"
-
-nginx['ssl_certificate'] = "{{ _ssl_paths[gitlab.server_name].certificate }}"
-nginx['ssl_certificate_key'] = "{{ _ssl_paths[gitlab.server_name].key }}"
+{% if gitlab.ssl %}
+nginx['ssl_certificate'] = "{{ ssl_facts[gitlab.server_name].certificate }}"
+nginx['ssl_certificate_key'] = "{{ ssl_facts[gitlab.server_name].key }}"
+{% endif %}
 # nginx['ssl_ciphers'] = "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256"
 # nginx['ssl_prefer_server_ciphers'] = "on"
 

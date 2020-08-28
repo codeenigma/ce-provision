@@ -1,5 +1,4 @@
 #!/bin/sh
-echo 'gitlab-docker' > /opt/gitlab/embedded/service/gitlab-rails/INSTALLATION_TYPE
 pkill -HUP -P 1 runsv$
 sleep 2
 /opt/gitlab/embedded/bin/runsvdir-start &

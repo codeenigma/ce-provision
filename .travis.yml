@@ -17,6 +17,10 @@ jobs:
       script:
         - yamllint roles
         - cd scripts && shellcheck *.sh
+    - name: Documentation (check)
+      script:
+        - /bin/sh contribute/toc.sh
+        - '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
     - name: Documentation (push)
       if: branch = '1.x'
       addons:

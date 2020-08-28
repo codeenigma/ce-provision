@@ -9,7 +9,8 @@ ldap_client:
 
 gitlab:
   server_name: "gitlab.{{ domain_name }}"
-  ssl_handling: "ssl_selfsigned"
+  ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
+    handling: selfsigned
   unicorn_worker_processes: 2
   initial_root_password: ""
   ldap: false
