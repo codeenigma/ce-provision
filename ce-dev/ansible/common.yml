@@ -5,8 +5,8 @@ ce_provision:
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "1.x"
   own_repository_skip_checkout: true
-  config_repository: "https://github.com/codeenigma/ce-provision-config-example.git"
-  config_repository_branch: "master"
+  config_repository: "https://github.com/codeenigma/ce-dev-ce-provision-config.git"
+  config_repository_branch: "1.x"
   config_repository_skip_checkout: true
   local_dir: "/home/ce-dev/ce-provision"
 user_provision:
