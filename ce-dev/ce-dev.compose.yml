@@ -11,7 +11,6 @@ services:
     x-ce_dev: {}
     volumes:
       - ../:/home/ce-dev/ce-provision
-    expose: 80
   target:
     image: codeenigma/ce-dev-1.x
     x-ce_dev:
