@@ -1,0 +1,17 @@
+---
+- name: restart postfix
+  service:
+    name: postfix
+    state: restarted
+
+- name: initialize transport
+  command: /usr/sbin/postmap /etc/postfix/transport
+
+- name: initialize sasl_passwd
+  command: /usr/sbin/postmap /etc/postfix/sasl_passwd
+
+- name: initialize virtual
+  command: /usr/sbin/postmap /etc/postfix/virtual
+
+- name: reload postfix configuration
+  command: /usr/sbin/postfix reload

@@ -21,7 +21,7 @@
 - name: Copy backup script in place.
   template:
     src: duplicity_backup.j2
-    dest: "/opt/duplicity/bin/duplicity_backup"
+    dest: "{{ duplicity.install_dir }}/bin/duplicity_backup"
     owner: root
     group: root
     mode: 0700
@@ -29,7 +29,7 @@
 - name: Copy restore script in place.
   template:
     src: duplicity_restore.j2
-    dest: "/opt/duplicity/bin/duplicity_restore"
+    dest: "{{ duplicity.install_dir }}/bin/duplicity_restore"
     owner: root
     group: root
     mode: 0700
@@ -37,7 +37,7 @@
 - name: Copy clean-up script in place.
   template:
     src: duplicity_clean.j2
-    dest: "/opt/duplicity/bin/duplicity_clean"
+    dest: "{{ duplicity.install_dir }}/bin/duplicity_clean"
     owner: root
     group: root
     mode: 0700
@@ -45,12 +45,12 @@
 - name: Copy include-exclude filelist.
   template:
     src: include-exclude-filelist.j2
-    dest: "/opt/duplicity/etc/{{ dir.name }}-include-filelist"
+    dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-filelist"
     owner: root
     group: root
     mode: 0644
   with_items: "{{ duplicity.dirs }}"
-  when: "{{ dir.rules|length }}"
+  when: "dir.rules|length"
   loop_control:
     loop_var: dir
 

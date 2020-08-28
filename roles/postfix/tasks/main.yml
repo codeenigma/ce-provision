@@ -1,0 +1,123 @@
+---
+
+- name: Install Postfix
+  apt:
+    pkg: postfix
+    state: present
+
+- name: Copy master config
+  copy:
+    src: "files/{{ item }}"
+    dest: "/etc/postfix/"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - master.cf
+
+- name: Configure mailname
+  template:
+    src: "mailname.j2"
+    dest: "/etc/mailname"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure main.cf
+  template:
+    src: "main.cf.j2"
+    dest: "/etc/postfix/main.cf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload postfix configuration
+
+- name: Configure transport
+  template:
+    src: "transport.j2"
+    dest: "/etc/postfix/transport"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - initialize transport
+    - reload postfix configuration
+
+- name: Install SASL
+  package:
+    name: libsasl2-modules
+    state: present
+  when: postfix.use_ses
+
+- name: Configure SASL
+  template:
+    src: "sasl_passwd.j2"
+    dest: "/etc/postfix/sasl_passwd"
+    owner: root
+    group: root
+    mode: "0644"
+  when: postfix.use_ses
+  notify:
+    - initialize sasl_passwd
+    - reload postfix configuration
+
+- name: Configure virtual
+  template:
+    src: "virtual.j2"
+    dest: "/etc/postfix/virtual"
+    owner: root
+    group: root
+    mode: "0644"
+  when: postfix.forward
+  notify:
+    - initialize virtual
+    - reload postfix configuration
+
+- name: Ensure host maildir exists.
+  file:
+    path: "/home/ce-dev/var/Maildir"
+    state: directory
+  when:
+   - postfix.ce_dev_delivery_mode == "host"
+   - is_local is defined
+   - is_local
+
+- name: Configure procmail to NULL.
+  template:
+    src: procmailrc_null.j2
+    dest: "/etc/procmailrc"
+    owner: root
+    group: root
+    mode: "0644"
+    force: yes
+  when:
+    - is_local is defined
+    - is_local
+
+- name: Configure procmail to host directory.
+  template:
+    src: procmailrc_host.j2
+    dest: "/etc/procmailrc"
+    owner: root
+    group: root
+    mode: "0644"
+    force: yes
+  when:
+    - postfix.ce_dev_delivery_mode == "host"
+    - is_local is defined
+    - is_local
+
+- name: Configure procmail to local.
+  file:
+    path: /etc/procmailrc
+    state: absent
+  when:
+    - postfix.ce_dev_delivery_mode == "local"
+    - is_local is defined
+    - is_local
+
+- name: Start postfix
+  service:
+    name: postfix
+    state: started
+    enabled: yes
