@@ -61,6 +61,8 @@
     accept_hostkey: true #@todo?
   become: true
   become_user: "{{ ce_provision.username }}"
+  when:
+    - not own_repository_skip_checkout
 
 - name: Checkout config directory.
   git:
@@ -69,7 +71,9 @@
     dest: "{{ ce_provision.local_dir }}/config"
   become: true
   become_user: "{{ ce_provision.username }}"
-  when: ce_provision_has_config_repo
+  when:
+    - ce_provision_has_config_repo
+    - not config_repository_skip_checkout
 
 - name: Create defaults folders.
   file:
