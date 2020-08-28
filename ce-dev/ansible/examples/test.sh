@@ -8,8 +8,8 @@ CE_DEV_BIN="/usr/local/bin/ce-dev"
 
 # Init/reset environment.
 init_ce_dev(){
-  $CE_DEV_BIN destroy
   $CE_DEV_BIN init
+  $CE_DEV_BIN destroy
   $CE_DEV_BIN start
   $CE_DEV_BIN provision
 }
