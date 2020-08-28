@@ -1,5 +1,5 @@
 gitlab:
-  server_name: provision-target.local
+  server_name: provision-privileged.local
   ssl:
     handling: selfsigned
   ldap: no
@@ -9,4 +9,4 @@ haproxy:
     - name: gitlab
       ip: 127.0.0.1
       port: 8881
-      domain: "provision-target.local"
+      domain: "provision-privileged.local"
