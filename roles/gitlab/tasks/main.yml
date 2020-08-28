@@ -32,11 +32,14 @@
     src: gitlab.rb.j2
     dest: /etc/gitlab/gitlab.rb
 
-- name: Let Gitlab know its on Docker.
+- name: Let Gitlab know it's on Docker.
   copy:
     content: "gitlab-docker"
     dest: "/opt/gitlab/embedded/service/gitlab-rails/INSTALLATION_TYPE"
     mode: "0666"
+  when:
+    - is_local is defined
+    - is_local
 
 - name: Trigger overrides
   include_role:
