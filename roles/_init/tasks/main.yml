@@ -37,11 +37,11 @@
     state: directory
 
 - name: Clone custom extra directory.
-  local_action:
-    module: git
+  git:
     repo: "{{ ce_provision.extra_repository }}"
     dest: "{{ _ce_provision_build_tmp_dir }}/extra"
     version: "{{ ce_provision.extra_repository_branch }}"
+  delegate_to: localhost
   when: ce_provision.extra_repository
 
 - name: Include custom variables.
