@@ -17,6 +17,23 @@ jobs:
       script:
         - yamllint roles
         - cd scripts && shellcheck *.sh
+    - name: Documentation (check)
+      script:
+        - /bin/sh contribute/toc.sh
+        - '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+    - name: Test examples
+      addons:
+        apt:
+          packages:
+            - libnss3-tools
+            - wget
+      install:
+        - wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 -O /tmp/mkcert
+        - sudo mv /tmp/mkcert /usr/local/bin
+        - sudo chmod +x /usr/local/bin/mkcert
+        - curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+      script:
+        - /bin/sh ce-dev/ansible/examples/test.sh
     - name: Documentation (push)
       if: branch = '1.x'
       addons:

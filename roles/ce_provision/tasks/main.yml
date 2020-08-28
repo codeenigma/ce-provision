@@ -1,4 +1,3 @@
----
 - name: Create the provision group for provisioning.
   group:
     name: "{{ ce_provision.username }}"
@@ -61,6 +60,8 @@
     accept_hostkey: true #@todo?
   become: true
   become_user: "{{ ce_provision.username }}"
+  when:
+    - not ce_provision.own_repository_skip_checkout
 
 - name: Checkout config directory.
   git:
@@ -69,7 +70,9 @@
     dest: "{{ ce_provision.local_dir }}/config"
   become: true
   become_user: "{{ ce_provision.username }}"
-  when: ce_provision_has_config_repo
+  when:
+    - ce_provision_has_config_repo
+    - not ce_provision.config_repository_skip_checkout
 
 - name: Create defaults folders.
   file:

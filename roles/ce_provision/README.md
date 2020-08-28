@@ -15,18 +15,21 @@ ce_provision:
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "master"
+  own_repository_skip_checkout: false
   # Destination.
   local_dir: "/home/{{ _ce_provision.username }}/ce-provision"
   # Private config repo.
   config_repository: ""
   config_repository_branch: "master"
+  config_repository_skip_checkout: false
   # Extra config repo.
   extra_repository: ""
   extra_repository_branch: "master"
+  extra_repository_skip_checkout: false
   extra_repository_vars_file: "custom.yml"
   extra_repository_allowed_vars: []
   # List of additional groups to add the user to.
-  groups: ""
+  groups: []
 
 ```
 

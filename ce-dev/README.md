@@ -4,7 +4,8 @@ This will spin up some Docker containers to be able to run roles against.
 By default, it will create:
 
 - a "controller" container, which acts as the provisioning server. This "ce-provision" repo is mounted at /home/ce-dev/ce-provision, so all changes (to roles, etc) made from your host computer are directly available within the container
-- a blank target server, called **provision-target**
+- a blank target server, called **provision-target**, which has standard privileges and should be used for most usecases.
+- another blank target server, called **provision-privileged**, that runs as a privileged container. This is needed for eg the gitlab role.
 
 ## Pre-requesites
 
@@ -34,7 +35,7 @@ git remote add origin git@github.com:codeenigma/ce-provision.git
 
 ### 4. Create your playbook(s)
 
-You can start creating playbooks in the ce-dev/ansible/local directory which is .gitignored (copy them from the example folder).
+You can start creating playbooks in the ce-dev/ansible/local directory which is .gitignored (copy them from the examples folder).
 
 When testing locally, you can put `is_local: yes` in the list of variables in your playbook. This will prevent certain roles from being installed, such as if you're including the **nginx** role, which has a dependency on the **aws/aws_cloudwatch_agent** role _except_ for when `is_local` is defined.
 

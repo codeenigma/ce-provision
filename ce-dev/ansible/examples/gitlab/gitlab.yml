@@ -1,0 +1,15 @@
+---
+- hosts: provision-privileged
+  become: yes
+  vars_files:
+    - ../../common.yml
+    - vars.yml
+  tasks:
+    - import_role:
+        name: _init
+    - import_role:
+        name: gitlab
+    - import_role:
+        name: haproxy
+    - import_role:
+        name: _exit
