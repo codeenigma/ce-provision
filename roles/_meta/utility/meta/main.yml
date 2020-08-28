@@ -5,7 +5,7 @@ dependencies:
   - role: user_provision
   - role: ce_deploy
   - role: gitlab
-  - role: jenkins
+  # - role: jenkins
   - role: docker_registry
   - role: haproxy
   - role: sops
