@@ -41,6 +41,24 @@
     - is_local is defined
     - is_local
 
+- name: Copy startup script in place.
+  template:
+    src: docker-init.sh.j2
+    dest: "/opt/gitlab-init.sh"
+    owner: root
+    group: root
+    mode: "0555"
+    force: true
+  when:
+    - is_local is defined
+    - is_local
+
+- name: Manually restart Gitlab/Docker.
+  command: "/bin/sh /opt/gitlab-init.sh"
+  when:
+    - is_local is defined
+    - is_local
+
 - name: Trigger overrides
   include_role:
     name: _overrides
