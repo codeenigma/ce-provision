@@ -33,7 +33,7 @@ jobs:
         - sudo chmod +x /usr/local/bin/mkcert
         - curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
       script:
-        - /bin/sh ce-dev/examples/test.sh
+        - /bin/sh ce-dev/ansible/examples/test.sh
     - name: Documentation (push)
       if: branch = '1.x'
       addons:
