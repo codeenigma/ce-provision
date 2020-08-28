@@ -1,0 +1,7 @@
+{{ ansible_hostname }} :
+{% for transport in postfix.transport_maps %}
+{% if transport|length %}
+{{ transport }} :
+{% endif %}
+{% endfor %}
+* discard :
