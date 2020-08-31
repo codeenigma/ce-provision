@@ -17,7 +17,7 @@ duplicity:
         - "- /var"
   exclude_other_filesystems: false
   full_backup_frequency: "3M"
-  gpg_passphrase: "{{ lookup('password', _ansible_provision_data_dir + '/' + inventory_hostname + '/duplicity-gpg-passphrase chars=ascii_letters,digits length=64') }}"
+  gpg_passphrase: "{{ lookup('password', _ce_provision_data_dir + '/' + inventory_hostname + '/duplicity-gpg-passphrase chars=ascii_letters,digits length=64') }}"
   install_dir: "/opt/duplicity"
   mail_recipient: "foo@bar.com"
   retention_period: "12M"
