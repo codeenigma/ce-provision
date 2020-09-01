@@ -12,7 +12,7 @@
 
 - name: Ensure Ansible is installed.
   apt:
-    pkg: ["ansible", "python-pip"]
+    pkg: ["ansible", "python-pip", "yamllint"]
     state: present
     update_cache: true
 
