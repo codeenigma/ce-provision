@@ -1,6 +1,6 @@
 ---
 aws_vpc_main_route:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   # tags:
   #   Name: "example"
