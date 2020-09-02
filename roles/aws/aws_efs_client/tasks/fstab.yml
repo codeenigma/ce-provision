@@ -6,7 +6,7 @@
     name: "{{ mount.src }}"
   become: true
   become_user: "{{ user_provision.username }}"
-  delegate_to: "{{ user_provision.utility_host }}"
+  delegate_to: "localhost"
   register: aws_efs_client_efs_volume
 
 - name: Create fstab entry.
