@@ -3,3 +3,4 @@ dependencies:
   - role: python-boto
   - role: ansible
   - role: packer
+  - role: terraform
