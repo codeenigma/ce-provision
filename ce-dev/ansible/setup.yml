@@ -6,8 +6,9 @@
   vars:
     - domain_name: provision-controller.local
     - project_name: provision
-    - apt_extra_packages:
-        - yamllint
+    - ce_provision:
+        own_repository_skip_checkout: false
+        config_repository_skip_checkout: false
   tasks:
     - import_role:
         name: ce_provision
