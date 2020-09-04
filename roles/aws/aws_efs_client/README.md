@@ -9,7 +9,7 @@ It uses the "Name" tag for a given volume to retrieve the volume path.
 ```yaml
 ---
 aws_efs_client:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   version: 1.26.2 # Version of AWS EFS utils to use.
   # See https://docs.ansible.com/ansible/latest/modules/mount_module.html

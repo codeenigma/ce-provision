@@ -8,7 +8,7 @@ This will add/update routes on the "main" route table for a given VPC, leaving e
 ```yaml
 # @todo Support associating route with several subnets.
 aws_vpc_route:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   # Beware when calling this on "peering" routes, not to override tags with the target peer's one.
   # tags:

@@ -8,7 +8,7 @@ Creates an image from Debian Buster base with Packer, provisioned with an Ansibl
 ```yaml
 ---
 aws_ec2_with_eip:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   instance_type: t2.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.

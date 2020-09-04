@@ -8,7 +8,7 @@ Creates a key pair for the current "provision user"
 ```yaml
 ---
 aws_provision_ec2_keypair:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}"
 

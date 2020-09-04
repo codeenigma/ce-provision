@@ -7,7 +7,7 @@
 ## Default variables
 ```yaml
 aws_ec2_autoscale_cluster:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   name: "example"
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.

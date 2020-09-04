@@ -11,7 +11,7 @@ This requires boto and Packer on the "provisioning" server.
 ```yaml
 ---
 ami_debian_buster:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: us-east-2
   instance_type: t2.micro
   ami_name: "{{ domain_name }}"

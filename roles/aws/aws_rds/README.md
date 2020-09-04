@@ -7,7 +7,7 @@ Creates an RDS instance and associated ressources.
 ## Default variables
 ```yaml
 aws_rds:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   subnets:
     - subnet-aaaaaaaa
@@ -23,6 +23,7 @@ aws_rds:
   max_allocated_storage: 1000 # Max size in GB for autoscaling.
   master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
   master_user_password: hellothere
+
 ```
 
 <!--ENDROLEVARS-->

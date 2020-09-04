@@ -7,7 +7,7 @@ Creates a VPC and associated subnets.
 ## Default variables
 ```yaml
 aws_vpc:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   name: example-vpc-2
   cidr_block: "10.0.0.0/16"
