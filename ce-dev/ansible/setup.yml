@@ -6,9 +6,6 @@
   vars:
     - domain_name: provision-controller.local
     - project_name: provision
-    - ce_provision:
-        own_repository_skip_checkout: false
-        config_repository_skip_checkout: false
   tasks:
     - import_role:
         name: ce_provision
