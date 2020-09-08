@@ -1,5 +1,5 @@
 aws_rds:
-  aws_profile: default
+  aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
   subnets:
     - subnet-aaaaaaaa

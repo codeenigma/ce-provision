@@ -30,6 +30,7 @@
     loop_var: ssl_service
   when:
     - not letsencrypt_cert.stat.exists
+    - ssl.services is defined
 
 - name: Register certificate if needed.
   command: "/usr/bin/certbot certonly -n --cert-name {{ ssl.domain }} --standalone --preferred-challenges http -d {{ ssl.domain }} --agree-tos -m {{ ssl.email }}"

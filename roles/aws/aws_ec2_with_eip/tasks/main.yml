@@ -45,6 +45,7 @@
   template:
     src: eip.tf.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/main.tf"
+    mode: "0666"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Init Terraform.
