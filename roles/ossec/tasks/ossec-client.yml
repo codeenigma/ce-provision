@@ -13,4 +13,15 @@
     dest: "/etc/logrotate.d/ossec-client"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
+
+- name: Copy OSSEC authentication password.
+  template:
+    src: authd.pass.j2
+    dest: "/var/ossec/etc/authd.pass"
+    owner: root
+    group: ossec
+    mode: "0440"
+
+- name: Register client against OSSEC server.
+  command: "/var/ossec/bin/agent-auth -m {{ ossec.serverip }} -P /var/ossec/etc/authd.pass"

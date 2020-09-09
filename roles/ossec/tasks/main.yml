@@ -21,5 +21,5 @@
     dest: "/var/ossec/etc/ossec.conf"
     owner: root
     group: ossec
-    mode: 0440
+    mode: "0440"
   notify: restart ossec
