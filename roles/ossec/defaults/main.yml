@@ -4,6 +4,8 @@
 ossec:
   client: true
   serverip: "123.123.123.123"
+  #auth_password should be 32 chars, lowercase letters and numbers, no symbols
+  auth_password: "xxx"
 
   global:
     email_notification: "yes"
@@ -20,6 +22,10 @@ ossec:
   email_alerts:
     email_to: "admin@example.com"
     level: 14
+
+  ssl:
+    domain: "ossec.example.com"
+    handling: "selfsigned"
 
   syscheck:
     frequency: 79200
