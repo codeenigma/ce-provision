@@ -13,7 +13,7 @@
     dest: "/etc/cron.d/ossec_watchdog"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Set ossec-watchdog script
   template:
@@ -21,7 +21,7 @@
     dest: "/usr/local/bin/ossec-watchdog"
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Copy OSSEC rules
   copy:
@@ -29,6 +29,26 @@
     dest: "/var/ossec/rules/"
     owner: root
     group: ossec
-    mode: 0550
+    mode: "0550"
   with_fileglob: "*_rules.xml"
   notify: restart ossec
+
+- name: Copy OSSEC authentication password.
+  template:
+    src: authd.pass.j2
+    dest: "/var/ossec/etc/authd.pass"
+    owner: root
+    group: ossec
+    mode: "0440"
+  notify:
+    - stop ossec-authd
+    - start ossec-authd
+
+- name: Generates SSL keys.
+  include_role:
+    name: ssl
+  vars:
+    ssl: "{{ ossec.ssl }}"
+
+- name: Start ossec-authd.
+  command: "/var/ossec/bin/ossec-authd -k {{ ssl_facts[ossec.ssl.domain].key }} -x {{ ssl_facts[ossec.ssl.domain].certificate }}"
