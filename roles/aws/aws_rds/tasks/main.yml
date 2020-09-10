@@ -1,5 +1,5 @@
 - name: Create DB subnet
-  rds_subnet_group:
+  community.aws.rds_subnet_group:
     name: "{{ aws_rds.name }}"
     state: "{{ aws_rds.state }}"
     subnets: "{{ aws_rds.subnets }}"
