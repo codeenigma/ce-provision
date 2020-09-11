@@ -14,22 +14,26 @@
   copy:
     src: "{{ pam_ldap.ssl_certificate }}"
     dest: "/etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}"
+    mode: "0666"
   when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
 
 - name: Copy nslcd config.
   template:
     src: nslcd.conf.j2
     dest: /etc/nslcd.conf
+    mode: "0600"
 
 - name: Copy ldap config.
   template:
     src: ldap.conf.j2
     dest: /etc/ldap/ldap.conf
+    mode: "0666"
 
 - name: Copy nsswitch config.
   template:
     src: nsswitch.conf.j2
     dest: /etc/nsswitch.conf
+    mode: "0666"
 
 - name: Ensure sudo-ldap is installed.
   apt:

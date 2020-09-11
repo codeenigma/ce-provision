@@ -12,4 +12,5 @@
     src: "{{ item.path }}"
     dest: "{{ item.path | regex_replace(template_override_path, '') }}"
     force: true
+    mode: "0666"
   with_items: "{{ template_overrides.files }}"
