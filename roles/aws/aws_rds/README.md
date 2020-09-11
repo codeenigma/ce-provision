@@ -23,6 +23,8 @@ aws_rds:
   max_allocated_storage: 1000 # Max size in GB for autoscaling.
   master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
   master_user_password: hellothere
+  publicly_accessible: false # Wether to allocate an IP address
+  security_groups: []
 
 ```
 
