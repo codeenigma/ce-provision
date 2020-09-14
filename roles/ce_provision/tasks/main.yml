@@ -35,6 +35,12 @@
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_provision.groups }}"
+
+- name: Fetch back the SSH pub key.
+  fetch:
+    dest: "{{ _ce_provision_data_dir }}"
+    src: "/home/{{ ce_provision.username }}/.ssh/id_rsa.pub"
+
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
   set_fact:
