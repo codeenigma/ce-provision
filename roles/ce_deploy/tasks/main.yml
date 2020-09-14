@@ -19,6 +19,12 @@
     ssh_key_comment: "{{ ce_deploy.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_deploy.groups }}"
+  register: _ce_deploy_user_created
+
+- name: Fetch back the SSH pub key.
+  fetch:
+    dest: "{{ _ce_provision_data_dir }}"
+    src: "/home/{{ ce_deploy.username }}/.ssh/id_rsa.pub"
 
 - name: Ensure Git is installed.
   apt:
