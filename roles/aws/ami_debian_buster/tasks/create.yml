@@ -3,6 +3,7 @@
   template:
     src: packer.json.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/packer.json"
+    mode: "0666"
 
 - name: Inspect Packer configuration.
   command:
