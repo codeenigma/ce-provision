@@ -37,7 +37,7 @@
 
 - name: Copy SSH public key to target.
   authorized_key:
-    key: "{{ lookup('file', key) }}"
+    key: "{{ key }}"
     user: "{{ user_ansible.username }}"
     state: present
   with_items: "{{ user_ansible.ssh_keys }}"
