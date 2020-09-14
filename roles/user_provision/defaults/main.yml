@@ -7,4 +7,4 @@ user_provision:
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
   sudoer: true
   groups: []
-  keys: []
+  ssh_keys: []
