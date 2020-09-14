@@ -35,25 +35,11 @@
     mode: "0600"
   when: user_ansible.sudoer
 
-- name: Create an .ssh folder.
-  file:
-    path: "/home/{{ user_ansible.username }}/.ssh"
-    state: directory
-    owner: "{{ user_ansible.username }}"
-    group: "{{ user_ansible.username }}"
-    mode: "0700"
-
-- name: Fetch public key from utility server.
-  fetch:
-    src: "/home/{{ user_ansible.utility_username }}/.ssh/id_rsa.pub"
-    dest: "{{ _ce_provision_build_tmp_dir }}/authorized_keys"
-    flat: true
-  delegate_to: "{{ user_ansible.utility_host }}"
-
-- name: Copy public key to target.
-  copy:
-    src: "{{ _ce_provision_build_tmp_dir }}/authorized_keys"
-    dest: "/home/{{ user_ansible.username }}/.ssh/authorized_keys"
-    owner: "{{ user_ansible.username }}"
-    group: "{{ user_ansible.username }}"
-    mode: "0644"
+- name: Copy SSH public key to target.
+  authorized_key:
+    key: "{{ lookup('file', key) }}"
+    user: "{{ user_ansible.username }}"
+    state: present
+  with_items: "{{ user_ansible.ssh_keys }}"
+  loop_control:
+    loop_var: key

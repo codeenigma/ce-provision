@@ -35,6 +35,12 @@
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_provision.groups }}"
+
+- name: Fetch back the SSH pub key.
+  fetch:
+    dest: "{{ _ce_provision_data_dir }}"
+    src: "/home/{{ ce_provision.username }}/.ssh/id_rsa.pub"
+
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
   set_fact:
@@ -60,7 +66,7 @@
 
 - name: Ensure provision scripts are presents.
   git:
-    repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git')}}"
+    repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git') }}"
     dest: "{{ ce_provision.local_dir }}"
     version: "{{ ce_provision.own_repository_branch  | default('master') }}"
     update: true
@@ -75,6 +81,7 @@
     repo: "{{ ce_provision.config_repository }}"
     accept_hostkey: true
     dest: "{{ ce_provision.local_dir }}/config"
+    version: "{{ ce_provision.config_repository_branch  | default('master') }}"
   become: true
   become_user: "{{ ce_provision.username }}"
   when:
