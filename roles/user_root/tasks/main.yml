@@ -24,5 +24,4 @@
     name: admin
     state: absent
     remove: true
-    force: true
   when: user_root.delete_admin
