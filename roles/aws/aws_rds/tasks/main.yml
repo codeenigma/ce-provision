@@ -8,6 +8,16 @@
     description: "{{ aws_rds.description }}"
   register: _aws_rds_rds_subnet_group
 
+- name: Reset security groups info
+  set_fact:
+    _aws_rds_security_group_ids: []
+
+- name: Gather security groups info.
+  include_tasks: security_group.yml
+  with_items: "{{ aws_rds.security_groups }}"
+  loop_control:
+    loop_var: security_group
+
 - name: Create RDS instance
   rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
@@ -29,7 +39,7 @@
     #enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
     allocated_storage: "{{ aws_rds.allocated_storage }}"
     max_allocated_storage: "{{ aws_rds.max_allocated_storage }}"
-    vpc_security_group_ids: "{{ aws_rds.security_groups }}"
+    vpc_security_group_ids: "{{ _aws_rds_security_group_ids }}"
     profile: "{{ aws_rds.aws_profile }}"
     tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
     allow_major_version_upgrade: false
