@@ -9,3 +9,5 @@ user_ansible:
     false
     # List of additional groups to add the user to.
   groups: ""
+  # List of SSH pub keys to authorize. These must exists on the controller server already.
+  ssh_keys: []
