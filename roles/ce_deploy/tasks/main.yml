@@ -31,12 +31,6 @@
     pkg: "git"
     state: present
 
-- name: Add community SOPS roles.
-  command:
-    cmd: ansible-galaxy collection install community.sops
-  become: true
-  become_user: "{{ ce_deploy.username }}"
-
 - name: Ensure deploy scripts are presents.
   git:
     repo: "{{ ce_deploy.own_repository | default('https://github.com/codeenigma/ce-deploy.git') }}"
