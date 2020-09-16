@@ -119,7 +119,7 @@
 - name: Stop Postfix
   command:
     cmd: /usr/sbin/service postfix stop
-  warn: false
+    warn: false
 
 - name: Remove trailing lock files.
   file:
@@ -134,4 +134,4 @@
 - name: Restart Postfix
   command:
     cmd: /usr/sbin/service postfix start
-  warn: false
+    warn: false
