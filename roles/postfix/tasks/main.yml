@@ -115,8 +115,23 @@
     - is_local is defined
     - is_local
 
-- name: Start postfix
-  service:
-    name: postfix
-    state: started
-    enabled: true
+# Needed for Docker.
+- name: Stop Postfix
+  command:
+    cmd: /usr/sbin/service postfix stop
+  warn: false
+
+- name: Remove trailing lock files.
+  file:
+    path: "{{ lock_file }}"
+    state: absent
+  with_items:
+    - /var/spool/postfix/pid/master.pid
+    - /var/lib/postfix/master.lock
+  loop_control:
+    loop_var: lock_file
+
+- name: Restart Postfix
+  command:
+    cmd: /usr/sbin/service postfix start
+  warn: false

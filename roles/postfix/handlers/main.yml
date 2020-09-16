@@ -1,9 +1,4 @@
 ---
-- name: restart postfix
-  service:
-    name: postfix
-    state: restarted
-
 - name: initialize transport
   command: /usr/sbin/postmap /etc/postfix/transport
 
