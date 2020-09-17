@@ -25,18 +25,3 @@
     tags: "{{ aws_vpc_subnet.tags | combine({ 'Name': subnet.name }) }}"
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"
-
-- name: Update route table.
-  include_role:
-    name: aws/aws_vpc_route
-  vars:
-    aws_vpc_route:
-      name: "{{ subnet.name }}"
-      aws_profile: "{{ aws_vpc_subnet.aws_profile }}"
-      region: "{{ aws_vpc_subnet.region }}"
-      vpc_id: "{{ _aws_vpc_subnet_vpc_id }}"
-      subnet_id: "{{ _aws_vpc_subnet_subnet.subnet.id }}"
-      tags: "{{ aws_vpc_subnet.tags | combine({ 'Name': subnet.name }) }}"
-      routes:
-        - dest: 0.0.0.0/0
-          gateway_id: "{{ _aws_vpc_subnet_gateway.nat_gateway_id }}"
