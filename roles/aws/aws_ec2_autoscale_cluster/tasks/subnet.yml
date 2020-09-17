@@ -4,7 +4,7 @@
       name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
       az: "{{ subnet.az }}"
       cidr_block: "{{ subnet.cidr_block }}"
-      nat_ipv4: true
+      nat_ipv4: false
       assign_instances_ipv6: false
 
 - name: Create private subnet.
