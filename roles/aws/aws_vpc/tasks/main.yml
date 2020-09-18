@@ -8,6 +8,17 @@
     state: "{{ aws_vpc.state }}"
   register: _aws_vpc_vpc
 
+- name: Ensure default Security group is tagged.
+  ec2_group:
+    name: "default"
+    profile: "{{ aws_vpc.aws_profile }}"
+    region: "{{ aws_vpc.region }}"
+    tags: "{{ aws_vpc.tags }}"
+    state: "{{ aws_vpc.state }}"
+    vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
+    description: "default VPC security group"
+    purge_rules: false
+
 - name: Create VPC Security groups.
   include_tasks: "security_group.yml"
   with_items: "{{ aws_vpc.security_groups }}"
@@ -33,5 +44,5 @@
       vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
       tags: "{{ aws_vpc.tags }}"
       routes:
-      - dest: 0.0.0.0/0
-        gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
+        - dest: 0.0.0.0/0
+          gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
