@@ -11,6 +11,8 @@ aws_vpc_subnet:
       # @todo IPV6
       nat_ipv4: false
       name: example.
+      # Wether to create a dedicated security group allowing internal traffic.
+      security_group: false
   tags:
     #Type: "util"
   state: present

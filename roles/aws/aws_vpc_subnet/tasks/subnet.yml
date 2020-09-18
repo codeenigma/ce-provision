@@ -26,3 +26,6 @@
     rules:
       - proto: all
         group_name: "{{ subnet.name }}"
+    when:
+      - subnet.security_group is defined
+      - subnet.security_group
