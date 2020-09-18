@@ -1,7 +1,11 @@
+- name: Construct private subnet name.
+  set_fact:
+    _aws_ec2_autoscale_cluster_private_subnet_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
+
 - name: Construct private subnet definition.
   set_fact:
     _aws_ec2_autoscale_cluster_subnet_definition:
-      name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
+      name: "{{ _aws_ec2_autoscale_cluster_private_subnet_name }}"
       az: "{{ subnet.az }}"
       cidr_block: "{{ subnet.cidr_block }}"
       nat_ipv4: false
@@ -26,7 +30,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
       vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-      tag:Name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
+      tag:Name: "{{ _aws_ec2_autoscale_cluster_private_subnet_name }}"
   register: _aws_ec2_autoscale_cluster_subnet
 
 - name: Gather public subnet information
@@ -49,3 +53,28 @@
 - name: Add public subnet to the list.
   set_fact:
     _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_public_subnet.subnets[0].subnet_id ] }}"
+
+# @todo Module has a bug and return result as a separate key.
+- name: Gather NAT gateway info.
+  ec2_vpc_nat_gateway_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      tag:Name: "{{ subnet.public_subnet }}"
+  register: _aws_ec2_autoscale_cluster_subnet_gateway
+
+- name: Generate route table for the private subnet.
+  include_role:
+    name: aws/aws_vpc_route
+  vars:
+    aws_vpc_route:
+      name: "{{ _aws_ec2_autoscale_cluster_private_subnet_name }}"
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      subnet_id: "{{ _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': _aws_ec2_autoscale_cluster_private_subnet_name } ) }}"
+      routes:
+        - dest: 0.0.0.0/0
+          gateway_id: "{{ _aws_ec2_autoscale_cluster_subnet_gateway.result[0].nat_gateway_id }}"
