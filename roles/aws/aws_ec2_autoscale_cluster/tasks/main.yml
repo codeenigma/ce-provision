@@ -21,6 +21,20 @@
     _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
   when: ( aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0 )
 
+- name: Create matching Security Group.
+  ec2_group:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+    description: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
+    rules:
+      - proto: all
+        group_name: "{{ aws_ec2_autoscale_cluster.name }}"
+  register: _aws_ec2_autoscale_cluster_security_group
+
 - name: Reset subnets lists.
   set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: []
@@ -52,6 +66,8 @@
       max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
+      security_groups:
+        - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
 
 - name: Create EFS volume
   efs:
@@ -87,6 +103,30 @@
 - name: Register latest AMI image.
   set_fact:
     aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
+- name: Create new AMI.
+  include_role:
+    name: aws/ami_debian_buster
+  vars:
+    ami_debian_buster:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
+      ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+      playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
+      operation: create
+
+- name: Gather AMI image from name.
+  ec2_ami_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    owners: self
+    filters:
+      name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+  register: aws_ec2_autoscale_cluster_image
+
+- name: Register latest AMI image.
+  set_fact:
+    aws_ec2_autoscale_cluster_image_latest: "{{ aws_ec2_autoscale_cluster_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Create Launch Configuration
   ec2_lc:
@@ -97,7 +137,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + _aws_ec2_autoscale_cluster_subnets_names }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ]}}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     volumes:
       - device_name: /dev/xvda
@@ -116,7 +156,7 @@
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   register: _aws_ec2_target_group_created
 
-- name: Create Autoscale group
+- name: Create Autoscale group and replace instances.
   community.aws.ec2_asg:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -128,7 +168,29 @@
     wait_timeout: 3000
     replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
+    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
+    max_size: "1000"
+    tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
+    vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+    target_group_arns:
+      - "{{ _aws_ec2_target_group_created.target_group_arn }}"
+  register: _aws_ec2_asg_created
+
+- name: Redefine Autoscale group.
+  community.aws.ec2_asg:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    launch_config_name: "{{ _aws_ec2_lc_created.name }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    replace_all_instances: false
+    wait_for_instances: false
+    min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
+    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
+    termination_policies:
+      - OldestLaunchConfiguration
+      - OldestInstance
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
     vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     target_group_arns:
@@ -143,7 +205,7 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
     listeners:
       - Protocol: HTTP
         Port: 80
