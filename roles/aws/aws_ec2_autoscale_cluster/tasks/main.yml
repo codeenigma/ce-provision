@@ -26,6 +26,7 @@
     _aws_ec2_autoscale_cluster_subnets_ids: []
     _aws_ec2_autoscale_cluster_efs_targets: []
     _aws_ec2_autoscale_cluster_public_subnets_ids: []
+    _aws_ec2_autoscale_cluster_subnets_names: []
 
 - name: Create private subnets.
   include_tasks: subnet.yml
@@ -96,7 +97,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + _aws_ec2_autoscale_cluster_subnets_names }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     volumes:
       - device_name: /dev/xvda
@@ -140,7 +141,7 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
     listeners:
       - Protocol: HTTP
         Port: 80
