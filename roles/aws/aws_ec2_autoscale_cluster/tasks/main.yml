@@ -124,7 +124,8 @@
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
-    wait_for_instances: false
+    wait_for_instances: true
+    wait_timeout: 3000
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
