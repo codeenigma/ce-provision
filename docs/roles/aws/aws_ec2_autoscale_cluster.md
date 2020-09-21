@@ -31,6 +31,7 @@ aws_ec2_autoscale_cluster:
   min_size: 4
   max_size: 8
   # Security groups for the instances cluster.
+  # An internal one will be created automatically.
   cluster_security_groups: []
   # Security groups for the ALB.
   alb_security_groups: []

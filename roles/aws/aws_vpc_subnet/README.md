@@ -15,12 +15,12 @@ aws_vpc_subnet:
     - cidr_block: "10.0.0.0/24"
       az: b
       assign_instances_ipv6: false
-      # A NAT gateway to associate with each of the subnets.
-      # This will make the subnet use its own route table.
-      # When set to no, subnets inherit the main VPC's route table.
+      # A NAT gateway to associate with the subnets.
       # @todo IPV6
       nat_ipv4: false
       name: example.
+      # Wether to create a dedicated security group allowing internal traffic.
+      security_group: false
   tags:
     #Type: "util"
   state: present
