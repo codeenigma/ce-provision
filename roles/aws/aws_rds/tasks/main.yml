@@ -49,3 +49,12 @@
     region: "{{ aws_rds.region }}"
     engine_version: "{{ aws_rds.engine_version | default(omit) }}"
     #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
+  register: _rds_instance_info
+
+- name: (Re) set facts for instance.
+  set_fact:
+    aws_rds_facts: "{{ aws_rds_facts | default({}) }}"
+
+- name: Add instance info.
+  set_fact:
+    aws_rds_facts: "{{ aws_rds_facts | combine( {aws_rds.name: _rds_instance_info} ) }}"
