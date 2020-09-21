@@ -9,6 +9,14 @@
   delegate_to: "localhost"
   register: aws_efs_client_efs_volume
 
+- name: Make sure mount point exists.
+  file:
+    path: "{{ mount.path }}"
+    state: directory
+    owner: "{{ mount.owner }}"
+    group: "{{ mount.group }}"
+    recurse: true
+
 - name: Create fstab entry.
   mount:
     fstype: efs
