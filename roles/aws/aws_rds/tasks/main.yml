@@ -34,7 +34,7 @@
     #multi_az: undefined # not required. Specifies if the DB instance is a Multi-AZ deployment. Mutually exclusive with I(availability_zone).
     db_subnet_group_name: "{{ _aws_rds_rds_subnet_group.subnet_group.name }}"
     #auto_minor_version_upgrade: undefined # not required. Whether minor version upgrades are applied automatically to the DB instance during the maintenance window.
-    force_update_password: false # not required. Set to True to update your cluster password with I(master_user_password). Since comparing passwords to determine if it needs to be updated is not possible this is set to False by default to allow idempotence.
+    force_update_password: true # not required. Set to True to update your cluster password with I(master_user_password). Since comparing passwords to determine if it needs to be updated is not possible this is set to False by default to allow idempotence.
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     #enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
     allocated_storage: "{{ aws_rds.allocated_storage }}"
