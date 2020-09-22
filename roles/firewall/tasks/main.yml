@@ -3,17 +3,6 @@
   apt:
     pkg: ["ufw"]
     state: present
-    update_cache: true
-    cache_valid_time: 240
-
-- name: Replace Default UFW Config
-  template:
-    src: ufw.j2
-    dest: /etc/default/ufw
-    owner: root
-    group: root
-    mode: 0644
-  notify: reset firewall
 
 - name: Gather facts from the controller/provisioner.
   setup:
@@ -69,6 +58,18 @@
 #     - user_deploy is defined
 #     - user_deploy.utility_host is defined
 #     - not user_deploy.utility_host == 'localhost'
+
+- name: Reset firewall
+  ufw:
+    state: reset
+
+- name: Replace Default UFW Config
+  template:
+    src: ufw.j2
+    dest: /etc/default/ufw
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Add a rule to allow SSH from known hosts (IPV4).
   ufw:
@@ -138,11 +139,6 @@
     route: "{{ item.route | default(omit) }}"
   with_items: "{{ firewall.rules }}"
 
-- name: Reload UFW Config
-  template:
-    src: ufw.j2
-    dest: /etc/default/ufw
-    owner: root
-    group: root
-    mode: 0644
-  notify: reload firewall
+- name: Reload firewall
+  ufw:
+    state: enabled
