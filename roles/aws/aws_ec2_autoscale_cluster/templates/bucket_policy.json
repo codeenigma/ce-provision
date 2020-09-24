@@ -1,0 +1,11 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "{{ aws_ec2_autoscale_cluster.vpc_name }}",
+      "Action": "s3:*",
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::{{ aws_ec2_autoscale_cluster.vpc_name }}"
+    }
+  ]
+}
