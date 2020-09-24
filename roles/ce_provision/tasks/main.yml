@@ -1,7 +1,7 @@
 ---
 - name: Add community AWS roles.
   command:
-    cmd: ansible-galaxy collection install community.aws
+    cmd: ansible-galaxy collection install community.aws amazon.aws
   become: true
   become_user: "{{ ce_provision.username }}"
 
