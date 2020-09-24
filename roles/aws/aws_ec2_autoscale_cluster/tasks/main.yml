@@ -16,6 +16,47 @@
     _aws_ec2_autoscale_cluster_vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
 
+- name: Create an S3 bucket to hold codebase.
+  amazon.aws.s3_bucket:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
+    state: present
+  register: _aws_ec2_autoscale_cluster_bucket
+
+- name: Create a matching policy.
+  community.aws.iam_managed_policy:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    policy_name: "{{ aws_ec2_autoscale_cluster.name }}-s3-deploy"
+    policy:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Action: "s3:*"
+          Resource: "arn:aws:s3:::{{ aws_ec2_autoscale_cluster.vpc_name }}"
+    make_default: true
+    state: present
+  register: _aws_ec2_autoscale_cluster_bucket_policy
+
+- name: Create an IAM role.
+  community.aws.iam_role:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    assume_role_policy_document: "{{ lookup('file','document_policy.json') }}"
+    managed_policies:
+      - "{{ _aws_ec2_autoscale_cluster_bucket_policy.policy.arn }}"
+    purge_policies: true
+
+- name: Gather IAM role info.
+  community.aws.iam_role_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+  register: _aws_ec2_autoscale_cluster_iam_role_info
+
 - name: Use provided VPC id.
   set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
@@ -115,6 +156,7 @@
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
     security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
+    instance_profile_name: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     volumes:
       - device_name: /dev/xvda
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
