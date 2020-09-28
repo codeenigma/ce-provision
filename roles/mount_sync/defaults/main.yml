@@ -1,0 +1,10 @@
+---
+mount_sync:
+  # A list of target/destination definitions.
+  sync_pairs:
+    - src: /my/path/to/sync
+      dest: /another/path/to/sync
+      minute: "*/10"
+      name: example
+      owner: root
+      group: root

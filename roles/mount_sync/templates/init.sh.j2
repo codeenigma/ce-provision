@@ -1,0 +1,6 @@
+#!/bin/sh
+mkdir -p "{{ item.src }}"
+chown {{ item.owner }}:{{ item.group }} "{{ item.src }}"
+mkdir -p "{{ item.dest }}"
+chown {{ item.owner }}:{{ item.group }} "{{ item.dest }}"
+rsync -a --delete --exclude '.unison.*' "{{ item.src }}/" "{{ item.dest }}"

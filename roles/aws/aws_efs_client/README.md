@@ -18,6 +18,8 @@ aws_efs_client:
       src: example-efs # This will be translated from the "name"
       opts: _netdev # See https://docs.aws.amazon.com/efs/latest/ug/mount-fs-auto-mount-onreboot.html
       state: present
+      owner: root
+      group: root
 
 ```
 

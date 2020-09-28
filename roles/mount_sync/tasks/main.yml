@@ -1,0 +1,20 @@
+---
+- name: Install Unison
+  apt:
+    pkg:
+      - unison
+    state: present
+
+- name: Create cloud-init script
+  template:
+    src: init.sh.j2
+    dest: "/var/lib/cloud/scripts/per-instance/sync-{{ item.name }}.sh"
+    mode: "0755"
+  with_items: "{{ mount_sync.sync_pairs }}"
+
+- name: Create unison cron task
+  cron:
+    name: "Unison {{ item.name }}"
+    minute: "{{ item.minute }}"
+    job: "flock -w 10 /tmp/unison.lock unison -copythreshold 10000 -owner -group -batch -prefer {{ item.src }} {{ item.src }} {{ item.dest }}"
+  with_items: "{{ mount_sync.sync_pairs }}"
