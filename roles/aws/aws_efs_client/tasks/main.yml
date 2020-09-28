@@ -12,3 +12,10 @@
   with_items: "{{ aws_efs_client.mounts }}"
   loop_control:
     loop_var: mount
+
+- name: Create cloud-init script
+  template:
+    src: init.sh.j2
+    dest: "/var/lib/cloud/scripts/per-boot/aws_efs_client.sh"
+    mode: "0755"
+  with_items: "{{ mount_sync.sync_pairs }}"

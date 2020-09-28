@@ -1,0 +1,4 @@
+#!/bin/sh
+{% for item in aws_efs_client.mounts %}
+chown {{ item.owner }}:{{ item.group }} "{{ item.dest }}"
+{% endfor %}
