@@ -30,7 +30,7 @@
      - [Managed /etc/hosts](/roles/hosts)
      - [Jenkins](/roles/jenkins)
      - ["Meta" roles that group individual roles together.](/roles/_meta)
-     - [cmount sync](/roles/mount_sync)
+     - [Mount sync](/roles/mount_sync)
      - [MariaDB Client](/roles/mysql_client)
      - [NodeJS](/roles/nodejs)
      - [opcache](/roles/opcache)

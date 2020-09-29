@@ -1,6 +1,24 @@
 #!/bin/sh
+
+# Prep initial folders, as they can be empty on first spin up of an instance.
 mkdir -p "{{ item.src }}"
 chown {{ item.owner }}:{{ item.group }} "{{ item.src }}"
 mkdir -p "{{ item.dest }}"
 chown {{ item.owner }}:{{ item.group }} "{{ item.dest }}"
-rsync -a --delete --exclude '.unison.*' "{{ item.src }}/" "{{ item.dest }}"
+
+# Nothing to do without an initial tarball.
+if [ ! -f "{{ item.tarball }}" ]; then
+  exit 0
+fi
+
+# Create tmp dir and untar.
+mkdir "/tmp/mountsync-init-{{ item.name }}"
+cp "{{ item.tarball }}" "/tmp/mountsync-init-{{ item.name }}/{{ item.name }}.tar"
+cd "/tmp/mountsync-init-{{ item.name }}"
+tar -xvf "{{ item.name }}.tar"
+
+# We now should have a matching dir structure.
+rsync -a "/tmp/mountsync-init-{{ item.name }}{{ item.dest }}/" "{{ item.dest }}"
+
+# Clean up tmp dir
+rm -rf "/tmp/mountsync-init-{{ item.name }}"

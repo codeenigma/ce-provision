@@ -1,4 +1,4 @@
-# cmount sync
+# Mount sync
 
 Syncronize some "mounted" filesystems with the local one. Typically used for EFS/NFS mounts on autoscale clusters.
 It will:
@@ -21,6 +21,7 @@ mount_sync:
       name: example
       owner: root
       group: root
+      tarball: /path/to/initial/seed.tar
 
 ```
 

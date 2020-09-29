@@ -9,9 +9,7 @@ It will:
   <!--ENDTOC-->
 
 <!--ROLEVARS-->
-
 ## Default variables
-
 ```yaml
 ---
 mount_sync:
@@ -23,6 +21,8 @@ mount_sync:
       name: example
       owner: root
       group: root
+      tarball: /path/to/initial/seed.tar
+
 ```
 
 <!--ENDROLEVARS-->
