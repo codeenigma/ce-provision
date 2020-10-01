@@ -230,6 +230,19 @@
         DefaultActions:
           - Type: forward
             TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+    register: _aws_ec2_autoscale_cluster_alb
+
+- name: Add a DNS record in route 53
+  community.aws.route53:
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    profile: "{{ aws_ec2_autoscale_cluster.route_53.aws_profile }}"
+    zone: "{{ aws_ec2_autoscale_cluster.route_53.zone }}"
+    record: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
+    type: CNAME
+    value: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}"
+  when:
+    - aws_ec2_autoscale_cluster.route_53.zone is defined
+    - aws_ec2_autoscale_cluster.route_53.zone | length > 0
 
 - name: Create peering VPC connections
   include_tasks: peering.yml
