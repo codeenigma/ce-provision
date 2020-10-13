@@ -42,6 +42,12 @@
   become: true
   become_user: "{{ ce_deploy.username }}"
 
+- name: Add community SOPS roles.
+  command:
+    cmd: ansible-galaxy collection install git+https://github.com/ansible-collections/community.sops.git,main
+  become: true
+  become_user: "{{ ce_deploy.username }}"
+
 - name: Checkout config directory.
   git:
     repo: "{{ ce_deploy.config_repository }}"
