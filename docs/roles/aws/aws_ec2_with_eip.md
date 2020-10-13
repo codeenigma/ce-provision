@@ -15,12 +15,18 @@ aws_ec2_with_eip:
   ami_name: "{{ domain_name }}" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   vpc_subnet_id: subnet-xxx
-  state: running
+  state: present
   instance_name: "{{ domain_name }}"
   root_volume_size: 80
   security_groups: []
   tags:
     Name: "{{ domain_name }}"
+  # Add an A record tied to the EIP.
+  # Set the zone to empty to skip.
+  route_53:
+    zone: "example.com"
+    record: "*.{{ domain_name }}"
+    aws_profile: another # Not necessarily the same as the "target" one.
 
 ```
 

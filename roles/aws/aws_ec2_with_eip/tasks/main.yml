@@ -60,13 +60,33 @@
     chdir: "{{ _ce_provision_build_tmp_dir }}"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
+- name: Re-register EIP.
+  ec2_eip_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    filters:
+      tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
+  register: aws_ec2_with_eip_instances_eip
+
 - name: Associate Elastic IP.
   ec2_eip:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
-    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip | default(omit) }}"
+    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
     private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
     in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
+
+- name: Add a DNS record in route 53
+  community.aws.route53:
+    state: "{{ aws_ec2_with_eip.state }}"
+    profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
+    zone: "{{ aws_ec2_with_eip.route_53.zone }}"
+    record: "{{ aws_ec2_with_eip.route_53.record }}"
+    type: A
+    value: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+  when:
+    - aws_ec2_with_eip.route_53.zone is defined
+    - aws_ec2_with_eip.route_53.zone | length > 0
