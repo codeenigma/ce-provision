@@ -63,10 +63,6 @@
   ufw:
     state: reset
 
-- name: Reload firewall
-  ufw:
-    state: enabled
-
 - name: Replace Default UFW Config
   template:
     src: ufw.j2
@@ -142,3 +138,7 @@
     to_port: "{{ item.to_port | default(omit) }}"
     route: "{{ item.route | default(omit) }}"
   with_items: "{{ firewall.rules }}"
+
+- name: Reload firewall
+  ufw:
+    state: enabled
