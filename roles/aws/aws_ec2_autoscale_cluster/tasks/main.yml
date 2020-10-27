@@ -157,6 +157,7 @@
     security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     instance_profile_name: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
+    ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
     volumes:
       - device_name: /dev/xvda
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"

@@ -19,6 +19,7 @@ aws_ec2_autoscale_cluster:
   ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   root_volume_size: 40
+  ebs_optimized: true
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   min_size: 4
   max_size: 8

@@ -26,6 +26,7 @@
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
     security_groups: "{{ aws_ec2_with_eip.security_groups }}"
+    ebs_optimized: "{{ aws_ec2_with_eip.ebs_optimized }}"
     volumes:
       - device_name: /dev/xvda
         ebs:
