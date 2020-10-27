@@ -105,4 +105,4 @@
 
 - name: Reload firewall
   ufw:
-    state: enabled
+    state: reloaded
