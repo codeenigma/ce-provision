@@ -19,7 +19,14 @@
     ssh_key_comment: "{{ ce_deploy.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_deploy.groups }}"
-  register: _ce_deploy_user_created
+# @see https://github.com/ansible/ansible/issues/24862
+- name: Ensure home ownership.
+  file:
+    path: "/home/{{ ce_deploy.username }}"
+    state: directory
+    owner: "{{ ce_deploy.username }}"
+    group: "{{ ce_deploy.username }}"
+    recurse: true
 
 - name: Fetch back the SSH pub key.
   fetch:
