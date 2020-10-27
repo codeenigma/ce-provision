@@ -9,15 +9,6 @@
   delegate_to: "localhost"
   delegate_facts: true
 
-- name: Gather facts from the utility server.
-  setup:
-  delegate_to: "{{ user_deploy.utility_host }}"
-  delegate_facts: true
-  when:
-    - user_deploy is defined
-    - user_deploy.utility_host is defined
-    - not user_deploy.utility_host == 'localhost'
-
 - name: Gather allowed SSH hosts from inventory (IPV4).
   set_fact:
     _firewall_allow_ssh_ipv4: "{{ hostvars['localhost']['ansible_all_ipv4_addresses'] + ansible_all_ipv4_addresses }}"
@@ -26,38 +17,11 @@
   set_fact:
     _firewall_allow_ssh_ipv6: "{{ hostvars['localhost']['ansible_all_ipv6_addresses'] + ansible_all_ipv6_addresses }}"
 
-- name: Gather allowed SSH hosts from utility server (IPV4).
-  set_fact:
-    _firewall_allow_ssh_ipv4: "{{ _firewall_allow_ssh_ipv4 + hostvars[user_deploy.utility_host]['ansible_all_ipv4_addresses'] }}"
-  when:
-    - user_deploy is defined
-    - user_deploy.utility_host is defined
-    - not user_deploy.utility_host == 'localhost'
-
-- name: Gather allowed SSH hosts from utility server (IPV6).
-  set_fact:
-    _firewall_allow_ssh_ipv6: "{{ _firewall_allow_ssh_ipv6 + hostvars[user_deploy.utility_host]['ansible_all_ipv6_addresses'] }}"
-  when:
-    - user_deploy is defined
-    - user_deploy.utility_host is defined
-    - not user_deploy.utility_host == 'localhost'
-
-- name: Gather allowed SSH hosts from utility domain name (IPV4).
+- name: Allow own IP.
   set_fact:
     _firewall_allow_ssh_ipv4: "{{ _firewall_allow_ssh_ipv4 + [ hostvars[inventory_hostname]['public_ip_address'] ] }}"
   when:
-    - user_deploy is defined
-    - user_deploy.utility_host is defined
-    - not user_deploy.utility_host == 'localhost'
     - hostvars[inventory_hostname]['public_ip_address'] is defined
-
-# - name: Gather allowed SSH hosts from utility domain name (IPV6).
-#   set_fact:
-#     _firewall_allow_ssh_ipv6: "{{ _firewall_allow_ssh_ipv6 + lookup('dig', user_deploy.utility_host, 'qtype=AAAA', wantlist=True) }}"
-#   when:
-#     - user_deploy is defined
-#     - user_deploy.utility_host is defined
-#     - not user_deploy.utility_host == 'localhost'
 
 - name: Reset firewall
   ufw:
