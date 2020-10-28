@@ -91,3 +91,17 @@
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
+
+- name: Add a matching wildcard DNS record
+  community.aws.route53:
+    state: "{{ aws_ec2_with_eip.state }}"
+    profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
+    zone: "{{ aws_ec2_with_eip.route_53.zone }}"
+    record: "*.{{ aws_ec2_with_eip.route_53.record }}"
+    type: CNAME
+    value: "{{ aws_ec2_with_eip.route_53.record }}"
+  when:
+    - aws_ec2_with_eip.route_53.zone is defined
+    - aws_ec2_with_eip.route_53.zone | length > 0
+    - aws_ec2_with_eip.route_53.wilcard is defined
+    - aws_ec2_with_eip.route_53.wilcard
