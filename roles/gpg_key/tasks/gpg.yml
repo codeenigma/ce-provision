@@ -40,18 +40,16 @@
 
 - name: Publish GPG key to openpgp.org.
   command:
-    cmd: "gpg --keyserver hkps://keys.openpgp.org --send-keys {{ user_ansible_gpg_key_id.stdout }}"
+    cmd: "gpg --keyserver {{ server }} --send-keys {{ user_ansible_gpg_key_id.stdout }}"
   become: true
   become_user: "{{ gpg_user.username }}"
   when:
     - gpg_user.publish
     - not user_ansible_gpg_key_exists.stdout
-
-- name: Publish GPG key to mit.edu.
-  command:
-    cmd: "gpg --keyserver hkps://pgp.mit.edu --send-keys {{ user_ansible_gpg_key_id.stdout }}"
-  become: true
-  become_user: "{{ gpg_user.username }}"
-  when:
-    - gpg_user.publish
-    - not user_ansible_gpg_key_exists.stdout
+  with_items:
+    - hkp://hkps.pool.sks-keyservers.net
+    - hkps://pgp.mit.edu
+    - hkps://keys.openpgp.org
+    - hkp://keys.gnupg.net
+  loop_control:
+    loop_var: server
