@@ -16,7 +16,7 @@ server {
     rewrite ^ https://{{ domain.server_name }}$request_uri? permanent;
 {% endif %}
 {% if server.custom_directives is defined %}
-    {% for directive in domain.custom_directives %}
+    {% for directive in server.custom_directives %}
     {{ directive }}
     {% endfor %}
 {% endif %}
