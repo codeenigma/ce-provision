@@ -12,8 +12,13 @@ upstream {{ upstream.name }} {
 server {
     listen {{ server.port }}{% if domain.is_default is defined and domain.is_default %} default_server{% endif %}{% if server.ssl %} ssl{% endif %};
     server_name {{ domain.server_name }};
-{% if server.https_redirect %}
+{% if server.https_redirect is defined and server.https_redirect %}
     rewrite ^ https://{{ domain.server_name }}$request_uri? permanent;
+{% endif %}
+{% if server.custom_directives is defined %}
+    {% for directive in domain.custom_directives %}
+    {{ directive }}
+    {% endfor %}
 {% endif %}
 {% if server.ssl %}
     ssl_certificate {{ ssl_facts[domain.ssl.domain].certificate }};
