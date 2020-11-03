@@ -25,7 +25,7 @@
   when:
     - locales.overrides is defined
     - locales.overrides | length > 0
-    
+
 - name: Generates locales.
   command: "/usr/sbin/locale-gen"
   when: locales_gen_changed.changed
