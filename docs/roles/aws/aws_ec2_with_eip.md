@@ -18,6 +18,7 @@ aws_ec2_with_eip:
   state: present
   instance_name: "{{ domain_name }}"
   root_volume_size: 80
+  ebs_optimized: true
   security_groups: []
   tags:
     Name: "{{ domain_name }}"
@@ -25,8 +26,9 @@ aws_ec2_with_eip:
   # Set the zone to empty to skip.
   route_53:
     zone: "example.com"
-    record: "*.{{ domain_name }}"
+    record: "{{ domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
+    wildcard: true # Creates a matching wildcard CNAME
 
 ```
 
