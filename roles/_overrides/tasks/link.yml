@@ -1,6 +1,6 @@
 ---
 - name: Create needed directory.
-  link:
+  file:
     path: "{{ override_link.dest | dirname }}"
     state: directory
     mode: "{{ override_link.mode | default('0755') }}"
