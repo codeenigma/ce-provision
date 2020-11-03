@@ -1,8 +1,4 @@
 ---
-
-- debug:
-    msg: "{{ _ce_provision_build_tmp_dir }}/extra"
-
 - name: Generate template overrides.
   include_tasks: template.yml
   with_items: "{{ _overrides.templates }}"
