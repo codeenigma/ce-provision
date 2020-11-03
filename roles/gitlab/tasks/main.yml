@@ -53,15 +53,20 @@
     - is_local is defined
     - is_local
 
+- name: Trigger overrides
+  include_role:
+    name: _overrides
+  vars:
+    _overrides: "{{ gitlab.overrides }}"
+  when:
+    - gitlab.overrides is defined
+    - gitlab.overrides | length > 0
+
 - name: Manually restart Gitlab/Docker.
   command: "/bin/sh /opt/gitlab-init.sh"
   when:
     - is_local is defined
     - is_local
-
-- name: Trigger overrides
-  include_role:
-    name: _overrides
 
 - name: Stop Gitlab.
   command: /opt/gitlab/bin/gitlab-ctl stop

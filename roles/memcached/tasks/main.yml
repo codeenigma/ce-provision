@@ -15,6 +15,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ memcached.overrides }}"
+  when:
+    - memcached.overrides is defined
+    - memcached.overrides | length > 0
 
 - name: Ensure memcached is restarted
   service:

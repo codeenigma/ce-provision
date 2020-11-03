@@ -17,3 +17,8 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ mysql_client.overrides }}"
+  when:
+    - mysql_client.overrides is defined
+    - mysql_client.overrides | length > 0

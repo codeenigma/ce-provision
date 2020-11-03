@@ -15,9 +15,14 @@
     group: root
     mode: "0644"
 
-- name: Trigger overrides
-  include_role:
-    name: _overrides
+# - name: Trigger overrides
+#   include_role:
+#     name: _overrides
+#   vars:
+#     _overrides: "{{ blackfire.overrides }}"
+#   when:
+#     - blackfire.overrides is defined
+#     - blackfire.overrides | length > 0
 
 - name: Restart mysql.
   service:

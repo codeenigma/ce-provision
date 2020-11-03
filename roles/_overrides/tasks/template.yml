@@ -1,0 +1,21 @@
+---
+
+- name: Create needed directory.
+  file:
+    path: "{{ override_template.dest | dirname}}"
+    state: directory
+    mode: "{{ override_template.mode | default('0755') }}"
+    owner: "{{ override_template.owner | default(omit) }}"
+    group: "{{ override_template.group | default(omit) }}"
+
+- name: Install templates overrides.
+  template:
+    src: "{{ item }}"
+    dest: "{{ override_template.dest }}"
+    force: true
+    mode: "{{ override_template.mode | default('0666') }}"
+    owner: "{{ override_template.owner | default(omit) }}"
+    group: "{{ override_template.group | default(omit) }}"
+  with_first_found:
+    - "{{ _ce_provision_build_tmp_dir }}/extra/templates/{{ override_template.src }}"
+    - "{{ override_template.src }}"

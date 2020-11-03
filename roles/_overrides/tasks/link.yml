@@ -1,0 +1,18 @@
+---
+
+- name: Create needed directory.
+  link:
+    path: "{{ override_link.dest | dirname}}"
+    state: directory
+    mode: "{{ override_link.mode | default('0755') }}"
+    owner: "{{ override_link.owner | default(omit) }}"
+    group: "{{ override_link.group | default(omit) }}"
+
+- name: Install links overrides.
+  file:
+    src: "{{ override_link.src }}"
+    dest: "{{ override_link.dest }}"
+    mode: "{{ override_link.mode | default('0666') }}"
+    owner: "{{ override_link.owner | default(omit) }}"
+    group: "{{ override_link.group | default(omit) }}"
+    state: link

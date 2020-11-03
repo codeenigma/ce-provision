@@ -76,6 +76,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ nginx.overrides }}"
+  when:
+    - nginx.overrides is defined
+    - nginx.overrides | length > 0
 
 - name: Ensure Nginx is restarted.
   service:

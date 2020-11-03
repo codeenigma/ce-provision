@@ -1,10 +1,31 @@
 ---
-- name: Define override paths.
-  set_fact:
-    _template_override_paths: "{{ template_override._paths_defaults + template_override.paths }}"
 
-- name: Run overrides in order.
-  include_tasks: override.yml
-  with_items: "{{ _template_override_paths }}"
+- debug:
+    msg: "{{ _ce_provision_build_tmp_dir }}/extra"
+
+- name: Generate template overrides.
+  include_tasks: template.yml
+  with_items: "{{ _overrides.templates }}"
   loop_control:
-    loop_var: template_override_path
+    loop_var: override_template
+  when:
+    - _overrides.templates is defined
+    - _overrides.templates | length
+
+- name: Generate files overrides.
+  include_tasks: file.yml
+  with_items: "{{ _overrides.files }}"
+  loop_control:
+    loop_var: override_file
+  when:
+    - _overrides.files is defined
+    - _overrides.files | length
+
+- name: Generate links overrides.
+  include_tasks: link.yml
+  with_items: "{{ _overrides.links }}"
+  loop_control:
+    loop_var: override_link
+  when:
+    - _overrides.links is defined
+    - _overrides.links | length

@@ -32,6 +32,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ php.fpm.overrides }}"
+  when:
+    - php.fpm.overrides is defined
+    - php.fpm.overrides | length > 0
 
 - name: Restart FPM service.
   service:

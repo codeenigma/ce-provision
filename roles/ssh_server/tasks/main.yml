@@ -45,6 +45,11 @@
 # - name: Trigger overrides
 #   include_role:
 #     name: _overrides
+#   vars:
+#     _overrides: "{{ rkhunter.overrides }}"
+#   when:
+#     - rkhunter.overrides is defined
+#     - rkhunter.overrides | length > 0
 
 - name: Restart SSH service.
   service:
