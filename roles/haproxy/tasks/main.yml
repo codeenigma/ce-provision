@@ -26,6 +26,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ haproxy.overrides }}"
+  when:
+    - haproxy.overrides is defined
+    - haproxy.overrides | length > 0
 
 - name: Ensure HAProxy is restarted.
   service:

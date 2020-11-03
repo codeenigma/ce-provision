@@ -86,10 +86,6 @@
     regexp: "AuthorizedKeysCommandUser "
     line: AuthorizedKeysCommandUser nobody
 
-- name: Trigger overrides.
-  include_role:
-    name: _overrides
-
 - name: Restart nslcd service.
   service:
     name: nslcd

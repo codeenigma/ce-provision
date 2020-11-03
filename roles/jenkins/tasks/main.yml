@@ -62,6 +62,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ jenkins.overrides }}"
+  when:
+    - jenkins.overrides is defined
+    - jenkins.overrides | length > 0
 
 - name: Create init.groovy.d directory
   file:

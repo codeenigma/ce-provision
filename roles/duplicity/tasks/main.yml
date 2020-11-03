@@ -65,3 +65,8 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ duplicity.overrides }}"
+  when:
+    - duplicity.overrides is defined
+    - duplicity.overrides | length > 0

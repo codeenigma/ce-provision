@@ -30,6 +30,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ redis.overrides }}"
+  when:
+    - redis.overrides is defined
+    - redis.overrides | length > 0
 
 - name: Restart Redis.
   service:

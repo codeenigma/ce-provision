@@ -20,6 +20,11 @@
 - name: Trigger overrides
   include_role:
     name: _overrides
+  vars:
+    _overrides: "{{ locales.overrides }}"
+  when:
+    - locales.overrides is defined
+    - locales.overrides | length > 0
 
 - name: Generates locales.
   command: "/usr/sbin/locale-gen"

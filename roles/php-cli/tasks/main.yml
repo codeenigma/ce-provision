@@ -41,6 +41,15 @@
   loop_control:
     loop_var: version
 
+- name: Trigger overrides
+  include_role:
+    name: _overrides
+  vars:
+    _overrides: "{{ php.cli.overrides }}"
+  when:
+    - php.cli.overrides is defined
+    - php.cli.overrides | length > 0
+
 - name: Setup composer.
   include_role:
     name: php_composer
