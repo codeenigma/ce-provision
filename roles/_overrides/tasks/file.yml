@@ -1,8 +1,7 @@
 ---
-
 - name: Create needed directory.
   file:
-    path: "{{ override_file.dest | dirname}}"
+    path: "{{ override_file.dest | dirname }}"
     state: directory
     mode: "{{ override_file.mode | default('0755') }}"
     owner: "{{ override_file.owner | default(omit) }}"
