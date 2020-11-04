@@ -33,7 +33,7 @@ nginx:
       is_default: true
       basic_auth:
         auth_enabled: false
-        auth_user: "{{ project_name }}"
+        auth_user: "hello"
         auth_pass: "P3nguin!"
       servers:
         - port: 80
