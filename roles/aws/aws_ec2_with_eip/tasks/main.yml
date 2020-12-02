@@ -103,5 +103,5 @@
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
-    - aws_ec2_with_eip.route_53.wilcard is defined
-    - aws_ec2_with_eip.route_53.wilcard
+    - aws_ec2_with_eip.route_53.wildcard is defined
+    - aws_ec2_with_eip.route_53.wildcard
