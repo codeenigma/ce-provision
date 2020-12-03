@@ -110,8 +110,8 @@
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
   when:
-    - aws_ec2_autoscale_cluster.rds is defined
-    - aws_ec2_autoscale_cluster.rds
+    - aws_ec2_autoscale_cluster.rds.rds is defined
+    - aws_ec2_autoscale_cluster.rds.rds
 
 - name: Create EFS volume
   efs:
