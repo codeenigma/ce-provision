@@ -21,6 +21,7 @@ postfix:
   protocols: all
   relayhost: ""
   ses_creds: "fwefe"
-  transport_maps: []
+  transport_maps:
+    - "* discard :"
   use_dkim: false
   use_ses: false
