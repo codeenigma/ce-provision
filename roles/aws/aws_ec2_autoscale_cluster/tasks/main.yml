@@ -92,6 +92,9 @@
 - name: Create RDS instance
   include_role:
     name: aws/aws_rds
+  when:
+    - aws_ec2_autoscale_cluster.rds is defined
+    - aws_ec2_autoscale_cluster.rds
   vars:
     aws_rds:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
