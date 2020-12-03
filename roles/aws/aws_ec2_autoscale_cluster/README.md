@@ -58,6 +58,7 @@ aws_ec2_autoscale_cluster:
     zone: "example.com"
     record: "*.{{ domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
+  ssl_certificate_ARN: ""
 
 ```
 
