@@ -219,7 +219,36 @@
       - "{{ _aws_ec2_target_group_created.target_group_arn }}"
   register: _aws_ec2_asg_created
 
-- name: Create ALB
+- name: Define default listeners.
+  set_fact:
+    _aws_ec2_autoscale_cluster_listeners_http:
+      Protocol: HTTP
+      Port: "80"
+      DefaultActions:
+        - Type: forward
+          TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+    _aws_ec2_autoscale_cluster_listeners_https:
+      Protocol: HTTPS
+      Port: "443"
+      DefaultActions:
+        - Type: forward
+          TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+          Certificates:
+            - CertificateArn: "{{ aws_ec2_autoscale_cluster.ssl_certificate_ARN }}"
+
+- name: Reset listeners list.
+  set_fact:
+    _aws_ec2_autoscale_cluster_listeners: "{{ [ _aws_ec2_autoscale_cluster_listeners_http ] }}"
+
+- name: Add HTTPS Listener.
+  set_fact:
+    _aws_ec2_autoscale_cluster_listeners: "{{ _aws_ec2_autoscale_cluster_listeners + [ _aws_ec2_autoscale_cluster_listeners_http ] }}"
+  when: aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+
+- name: Add HTTP listener.
+  set_fact:
+    _aws_ec2_autoscale_cluster_listeners: { {} }
+
   elb_application_lb:
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -228,12 +257,7 @@
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
     security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
-    listeners:
-      - Protocol: HTTP
-        Port: 80
-        DefaultActions:
-          - Type: forward
-            TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+    listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
   register: _aws_ec2_autoscale_cluster_alb
 
 - name: Add a DNS record in route 53
