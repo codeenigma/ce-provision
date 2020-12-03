@@ -1,0 +1,40 @@
+# Postfix
+Installs and configures Postfix for sending mail. Mail sending is disabled by default.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
+---
+
+postfix:
+  dest_hosts: "mail.host1.com,mail.host2.com"
+  disable_vrfy: false
+  forward_domains:
+    - another.com
+    - lalala.com
+  forward_from: "admin@example.com"
+  forward_to: "admin@example.com"
+  forward: false
+  hostname: "{{ ansible_fqdn }}"
+  interfaces: all
+  # ce_dev_delivery_mode is only used when is_local == true, which means you're probably using ce-dev locally. Valid modes are host, local and discard.
+  ce_dev_delivery_mode: "host"
+  message_size: 10240000
+  networks:
+    - "[::1]/128"
+    - "[::ffff:127.0.0.0]/104"
+    - 127.0.0.0/8
+  protocols: all
+  relayhost: ""
+  ses_creds: "fwefe"
+  transport_maps:
+    - "* discard :"
+  use_dkim: false
+  use_ses: false
+
+```
+
+<!--ENDROLEVARS-->
