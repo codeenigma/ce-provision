@@ -1,4 +1,5 @@
 # Postfix
+Installs and configures Postfix for sending mail. Mail sending is disabled by default.
 
 <!--TOC-->
 <!--ENDTOC-->
