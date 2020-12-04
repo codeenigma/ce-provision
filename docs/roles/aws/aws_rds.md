@@ -9,6 +9,7 @@ Creates an RDS instance and associated ressources.
 aws_rds:
   aws_profile: "{{ _aws_profile }}"
   region: eu-west-3
+  multi_az: true
   subnets:
     - subnet-aaaaaaaa
     - subnet-bbbbbbbb

@@ -31,7 +31,7 @@
     #db_parameter_group_name: undefined # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
     copy_tags_to_snapshot: true
     #character_set_name: undefined # not required. The character set to associate with the DB cluster.
-    #multi_az: undefined # not required. Specifies if the DB instance is a Multi-AZ deployment. Mutually exclusive with I(availability_zone).
+    multi_az: "{{ aws_rds.multi_az }}"
     db_subnet_group_name: "{{ _aws_rds_rds_subnet_group.subnet_group.name }}"
     #auto_minor_version_upgrade: undefined # not required. Whether minor version upgrades are applied automatically to the DB instance during the maintenance window.
     force_update_password: true # not required. Set to True to update your cluster password with I(master_user_password). Since comparing passwords to determine if it needs to be updated is not possible this is set to False by default to allow idempotence.
