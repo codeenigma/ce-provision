@@ -1,3 +1,12 @@
+# Postfix
+Installs and configures Postfix for sending mail. Mail sending is disabled by default.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 
 postfix:
@@ -25,3 +34,7 @@ postfix:
     - "* discard :"
   use_dkim: false
   use_ses: false
+
+```
+
+<!--ENDROLEVARS-->
