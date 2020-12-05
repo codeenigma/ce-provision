@@ -10,7 +10,7 @@
     src: init.sh.j2
     dest: "/var/lib/cloud/scripts/per-instance/sync-{{ item.name }}.sh"
     mode: "0755"
-  with_items: "{{ mount_sync.sync_pairs }}"
+  with_items: "{{ mount_sync.tarballs }}"
 # - name: Create unison cron task
 #   cron:
 #     name: "Unison {{ item.name }}"
