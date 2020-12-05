@@ -21,7 +21,8 @@ mount_sync:
       name: example
       owner: root
       group: root
-      tarball: /path/to/initial/seed.tar
+  tarballs:
+    - /path/to/initial/seed.tar
 
 ```
 

@@ -8,9 +8,8 @@
 - name: Create cloud-init script
   template:
     src: init.sh.j2
-    dest: "/var/lib/cloud/scripts/per-instance/sync-{{ item.name }}.sh"
+    dest: "/var/lib/cloud/scripts/per-instance/mount-sync-tarballs.sh"
     mode: "0755"
-  with_items: "{{ mount_sync.sync_pairs }}"
 # - name: Create unison cron task
 #   cron:
 #     name: "Unison {{ item.name }}"
