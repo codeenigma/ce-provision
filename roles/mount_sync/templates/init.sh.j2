@@ -7,11 +7,11 @@ if [ ! -f "{{ item }}" ]; then
 fi
 
 # Create tmp dir and untar.
-mkdir -p "/tmp/{{ item }}"
-cp "{{ item }}" "/tmp/{{ item }}"
-cd "/tmp/{{ item }}"
+mkdir -p $(dirname "/tmp{{ item }}")
+cp "{{ item }}" $(dirname "/tmp{{ item }}/")
+cd $(dirname "/tmp{{ item }}")
 tar -xvf *.tar --directory /
 
 # Clean up tmp dir
-rm -rf "/tmp/{{ item }}"
+rm -rf $(dirname "/tmp{{ item }}")
 {% endfor %}}
