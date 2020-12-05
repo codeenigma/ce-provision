@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% for item in mount_sync.tarballs %}}
+{% for item in mount_sync.tarballs %}
 # Nothing to do without an initial tarball.
 if [ ! -f "{{ item }}" ]; then
   exit 0
@@ -14,4 +14,4 @@ tar -xvf *.tar --directory /
 
 # Clean up tmp dir
 rm -rf $(dirname "/tmp{{ item }}")
-{% endfor %}}
+{% endfor %}
