@@ -122,7 +122,8 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     targets: "{{ _aws_ec2_autoscale_cluster_efs_targets }}"
-  register: _aws_ec2_autoscale_cluster_efs
+  when:
+    - aws_ec2_autoscale_cluster.efs
 
 - name: Create new AMI.
   include_role:

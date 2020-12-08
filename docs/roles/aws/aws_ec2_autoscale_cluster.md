@@ -62,6 +62,8 @@ aws_ec2_autoscale_cluster:
   ssl_certificate_ARN: ""
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
+  # Wether to create a dedicated EFS volume.
+  efs: true
 
 ```
 
