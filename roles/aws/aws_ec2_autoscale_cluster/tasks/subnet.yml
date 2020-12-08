@@ -48,7 +48,11 @@
 
 - name: Add subnet to the list of EFS targets.
   set_fact:
-    _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id, 'security_groups': [ _aws_ec2_autoscale_cluster_security_group.group_id ] } ] }}"
+    _aws_ec2_autoscale_cluster_efs_self_targets: "{{ _aws_ec2_autoscale_cluster_efs_self_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id, 'security_groups': [ _aws_ec2_autoscale_cluster_security_group.group_id ] } ] }}"
+
+- name: Add subnet to the list of EFS targets.
+  set_fact:
+    _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id } ] }}"
 
 - name: Add public subnet to the list.
   set_fact:

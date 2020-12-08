@@ -62,8 +62,11 @@ aws_ec2_autoscale_cluster:
   ssl_certificate_ARN: ""
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
-  # Wether to create a dedicated EFS volume.
-  efs: true
+  # Wether to create a dedicated EFS volume. This can be set either to:
+  # - An empty string. Won't create an EFS volume, nor do anything.
+  # - The special keyword "self". Will create an EFS volume tied to the cluster.
+  # - The name of an existing EFS volume. It will just add the network targets, leaving the rest untouched. You'll need to take care of the matching SG manually.
+  efs: self
 
 ```
 
