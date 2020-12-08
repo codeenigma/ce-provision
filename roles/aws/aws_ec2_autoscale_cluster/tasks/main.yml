@@ -260,6 +260,13 @@
     _aws_ec2_autoscale_cluster_listeners: "{{ [ _aws_ec2_autoscale_cluster_listeners_redirect, _aws_ec2_autoscale_cluster_listeners_https ] }}"
   when: aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
 
+- name: Add custom Listeners.
+  set_fact:
+    _aws_ec2_autoscale_cluster_listeners: "{{ _aws_ec2_autoscale_cluster_listeners + aws_ec2_autoscale_cluster.listeners }}"
+  when:
+    - aws_ec2_autoscale_cluster is defined
+    - aws_ec2_autoscale_cluster | length
+
 - name: Create the ALB.
   community.aws.elb_application_lb:
     name: "{{ aws_ec2_autoscale_cluster.name }}"

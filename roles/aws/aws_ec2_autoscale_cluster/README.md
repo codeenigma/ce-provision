@@ -60,6 +60,8 @@ aws_ec2_autoscale_cluster:
     record: "*.{{ domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
+  # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
+  listeners: []
 
 ```
 
