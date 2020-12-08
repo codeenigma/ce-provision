@@ -80,6 +80,7 @@
   set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: []
     _aws_ec2_autoscale_cluster_efs_targets: []
+    _aws_ec2_autoscale_cluster_efs_self_targets: []
     _aws_ec2_autoscale_cluster_public_subnets_ids: []
     _aws_ec2_autoscale_cluster_subnets_names: []
 
@@ -121,9 +122,30 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-    targets: "{{ _aws_ec2_autoscale_cluster_efs_targets }}"
+    targets: "{{ _aws_ec2_autoscale_cluster_efs_self_targets }}"
   when:
-    - aws_ec2_autoscale_cluster.efs
+    - aws_ec2_autoscale_cluster.efs == self
+
+- name: Gather existing EFS info.
+  efs_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    name: "{{ aws_ec2_autoscale_cluster.efs }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+  register: _aws_ec2_autoscale_cluster_existing_efs
+  when:
+    - aws_ec2_autoscale_cluster.efs | length > 1
+    - aws_ec2_autoscale_cluster.efs != self
+
+- name: Register new targets
+  efs:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + _aws_ec2_autoscale_cluster_existing_efs.efs[0].mount_targets }}"
+  when:
+    - aws_ec2_autoscale_cluster.efs | length > 1
+    - aws_ec2_autoscale_cluster.efs != self
 
 - name: Create new AMI.
   include_role:
