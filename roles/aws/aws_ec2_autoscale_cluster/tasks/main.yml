@@ -127,6 +127,7 @@
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
       purge_targets: true
       purge_tags: true
+      wait: false
   when:
     - aws_ec2_autoscale_cluster.efs == self
 
@@ -143,6 +144,7 @@
         - "{{ aws_ec2_autoscale_cluster.efs }}"
       purge_targets: false
       purge_tags: false
+      wait: false
   when:
     - aws_ec2_autoscale_cluster.efs | length > 1
     - aws_ec2_autoscale_cluster.efs != self
