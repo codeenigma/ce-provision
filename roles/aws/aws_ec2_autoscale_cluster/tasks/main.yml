@@ -120,7 +120,7 @@
     aws_efs:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       security_groups:
@@ -137,7 +137,7 @@
     aws_efs:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
       name: "{{ aws_ec2_autoscale_cluster.efs }}"
       security_groups:
         - "{{ aws_ec2_autoscale_cluster.efs }}"
