@@ -56,7 +56,7 @@
 
 - name: Add public subnet to the list.
   set_fact:
-    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_existing_efs.efs[0].name ] }}"
+    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_public_subnet.subnets[0].subnet_id ] }}"
 
 # @todo Module has a bug and return result as a separate key.
 - name: Gather NAT gateway info.
