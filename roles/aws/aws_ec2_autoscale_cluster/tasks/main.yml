@@ -154,6 +154,7 @@
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
+    purge_tags: false
     targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + _aws_ec2_autoscale_cluster_existing_efs.efs[0].mount_targets }}"
   when:
     - aws_ec2_autoscale_cluster.efs | length > 1
