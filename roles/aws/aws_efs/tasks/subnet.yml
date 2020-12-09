@@ -1,7 +1,7 @@
 - name: Gather subnet information
   ec2_vpc_subnet_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    profile: "{{ aws_efs.aws_profile }}"
+    region: "{{ aws_efs.region }}"
     filters:
       "tag:Name": "{{ subnet }}"
   register: _aws_efs_subnet
