@@ -18,4 +18,3 @@
     src: init.sh.j2
     dest: "/var/lib/cloud/scripts/per-boot/aws_efs_client.sh"
     mode: "0755"
-  with_items: "{{ mount_sync.sync_pairs }}"
