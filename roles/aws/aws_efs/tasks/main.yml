@@ -14,7 +14,7 @@
 
 - name: Reset targets info
   set_fact:
-    _aws_efs_targets: []
+    _aws_efs_targets: {}
 
 - name: Gather security groups info.
   include_tasks: security_group.yml
@@ -60,4 +60,4 @@
     state: "{{ aws_efs.state }}"
     tags: "{{ aws_efs.tags }}"
     purge_tags: "{{ aws_efs.purge_tags }}"
-    targets: "{{ _aws_efs_targets }}"
+    targets: "{{ _aws_efs_targets | simpledict2list }}"
