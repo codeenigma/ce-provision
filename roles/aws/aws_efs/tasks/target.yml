@@ -1,0 +1,3 @@
+- name: Add subnet to the list of EFS targets.
+  set_fact:
+    _aws_efs_targets: "{{ _aws_efs_targets + [ { 'subnet_id': target, 'security_groups': _aws_efs_security_group_ids } ] }}"

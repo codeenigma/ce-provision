@@ -1,0 +1,18 @@
+- name: Gather security group info.
+  ec2_group_info:
+    profile: "{{ aws_efs.aws_profile }}"
+    region: "{{ aws_efs.region }}"
+    filters:
+      group_name: "{{ security_group }}"
+  register: _aws_efs_security_group_info
+
+- name: Add security group id.
+  set_fact:
+    _aws_efs_security_group_ids: "{{ _aws_efs_security_group_ids + [ _aws_efs_security_group_info.security_groups[0].group_id ] }}"
+- name: Add subnet to the list of EFS targets.
+  set_fact:
+    _aws_ec2_autoscale_cluster_efs_self_targets: "{{ _aws_ec2_autoscale_cluster_efs_self_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id, 'security_groups': [ _aws_ec2_autoscale_cluster_security_group.group_id ] } ] }}"
+
+- name: Add subnet to the list of EFS targets.
+  set_fact:
+    _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id, 'security_groups': [ _aws_ec2_autoscale_cluster_existing_efs_security_group.security_groups[0].group_id ] } ] }}"

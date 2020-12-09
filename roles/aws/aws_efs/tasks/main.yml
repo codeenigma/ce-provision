@@ -1,0 +1,57 @@
+- name: Reset security groups info
+  set_fact:
+    _aws_efs_security_group_ids: []
+
+- name: Reset subnet ids info
+  set_fact:
+    _aws_efs_subnets_ids: []
+
+- name: Reset targets info
+  set_fact:
+    _aws_efs_targets: []
+
+- name: Gather security groups info.
+  include_tasks: security_group.yml
+  with_items: "{{ aws_efs.security_groups }}"
+  loop_control:
+    loop_var: security_group
+
+- name: Gather subnets info.
+  include_tasks: subnet.yml
+  with_items: "{{ aws_efs.subnets_names }}"
+  loop_control:
+    loop_var: subnet
+
+- name: Construct target list.
+  include_tasks: target.yml
+  with_items: "{{ _aws_efs_subnets_ids }}"
+  loop_control:
+    loop_var: target
+
+- name: Gather existing EFS info.
+  efs_info:
+    profile: "{{ aws_efs.aws_profile }}"
+    name: "{{ aws_efs.name }}"
+    region: "{{ aws_efs.region }}"
+  register: _aws_efs_existing_efs
+  when:
+    - not aws_efs.purge_targets
+
+- name: Re-add existing targets.
+  include_tasks: append.yml
+  with_items: "{{ _aws_efs_existing_efs.efs[0].mount_targets }}"
+  loop_control:
+    loop_var: append
+  when:
+    - not aws_efs.purge_targets
+    - _aws_efs_existing_efs.efs[0].mount_targets is defined
+
+- name: Create EFS volume
+  efs:
+    profile: "{{ aws_efs.aws_profile }}"
+    name: "{{ aws_efs.name }}"
+    region: "{{ aws_efs.region }}"
+    state: "{{ aws_efs.state }}"
+    tags: "{{ aws_efs.tags }}"
+    purge_tags: "{{ aws_efs.purge_tags }}"
+    targets: "{{ _aws_efs_targets }}"

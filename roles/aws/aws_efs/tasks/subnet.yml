@@ -1,0 +1,11 @@
+- name: Gather subnet information
+  ec2_vpc_subnet_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      "tag:Name": "{{ subnet }}"
+  register: _aws_efs_subnet
+
+- name: Add subnet id to the ids list.
+  set_fact:
+    _aws_efs_subnets_ids: "{{ _aws_efs_subnets_ids + [ _aws_efs_subnet.subnets[0].subnet_id ] }}"

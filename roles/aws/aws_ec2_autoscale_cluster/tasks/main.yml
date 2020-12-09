@@ -76,33 +76,9 @@
         group_name: "{{ aws_ec2_autoscale_cluster.name }}"
   register: _aws_ec2_autoscale_cluster_security_group
 
-- name: Gather existing EFS info.
-  efs_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ aws_ec2_autoscale_cluster.efs }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-  register: _aws_ec2_autoscale_cluster_existing_efs
-  when:
-    - aws_ec2_autoscale_cluster.efs | length > 1
-    - aws_ec2_autoscale_cluster.efs != self
-
-- name: Gather EFS security group info.
-  amazon.aws.ec2_group_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    filters:
-      "tag:Name": "{{ aws_ec2_autoscale_cluster.efs }}"
-      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-  register: _aws_ec2_autoscale_cluster_existing_efs_security_group
-  when:
-    - aws_ec2_autoscale_cluster.efs | length > 1
-    - aws_ec2_autoscale_cluster.efs != self
-
 - name: Reset subnets lists.
   set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: []
-    _aws_ec2_autoscale_cluster_efs_targets: []
-    _aws_ec2_autoscale_cluster_efs_self_targets: []
     _aws_ec2_autoscale_cluster_public_subnets_ids: []
     _aws_ec2_autoscale_cluster_subnets_names: []
 
@@ -138,24 +114,35 @@
     - aws_ec2_autoscale_cluster.rds.rds
 
 - name: Create EFS volume
-  efs:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ aws_ec2_autoscale_cluster.name }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    state: "{{ aws_ec2_autoscale_cluster.state }}"
-    tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-    targets: "{{ _aws_ec2_autoscale_cluster_efs_self_targets }}"
+  include_role:
+    name: aws/aws_efs
+  vars:
+    aws_efs:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      security_groups:
+        - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
+      purge_targets: true
+      purge_tags: true
   when:
     - aws_ec2_autoscale_cluster.efs == self
 
-- name: Register new targets
-  efs:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ aws_ec2_autoscale_cluster.efs }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    state: "{{ aws_ec2_autoscale_cluster.state }}"
-    purge_tags: false
-    targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + _aws_ec2_autoscale_cluster_existing_efs.efs[0].mount_targets }}"
+- name: Register existing EFS volume
+  include_role:
+    name: aws/aws_efs
+  vars:
+    aws_efs:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      name: "{{ aws_ec2_autoscale_cluster.efs }}"
+      security_groups:
+        - "{{ aws_ec2_autoscale_cluster.efs }}"
+      purge_targets: false
+      purge_tags: false
   when:
     - aws_ec2_autoscale_cluster.efs | length > 1
     - aws_ec2_autoscale_cluster.efs != self
