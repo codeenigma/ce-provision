@@ -6,6 +6,12 @@
   set_fact:
     _aws_efs_subnets_ids: []
 
+- name: Add given subnets.
+  set_fact:
+    _aws_efs_subnets_ids: "{{ _aws_efs_subnets_ids + aws_efs.subnets_ids }}"
+  when:
+    - aws_efs.subnets_ids | length
+
 - name: Reset targets info
   set_fact:
     _aws_efs_targets: []
