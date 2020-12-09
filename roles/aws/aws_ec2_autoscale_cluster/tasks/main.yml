@@ -93,7 +93,7 @@
     filters:
       "tag:Name": "{{ aws_ec2_autoscale_cluster.efs }}"
       vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-    register: _aws_ec2_autoscale_cluster_existing_efs_security_group
+  register: _aws_ec2_autoscale_cluster_existing_efs_security_group
   when:
     - aws_ec2_autoscale_cluster.efs | length > 1
     - aws_ec2_autoscale_cluster.efs != self
