@@ -2,6 +2,10 @@
   set_fact:
     _aws_ec2_autoscale_cluster_private_subnet_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
 
+- name: Add subnet name to the list.
+  set_fact:
+    _aws_ec2_autoscale_cluster_subnets_names: "{{ _aws_ec2_autoscale_cluster_subnets_names + [ _aws_ec2_autoscale_cluster_private_subnet_name ] }}"
+
 - name: Construct private subnet definition.
   set_fact:
     _aws_ec2_autoscale_cluster_subnet_definition:
@@ -46,17 +50,9 @@
   set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids + [ _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id ] }}"
 
-- name: Add subnet to the list of EFS targets.
-  set_fact:
-    _aws_ec2_autoscale_cluster_efs_self_targets: "{{ _aws_ec2_autoscale_cluster_efs_self_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id, 'security_groups': [ _aws_ec2_autoscale_cluster_security_group.group_id ] } ] }}"
-
-- name: Add subnet to the list of EFS targets.
-  set_fact:
-    _aws_ec2_autoscale_cluster_efs_targets: "{{ _aws_ec2_autoscale_cluster_efs_targets + [ { 'subnet_id': _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id, 'security_groups': [ _aws_ec2_autoscale_cluster_existing_efs_security_group.security_groups[0].group_id ] } ] }}"
-
 - name: Add public subnet to the list.
   set_fact:
-    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_existing_efs.efs[0].name ] }}"
+    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_public_subnet.subnets[0].subnet_id ] }}"
 
 # @todo Module has a bug and return result as a separate key.
 - name: Gather NAT gateway info.
