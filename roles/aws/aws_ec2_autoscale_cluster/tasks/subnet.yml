@@ -2,6 +2,10 @@
   set_fact:
     _aws_ec2_autoscale_cluster_private_subnet_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ subnet.az }}"
 
+- name: Add subnet name to the list.
+  set_fact:
+    _aws_ec2_autoscale_cluster_subnets_names: "{{ _aws_ec2_autoscale_cluster_subnets_names + [ _aws_ec2_autoscale_cluster_private_subnet_name ] }}"
+
 - name: Construct private subnet definition.
   set_fact:
     _aws_ec2_autoscale_cluster_subnet_definition:

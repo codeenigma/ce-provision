@@ -6,12 +6,6 @@
   set_fact:
     _aws_efs_subnets_ids: []
 
-- name: Add given subnets.
-  set_fact:
-    _aws_efs_subnets_ids: "{{ _aws_efs_subnets_ids + aws_efs.subnets_ids }}"
-  when:
-    - aws_efs.subnets_ids | length
-
 - name: Reset targets info
   set_fact:
     _aws_efs_targets: {}
@@ -24,7 +18,7 @@
 
 - name: Gather subnets info.
   include_tasks: subnet.yml
-  with_items: "{{ aws_efs.subnets_names }}"
+  with_items: "{{ aws_efs.subnets }}"
   loop_control:
     loop_var: subnet
 
@@ -33,24 +27,6 @@
   with_items: "{{ _aws_efs_subnets_ids }}"
   loop_control:
     loop_var: target
-
-- name: Gather existing EFS info.
-  community.aws.efs_info:
-    profile: "{{ aws_efs.aws_profile }}"
-    name: "{{ aws_efs.name }}"
-    region: "{{ aws_efs.region }}"
-  register: _aws_efs_existing_efs
-  when:
-    - not aws_efs.purge_targets
-
-- name: Re-add existing targets.
-  include_tasks: append.yml
-  with_items: "{{ _aws_efs_existing_efs.efs[0].mount_targets }}"
-  loop_control:
-    loop_var: append
-  when:
-    - not aws_efs.purge_targets
-    - _aws_efs_existing_efs.efs[0].mount_targets is defined
 
 - name: Create EFS volume
   community.aws.efs:

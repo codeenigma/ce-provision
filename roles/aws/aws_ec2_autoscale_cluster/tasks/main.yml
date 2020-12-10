@@ -120,34 +120,15 @@
     aws_efs:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_names }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
-      purge_targets: true
       purge_tags: true
       wait: false
   when:
-    - aws_ec2_autoscale_cluster.efs == self
-
-- name: Register existing EFS volume
-  include_role:
-    name: aws/aws_efs
-  vars:
-    aws_efs:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
-      subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
-      name: "{{ aws_ec2_autoscale_cluster.efs }}"
-      security_groups:
-        - "{{ aws_ec2_autoscale_cluster.efs }}"
-      purge_targets: false
-      purge_tags: false
-      wait: false
-  when:
-    - aws_ec2_autoscale_cluster.efs | length > 1
-    - aws_ec2_autoscale_cluster.efs != self
+    - aws_ec2_autoscale_cluster.efs
 
 - name: Create new AMI.
   include_role:

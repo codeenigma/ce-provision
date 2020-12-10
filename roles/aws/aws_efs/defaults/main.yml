@@ -7,11 +7,7 @@ aws_efs:
   tags: []
   state: present
   wait: true
-  # Rebuild the targets if true, append to existing ones if false.
-  purge_targets: false
-  # Subnets ids.
-  subnets_ids: []
   # Subnets names.
-  subnets_names: []
+  subnets: []
   # SG names. Note, the assumption is that all subnets have the same SGs.
   security_groups: []
