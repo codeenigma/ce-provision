@@ -35,7 +35,7 @@
     loop_var: target
 
 - name: Gather existing EFS info.
-  efs_info:
+  community.aws.efs_info:
     profile: "{{ aws_efs.aws_profile }}"
     name: "{{ aws_efs.name }}"
     region: "{{ aws_efs.region }}"
@@ -53,7 +53,7 @@
     - _aws_efs_existing_efs.efs[0].mount_targets is defined
 
 - name: Create EFS volume
-  efs:
+  community.aws.efs:
     profile: "{{ aws_efs.aws_profile }}"
     name: "{{ aws_efs.name }}"
     region: "{{ aws_efs.region }}"
