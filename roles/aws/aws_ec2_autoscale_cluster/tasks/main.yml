@@ -183,6 +183,14 @@
     protocol: http
     port: 80
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
+    health_check_protocol: "{{ aws_ec2_autoscale_cluster.health_check_protocol }}"
+    health_check_path: "{{ aws_ec2_autoscale_cluster.health_check_path }}"
+    health_check_port: "{{ aws_ec2_autoscale_cluster.health_check_port }}"
+    successful_response_codes: "{{ aws_ec2_autoscale_cluster.health_check_success_codes }}"
+    health_check_interval: "{{ aws_ec2_autoscale_cluster.health_check_interval }}"
+    health_check_timeout: "{{ aws_ec2_autoscale_cluster.health_check_timeout }}"
+    healthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_healthy_count }}"
+    unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
   register: _aws_ec2_target_group_created
 
 - name: Create Autoscale group and replace instances.
