@@ -31,7 +31,7 @@ aws_ec2_autoscale_cluster:
   # ALB health checks
   health_check_protocol: "http"
   health_check_path: "/"
-  health_check_port: "target-port" # Default is target-port, which matches the target port. Can be overridden with a port number.
+  health_check_port: "traffic-port" # Default is traffic-port, which matches the target port. Can be overridden with a port number.
   health_check_success_codes: "200" # Can be single code, like "200", or a comma-separated value with ranges: "200,250-260".
   health_check_interval: 30
   health_check_timeout: 5
