@@ -39,5 +39,6 @@ jobs:
         shell: bash
 
       - name: Documentation (check)
-        run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+        run: contribute/toc.sh
+      #  run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
         shell: bash
