@@ -34,6 +34,6 @@ jobs:
       #  shell: bash
 
       # Test step
-      -name: Testing existence of Git
+      - name: Testing existence of Git
         run: git help
         shell: bash
