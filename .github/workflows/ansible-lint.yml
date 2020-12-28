@@ -48,7 +48,7 @@ jobs:
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          /bin/sh ce-dev/ansible/examples/test.sh
+          /bin/bash ce-dev/ansible/examples/test.sh
         shell: bash
 
       - name: Documentation (push)
