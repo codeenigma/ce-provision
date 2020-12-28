@@ -14,8 +14,8 @@ jobs:
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
-      #- name: Checkout code
-      #  uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       # Runs the Super-Linter action
       #- name: Run Super-Linter
@@ -36,4 +36,8 @@ jobs:
       # Test step
       - name: Testing existence of Git
         run: git help
+        shell: bash
+
+      - name: Documentation (check)
+        run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
         shell: bash
