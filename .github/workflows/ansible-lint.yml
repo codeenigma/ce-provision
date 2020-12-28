@@ -26,6 +26,8 @@ jobs:
 
       # Checks the documentation
       - name: Documentation (check)
+        # Run the step even if the previous one failed
+        if: ${{ always() }}
         run: |
           contribute/toc.sh
           '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
