@@ -41,6 +41,7 @@ jobs:
         shell: bash
 
       - name: Testing branch name checking
-        if: ${{ contains(github.ref, 'github') }}
-        run: 'echo "Test branch!"'
+        if: ${{ always() }}
+        #if: ${{ contains(github.ref, 'github') }}
+        run: echo ${{ github.ref }}
         shell: bash
