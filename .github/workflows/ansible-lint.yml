@@ -1,4 +1,4 @@
-name: Super-Linter
+name: Run tests
 
 # Run this workflow every time a new commit pushed to your repository
 on: push
@@ -6,29 +6,34 @@ on: push
 jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
-  super-lint:
+  run-tests:
     # Name the Job
-    name: Lint code base
+    name: Run tests against Ansible code base
     # Set the type of machine to run on
     runs-on: ubuntu-latest
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
-      - name: Checkout code
-        uses: actions/checkout@v2
+      #- name: Checkout code
+      #  uses: actions/checkout@v2
 
       # Runs the Super-Linter action
-      - name: Run Super-Linter
-        uses: github/super-linter@v3
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Run Super-Linter
+      #  uses: github/super-linter@v3
+      #  env:
+      #    DEFAULT_BRANCH: main
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Checks the documentation
-      - name: Documentation (check)
+      #- name: Documentation (check)
         # Run the step even if the previous one failed
-        if: ${{ always() }}
-        run: |
-          contribute/toc.sh
-          '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+      #  if: ${{ always() }}
+      #  run: |
+      #    contribute/toc.sh
+      #    [ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]
+      #  shell: bash
+
+      # Test step
+      -name: Testing existence of Git
+        run: git help
         shell: bash
