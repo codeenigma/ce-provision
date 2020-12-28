@@ -24,22 +24,18 @@ jobs:
       #    DEFAULT_BRANCH: main
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Checks the documentation
-      #- name: Documentation (check)
-        # Run the step even if the previous one failed
-      #  if: ${{ always() }}
-      #  run: |
-      #    contribute/toc.sh
-      #    [ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]
-      #  shell: bash
-
       # Test step
       - name: Testing existence of Git
+        if: ${{ always() }}
         run: git help
         shell: bash
 
+      - name: Documentation (build)
+        if: ${{ always() }}
+        run: contribute/toc.sh
+        shell: bash
+
       - name: Documentation (check)
-        run: |
-          contribute/toc.sh
-          '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+        if: ${{ always() }}
+        run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
         shell: bash
