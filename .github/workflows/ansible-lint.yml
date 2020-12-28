@@ -39,3 +39,10 @@ jobs:
         if: ${{ always() }}
         run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
         shell: bash
+
+    if: contains(github.ref, "github")
+    steps:
+      - name: Testing branch name checking
+        if: ${{ always() }}
+        run: 'echo "Test branch!"'
+        shell: bash
