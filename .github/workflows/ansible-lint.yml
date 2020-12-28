@@ -41,6 +41,6 @@ jobs:
         shell: bash
 
       - name: Testing branch name checking
-        if: contains(github.ref, "github")
+        if: ${{ contains(github.ref, "github") }}
         run: 'echo "Test branch!"'
         shell: bash
