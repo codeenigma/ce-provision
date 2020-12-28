@@ -23,3 +23,10 @@ jobs:
         env:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Checks the documentation
+      - name: Documentation (check)
+        run: |
+          contribute/toc.sh
+          '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+        shell: bash
