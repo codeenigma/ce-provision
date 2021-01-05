@@ -10,7 +10,7 @@ jobs:
     # Name the Job
     name: Run tests against Ansible code base
     # Set the type of machine to run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
@@ -43,6 +43,7 @@ jobs:
       - name: Run a test
         if: ${{ always() }}
         run: |
+          sudo apt-get install net-tools
           curl https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 --output /tmp/mkcert
           sudo mv /tmp/mkcert /usr/local/bin
           sudo chmod +x /usr/local/bin/mkcert
