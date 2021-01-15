@@ -95,7 +95,7 @@
     aws_rds:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      instance_type: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
+      db_instance_class: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
       subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       description: "{{ aws_ec2_autoscale_cluster.name }}"
