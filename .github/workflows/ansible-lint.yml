@@ -43,6 +43,7 @@ jobs:
       - name: Run a test
         if: ${{ always() }}
         run: |
+          echo "$SHELL"
           sudo apt-get install net-tools
           curl https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 --output /tmp/mkcert
           sudo mv /tmp/mkcert /usr/local/bin
