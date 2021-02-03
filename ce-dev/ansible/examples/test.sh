@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Test project creation and templates.
 set -e
 EXAMPLES="blank gitlab"
