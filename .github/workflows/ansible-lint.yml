@@ -45,12 +45,11 @@ jobs:
         run: |
           echo "$SHELL"
           sudo apt-get install net-tools
-          curl https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 --output /tmp/mkcert
+          curl https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64 --output /tmp/mkcert
           sudo mv /tmp/mkcert /usr/local/bin
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          sudo chmod +x ce-dev/ansible/examples/test.sh
           /bin/bash ce-dev/ansible/examples/test.sh
         shell: bash
 
