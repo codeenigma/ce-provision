@@ -18,17 +18,11 @@ jobs:
         uses: actions/checkout@v2
 
       # Runs the Super-Linter action
-      #- name: Run Super-Linter
-      #  uses: github/super-linter@v3
-      #  env:
-      #    DEFAULT_BRANCH: main
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Test step
-      - name: Testing existence of Git
-        if: ${{ always() }}
-        run: git help
-        shell: bash
+      - name: Run Super-Linter
+        uses: github/super-linter@v3
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Documentation (build)
         if: ${{ always() }}
@@ -43,7 +37,6 @@ jobs:
       - name: Run a test
         if: ${{ always() }}
         run: |
-          echo "$SHELL"
           wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
           export PATH=$PATH:/usr/local/go/bin
