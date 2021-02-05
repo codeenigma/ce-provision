@@ -1,7 +1,7 @@
 name: Run tests
 
 # Run this workflow every time a new commit pushed to your repository
-on: push
+on: [push, pull_request]
 
 jobs:
   # Set the job key. The key is displayed as the job name
@@ -17,13 +17,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Runs the Super-Linter action
-      - name: Run Super-Linter
-        uses: github/super-linter@v3
-        env:
-          DEFAULT_BRANCH: devel
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: false
+      # Runs the ansible-lint action (Super-Linter is too heavy)
+      - name: Lint Ansible playbooks
+        uses: ansible/ansible-lint-action@v4.1.0
+        with:
+          targets: ""
 
       - name: Documentation (build)
         if: ${{ always() }}
