@@ -25,14 +25,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
 
-      - name: Documentation (check)
+      - name: Documentation (build)
         if: ${{ always() }}
-        run: |
-          /bin/sh contribute/toc.sh
-          '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+        run: contribute/toc.sh
         shell: bash
 
-      # We compile mkcert because the shipped binaries are broken in Ubuntu
+      - name: Documentation (check)
+        if: ${{ always() }}
+        run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+        shell: bash
+
       - name: Run a test
         if: ${{ always() }}
         run: |
@@ -45,7 +47,7 @@ jobs:
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          /bin/sh ce-dev/ansible/examples/test.sh
+          /bin/bash ce-dev/ansible/examples/test.sh
         shell: bash
 
       - name: Documentation (push)
