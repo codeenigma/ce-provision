@@ -45,8 +45,12 @@ jobs:
         run: |
           echo "$SHELL"
           sudo apt-get install net-tools
-          curl https://github.com/FiloSottile/mkcert/releases/download/v1.4.3/mkcert-v1.4.3-linux-amd64 --output /tmp/mkcert
-          sudo mv /tmp/mkcert /usr/local/bin
+          curl https://golang.org/dl/go1.15.8.linux-amd64.tar.gz --output go1.15.8.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
+          export PATH=$PATH:/usr/local/go/bin
+          git clone https://github.com/FiloSottile/mkcert && cd mkcert
+          go build -ldflags "-X main.Version=$(git describe --tags)"
+          sudo mv ./mkcert /usr/local/bin && cd ../
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
