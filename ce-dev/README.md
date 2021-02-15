@@ -11,6 +11,8 @@ By default, it will create:
 
 You'll need https://github.com/codeenigma/ce-dev installed.
 
+You'll need to set up a `config` directory in the root of the cloned `ce-provision` project, the deploy playbooks expect it to exist and to have `ansible.cfg` within. You might have a config repo for your organisation including your private and/or custom roles, in which case that should be cloned here.
+
 ## Usage
 
 ### 1. Generate the actual docker-compose file and start the containers
