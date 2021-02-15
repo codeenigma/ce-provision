@@ -11,7 +11,7 @@ By default, it will create:
 
 You'll need https://github.com/codeenigma/ce-dev installed.
 
-You'll need to set up a `config` directory in the root of the cloned `ce-provision` project, the deploy playbooks expect it to exist and to have `ansible.cfg` within. You might have a config repo for your organisation including your private and/or custom roles, in which case that should be cloned here.
+You'll need to set up a `config` directory in the root of the cloned `ce-provision` project, the deploy playbooks expect it to exist and to have `ansible.cfg` within. If you already have a private config repo for your organisation that should be cloned here. If you do not, you can use our provided example repo to get started with - https://github.com/codeenigma/ce-provision-config-example
 
 ## Usage
 
