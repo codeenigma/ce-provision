@@ -1,0 +1,4 @@
+aws_iam_saml:
+  admin_role: "Administrators"
+  provider_name: "CodeEnigma"
+  ldap_gid: "6070"
