@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::{{ caller_info.account }}:saml-provider/CodeEnigma"
+      },
+      "Action": "sts:AssumeRoleWithSAML",
+      "Condition": {
+        "StringEquals": {
+          "SAML:aud": "https://signin.aws.amazon.com/saml"
+        },
+        "ForAllValues:StringLike": {
+          "saml:edupersonaffiliation": "{{ aws_iam_saml.ldap_gid }}"
+        }
+      }
+    }
+  ]
+}
