@@ -5,7 +5,7 @@
   tasks:
     - name: Ensure provision scripts are presents.
       git:
-        repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git')}}"
+        repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git') }}"
         dest: "{{ ce_provision.local_dir }}"
         version: "{{ ce_provision.own_repository_branch  | default('master') }}"
         update: yes
