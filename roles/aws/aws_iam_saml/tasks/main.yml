@@ -1,3 +1,10 @@
+- name: Create IAM account alias for grouping
+  iam_alias:
+    aws_account_alias: "{{ aws_iam_saml.aws_account_alias }}"
+  when:
+    - aws_iam_saml.aws_account_alias is defined
+    - aws_iam_saml.aws_account_alias | length > 0
+
 - name: Create SAML provider
   community.aws.iam_saml_federation:
     name: "{{ aws_iam_saml.provider_name }}"
@@ -7,7 +14,6 @@
     - aws_iam_saml.saml_metadata_document | length > 40
 
 - name: Get the current AWS account caller identity information
-
   amazon.aws.aws_caller_info:
   register: caller_info
 

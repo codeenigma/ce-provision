@@ -1,12 +1,12 @@
 ---
 - name: initialize transport
-  shell: /usr/sbin/postmap /etc/postfix/transport
+  command: /usr/sbin/postmap /etc/postfix/transport
 
 - name: initialize sasl_passwd
-  shell: /usr/sbin/postmap /etc/postfix/sasl_passwd
+  command: /usr/sbin/postmap /etc/postfix/sasl_passwd
 
 - name: initialize virtual
-  shell: /usr/sbin/postmap /etc/postfix/virtual
+  command: /usr/sbin/postmap /etc/postfix/virtual
 
 - name: reload postfix configuration
-  shell: /usr/sbin/postfix reload
+  command: /usr/sbin/postfix reload
