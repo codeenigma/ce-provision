@@ -9,3 +9,4 @@ aws_iam_saml:
   billing_policy: "BillingPolicy"
   billing_ldap_groups: []
   saml_metadata_document: ""
+  linotp_server: ""

@@ -1,0 +1,94 @@
+<?php
+##########################################
+# AWS SP FOR {{ aws_iam_saml.provider_name }}
+##########################################
+$metadata['urn:amazon:{{ caller_info.account }}'] = array (
+  'entityid' => 'urn:amazon:{{ caller_info.account }}',
+  'description' => array (),
+  'name' => array (
+    'en' => 'AWS Console Access',
+  ),
+  'contacts' => array (),
+  'metadata-set' => 'saml20-sp-remote',
+  'AssertionConsumerService' => array (
+    0 => array (
+      'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+      'Location' => 'https://signin.aws.amazon.com/saml',
+      'index' => 1,
+      'isDefault' => true,
+    ),
+  ),
+  'SingleLogoutService' => array (),
+  'NameIDFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+  'attributes' => array (
+    'https://aws.amazon.com/SAML/Attributes/Role',
+    'https://aws.amazon.com/SAML/Attributes/RoleSessionName',
+    'eduPersonAffiliation' => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
+  ),
+  'keys' => array (
+    0 => array (
+      'encryption' => false,
+      'signing' => true,
+      'type' => 'X509Certificate',
+      'X509Certificate' => 'MIIDbTCCAlWgAwIBAgIELHF25zANBgkqhkiG9w0BAQsFADBnMR8wHQYDVQQDExZ1
+  cm46YW1hem9uOndlYnNlcnZpY2VzMSIwIAYDVQQKExlBbWF6b24gV2ViIFNlcnZp
+  Y2VzLCBJbmMuMRMwEQYDVQQIEwpXYXNoaW5ndG9uMQswCQYDVQQGEwJVUzAeFw0x
+  ODA1MjUwMDAwMDBaFw0xOTA1MjUwMDAwMDBaMGcxHzAdBgNVBAMTFnVybjphbWF6
+  b246d2Vic2VydmljZXMxIjAgBgNVBAoTGUFtYXpvbiBXZWIgU2VydmljZXMsIElu
+  Yy4xEzARBgNVBAgTCldhc2hpbmd0b24xCzAJBgNVBAYTAlVTMIIBIjANBgkqhkiG
+  9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnPfBStchvxtbQZYNd9p9U8Il9eb2MsR8+e64
+  aPTMPLIGqu4lJt7yM0+IYa0jnJg6rNKqWTzrGQDEuKDPki5tsohLS2qgK/+WfKtl
+  CHwRbKnYQUa3jxIVGudpngSPFNr/EtcMa7iAeQPStDcLs/dX5UM/AdgKVkoJYHTG
+  Ard68CtCxocrk0jGD1SHIKw/FUntt82LRFbRO+MLZOni2qWPgKwsjlIZh5UgB4rP
+  Br+Yf3W/8nnbxyUUDt/rGtocb6D56DB7g7//YoyVjqcdByPlO63xAx+fAKQJZnbe
+  A/gXTEVvMg8UfRS3ByIQPEOEPdCDvDRmkkbdvGPXmNHdfd2YSwIDAQABoyEwHzAd
+  BgNVHQ4EFgQUrKNqcBKQB5JM5Ziy2UvfS7MirXowDQYJKoZIhvcNAQELBQADggEB
+  AGlYWVgox7zHZYbzlA4+MD0H9ofpEI4PLpacIqBrDMgMLuA6pq/e1RT/FnqTXKu+
+  8uBFXENMottyzzBoPegMpw4LCd0v35vQC/VDBFsf/H5Elug7uCyyf89EqV5q2FTs
+  KtUbgfUQsq1XJGZzRMEVXpdwe7b8b7ypZEP+4si2YIh76eWfhmcWQiFanqmOKrDV
+  PcPQt209sShTXXiY6Vw7/EEvo+G+y5t8RmXtAtd5PFfGLb1Ip22IQkia2bQHFJ5j
+  DWlWGuiaRDvVyG5lCvrDPieuiUCItdGK7z3afRsXFPke6NvLAjsZa2ChgCUPoHnv
+  lz6POXTmmTKL5O/znLo6wBw=',
+    ),
+  ),
+  'saml20.sign.assertion' => true,
+  'authproc' => array(
+    # AWS settings
+    10 => array(
+      'class' => 'core:AttributeAdd',
+      'https://aws.amazon.com/SAML/Attributes/Role' => array(
+        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.admin_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.readonly_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.billing_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+      ),
+    ),
+
+    20 => array(
+      'class' => 'core:AttributeCopy',
+      'uid' => 'https://aws.amazon.com/SAML/Attributes/RoleSessionName',
+    ),
+
+    30 => array(
+      'class' => 'core:AttributeCopy',
+      'groups' => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
+    ),
+
+    # LinOTP settings
+    55 => array(
+      'class' => 'linotp2:OTP',
+      'linotpserver' => '{{ aws_iam_saml.linotp_server }}',
+      'linotpuidattribute' => 'https://aws.amazon.com/SAML/Attributes/RoleSessionName',
+      'sslverifyhost' => True,
+      'sslverifypeer' => True,
+      'realm' => '',
+      'attributemap' => array(
+        'username' => 'samlLoginName',
+        'surname' => 'surName',
+        'givenname' => 'givenName',
+        'email' => 'emailAddress',
+        'phone' => 'telePhone',
+        'mobile' => 'mobilePhone',
+      ),
+    ),
+  ),
+);
