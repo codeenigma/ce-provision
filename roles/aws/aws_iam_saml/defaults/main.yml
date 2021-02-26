@@ -1,4 +1,5 @@
 aws_iam_saml:
+  aws_account_alias: ""
   provider_name: "SAMLProvider"
   admin_role: "Administrators"
   admin_ldap_groups: []
