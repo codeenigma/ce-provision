@@ -1,4 +1,10 @@
 aws_iam_saml:
+  provider_name: "SAMLProvider"
   admin_role: "Administrators"
-  provider_name: "CodeEnigma"
-  ldap_gid: "6070"
+  admin_ldap_groups: []
+  readonly_role: "ReadOnly"
+  readonly_ldap_groups: []
+  billing_role: "Billing"
+  billing_policy: "BillingPolicy"
+  billing_ldap_groups: []
+  saml_metadata_document: ""

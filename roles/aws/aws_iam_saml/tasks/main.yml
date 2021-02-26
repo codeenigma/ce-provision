@@ -1,35 +1,12 @@
-- name: Create Code Enigma SAML provider
+- name: Create SAML provider
   community.aws.iam_saml_federation:
-      name: "{{ aws_iam_saml.provider_name }}"
-      saml_metadata_document: >
-          <?xml version="1.0"?>
-          <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://login.codeenigma.net/idp/saml2/idp/metadata.php">
-            <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-              <md:KeyDescriptor use="signing">
-                <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-                  <ds:X509Data>
-                    <ds:X509Certificate>MIID+TCCAuGgAwIBAgIJAKv3laOkDrJ6MA0GCSqGSIb3DQEBCwUAMIGSMQswCQYDVQQGEwJHQjEPMA0GA1UECAwGTG9uZG9uMQ8wDQYDVQQHDAZMb25kb24xHDAaBgNVBAoME0NvZGUgRW5pZ21hIExpbWl0ZWQxHTAbBgNVBAMMFGxvZ2luLmNvZGVlbmlnbWEubmV0MSQwIgYJKoZIhvcNAQkBFhVzeXNhZG1AY29kZWVuaWdtYS5jb20wHhcNMTcwMjI3MTAyNzI0WhcNMjAwMjI3MTAyNzI0WjCBkjELMAkGA1UEBhMCR0IxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9uMRwwGgYDVQQKDBNDb2RlIEVuaWdtYSBMaW1pdGVkMR0wGwYDVQQDDBRsb2dpbi5jb2RlZW5pZ21hLm5ldDEkMCIGCSqGSIb3DQEJARYVc3lzYWRtQGNvZGVlbmlnbWEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqZVACiu5W3BunAyLhYWaHGa29dLxNqaw+vO3U4nPWs/SnhzWbAk0NYE/dMs6KG84OVyVedvYZWhSWqYSMnYdgJzsEwZlIJySEkPvmGKSQVDaCAnmaBK7gEEpr20JcPrRXIN35ttZJbifkLGTUQ4qxVRkrdeb+8XVCNCUze1Zwq8xtQbdXYVMVXoQQSI46iZhL4CdvOnjZHVYQxEOqizph8KNwhVyWIyrdUvuZ/Wco1tJ2fZjSZOHSN0V8oKL47gEz50FONzirAnkeuLHnBAB+l54ECICjkek14rz3TJyGq6UucYyc66+9oYlk/iWfD0hkMckX1IsOkvNG9Env47/nwIDAQABo1AwTjAdBgNVHQ4EFgQUCZs64XMmZ7Er/WHDreiy3EmbD9YwHwYDVR0jBBgwFoAUCZs64XMmZ7Er/WHDreiy3EmbD9YwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAVOsG7NRmeIY+8D1jICvPsPUjuDmUBTXrI5UBIXt8n5gd3SELM1xv0prrm/nBI2Pdh7KWd3dSYdPxhCJPuP15seorRoDymvrXDOys91iCnRIN9/YghdSwBAAzo+UV9anf2tWJTLJkyg0REuVN95503SYS6ELDG1c41N1w2q3IaR866d/x5nOZN5tMaPQQVHpmGM+0z11U1n2mswjbkltl59jVWiHFHMbskXdp5vpPhVhfb4ELecBKl5gpZj2VByTTc3y7ZCHxTIyZQuKiHBS1co7ROYwut2qsuDhrW4rf29MAR9jkm1DnCPCr7cURtFr3fFV5zvv37hKBZcX35dgsbA==</ds:X509Certificate>
-                  </ds:X509Data>
-                </ds:KeyInfo>
-              </md:KeyDescriptor>
-              <md:KeyDescriptor use="encryption">
-                <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
-                  <ds:X509Data>
-                    <ds:X509Certificate>MIID+TCCAuGgAwIBAgIJAKv3laOkDrJ6MA0GCSqGSIb3DQEBCwUAMIGSMQswCQYDVQQGEwJHQjEPMA0GA1UECAwGTG9uZG9uMQ8wDQYDVQQHDAZMb25kb24xHDAaBgNVBAoME0NvZGUgRW5pZ21hIExpbWl0ZWQxHTAbBgNVBAMMFGxvZ2luLmNvZGVlbmlnbWEubmV0MSQwIgYJKoZIhvcNAQkBFhVzeXNhZG1AY29kZWVuaWdtYS5jb20wHhcNMTcwMjI3MTAyNzI0WhcNMjAwMjI3MTAyNzI0WjCBkjELMAkGA1UEBhMCR0IxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9uMRwwGgYDVQQKDBNDb2RlIEVuaWdtYSBMaW1pdGVkMR0wGwYDVQQDDBRsb2dpbi5jb2RlZW5pZ21hLm5ldDEkMCIGCSqGSIb3DQEJARYVc3lzYWRtQGNvZGVlbmlnbWEuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqZVACiu5W3BunAyLhYWaHGa29dLxNqaw+vO3U4nPWs/SnhzWbAk0NYE/dMs6KG84OVyVedvYZWhSWqYSMnYdgJzsEwZlIJySEkPvmGKSQVDaCAnmaBK7gEEpr20JcPrRXIN35ttZJbifkLGTUQ4qxVRkrdeb+8XVCNCUze1Zwq8xtQbdXYVMVXoQQSI46iZhL4CdvOnjZHVYQxEOqizph8KNwhVyWIyrdUvuZ/Wco1tJ2fZjSZOHSN0V8oKL47gEz50FONzirAnkeuLHnBAB+l54ECICjkek14rz3TJyGq6UucYyc66+9oYlk/iWfD0hkMckX1IsOkvNG9Env47/nwIDAQABo1AwTjAdBgNVHQ4EFgQUCZs64XMmZ7Er/WHDreiy3EmbD9YwHwYDVR0jBBgwFoAUCZs64XMmZ7Er/WHDreiy3EmbD9YwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAVOsG7NRmeIY+8D1jICvPsPUjuDmUBTXrI5UBIXt8n5gd3SELM1xv0prrm/nBI2Pdh7KWd3dSYdPxhCJPuP15seorRoDymvrXDOys91iCnRIN9/YghdSwBAAzo+UV9anf2tWJTLJkyg0REuVN95503SYS6ELDG1c41N1w2q3IaR866d/x5nOZN5tMaPQQVHpmGM+0z11U1n2mswjbkltl59jVWiHFHMbskXdp5vpPhVhfb4ELecBKl5gpZj2VByTTc3y7ZCHxTIyZQuKiHBS1co7ROYwut2qsuDhrW4rf29MAR9jkm1DnCPCr7cURtFr3fFV5zvv37hKBZcX35dgsbA==</ds:X509Certificate>
-                  </ds:X509Data>
-                </ds:KeyInfo>
-              </md:KeyDescriptor>
-              <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://login.codeenigma.net/idp/saml2/idp/SingleLogoutService.php"/>
-              <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
-              <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://login.codeenigma.net/idp/saml2/idp/SSOService.php"/>
-            </md:IDPSSODescriptor>
-            <md:ContactPerson contactType="technical">
-              <md:SurName>Administrator</md:SurName>
-              <md:EmailAddress>sysadm@codeenigma.com</md:EmailAddress>
-            </md:ContactPerson>
-          </md:EntityDescriptor>
+    name: "{{ aws_iam_saml.provider_name }}"
+    saml_metadata_document: "{{ aws_iam_saml.saml_metadata_document }}"
+  when:
+    - aws_iam_saml.saml_metadata_document is defined
+    - aws_iam_saml.saml_metadata_document | length > 40
 
-- name: Get the current caller identity information
+- name: Get the current AWS account caller identity information
   amazon.aws.aws_caller_info:
   register: caller_info
 
@@ -40,3 +17,39 @@
     description: "Administrative access to all systems"
     managed_policy:
       - arn:aws:iam::aws:policy/AdministratorAccess
+  when:
+    - aws_iam_saml.admin_ldap_groups is defined
+    - aws_iam_saml.admin_ldap_groups[0] | length > 0
+
+- name: Create a role for read-only access
+  iam_role:
+    name: "{{ aws_iam_saml.readonly_role }}"
+    assume_role_policy_document: "{{ lookup('template', 'assume_readonly_policy.j2') }}"
+    description: "Read-only access to all systems"
+    managed_policy:
+      - arn:aws:iam::aws:policy/ReadOnlyAccess
+  when:
+    - aws_iam_saml.readonly_ldap_groups is defined
+    - aws_iam_saml.readonly_ldap_groups[0] | length > 0
+
+- name: Create a customer managed policy for billing access
+  community.aws.iam_managed_policy:
+    policy_name: "{{ aws_iam_saml.billing_policy }}"
+    policy_description: "Custom policy for billing access"
+    policy: "{{ lookup('template', 'access_billing_policy.j2') }}"
+    state: present
+  register: billing_policy
+  when:
+    - aws_iam_saml.billing_ldap_groups is defined
+    - aws_iam_saml.billing_ldap_groups[0] | length > 0
+
+- name: Create a role for billing access
+  iam_role:
+    name: "{{ aws_iam_saml.billing_role }}"
+    assume_role_policy_document: "{{ lookup('template', 'assume_billing_policy.j2') }}"
+    description: "Billing access only"
+    managed_policy:
+      - "{{ billing_policy.policy.arn }}"
+  when:
+    - billing_policy.policy is defined
+    - billing_policy.policy.arn | length > 1
