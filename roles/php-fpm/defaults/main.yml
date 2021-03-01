@@ -24,3 +24,10 @@ php:
     date_timezone: "Europe/London"
     pool_user: "{{ user_deploy.username }}"
     pool_group: "{{ user_deploy.username }}"
+    default_socket_timeout: 60
+    max_children: 5
+    start_servers: 2
+    min_spare_servers: 1
+    max_spare_servers: 3
+    process_idle_timeout: 10s
+    max_requests: 500
