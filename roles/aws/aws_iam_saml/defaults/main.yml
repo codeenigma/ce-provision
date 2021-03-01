@@ -15,3 +15,4 @@ aws_iam_saml:
   saml_repository_branch: "master"
   saml_include_path: ""
   saml_sp_path: ""
+  saml_sp_certificate: ""

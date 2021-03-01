@@ -30,25 +30,7 @@ $metadata['urn:amazon:{{ caller_info.account }}'] = array (
       'encryption' => false,
       'signing' => true,
       'type' => 'X509Certificate',
-      'X509Certificate' => 'MIIDbTCCAlWgAwIBAgIELHF25zANBgkqhkiG9w0BAQsFADBnMR8wHQYDVQQDExZ1
-  cm46YW1hem9uOndlYnNlcnZpY2VzMSIwIAYDVQQKExlBbWF6b24gV2ViIFNlcnZp
-  Y2VzLCBJbmMuMRMwEQYDVQQIEwpXYXNoaW5ndG9uMQswCQYDVQQGEwJVUzAeFw0x
-  ODA1MjUwMDAwMDBaFw0xOTA1MjUwMDAwMDBaMGcxHzAdBgNVBAMTFnVybjphbWF6
-  b246d2Vic2VydmljZXMxIjAgBgNVBAoTGUFtYXpvbiBXZWIgU2VydmljZXMsIElu
-  Yy4xEzARBgNVBAgTCldhc2hpbmd0b24xCzAJBgNVBAYTAlVTMIIBIjANBgkqhkiG
-  9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnPfBStchvxtbQZYNd9p9U8Il9eb2MsR8+e64
-  aPTMPLIGqu4lJt7yM0+IYa0jnJg6rNKqWTzrGQDEuKDPki5tsohLS2qgK/+WfKtl
-  CHwRbKnYQUa3jxIVGudpngSPFNr/EtcMa7iAeQPStDcLs/dX5UM/AdgKVkoJYHTG
-  Ard68CtCxocrk0jGD1SHIKw/FUntt82LRFbRO+MLZOni2qWPgKwsjlIZh5UgB4rP
-  Br+Yf3W/8nnbxyUUDt/rGtocb6D56DB7g7//YoyVjqcdByPlO63xAx+fAKQJZnbe
-  A/gXTEVvMg8UfRS3ByIQPEOEPdCDvDRmkkbdvGPXmNHdfd2YSwIDAQABoyEwHzAd
-  BgNVHQ4EFgQUrKNqcBKQB5JM5Ziy2UvfS7MirXowDQYJKoZIhvcNAQELBQADggEB
-  AGlYWVgox7zHZYbzlA4+MD0H9ofpEI4PLpacIqBrDMgMLuA6pq/e1RT/FnqTXKu+
-  8uBFXENMottyzzBoPegMpw4LCd0v35vQC/VDBFsf/H5Elug7uCyyf89EqV5q2FTs
-  KtUbgfUQsq1XJGZzRMEVXpdwe7b8b7ypZEP+4si2YIh76eWfhmcWQiFanqmOKrDV
-  PcPQt209sShTXXiY6Vw7/EEvo+G+y5t8RmXtAtd5PFfGLb1Ip22IQkia2bQHFJ5j
-  DWlWGuiaRDvVyG5lCvrDPieuiUCItdGK7z3afRsXFPke6NvLAjsZa2ChgCUPoHnv
-  lz6POXTmmTKL5O/znLo6wBw=',
+      'X509Certificate' => '{{ aws_iam_saml.saml_sp_certificate }}',
     ),
   ),
   'saml20.sign.assertion' => true,
