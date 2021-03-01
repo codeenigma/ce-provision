@@ -10,3 +10,8 @@ aws_iam_saml:
   billing_ldap_groups: []
   saml_metadata_document: ""
   linotp_server: ""
+  saml_repository: ""
+  saml_repository_directory: "simplesamlphp"
+  saml_repository_branch: "master"
+  saml_include_path: ""
+  saml_sp_path: ""
