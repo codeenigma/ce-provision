@@ -86,21 +86,32 @@
     - aws_iam_saml.saml_include_path is defined
     - aws_iam_saml.saml_include_path | length > 0
 
-- name: Add, commit and push the AWS account include
-  local_action:
-    module: command
-    cmd: "{{ item }}"
-    args:
-      chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
+- name: Stage the AWS account include
+  command: git add .
+  args:
+    chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
-  with_items:
-    - git add .
-    - git commit -m "Automated commit - admin access for AWS account {{ caller_info.account }}."
-    - git push origin {{ aws_iam_saml.saml_repository_branch }}
   when:
     - saml_include_template is succeeded
-    - aws_iam_saml.saml_include_path is defined
-    - aws_iam_saml.saml_include_path | length > 0
+
+- name: Try a git commit of the AWS account include
+  command: git commit -m "Automated commit - admin access for AWS account {{ caller_info.account }}."
+  args:
+    chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
+  delegate_to: localhost
+  ignore_errors: yes
+  register: include_commit
+  when:
+    - saml_include_template is succeeded
+
+- name: Push the AWS account include
+  command: git push origin {{ aws_iam_saml.saml_repository_branch }}
+  args:
+    chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
+  delegate_to: localhost
+  when:
+    - include_commit is succeeded
+    - saml_include_template is succeeded
 
 - name: Create a SAML service provider for the AWS account
   template:
@@ -112,18 +123,29 @@
     - aws_iam_saml.saml_sp_path is defined
     - aws_iam_saml.saml_sp_path | length > 0
 
-- name: Add, commit and push the AWS account service provider
-  local_action:
-    module: command
-    cmd: "{{ item }}"
-    args:
-      chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
+- name: Stage the AWS account service provider
+  command: git add .
+  args:
+    chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
-  with_items:
-    - git add .
-    - git commit -m "Automated commit - dedicated SP for AWS account {{ caller_info.account }}."
-    - git push origin {{ aws_iam_saml.saml_repository_branch }}
   when:
     - saml_sp_template is succeeded
-    - aws_iam_saml.saml_sp_path is defined
-    - aws_iam_saml.saml_sp_path | length > 0
+
+- name: Try a git commit of the AWS account service provider
+  command: git commit -m "Automated commit - dedicated SP for AWS account {{ caller_info.account }}."
+  args:
+    chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
+  delegate_to: localhost
+  ignore_errors: yes
+  register: sp_commit
+  when:
+    - saml_sp_template is succeeded
+
+- name: Push the AWS account service provider
+  command: git push origin {{ aws_iam_saml.saml_repository_branch }}
+  args:
+    chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
+  delegate_to: localhost
+  when:
+    - sp_commit is succeeded
+    - saml_sp_template is succeeded
