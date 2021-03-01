@@ -1,0 +1,62 @@
+- name: Create IAM account alias for grouping
+  iam_alias:
+    aws_account_alias: "{{ aws_iam_saml.aws_account_alias }}"
+  when:
+    - aws_iam_saml.aws_account_alias is defined
+    - aws_iam_saml.aws_account_alias | length > 0
+
+- name: Create SAML provider
+  community.aws.iam_saml_federation:
+    name: "{{ aws_iam_saml.provider_name }}"
+    saml_metadata_document: "{{ aws_iam_saml.saml_metadata_document }}"
+  when:
+    - aws_iam_saml.saml_metadata_document is defined
+    - aws_iam_saml.saml_metadata_document | length > 40
+
+- name: Get the current AWS account caller identity information
+  amazon.aws.aws_caller_info:
+  register: caller_info
+
+- name: Create a role for administrative access
+  iam_role:
+    name: "{{ aws_iam_saml.admin_role }}"
+    assume_role_policy_document: "{{ lookup('template', 'assume_admin_policy.j2') }}"
+    description: "Administrative access to all systems"
+    managed_policy:
+      - arn:aws:iam::aws:policy/AdministratorAccess
+  when:
+    - aws_iam_saml.admin_ldap_groups is defined
+    - aws_iam_saml.admin_ldap_groups[0] | length > 0
+
+- name: Create a role for read-only access
+  iam_role:
+    name: "{{ aws_iam_saml.readonly_role }}"
+    assume_role_policy_document: "{{ lookup('template', 'assume_readonly_policy.j2') }}"
+    description: "Read-only access to all systems"
+    managed_policy:
+      - arn:aws:iam::aws:policy/ReadOnlyAccess
+  when:
+    - aws_iam_saml.readonly_ldap_groups is defined
+    - aws_iam_saml.readonly_ldap_groups[0] | length > 0
+
+- name: Create a customer managed policy for billing access
+  community.aws.iam_managed_policy:
+    policy_name: "{{ aws_iam_saml.billing_policy }}"
+    policy_description: "Custom policy for billing access"
+    policy: "{{ lookup('template', 'access_billing_policy.j2') }}"
+    state: present
+  register: billing_policy
+  when:
+    - aws_iam_saml.billing_ldap_groups is defined
+    - aws_iam_saml.billing_ldap_groups[0] | length > 0
+
+- name: Create a role for billing access
+  iam_role:
+    name: "{{ aws_iam_saml.billing_role }}"
+    assume_role_policy_document: "{{ lookup('template', 'assume_billing_policy.j2') }}"
+    description: "Billing access only"
+    managed_policy:
+      - "{{ billing_policy.policy.arn }}"
+  when:
+    - billing_policy.policy is defined
+    - billing_policy.policy.arn | length > 1
