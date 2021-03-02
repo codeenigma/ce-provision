@@ -55,6 +55,7 @@ $metadata['urn:amazon:{{ caller_info.account }}'] = array (
       'groups' => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
     ),
 
+{% if aws_iam_saml.linotp_server is defined %}
     # LinOTP settings
     55 => array(
       'class' => 'linotp2:OTP',
@@ -72,5 +73,6 @@ $metadata['urn:amazon:{{ caller_info.account }}'] = array (
         'mobile' => 'mobilePhone',
       ),
     ),
+{% endif %}
   ),
 );
