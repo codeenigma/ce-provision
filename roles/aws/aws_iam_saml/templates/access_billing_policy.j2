@@ -1,0 +1,19 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "aws-portal:View*",
+        "budgets:View*",
+        "cur:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+      "Action": "aws-portal:*Account",
+      "Effect": "Deny",
+      "Resource": "*"
+    }
+  ]
+}
