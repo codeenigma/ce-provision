@@ -2,12 +2,12 @@ aws_iam_saml:
   aws_account_alias: ""
   provider_name: "SAMLProvider"
   admin_role: "Administrators"
-  admin_ldap_groups: []
+  admin_groups: []
   readonly_role: "ReadOnly"
-  readonly_ldap_groups: []
+  readonly_groups: []
   billing_role: "Billing"
   billing_policy: "BillingPolicy"
-  billing_ldap_groups: []
+  billing_groups: []
   saml_metadata_document: ""
   linotp_server: ""
   saml_repository: ""

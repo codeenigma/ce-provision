@@ -29,8 +29,8 @@
       - arn:aws:iam::aws:policy/AdministratorAccess
   delegate_to: localhost
   when:
-    - aws_iam_saml.admin_ldap_groups is defined
-    - aws_iam_saml.admin_ldap_groups[0] | length > 0
+    - aws_iam_saml.admin_groups is defined
+    - aws_iam_saml.admin_groups[0] | length > 0
 
 - name: Create a role for read-only access
   iam_role:
@@ -41,8 +41,8 @@
       - arn:aws:iam::aws:policy/ReadOnlyAccess
   delegate_to: localhost
   when:
-    - aws_iam_saml.readonly_ldap_groups is defined
-    - aws_iam_saml.readonly_ldap_groups[0] | length > 0
+    - aws_iam_saml.readonly_groups is defined
+    - aws_iam_saml.readonly_groups[0] | length > 0
 
 - name: Create a customer managed policy for billing access
   community.aws.iam_managed_policy:
@@ -53,8 +53,8 @@
   delegate_to: localhost
   register: billing_policy
   when:
-    - aws_iam_saml.billing_ldap_groups is defined
-    - aws_iam_saml.billing_ldap_groups[0] | length > 0
+    - aws_iam_saml.billing_groups is defined
+    - aws_iam_saml.billing_groups[0] | length > 0
 
 - name: Create a role for billing access
   iam_role:
