@@ -12,9 +12,9 @@
           "SAML:aud": "https://signin.aws.amazon.com/saml"
         },
         "ForAnyValue:StringLike": {
-          "saml:edupersonaffiliation": [{% for group in aws_iam_saml.billing_ldap_groups[:-1] %}
+          "saml:edupersonaffiliation": [{% for group in aws_iam_saml.billing_groups[:-1] %}
             "{{ group }}",{% endfor %}
-            "{{ aws_iam_saml.billing_ldap_groups|last }}"
+            "{{ aws_iam_saml.billing_groups|last }}"
           ]
         }
       }
