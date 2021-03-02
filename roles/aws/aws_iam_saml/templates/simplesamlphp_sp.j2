@@ -1,0 +1,76 @@
+<?php
+##########################################
+# AWS SP FOR {{ caller_info.account }}
+##########################################
+$metadata['urn:amazon:{{ caller_info.account }}'] = array (
+  'entityid' => 'urn:amazon:{{ caller_info.account }}',
+  'description' => array (),
+  'name' => array (
+    'en' => 'AWS Console Access',
+  ),
+  'contacts' => array (),
+  'metadata-set' => 'saml20-sp-remote',
+  'AssertionConsumerService' => array (
+    0 => array (
+      'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+      'Location' => 'https://signin.aws.amazon.com/saml',
+      'index' => 1,
+      'isDefault' => true,
+    ),
+  ),
+  'SingleLogoutService' => array (),
+  'NameIDFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+  'attributes' => array (
+    'https://aws.amazon.com/SAML/Attributes/Role',
+    'https://aws.amazon.com/SAML/Attributes/RoleSessionName',
+    'eduPersonAffiliation' => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
+  ),
+  'keys' => array (
+    0 => array (
+      'encryption' => false,
+      'signing' => true,
+      'type' => 'X509Certificate',
+      'X509Certificate' => '{{ aws_iam_saml.saml_sp_certificate }}',
+    ),
+  ),
+  'saml20.sign.assertion' => true,
+  'authproc' => array(
+    # AWS settings
+    10 => array(
+      'class' => 'core:AttributeAdd',
+      'https://aws.amazon.com/SAML/Attributes/Role' => array(
+        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.admin_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.readonly_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.billing_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+      ),
+    ),
+
+    20 => array(
+      'class' => 'core:AttributeCopy',
+      'uid' => 'https://aws.amazon.com/SAML/Attributes/RoleSessionName',
+    ),
+
+    30 => array(
+      'class' => 'core:AttributeCopy',
+      'groups' => 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
+    ),
+
+    # LinOTP settings
+    55 => array(
+      'class' => 'linotp2:OTP',
+      'linotpserver' => '{{ aws_iam_saml.linotp_server }}',
+      'linotpuidattribute' => 'https://aws.amazon.com/SAML/Attributes/RoleSessionName',
+      'sslverifyhost' => True,
+      'sslverifypeer' => True,
+      'realm' => '',
+      'attributemap' => array(
+        'username' => 'samlLoginName',
+        'surname' => 'surName',
+        'givenname' => 'givenName',
+        'email' => 'emailAddress',
+        'phone' => 'telePhone',
+        'mobile' => 'mobilePhone',
+      ),
+    ),
+  ),
+);
