@@ -23,6 +23,7 @@
      - [ce-provision](/roles/ce_provision)
      - [ClamAV Clamscan](/roles/clamav_clamscan)
      - [ClamAV Daemon](/roles/clamav_daemon)
+     - [Drush](/roles/drush)
      - [UFW Firewall](/roles/firewall)
      - [Frontail](/roles/frontail)
      - [Gitlab](/roles/gitlab)
