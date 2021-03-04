@@ -1,0 +1,33 @@
+---
+- name: Define Drush path.
+  set_fact:
+    drush_bin: "{{ drush_bin | default('/home/{{ drush_user }}/.bin/drush.phar') }}"
+
+- name: Check if we already have a global Drush.
+  stat:
+    path: "{{ drush_bin }}"
+  register: drush_global
+
+- name: Ensure bin directory exists.
+  file:
+    path: "{{ drush_bin | dirname }}"
+    state: directory
+
+- name: Check if installed Drush version match.
+  shell: "{{ drush_bin }} --version | grep -o '[0-9]\\.[0-9]\\.[0-9]'"
+  register: drush_global_version
+  when:
+    - drush_global.stat.exists
+
+- name: Download Drush installer.
+  get_url:
+    url: "https://github.com/drush-ops/drush/releases/download/{{ drush.version }}/drush.phar"
+    dest: "{{ drush_bin }}"
+    mode: 0755
+  when:
+    - not drush_global.stat.exists or not drush_global_version.stdout == drush.version
+
+- name: Trigger Drush init tasks.
+  command: "{{ drush_bin }} init -y"
+  when:
+    - not drush_global.stat.exists or not drush_global_version.stdout == drush.version

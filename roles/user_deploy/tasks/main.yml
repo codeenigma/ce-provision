@@ -3,3 +3,12 @@
     name: user_ansible
   vars:
     user_ansible: "{{ user_deploy }}"
+
+- include_role:
+    name: drush
+  vars:
+    drush_user: "{{ user_deploy }}"
+    version: "{{ drush_version }}"
+  when:
+    - install_drush is defined
+    - install_drush

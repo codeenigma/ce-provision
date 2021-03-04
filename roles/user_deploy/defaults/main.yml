@@ -9,3 +9,6 @@ user_deploy:
   # List of additional groups to add the user to.
   groups: []
   keys: []
+  # This determines if Drush should be installed during provisioning. Mainly used when servers run Drupal 7 sites.
+  install_drush: false
+  drush_version: 8.4.5
