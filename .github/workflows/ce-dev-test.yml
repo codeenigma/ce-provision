@@ -50,6 +50,13 @@ jobs:
         shell: bash
 
       - name: Documentation (push)
-        if: ${{ contains(github.ref, '1.x') }}
-        run: 'echo "On the release branch, we will build docs!"'
+        if: github.event.pull_request.base.ref == '1.x'
+        run: |
+          cd
+          git clone https://github.com/codeenigma/wikis2pages.git
+          cd wikis2pages
+          /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
+          /bin/sh set-current.sh ce-provision-1.x-travis
+          docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
+          /bin/sh .travis-push.sh
         shell: bash
