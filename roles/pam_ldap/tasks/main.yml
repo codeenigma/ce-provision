@@ -74,17 +74,47 @@
     mode: 0555
     owner: root
 
-- name: Configure SSH pub key command.
+- name: Create LDAP key script passwd file.
+  template:
+    src: ldap-bindpw.j2
+    dest: /etc/ldap/ldap-bindpw
+    mode: "0600"
+    owner: root
+  when:
+    - ldap_client.binddn is defined and ldap_client.binddn
+    - ldap_client.bindpw is defined and ldap_client.bindpw
+  
+- name: Create wrapper script for LDAP key script.
+  template:
+    src: ssh-getkey-ldap-wrapper.sh.j2
+    dest: /opt/bin/ssh-getkey-ldap-wrapper.sh
+    mode: "0555"
+    owner: root
+  when:
+    - ldap_client.binddn is defined and ldap_client.binddn
+    - ldap_client.bindpw is defined and ldap_client.bindpw
+
+- name: Configure SSH pub key command if there is a binddn set.
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "AuthorizedKeysCommand "
+    line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap-wrapper.sh
+  when:
+    - ldap_client.binddn is defined and ldap_client.binddn
+
+- name: Configure SSH pub key command if no binddn set.
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommand "
     line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap
+  when:
+    - not ldap_client.binddn
 
 - name: Configure SSH pub key command user.
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommandUser "
-    line: AuthorizedKeysCommandUser nobody
+    line: AuthorizedKeysCommandUser root
 
 - name: Restart nslcd service.
   service:
