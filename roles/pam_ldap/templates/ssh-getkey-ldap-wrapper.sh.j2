@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# This script wraps the script stored here:
+# - https://github.com/codeenigma/ssh-getkey-ldap
+#
+# The reason for the wrapper is AuthorizedKeysCommand in sshd config will only pass a username
+# yet if you need to provide a bind DN the script needs to accept at least two arguments,
+# probably three if you have a bind password too. This script passes in the bind DN and
+# password to ssh-getkey-ldap leaving sshd conf to pass the authenticating user only.
+
+log() {
+	logger -s -t sshd -p "auth.$1" "$2"
+}
+
+# Catch and error if no username provided
+if [ $# -eq 0 ]; then
+	usage
+	exit 1
+fi
+
+uid="$1"
+# Catch and error if invalid username provided
+if ! expr "$uid" : '[a-zA-Z0-9._-]*$' 1>/dev/null; then
+	log err "bad characters in username: $uid"
+	exit 2
+fi
+
+# Call main script
+/bin/sh /opt/bin/ssh-getkey-ldap {{ ldap_client.binddn }} /etc/ldap/ldap-bindpw $uid
