@@ -26,4 +26,4 @@ if ! expr "$uid" : '[a-zA-Z0-9._-]*$' 1>/dev/null; then
 fi
 
 # Call main script
-/bin/sh /opt/bin/ssh-getkey-ldap {{ ldap_client.binddn }} /etc/ldap/ldap-bindpw $uid
+/bin/sh /opt/bin/ssh-getkey-ldap $uid {{ ldap_client.binddn }} {% if ldap_client.bindpw is defined and ldap_client.bindpw %}/etc/ldap/ldap-bindpw{% endif %}
