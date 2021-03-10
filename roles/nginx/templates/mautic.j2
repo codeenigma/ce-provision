@@ -66,7 +66,7 @@ location ~ ^/(index_dev|upgrade)\.php$ {
 {% endif %}
 
 # Core and contrib assets can be pretty much anywhere.
-location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot)$ {
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf)$ {
     try_files $uri @rewrite;
 }
 
