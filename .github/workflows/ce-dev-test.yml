@@ -58,5 +58,7 @@ jobs:
           /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
           /bin/sh set-current.sh ce-provision-1.x-travis
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
+          git config user.name "ce-jenkins"
+          git config user.email "sysadm@codeenigma.com"
           /bin/sh .travis-push.sh
         shell: bash
