@@ -64,9 +64,9 @@ jobs:
           /bin/sh set-current.sh ce-provision-1.x-travis
           echo "=========> set-current.sh ran"
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
-          "=========> docker exec ran"
-          git config user.name "ce-jenkins"
-          git config user.email "sysadm@codeenigma.com"
-          "=========> Git configured"
+          echo "=========> docker exec ran"
+          # git config user.name "ce-jenkins"
+          # git config user.email "sysadm@codeenigma.com"
+          # echo "=========> Git configured"
           /bin/sh .travis-push.sh
         shell: bash
