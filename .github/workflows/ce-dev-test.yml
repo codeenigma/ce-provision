@@ -17,15 +17,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Runs the ansible-lint action (Super-Linter is too heavy)
-      - name: Lint Ansible playbooks
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ansible-lint
-          find ./ -name "*.yml"  | xargs ansible-lint
-
+      # Installs the ce-dev stack
       - name: Install ce-dev
-        if: ${{ always() }}
         run: |
           wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
@@ -35,27 +28,29 @@ jobs:
           sudo mv ./mkcert /usr/local/bin && cd ../
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
-          
+
+      # Configures global Git variables for committing
       - name: Configure Git
-        if: ${{ always() }}
         run: |
           git config --global user.email "sysadm@codeenigma.com"
           git config --global user.name "Code Enigma CI"
 
+      # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
-        if: ${{ always() }}
         run: |
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
           /bin/bash ce-dev/ansible/examples/test.sh
         shell: bash
 
+      # Builds the table of contents for the docs
       - name: Documentation (build table of contents)
-        if: ${{ always() }}
+        if: ${{ github.event.pull_request.base.ref == '1.x' }}
         run: contribute/toc.sh
         shell: bash
 
+      # Uses the ce-dev stack to run Hugo to build and deploy the docs
       - name: Documentation (build and publish)
-        if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
+        if: ${{ github.event.pull_request.base.ref == '1.x' }}
         run: |
           cd
           git clone https://github.com/codeenigma/wikis2pages.git
@@ -68,3 +63,11 @@ jobs:
           git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
           git push ci master
         shell: bash
+
+      # Runs the ansible-lint action (Super-Linter is too heavy)
+      - name: Lint Ansible playbooks
+        if: ${{ always() }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible-lint
+          find ./ -name "*.yml"  | xargs ansible-lint
