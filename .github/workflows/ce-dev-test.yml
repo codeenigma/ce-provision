@@ -69,6 +69,9 @@ jobs:
           /bin/sh set-current.sh ce-provision-1.x-travis
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
           /bin/sh .github-actions-push.sh
+          cd /home/runner/wikis2pages/public/ce-provision-1.x-travis
+          git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
+          git push ci master
         shell: bash
 
       #- name: Documentation (push)
