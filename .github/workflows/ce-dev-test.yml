@@ -1,4 +1,4 @@
-name: Run tests
+name: Run tests and build docs
 
 # Run this workflow every time a new commit pushed to your repository
 on: pull_request
@@ -18,11 +18,11 @@ jobs:
         uses: actions/checkout@v2
 
       # Runs the ansible-lint action (Super-Linter is too heavy)
-      #- name: Lint Ansible playbooks
-      #  run: |
-      #    sudo apt-get update
-      #    sudo apt-get install -y ansible-lint
-      #    find ./ -name "*.yml"  | xargs ansible-lint
+      - name: Lint Ansible playbooks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible-lint
+          find ./ -name "*.yml"  | xargs ansible-lint
 
       - name: Install ce-dev
         if: ${{ always() }}
@@ -42,24 +42,19 @@ jobs:
           git config --global user.email "sysadm@codeenigma.com"
           git config --global user.name "Code Enigma CI"
 
-      - name: Documentation (build for check)
+      - name: Run a test provision
+        if: ${{ always() }}
+        run: |
+          git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
+          /bin/bash ce-dev/ansible/examples/test.sh
+        shell: bash
+
+      - name: Documentation (build table of contents)
         if: ${{ always() }}
         run: contribute/toc.sh
         shell: bash
 
-      #- name: Documentation (check)
-      #  if: ${{ always() }}
-      #  run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
-      #  shell: bash
-
-      #- name: Run a test provision
-      #  if: ${{ always() }}
-      #  run: |
-      #    git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-      #    /bin/bash ce-dev/ansible/examples/test.sh
-      #  shell: bash
-
-      - name: Documentation (build for publish)
+      - name: Documentation (build and publish)
         if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
         run: |
           cd
@@ -73,14 +68,3 @@ jobs:
           git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
           git push ci master
         shell: bash
-
-      #- name: Documentation (push)
-      #  uses: cpina/github-action-push-to-another-repository@master
-      #  if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
-      #  env:
-      #    API_TOKEN_GITHUB: ${{ secrets.DOCS_GITHUB_TOKEN }}
-      #  with:
-      #    source-directory: '/home/runner/wikis2pages/public/ce-provision-1.x-travis'
-      #    destination-github-username: 'ce-jenkins'
-      #    destination-repository-name: 'ce-provision-docs'
-      #    user-email: sysadm@codeenigma.com
