@@ -36,7 +36,7 @@ jobs:
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
 
-      - name: Documentation (build)
+      - name: Documentation (build for check)
         if: ${{ always() }}
         run: contribute/toc.sh
         shell: bash
@@ -53,7 +53,7 @@ jobs:
       #    /bin/bash ce-dev/ansible/examples/test.sh
       #  shell: bash
 
-      - name: Documentation (push)
+      - name: Documentation (build for publish)
         if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
         run: |
           cd
@@ -65,8 +65,15 @@ jobs:
           echo "=========> set-current.sh ran"
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
           echo "=========> docker exec ran"
-          # git config user.name "ce-jenkins"
-          # git config user.email "sysadm@codeenigma.com"
-          # echo "=========> Git configured"
-          /bin/sh .travis-push.sh
+          /bin/sh .github-actions-push.sh
         shell: bash
+
+      - name: Documentation (push)
+        uses: cpina/github-action-push-to-another-repository@master
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'output'
+          destination-github-username: 'ce-jenkins'
+          destination-repository-name: 'ce-provision-docs'
+          user-email: sysadm@codeenigma.com
