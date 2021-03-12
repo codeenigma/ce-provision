@@ -83,7 +83,7 @@
   when:
     - ldap_client.binddn is defined and ldap_client.binddn
     - ldap_client.bindpw is defined and ldap_client.bindpw
-  
+
 - name: Create wrapper script for LDAP key script.
   template:
     src: ssh-getkey-ldap-wrapper.sh.j2
