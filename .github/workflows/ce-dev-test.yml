@@ -29,25 +29,25 @@ jobs:
         run: contribute/toc.sh
         shell: bash
 
-      - name: Documentation (check)
-        if: ${{ always() }}
-        run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
-        shell: bash
+      #- name: Documentation (check)
+      #  if: ${{ always() }}
+      #  run: '[ -z "$(git diff)" ] && [ -z "$( git ls-files . --exclude-standard --others)" ]'
+      #  shell: bash
 
-      - name: Run a test
-        if: ${{ always() }}
-        run: |
-          wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
-          sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
-          export PATH=$PATH:/usr/local/go/bin
-          git clone https://github.com/FiloSottile/mkcert && cd mkcert
-          go build -ldflags "-X main.Version=$(git describe --tags)"
-          sudo mv ./mkcert /usr/local/bin && cd ../
-          sudo chmod +x /usr/local/bin/mkcert
-          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
-          git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          /bin/bash ce-dev/ansible/examples/test.sh
-        shell: bash
+      #- name: Run a test
+      #  if: ${{ always() }}
+      #  run: |
+      #    wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
+      #    sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
+      #    export PATH=$PATH:/usr/local/go/bin
+      #    git clone https://github.com/FiloSottile/mkcert && cd mkcert
+      #    go build -ldflags "-X main.Version=$(git describe --tags)"
+      #    sudo mv ./mkcert /usr/local/bin && cd ../
+      #    sudo chmod +x /usr/local/bin/mkcert
+      #    curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+      #    git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
+      #    /bin/bash ce-dev/ansible/examples/test.sh
+      #  shell: bash
 
       - name: Documentation (push)
         if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
@@ -56,9 +56,13 @@ jobs:
           git clone https://github.com/codeenigma/wikis2pages.git
           cd wikis2pages
           /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
+          echo "=========> init.sh ran"
           /bin/sh set-current.sh ce-provision-1.x-travis
+          echo "=========> set-current.sh ran"
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
+          "=========> docker exec ran"
           git config user.name "ce-jenkins"
           git config user.email "sysadm@codeenigma.com"
+          "=========> Git configured"
           /bin/sh .travis-push.sh
         shell: bash
