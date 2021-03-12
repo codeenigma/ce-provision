@@ -50,7 +50,7 @@ jobs:
         shell: bash
 
       - name: Documentation (push)
-        if: github.event.pull_request.base.ref == '1.x'
+        if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
         run: |
           cd
           git clone https://github.com/codeenigma/wikis2pages.git
