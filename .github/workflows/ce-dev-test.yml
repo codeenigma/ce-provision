@@ -35,6 +35,12 @@ jobs:
           sudo mv ./mkcert /usr/local/bin && cd ../
           sudo chmod +x /usr/local/bin/mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+          
+      - name: Configure Git
+        if: ${{ always() }}
+        run: |
+          git config --global user.email "sysadm@codeenigma.com"
+          git config --global user.name "Code Enigma CI"
 
       - name: Documentation (build for check)
         if: ${{ always() }}
@@ -60,21 +66,18 @@ jobs:
           git clone https://github.com/codeenigma/wikis2pages.git
           cd wikis2pages
           /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
-          echo "=========> init.sh ran"
           /bin/sh set-current.sh ce-provision-1.x-travis
-          echo "=========> set-current.sh ran"
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
-          echo "=========> docker exec ran"
           /bin/sh .github-actions-push.sh
         shell: bash
 
-      - name: Documentation (push)
-        uses: cpina/github-action-push-to-another-repository@master
-        if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.DOCS_GITHUB_TOKEN }}
-        with:
-          source-directory: '/home/runner/wikis2pages/public/ce-provision-1.x-travis'
-          destination-github-username: 'ce-jenkins'
-          destination-repository-name: 'ce-provision-docs'
-          user-email: sysadm@codeenigma.com
+      #- name: Documentation (push)
+      #  uses: cpina/github-action-push-to-another-repository@master
+      #  if: ${{ github.event.pull_request.base.ref == '1.x' && always() }}
+      #  env:
+      #    API_TOKEN_GITHUB: ${{ secrets.DOCS_GITHUB_TOKEN }}
+      #  with:
+      #    source-directory: '/home/runner/wikis2pages/public/ce-provision-1.x-travis'
+      #    destination-github-username: 'ce-jenkins'
+      #    destination-repository-name: 'ce-provision-docs'
+      #    user-email: sysadm@codeenigma.com
