@@ -27,6 +27,7 @@ jobs:
           go build -ldflags "-X main.Version=$(git describe --tags)"
           sudo mv ./mkcert /usr/local/bin && cd ../
           sudo chmod +x /usr/local/bin/mkcert
+          rm -Rf mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
 
       # Configures global Git variables for committing
