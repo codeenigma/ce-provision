@@ -124,7 +124,7 @@
       subnets: "{{ _aws_ec2_autoscale_cluster_subnets_names }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
-      encrypt: "{{ aws_ec2_autoscale.cluster.efs_encrypt }}"
+      encrypt: "{{ aws_ec2_autoscale_cluster.efs_encrypt }}"
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
       purge_tags: true
