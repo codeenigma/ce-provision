@@ -85,6 +85,7 @@ aws_iam_saml:
   saml_include_path: "" # Location to save the AWS admin include
   saml_sp_path: "" # Location to save account-specific SP in
   saml_sp_certificate: "" # The value for the X509Certificate
+  saml_sp_certificate: "" # The value for the X509Certificate
 ```
 
 <!--ENDROLEVARS-->

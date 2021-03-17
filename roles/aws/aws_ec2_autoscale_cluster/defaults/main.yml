@@ -20,6 +20,7 @@ aws_ec2_autoscale_cluster:
   ami_owner: self # Default to self-created image.
   root_volume_size: 40
   ebs_optimized: true
+  encrypt_boot: false # Whether to encrypt the EBS volumes or not.
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   min_size: 4
   max_size: 8
@@ -51,6 +52,7 @@ aws_ec2_autoscale_cluster:
     #engine_version: 5.7.9
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.
+    storage_encrypted: false # Whether to encrypt the RDS instance or not.
     master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
     master_user_password: hellothere
     multi_az: true
@@ -63,5 +65,5 @@ aws_ec2_autoscale_cluster:
   ssl_certificate_ARN: ""
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
-  # Wether to create an EFS volume.
-  efs: true
+  efs: true # Whether to create an EFS volume.
+  efs_encrypt: false # Whether to encrypt the EFS volume

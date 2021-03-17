@@ -37,3 +37,4 @@
     tags: "{{ aws_efs.tags }}"
     purge_tags: "{{ aws_efs.purge_tags }}"
     targets: "{{ _aws_efs_targets.values() | list }}"
+    encrypt: "{{ aws_efs.encrypt }}"

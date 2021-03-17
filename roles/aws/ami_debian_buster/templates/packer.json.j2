@@ -13,6 +13,7 @@
       "ssh_username": "admin",
       "ami_name": "{{ ami_debian_buster.ami_name }}",
       "associate_public_ip_address": true,
+      "encrypt_boot": "{{ ami_debian_buster.encrypt_boot }}",
       "source_ami_filter": {
       "filters": {
         "virtualization-type": "hvm",
