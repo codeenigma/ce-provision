@@ -104,6 +104,7 @@
       engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
       allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
       max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
+      storage_encrypted: "{{ aws_ec2_autoscale_cluster.rds.storage_encrypted }}"
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
@@ -123,6 +124,7 @@
       subnets: "{{ _aws_ec2_autoscale_cluster_subnets_names }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      encrypt: "{{ aws_ec2_autoscale.cluster.efs_encrypt }}"
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
       purge_tags: true
@@ -139,6 +141,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+      encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       operation: create
 
