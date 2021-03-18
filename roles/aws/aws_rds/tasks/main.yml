@@ -43,7 +43,7 @@
     profile: "{{ aws_rds.aws_profile }}"
     tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
     allow_major_version_upgrade: false
-    #storage_encrypted: undefined # not required. Whether the DB instance is encrypted.
+    storage_encrypted: "{{ aws_rds.storage_encrypted }}"
     apply_immediately: true
     wait: true
     region: "{{ aws_rds.region }}"

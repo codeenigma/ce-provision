@@ -21,6 +21,8 @@ aws_efs:
   subnets: []
   # SG names. Note, the assumption is that all subnets have the same SGs.
   security_groups: []
+  # Whether to encrypt the volume or not.
+  encrypt: false
 
 ```
 
