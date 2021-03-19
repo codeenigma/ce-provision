@@ -25,10 +25,12 @@ jobs:
           sudo apt-get install -y ansible-lint yamllint shellcheck
           find ./roles -name "*.yml"  | xargs ansible-lint
           yamllint ./roles
-          shellcheck ./scripts/*.sh
+          cd scripts && shellcheck *.sh
+
       # Installs the ce-dev stack
       - name: Install ce-dev
         run: |
+          cd /tmp
           wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
           export PATH=$PATH:/usr/local/go/bin
