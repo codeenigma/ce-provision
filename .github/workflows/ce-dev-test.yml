@@ -17,9 +17,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Linter checks.
+      - name: Run linters.
+        if: ${{ always() }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible-lint yamllint shellcheck
+          find ./roles -name "*.yml"  | xargs ansible-lint
+          yamllint ./roles
+          cd scripts && shellcheck *.sh
+
       # Installs the ce-dev stack
       - name: Install ce-dev
         run: |
+          cd /tmp
           wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
           export PATH=$PATH:/usr/local/go/bin
@@ -64,11 +75,3 @@ jobs:
           git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
           git push ci master
         shell: bash
-
-      # Runs the ansible-lint action (Super-Linter is too heavy)
-      - name: Lint Ansible playbooks
-        if: ${{ always() }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ansible-lint
-          find ./ -name "*.yml"  | xargs ansible-lint
