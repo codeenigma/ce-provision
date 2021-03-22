@@ -204,36 +204,12 @@
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     health_check_type: "ELB"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: false
-    wait_for_instances: false
-    termination_policies:
-      - OldestLaunchConfiguration
-      - OldestInstance
-    wait_timeout: 3000
-    desired_capacity: "{{ aws_ec2_autoscale_cluster.max_size }}"
-    min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
-    tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
-    vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
-    target_group_arns:
-      - "{{ _aws_ec2_target_group_created.target_group_arn }}"
-  register: _aws_ec2_asg_created
-
-- name: Create Autoscale group and replace instances.
-  community.aws.ec2_asg:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ aws_ec2_autoscale_cluster.name }}"
-    state: "{{ aws_ec2_autoscale_cluster.state }}"
-    launch_config_name: "{{ _aws_ec2_lc_created.name }}"
-    health_check_type: "ELB"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
     wait_for_instances: true
     termination_policies:
       - OldestLaunchConfiguration
       - OldestInstance
     wait_timeout: 3000
-    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
