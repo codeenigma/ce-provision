@@ -206,10 +206,12 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
     wait_for_instances: true
+    termination_policies:
+      - OldestLaunchConfiguration
+      - OldestInstance
     wait_timeout: 3000
-    replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
+    desired_capacity: "{{ aws_ec2_autoscale_cluster.max_size }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
     vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
