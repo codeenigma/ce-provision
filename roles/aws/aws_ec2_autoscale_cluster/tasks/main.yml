@@ -186,7 +186,7 @@
   register: aws_ec2_autoscale_cluster_running_instances
 
 - name: Create a Target group for port 80
-  elb_target_group:
+  community.aws.elb_target_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
@@ -203,6 +203,7 @@
     health_check_timeout: "{{ aws_ec2_autoscale_cluster.health_check_timeout }}"
     healthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_healthy_count }}"
     unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
+    modify_targets: false
   register: _aws_ec2_target_group_created
 
 - name: Gather running instances information.
