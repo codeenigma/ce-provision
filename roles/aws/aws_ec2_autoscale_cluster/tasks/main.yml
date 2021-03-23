@@ -205,7 +205,7 @@
     health_check_type: "ELB"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: false
-    wait_for_instances: true
+    wait_for_instances: false
     termination_policies:
       - OldestLaunchConfiguration
       - OldestInstance
