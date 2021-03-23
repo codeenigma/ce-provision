@@ -219,7 +219,7 @@
   register: _aws_ec2_asg_created
 
 - name: Start a refresh and pass preferences
-  community.aws.ec2_asg_instance_refresh:
+  ec2_asg_instance_refresh:
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: started
     preferences:
