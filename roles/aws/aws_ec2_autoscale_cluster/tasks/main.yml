@@ -202,7 +202,7 @@
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
-    # health_check_type: "ELB"
+    health_check_type: "ELB"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
     wait_for_instances: false
