@@ -215,6 +215,7 @@
   register: aws_ec2_autoscale_cluster_running_instances
 
 # First pass, create 2x the desired capacity.
+# Note: we always assume desired capacity === min capacity.
 - name: Create Autoscale group and spin up new instances.
   community.aws.ec2_asg:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -241,7 +242,7 @@
   register: _aws_ec2_asg_created
 
 # Now reduce back to the desired number of instances.
-# That is only needed for groups with no scale down policies,
+# That is only needed for groups with no scale-down policies,
 # but we still don't have that in place.
 - name: Scale down instances.
   community.aws.ec2_asg:
@@ -253,7 +254,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: false
     wait_for_instances: false
-    desired_capacity: "{{ aws_ec2_autoscale_cluster_running_instances | length }}"
+    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
     lc_check: false
     replace_batch_size: 1
     termination_policies:
