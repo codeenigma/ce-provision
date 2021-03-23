@@ -223,7 +223,7 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     health_check_type: "ELB"
-    health_check_period: 600
+    health_check_period: 1200
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: false
     wait_for_instances: true
@@ -252,7 +252,7 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
     health_check_type: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}ELB{% else %}EC2{% endif %}"
-    health_check_period: 300
+    health_check_period: 1200
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: false
     wait_for_instances: false
