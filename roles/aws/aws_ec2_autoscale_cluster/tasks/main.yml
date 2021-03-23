@@ -226,14 +226,11 @@
     health_check_type: "ELB"
     health_check_period: 1200
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: false
+    replace_all_instances: true
     wait_for_instances: true
     desired_capacity: "{{ [ aws_ec2_autoscale_cluster.min_size * 2, aws_ec2_autoscale_cluster_running_instances.instances | length * 2 ] | max }}"
-    lc_check: false
-    replace_batch_size: 1
-    termination_policies:
-      - OldestLaunchConfiguration
-      - OldestInstance
+    lc_check: true
+    replace_batch_size: "{{ [ aws_ec2_autoscale_cluster.min_size * 2, aws_ec2_autoscale_cluster_running_instances.instances | length * 2 ] | max }}"
     wait_timeout: 3000
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size * 2 }}"
@@ -252,20 +249,17 @@
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
-    health_check_type: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}ELB{% else %}EC2{% endif %}"
+    health_check_type: "ELB"
     health_check_period: 1200
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: false
-    wait_for_instances: false
+    replace_all_instances: true
+    wait_for_instances: true
     desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    lc_check: false
-    replace_batch_size: 1
-    termination_policies:
-      - OldestLaunchConfiguration
-      - OldestInstance
+    lc_check: true
+    replace_batch_size: "{{ [ aws_ec2_autoscale_cluster.min_size * 2, aws_ec2_autoscale_cluster_running_instances.instances | length * 2 ] | max }}"
     wait_timeout: 3000
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
+    max_size: "{{ aws_ec2_autoscale_cluster.max_size * 2 }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
     vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     target_group_arns:
