@@ -226,7 +226,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: false
     wait_for_instances: true
-    desired_capacity: "{{ [ aws_ec2_autoscale_cluster.min_size * 2, aws_ec2_autoscale_cluster_running_instances | length * 2 ] | max }}"
+    desired_capacity: "{{ [ aws_ec2_autoscale_cluster.min_size * 2, aws_ec2_autoscale_cluster_running_instances.instances | length * 2 ] | max }}"
     lc_check: false
     replace_batch_size: 1
     termination_policies:
