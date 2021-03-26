@@ -5,6 +5,7 @@
   - [Roles](roles)
      - [Ansible](/roles/ansible)
      - [Extra packages](/roles/apt_extra_packages)
+     - [AWS Cloudwatch agent](/roles/aws_cloudwatch_agent)
      - [AWS tools roles](/roles/aws)
        - [AMI Debian Buster](/roles/aws/ami_debian_buster)
        - [Amazon credentials](/roles/aws/aws_credentials)
