@@ -19,12 +19,12 @@
     owner: cwagent
     group: cwagent
   when:
-    - aws_cloudwatch_agent.use_credentials == true
+    - aws_cloudwatch_agent.use_credentials
 
 - name: Generate AWS credentials
   template:
     src: credentials.j2
-    dest: /home/cwagent/.aws/credentials == true
+    dest: /home/cwagent/.aws/credentials
     owner: cwagent
     group: cwagent
   when:
