@@ -7,6 +7,7 @@
     managed_policies: "{{ aws_iam_role.managed_policies }}"
     purge_policies: true
     tags: "{{ aws_iam_role.tags }}"
+    create_instance_profile: "{% if aws_iam_role.policy_document == 'ec2' %}true{% else %}false{% endif %}"
   register: _aws_iam_role_result
 
 - name: Register aws_iam_role results.
