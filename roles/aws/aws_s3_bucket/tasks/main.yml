@@ -22,5 +22,6 @@
     state: present
   register: _aws_s3_bucket_bucket_policy
 
-- set_fact:
+- name: Register aws_s3_bucket results.
+  set_fact:
     aws_s3_bucket: "{{ aws_s3_bucket | combine( { '_result': { 'bucket':  _aws_s3_bucket_bucket, 'policy': _aws_s3_bucket_bucket_policy } } ) }}"
