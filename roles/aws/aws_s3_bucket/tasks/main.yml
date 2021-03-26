@@ -1,4 +1,4 @@
-- name: Create an S3 bucket to hold codebase.
+- name: Create an S3 bucket.
   amazon.aws.s3_bucket:
     profile: "{{ aws_s3_bucket.aws_profile }}"
     region: "{{ aws_s3_bucket.region }}"
