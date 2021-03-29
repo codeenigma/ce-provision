@@ -15,6 +15,8 @@ aws_ec2_with_eip:
   ami_name: "{{ domain_name }}" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   vpc_subnet_id: subnet-xxx
+  # An IAM Role name to associate with the instance.
+  iam_role_name: "example"
   state: present
   instance_name: "{{ domain_name }}"
   root_volume_size: 80
