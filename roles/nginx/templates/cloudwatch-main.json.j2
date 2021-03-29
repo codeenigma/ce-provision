@@ -6,12 +6,20 @@
           {
             "file_path": "/var/log/nginx/access.log",
             "log_group_name": "nginx-access",
+            {% if aws_resource_name is defined and aws_resource_name|length %}
+						"log_stream_name": "{{ aws_resource_name }} {instance_id}"
+            {% else %}
             "log_stream_name": "{instance_id}"
+            {% endif %}
           },
           {
             "file_path": "/var/log/nginx/error.log",
             "log_group_name": "nginx-error",
+            {% if aws_resource_name is defined and aws_resource_name|length %}
+						"log_stream_name": "{{ aws_resource_name }} {instance_id}"
+            {% else %}
             "log_stream_name": "{instance_id}"
+            {% endif %}
           }
         ]
       }
