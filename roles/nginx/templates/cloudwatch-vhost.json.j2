@@ -6,20 +6,12 @@
           {
             "file_path": "{{ domain.access_log }}",
             "log_group_name": "nginx-access",
-            {% if aws_resource_name is defined and aws_resource_name|length %}
-						"log_stream_name": "{{ aws_resource_name }} {{ domain.server_name }} {instance_id}"
-            {% else %}
-            "log_stream_name": "{{ domain.server_name }} {instance_id}"
-            {% endif %}
+            "log_stream_name": "{{ domain.log_stream_name }}"
           },
           {
             "file_path": "{{ domain.error_log }}",
             "log_group_name": "nginx-error",
-            {% if aws_resource_name is defined and aws_resource_name|length %}
-						"log_stream_name": "{{ aws_resource_name }} {{ domain.server_name }} {instance_id}"
-            {% else %}
-            "log_stream_name": "{{ domain.server_name }} {instance_id}"
-            {% endif %}
+            "log_stream_name": "{{ domain.log_stream_name }}"
           }
         ]
       }

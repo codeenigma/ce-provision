@@ -13,6 +13,8 @@ nginx:
     server_names_hash_bucket_size: 256
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
+  # Main log stream for nginx (Cloudwatch).
+  log_stream_name: example
   # We can only have one backend, due to the way we use "common" templates.
   # Moving this per domain means instead having templates per project type.
   php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.','') }}"
@@ -25,6 +27,8 @@ nginx:
       access_log: "/var/log/nginx/access.log"
       error_log: "/var/log/nginx/error.log"
       error_log_level: "notice"
+      # Server specific log stream (Cloudwatch),
+      log_stream_name: example
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
