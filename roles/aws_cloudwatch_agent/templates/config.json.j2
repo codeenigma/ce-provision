@@ -10,27 +10,47 @@
 					{
 						"file_path": "/var/log/syslog",
 						"log_group_name": "syslog",
-						"log_stream_name": "{instance_id}"
+            {% if aws_cloudwatch_agent.name is defined and aws_cloudwatch_agent.name|length %}
+						"log_stream_name": "{{ aws_cloudwatch_agent.name }} {instance_id}"
+            {% else %}
+            "log_stream_name": "{instance_id}"
+            {% endif %}
 					},
 					{
 						"file_path": "/var/log/auth.log",
 						"log_group_name": "auth",
-						"log_stream_name": "{instance_id}"
+            {% if aws_cloudwatch_agent.name is defined and aws_cloudwatch_agent.name|length %}
+						"log_stream_name": "{{ aws_cloudwatch_agent.name }} {instance_id}"
+            {% else %}
+            "log_stream_name": "{instance_id}"
+            {% endif %}
 					},
 					{
 						"file_path": "/var/log/daemon.log",
 						"log_group_name": "daemon",
-						"log_stream_name": "{instance_id}"
+            {% if aws_cloudwatch_agent.name is defined and aws_cloudwatch_agent.name|length %}
+						"log_stream_name": "{{ aws_cloudwatch_agent.name }} {instance_id}"
+            {% else %}
+            "log_stream_name": "{instance_id}"
+            {% endif %}
 					},
 					{
 						"file_path": "/var/log/messages",
 						"log_group_name": "messages",
-						"log_stream_name": "{instance_id}"
+            {% if aws_cloudwatch_agent.name is defined and aws_cloudwatch_agent.name|length %}
+						"log_stream_name": "{{ aws_cloudwatch_agent.name }} {instance_id}"
+            {% else %}
+            "log_stream_name": "{instance_id}"
+            {% endif %}
 					},
 					{
 						"file_path": "/var/log/alternatives.log",
 						"log_group_name": "alternatives",
-						"log_stream_name": "{instance_id}"
+            {% if aws_cloudwatch_agent.name is defined and aws_cloudwatch_agent.name|length %}
+						"log_stream_name": "{{ aws_cloudwatch_agent.name }} {instance_id}"
+            {% else %}
+            "log_stream_name": "{instance_id}"
+            {% endif %}
 					}
 				]
 			}
