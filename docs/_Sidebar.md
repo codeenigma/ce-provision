@@ -13,6 +13,7 @@
        - [AMI Debian Buster](/roles/aws/aws_ec2_with_eip)
        - [EFS client](/roles/aws/aws_efs_client)
        - [AWS EFS](/roles/aws/aws_efs)
+       - [AWS IAM EC2](/roles/aws/aws_iam_role)
        - [AWS IAM SAML](/roles/aws/aws_iam_saml)
        - [AWS key pair.](/roles/aws/aws_provision_ec2_keypair)
        - [AWS RDS](/roles/aws/aws_rds)
