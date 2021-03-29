@@ -1,3 +1,5 @@
+# @todo Do we still need that? Used by AMI and LC,
+# but probably could simply use the base name.
 - name: Define unique name for resources.
   set_fact:
     _aws_ec2_autoscale_cluster_unique_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ ansible_date_time.iso8601_basic_short }}"
@@ -100,6 +102,8 @@
   when:
     - aws_ec2_autoscale_cluster.efs
 
+# @todo We should be able to simply "register" here and
+# get rid of the lookup below?
 - name: Create new AMI.
   include_role:
     name: aws/ami_debian_buster
@@ -152,7 +156,7 @@
   register: _aws_ec2_lc_created
 
 - name: Create a Target group for port 80
-  elb_target_group:
+  community.aws.elb_target_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
@@ -169,43 +173,33 @@
     health_check_timeout: "{{ aws_ec2_autoscale_cluster.health_check_timeout }}"
     healthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_healthy_count }}"
     unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
+    modify_targets: false
   register: _aws_ec2_target_group_created
 
-- name: Create Autoscale group and replace instances.
+- name: Gather running instances information.
+  community.aws.ec2_instance_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
+      instance-state-name: ["running"]
+  register: aws_ec2_autoscale_cluster_running_instances
+
+- name: Create Autoscale group and spin up new instances.
   community.aws.ec2_asg:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
+    health_check_type: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}ELB{% else %}EC2{% endif %}"
+    health_check_period: 1200
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
     wait_for_instances: true
+    lc_check: true
     wait_timeout: 3000
-    replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    max_size: "1000"
-    tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
-    vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
-    target_group_arns:
-      - "{{ _aws_ec2_target_group_created.target_group_arn }}"
-  register: _aws_ec2_asg_created
-
-- name: Redefine Autoscale group.
-  community.aws.ec2_asg:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ aws_ec2_autoscale_cluster.name }}"
-    state: "{{ aws_ec2_autoscale_cluster.state }}"
-    launch_config_name: "{{ _aws_ec2_lc_created.name }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    replace_all_instances: false
-    wait_for_instances: false
-    min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
-    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
-    termination_policies:
-      - OldestLaunchConfiguration
-      - OldestInstance
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
     vpc_zone_identifier: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
     target_group_arns:

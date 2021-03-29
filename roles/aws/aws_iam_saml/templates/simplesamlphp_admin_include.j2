@@ -1,5 +1,5 @@
 <?php
-# Include for account {{ caller_info.account }}
+# Include for account {{ caller_info.account }} with alias {{ aws_iam_saml.aws_account_alias }}
 $authproc_attribute_admin = 'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.admin_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}';
 $authproc_attribute_readonly = 'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.readonly_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}';
 $authproc_attribute_billing = 'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.billing_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}';
