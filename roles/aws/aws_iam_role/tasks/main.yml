@@ -1,0 +1,15 @@
+- name: Create an IAM role.
+  community.aws.iam_role:
+    profile: "{{ aws_iam_role.aws_profile }}"
+    region: "{{ aws_iam_role.region }}"
+    name: "{{ aws_iam_role.name }}"
+    assume_role_policy_document: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
+    managed_policies: "{{ aws_iam_role.managed_policies }}"
+    purge_policies: true
+    tags: "{{ aws_iam_role.tags }}"
+    create_instance_profile: "{% if aws_iam_role.policy_document == 'ec2' %}true{% else %}false{% endif %}"
+  register: _aws_iam_role_result
+
+- name: Register aws_iam_role results.
+  set_fact:
+    aws_iam_role: "{{ aws_iam_role | combine( { '_result': { aws_iam_role.name : _aws_iam_role_result } } ) }}"
