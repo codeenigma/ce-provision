@@ -37,6 +37,7 @@
      - ["Meta" roles that group individual roles together.](/roles/_meta)
      - [Mount sync](/roles/mount_sync)
      - [MariaDB Client](/roles/mysql_client)
+     - [NGINX](/roles/nginx)
      - [NodeJS](/roles/nodejs)
      - [opcache](/roles/opcache)
      - [OSSEC](/roles/ossec)
