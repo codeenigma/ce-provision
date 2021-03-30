@@ -29,6 +29,8 @@ nginx:
       error_log_level: "notice"
       # Server specific log stream (Cloudwatch),
       log_stream_name: example
+      # Group prefix. Useful for grouping by environments.
+      log_group_prefix: ""
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
