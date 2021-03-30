@@ -9,6 +9,8 @@
 - name: Create SAML provider
   community.aws.iam_saml_federation:
     name: "{{ aws_iam_saml.provider_name }}"
+    profile: "{{ aws_iam_saml.aws_profile }}"
+    region: "{{ aws_iam_saml.region }}"
     saml_metadata_document: "{{ aws_iam_saml.saml_metadata_document }}"
   delegate_to: localhost
   when:
@@ -17,12 +19,17 @@
 
 - name: Get the current AWS account caller identity information
   amazon.aws.aws_caller_info:
+    profile: "{{ aws_iam_saml.aws_profile }}"
+    region: "{{ aws_iam_saml.region }}"
   delegate_to: localhost
   register: caller_info
 
 - name: Create a role for administrative access
   iam_role:
     name: "{{ aws_iam_saml.admin_role }}"
+    profile: "{{ aws_iam_saml.aws_profile }}"
+    region: "{{ aws_iam_saml.region }}"
+    tags: "{{ aws_iam_saml.tags }}"
     assume_role_policy_document: "{{ lookup('template', 'assume_admin_policy.j2') }}"
     description: "Administrative access to all systems"
     managed_policy:
@@ -35,6 +42,9 @@
 - name: Create a role for read-only access
   iam_role:
     name: "{{ aws_iam_saml.readonly_role }}"
+    profile: "{{ aws_iam_saml.aws_profile }}"
+    region: "{{ aws_iam_saml.region }}"
+    tags: "{{ aws_iam_saml.tags }}"
     assume_role_policy_document: "{{ lookup('template', 'assume_readonly_policy.j2') }}"
     description: "Read-only access to all systems"
     managed_policy:
@@ -48,6 +58,8 @@
   community.aws.iam_managed_policy:
     policy_name: "{{ aws_iam_saml.billing_policy }}"
     policy_description: "Custom policy for billing access"
+    profile: "{{ aws_iam_saml.aws_profile }}"
+    region: "{{ aws_iam_saml.region }}"
     policy: "{{ lookup('template', 'access_billing_policy.j2') }}"
     state: present
   delegate_to: localhost
@@ -59,6 +71,9 @@
 - name: Create a role for billing access
   iam_role:
     name: "{{ aws_iam_saml.billing_role }}"
+    profile: "{{ aws_iam_saml.aws_profile }}"
+    region: "{{ aws_iam_saml.region }}"
+    tags: "{{ aws_iam_saml.tags }}"
     assume_role_policy_document: "{{ lookup('template', 'assume_billing_policy.j2') }}"
     description: "Billing access only"
     managed_policy:

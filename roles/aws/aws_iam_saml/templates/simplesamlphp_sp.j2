@@ -1,6 +1,6 @@
 <?php
 ##########################################
-# AWS SP FOR {{ caller_info.account }}
+# AWS SP FOR {{ caller_info.account }} with alias {{ aws_iam_saml.aws_account_alias }}
 ##########################################
 $metadata['urn:amazon:{{ caller_info.account }}'] = array (
   'entityid' => 'urn:amazon:{{ caller_info.account }}',
