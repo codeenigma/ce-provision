@@ -6,7 +6,7 @@
           {
             "file_path": "/var/log/nginx/access.log",
 {% if nginx.log_group_prefix is defined and nginx.log_group_prefix|length %}
-            "log_group_name": "{{nginx.log_group_prefix}}nginx-access",
+            "log_group_name": "{{ nginx.log_group_prefix }}nginx-access",
 {% else %}
 						"log_group_name": "nginx-access",
 {% endif %}
@@ -15,7 +15,7 @@
           {
             "file_path": "/var/log/nginx/error.log",
 {% if nginx.log_group_prefix is defined and nginx.log_group_prefix|length %}
-            "log_group_name": "{{nginx.log_group_prefix}}nginx-error",
+            "log_group_name": "{{ nginx.log_group_prefix }}nginx-error",
 {% else %}
 						"log_group_name": "nginx-error",
 {% endif %}
