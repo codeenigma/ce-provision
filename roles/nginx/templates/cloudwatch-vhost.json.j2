@@ -5,13 +5,13 @@
         "collect_list": [
           {
             "file_path": "{{ domain.access_log }}",
-            "log_group_name": "nginx-access-{{ domain.server_name }}",
-            "log_stream_name": "{instance_id}"
+            "log_group_name": "nginx-access",
+            "log_stream_name": "{{ domain.log_stream_name }}"
           },
           {
             "file_path": "{{ domain.error_log }}",
-            "log_group_name": "nginx-error-{{ domain.server_name }}",
-            "log_stream_name": "{instance_id}"
+            "log_group_name": "nginx-error",
+            "log_stream_name": "{{ domain.log_stream_name }}"
           }
         ]
       }

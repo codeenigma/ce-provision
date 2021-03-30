@@ -1,7 +1,7 @@
 ---
 aws_cloudwatch_agent:
-  # A resource name used as prefix for the streams.
-  name: "example"
+  # Stream name.
+  log_stream_name: "example"
   # You'd normally use IAM policies, but that allows
   # non-AWS servers to log in cloudwatch too.
   use_credentials: false
