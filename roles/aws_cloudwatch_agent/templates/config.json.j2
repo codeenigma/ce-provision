@@ -37,6 +37,9 @@
 		}
 	},
 	"metrics": {
+{% if aws_cloudwatch_agent.metrics_namespace is defined and aws_cloudwatch_agent.metrics_namespace|length %}
+    "namespace": "MyCustomNamespace",
+{% endif %}  
 		"append_dimensions": {
 			"AutoScalingGroupName": "${aws:AutoScalingGroupName}",
 			"ImageId": "${aws:ImageId}",

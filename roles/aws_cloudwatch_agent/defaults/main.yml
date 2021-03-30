@@ -2,6 +2,8 @@
 aws_cloudwatch_agent:
   # Stream name.
   log_stream_name: "example"
+  # Namespace for metrics.
+  metrics_namespace: "example"
   # You'd normally use IAM policies, but that allows
   # non-AWS servers to log in cloudwatch too.
   use_credentials: false
