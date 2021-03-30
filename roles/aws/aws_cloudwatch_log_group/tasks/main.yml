@@ -6,7 +6,7 @@
     tags: "{{ aws_cloudwatch_log_group.tags }}"
     state: "{{ aws_cloudwatch_log_group.state }}"
     log_group_name: "{{ log_group_name }}"
-    retention: "{{ aws_cloudwatch_log_group.retention}}"
+    retention: "{{ aws_cloudwatch_log_group.retention }}"
   with_items: "{{ aws_cloudwatch_log_group.log_group_names }}"
   loop_control:
     loop_var: log_group_name
