@@ -9,27 +9,47 @@
 				"collect_list": [
 					{
 						"file_path": "/var/log/syslog",
+{% if aws_cloudwatch_agent.log_group_prefix is defined and aws_cloudwatch_agent.log_group_prefix|length %}
+            "log_group_name": "{{aws_cloudwatch_agent.log_group_prefix}}syslog",
+{% else %}
 						"log_group_name": "syslog",
+{% endif %}
 						"log_stream_name": "{{ aws_cloudwatch_agent.log_stream_name }}"
 					},
 					{
 						"file_path": "/var/log/auth.log",
+{% if aws_cloudwatch_agent.log_group_prefix is defined and aws_cloudwatch_agent.log_group_prefix|length %}
+            "log_group_name": "{{aws_cloudwatch_agent.log_group_prefix}}auth",
+{% else %}
 						"log_group_name": "auth",
+{% endif %}
             "log_stream_name": "{{ aws_cloudwatch_agent.log_stream_name }}"
 					},
 					{
 						"file_path": "/var/log/daemon.log",
+{% if aws_cloudwatch_agent.log_group_prefix is defined and aws_cloudwatch_agent.log_group_prefix|length %}
+            "log_group_name": "{{aws_cloudwatch_agent.log_group_prefix}}daemon",
+{% else %}
 						"log_group_name": "daemon",
+{% endif %}
             "log_stream_name": "{{ aws_cloudwatch_agent.log_stream_name }}"
 					},
 					{
 						"file_path": "/var/log/messages",
+{% if aws_cloudwatch_agent.log_group_prefix is defined and aws_cloudwatch_agent.log_group_prefix|length %}
+            "log_group_name": "{{aws_cloudwatch_agent.log_group_prefix}}messages",
+{% else %}
 						"log_group_name": "messages",
+{% endif %}
             "log_stream_name": "{{ aws_cloudwatch_agent.log_stream_name }}"
 					},
 					{
 						"file_path": "/var/log/alternatives.log",
+{% if aws_cloudwatch_agent.log_group_prefix is defined and aws_cloudwatch_agent.log_group_prefix|length %}
+            "log_group_name": "{{aws_cloudwatch_agent.log_group_prefix}}alternatives",
+{% else %}
 						"log_group_name": "alternatives",
+{% endif %}
             "log_stream_name": "{{ aws_cloudwatch_agent.log_stream_name }}"
 					}
 				]
@@ -37,6 +57,9 @@
 		}
 	},
 	"metrics": {
+{% if aws_cloudwatch_agent.metrics_namespace is defined and aws_cloudwatch_agent.metrics_namespace|length %}
+    "namespace": "{{ aws_cloudwatch_agent.metrics_namespace }}",
+{% endif %}  
 		"append_dimensions": {
 			"AutoScalingGroupName": "${aws:AutoScalingGroupName}",
 			"ImageId": "${aws:ImageId}",
