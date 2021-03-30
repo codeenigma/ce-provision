@@ -8,6 +8,7 @@
      - [AWS Cloudwatch agent](/roles/aws_cloudwatch_agent)
      - [AWS tools roles](/roles/aws)
        - [AMI Debian Buster](/roles/aws/ami_debian_buster)
+       - [Cloudwatch log group](/roles/aws/aws_cloudwatch_log_group)
        - [Amazon credentials](/roles/aws/aws_credentials)
        - [Autoscale cluster](/roles/aws/aws_ec2_autoscale_cluster)
        - [AMI Debian Buster](/roles/aws/aws_ec2_with_eip)
