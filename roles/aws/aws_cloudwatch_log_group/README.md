@@ -9,7 +9,7 @@ Manage log groups states and retention policies.
 ## Default variables
 ```yaml
 ---
-ami_debian_buster:
+aws_cloudwatch_log_group:
   aws_profile: "{{ _aws_profile }}"
   region: "eu-west-3"
   tags: {}
