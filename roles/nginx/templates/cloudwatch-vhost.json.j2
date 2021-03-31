@@ -5,13 +5,16 @@
         "collect_list": [
           {
             "file_path": "{{ domain.access_log }}",
-            "log_group_name": "nginx-access",
 {% if nginx.log_group_prefix is defined and nginx.log_group_prefix|length %}
             "log_group_name": "{{ nginx.log_group_prefix }}nginx-access",
 {% else %}
 						"log_group_name": "nginx-access",
 {% endif %}
+{% if domain.log_stream_name is defined and domain.log_stream_name|length %}
             "log_stream_name": "{{ domain.log_stream_name }}"
+{% else %}
+						"log_stream_name": "{{ nginx.log_stream_name }}"
+{% endif %}
           },
           {
             "file_path": "{{ domain.error_log }}",
@@ -20,7 +23,11 @@
 {% else %}
 						"log_group_name": "nginx-error",
 {% endif %}
+{% if domain.log_stream_name is defined and domain.log_stream_name|length %}
             "log_stream_name": "{{ domain.log_stream_name }}"
+{% else %}
+						"log_stream_name": "{{ nginx.log_stream_name }}"
+{% endif %}
           }
         ]
       }
