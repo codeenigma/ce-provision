@@ -1,0 +1,12 @@
+---
+- name: Ensure Cloudwatch group settings.
+  community.aws.cloudwatchlogs_log_group:
+    profile: "{{ aws_cloudwatch_log_group.aws_profile }}"
+    region: "{{ aws_cloudwatch_log_group.region }}"
+    tags: "{{ aws_cloudwatch_log_group.tags }}"
+    state: "{{ aws_cloudwatch_log_group.state }}"
+    log_group_name: "{{ log_group_name }}"
+    retention: "{{ aws_cloudwatch_log_group.retention }}"
+  with_items: "{{ aws_cloudwatch_log_group.log_group_names }}"
+  loop_control:
+    loop_var: log_group_name
