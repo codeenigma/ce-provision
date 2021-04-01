@@ -13,6 +13,7 @@ ami_debian_buster:
   #@todo find better names.
   operation: ensure
   # Ansible groups to add the target to. Useful for picking up group_vars.
-  groups:
-    - "all"
-    - "example"
+  groups: []
+  # groups:
+  #   - "all"
+  #   - "example"
