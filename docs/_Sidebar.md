@@ -32,6 +32,7 @@
      - [Managed /etc/hosts](/roles/hosts)
      - [Jenkins](/roles/jenkins)
      - ["Meta" roles that group individual roles together.](/roles/_meta)
+       - [AWS client](/roles/_meta/aws_client_instance)
      - [Mount sync](/roles/mount_sync)
      - [MariaDB Client](/roles/mysql_client)
      - [NodeJS](/roles/nodejs)
