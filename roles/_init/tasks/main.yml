@@ -19,7 +19,7 @@
   set_fact:
     _init_vars_dirs_list: "{{ _init.vars_dirs + [ playbook_dir ] }}"
 
-- name: Compute current playbook md5
+- name: Compute files md5 hash.
   shell: 'find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
   args:
     warn: false
@@ -28,6 +28,13 @@
   with_items: "{{ _init_vars_dirs_list }}"
   loop_control:
     loop_var: _init_vars_dir
+
+- name: Combine files md5 hash.
+  set_fact:
+    current_play_dir_md5: "{{ current_play_dir_md5 | default() + _init_vars_dir_md5.stdout }}"
+  with_items: "{{ _init_vars_dirs_md5.results }}"
+  loop_control:
+    loop_var: _init_vars_dir_md5
 
 - name: Lookup current playbook md5
   set_fact:
