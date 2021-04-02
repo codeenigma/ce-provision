@@ -45,7 +45,7 @@
       - "yml"
   with_items: "{{ _init.vars_dirs }}"
   loop_control:
-    loop_var: _init_vars_dir
+    loop_var: _init_vars_dir_include
 
 - name: Ensure /opt/bin directory exists.
   file:
