@@ -39,6 +39,6 @@
 
 - name: Store current playbook md5.
   copy:
-    content: "{{ current_play_dir_md5.stdout }}"
+    content: "{{ current_play_dir_md5 }}"
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
   delegate_to: localhost
