@@ -47,7 +47,7 @@
 
 - name: Include vars directories.
   include_vars:
-    dir: _init_vars_dir_include
+    dir: "{{ _init_vars_dir_include }}"
     extensions:
       - "yml"
   with_items: "{{ _init.vars_dirs }}"
@@ -90,15 +90,3 @@
     - ce_provision_extra_vars_filtered is defined
     - ce_provision_extra_vars_filtered[item.name] is defined
   loop: "{{ ce_provision.extra_repository_allowed_vars }}"
-
-- name: Define template lookup paths.
-  set_fact:
-    ce_provision_search_paths_template:
-      - "{{ playbook_dir }}/templates"
-      - "{{ _ce_provision_build_tmp_dir }}/extra/templates"
-      - "{{ _ce_provision_base_dir }}/config/templates"
-
-- name: Add defaults lookup paths.
-  set_fact:
-    ce_provision_search_paths_template: "{{ ce_provision_search_paths_template + [ item + '/templates' ] }}"
-  with_items: "{{ ansible_search_path }}"
