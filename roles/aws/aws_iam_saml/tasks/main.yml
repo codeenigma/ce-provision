@@ -65,7 +65,7 @@
     - aws_iam_saml.billing_groups[0] | length > 0
 
 - name: Create a role for billing access
-  iam_role:
+  community.aws.iam_role:
     name: "{{ aws_iam_saml.billing_role }}"
     profile: "{{ aws_iam_saml.aws_profile }}"
     tags: "{{ aws_iam_saml.tags }}"
