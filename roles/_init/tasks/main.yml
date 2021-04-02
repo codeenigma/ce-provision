@@ -17,7 +17,7 @@
 
 - name: Build the list of directories to scan for changes.
   set_fact:
-    _init_vars_dirs_list: "{{ _init.vars_dirs + [ playbook_dir | basename ] }}"
+    _init_vars_dirs_list: "{{ _init.vars_dirs + [ playbook_dir ] }}"
 
 - name: Compute current playbook md5
   shell: 'find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
