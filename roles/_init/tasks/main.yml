@@ -42,7 +42,7 @@
 
 - meta: end_play
   when:
-    - current_play_dir_md5.stdout == previous_play_dir_md5
+    - current_play_dir_md5 == previous_play_dir_md5
     - not _ce_provision_force_play
 
 - name: Include vars directories.
