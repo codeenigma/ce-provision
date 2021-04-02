@@ -1,3 +1,13 @@
+# NGINX
+
+Install and configure the nginx webserver.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 php:
   version:
@@ -55,3 +65,7 @@ nginx:
       #     backends:
       #       - 142.42.64.2:8080
       #       - 142.42.64.3:8080
+
+```
+
+<!--ENDROLEVARS-->

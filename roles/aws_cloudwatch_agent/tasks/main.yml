@@ -18,6 +18,8 @@
     recurse: true
     owner: cwagent
     group: cwagent
+  when:
+    - aws_cloudwatch_agent.use_credentials
 
 - name: Generate AWS credentials
   template:
@@ -25,24 +27,13 @@
     dest: /home/cwagent/.aws/credentials
     owner: cwagent
     group: cwagent
-
-- name: Stop the agent
-  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
-
-- name: Start the agent
-  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+  when:
+    - aws_cloudwatch_agent.use_credentials
 
 - name: Remove default config
   file:
     path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/default
     state: absent
-
-- name: Generate main config
-  template:
-    src: config.json.j2
-    dest: /opt/aws/amazon-cloudwatch-agent/bin/config.json
-    owner: cwagent
-    group: cwagent
 
 - name: Install main config
   template:
