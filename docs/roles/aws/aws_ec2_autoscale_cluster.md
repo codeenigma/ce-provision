@@ -48,6 +48,8 @@ aws_ec2_autoscale_cluster:
   health_check_unhealthy_count: 2
   tags:
     Name: "example"
+  # An IAM Role name to associate with instances.
+  iam_role_name: "example"
   # Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
   peering:
     - name: utility-server.example.com
