@@ -6,7 +6,9 @@ Install and configure the nginx webserver.
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
+
 ## Default variables
+
 ```yaml
 ---
 php:
@@ -35,7 +37,7 @@ nginx:
   fastcgi_read_timeout: 60
   overrides: [] # See the '_overrides' role.
   domains:
-    - server_name: "{{ domain_name }}"
+    - server_name: "{{ _domain_name }}"
       access_log: "/var/log/nginx/access.log"
       error_log: "/var/log/nginx/error.log"
       error_log_level: "notice"
@@ -44,7 +46,7 @@ nginx:
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
-        domain: "{{ domain_name }}"
+        domain: "{{ _domain_name }}"
         handling: selfsigned
       ratelimitingcrawlers: true
       is_default: true
@@ -65,7 +67,6 @@ nginx:
       #     backends:
       #       - 142.42.64.2:8080
       #       - 142.42.64.3:8080
-
 ```
 
 <!--ENDROLEVARS-->

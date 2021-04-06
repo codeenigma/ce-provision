@@ -60,7 +60,7 @@
 
 - name: Setup Git identity email.
   command:
-    cmd: "git config --global user.email {{ ce_provision.username }}@{{ domain_name }}"
+    cmd: "git config --global user.email {{ ce_provision.username }}@{{ _domain_name }}"
   become: true
   become_user: "{{ ce_provision.username }}"
 

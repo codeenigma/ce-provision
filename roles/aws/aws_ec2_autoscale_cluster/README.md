@@ -4,7 +4,9 @@
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
+
 ## Default variables
+
 ```yaml
 aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
@@ -70,14 +72,13 @@ aws_ec2_autoscale_cluster:
   # Set the zone to empty to skip.
   route_53:
     zone: "example.com"
-    record: "*.{{ domain_name }}"
+    record: "*.{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   efs: true # Whether to create an EFS volume.
   efs_encrypt: false # Whether to encrypt the EFS volume
-
 ```
 
 <!--ENDROLEVARS-->
