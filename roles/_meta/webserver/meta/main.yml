@@ -8,6 +8,7 @@ dependencies:
   - role: user_provision
   - role: user_deploy
   - role: mysql_client
+  - role: nodejs
   - role: php-cli
   - role: php-fpm
   - role: opcache
