@@ -14,7 +14,7 @@ Install and configure the nginx webserver.
 php:
   version:
     - 7.3
-symfony_env: "{{ env_type }}"
+symfony_env: "{{ _env_type }}"
 nginx:
   # Global default config for nginx.conf.
   user: www-data
