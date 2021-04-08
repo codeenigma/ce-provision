@@ -18,15 +18,6 @@
     _aws_ec2_autoscale_cluster_vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
   when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
 
-- name: Create an S3 bucket to hold codebase.
-  amazon.aws.s3_bucket:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    name: "{{ aws_ec2_autoscale_cluster.name }}"
-    tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
-    state: present
-  register: _aws_ec2_autoscale_cluster_bucket
-
 - name: Use provided VPC id.
   set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
