@@ -4,9 +4,7 @@
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-
 ## Default variables
-
 ```yaml
 aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
@@ -26,7 +24,6 @@ aws_ec2_autoscale_cluster:
       public_subnet: public-c
   instance_type: t2.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
-  ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   root_volume_size: 40
   ebs_optimized: true
@@ -79,6 +76,7 @@ aws_ec2_autoscale_cluster:
   listeners: []
   efs: true # Whether to create an EFS volume.
   efs_encrypt: false # Whether to encrypt the EFS volume
+
 ```
 
 <!--ENDROLEVARS-->

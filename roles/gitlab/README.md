@@ -9,9 +9,7 @@ Because of the size of the gitlab.rb file, it is impractical to try to parameter
 Only a few basic variables are thus provided. To further customize it, the recommended approach is to leverage the "override" system and provide a custom template.
 
 <!--ROLEVARS-->
-
 ## Default variables
-
 ```yaml
 ---
 # See https://github.com/ansible/ansible/issues/8603
@@ -39,6 +37,7 @@ gitlab:
     client_max_body_size: "250m"
     redirect_http_to_https: "false"
     redirect_http_to_https_port: 8881
+
 ```
 
 <!--ENDROLEVARS-->

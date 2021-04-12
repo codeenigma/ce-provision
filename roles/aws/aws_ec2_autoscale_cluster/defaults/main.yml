@@ -16,7 +16,6 @@ aws_ec2_autoscale_cluster:
       public_subnet: public-c
   instance_type: t2.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
-  ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   root_volume_size: 40
   ebs_optimized: true

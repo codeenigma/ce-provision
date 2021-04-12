@@ -4,9 +4,7 @@
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-
 ## Default variables
-
 ```yaml
 ---
 ldap_client:
@@ -37,6 +35,7 @@ jenkins:
   ldap_binddn: "{{ ldap_client.binddn }}"
   ldap_bindpw: "{{ ldap_client.bindpw }}"
   mailto: "admins@example.com"
+
 ```
 
 <!--ENDROLEVARS-->

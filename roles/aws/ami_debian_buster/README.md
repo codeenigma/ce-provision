@@ -28,6 +28,9 @@ ami_debian_buster:
   # groups:
   #   - "all"
   #   - "example"
+  # A string of additional arguments to pass as ansible --extra-vars.
+  # It must me escaped already, and will be passed as-is.
+  extra_vars: ""
 
 ```
 

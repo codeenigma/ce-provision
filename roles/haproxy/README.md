@@ -4,9 +4,7 @@
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-
 ## Default variables
-
 ```yaml
 ---
 _haproxy:
@@ -24,6 +22,7 @@ haproxy:
       ip: 127.0.0.1
       port: 8080
       domain: "{{ _domain_name }}"
+
 ```
 
 <!--ENDROLEVARS-->
