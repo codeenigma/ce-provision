@@ -22,6 +22,7 @@
        - [VPC](/roles/aws/aws_vpc)
        - [Update main route for a given VPC](/roles/aws/aws_vpc_route)
        - [VPC](/roles/aws/aws_vpc_subnet)
+     - [AWS SSM agent](/roles/aws_ssm_agent)
      - [ce-deploy](/roles/ce_deploy)
      - [Extra packages](/roles/ce_dev)
      - [ce-provision](/roles/ce_provision)

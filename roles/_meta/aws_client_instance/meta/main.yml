@@ -1,3 +1,4 @@
 ---
 dependencies:
   - role: aws_cloudwatch_agent
+  - role: aws_ssm_agent
