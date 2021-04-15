@@ -1,3 +1,14 @@
+# \_overrides.
+
+Allow some files and symlinks to be created or replaced on the target server.
+Usually not called by itself, but triggered by other roles relying on it.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 _overrides:
   # A list of files to override.
@@ -15,3 +26,7 @@ _overrides:
   #     mode: "0755"
   #     owner: "nginx"
   #     group: "nginx"
+
+```
+
+<!--ENDROLEVARS-->

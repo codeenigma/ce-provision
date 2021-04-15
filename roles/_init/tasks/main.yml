@@ -31,51 +31,15 @@
     - current_play_dir_md5.stdout == previous_play_dir_md5
     - not _ce_provision_force_play
 
+# @todo This should be removed/refactored
 - name: Ensure /opt/bin directory exists.
   file:
     path: "/opt/bin"
     state: directory
 
-- name: Clone custom extra directory.
-  git:
-    repo: "{{ ce_provision.extra_repository }}"
-    dest: "{{ _ce_provision_build_tmp_dir }}/extra"
-    version: "{{ ce_provision.extra_repository_branch }}"
-  delegate_to: localhost
-  when: ce_provision.extra_repository
-
-- name: Include custom variables.
-  include_vars:
-    file: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
-    name: _ce_provision_extra_vars
-  when:
-    - ce_provision.extra_repository
-    - ce_provision.extra_repository_vars_file
-
-- name: Filter allowed custom variables.
-  set_fact:
-    ce_provision_extra_vars_filtered: "{{ _ce_provision_extra_vars | allowed_vars(ce_provision.extra_repository_allowed_vars) }}"
+- name: Load custom vars file.
+  include_tasks: allowed_vars.yml
   when:
     - ce_provision.extra_repository
     - ce_provision.extra_repository_vars_file
     - ce_provision.extra_repository_allowed_vars
-
-- name: Override variables with custom ones.
-  set_fact:
-    "{{ item.name }}": "{{ ce_provision_extra_vars_filtered[item.name] }}"
-  when:
-    - ce_provision_extra_vars_filtered is defined
-    - ce_provision_extra_vars_filtered[item.name] is defined
-  loop: "{{ ce_provision.extra_repository_allowed_vars }}"
-
-- name: Define template lookup paths.
-  set_fact:
-    ce_provision_search_paths_template:
-      - "{{ playbook_dir }}/templates"
-      - "{{ _ce_provision_build_tmp_dir }}/extra/templates"
-      - "{{ _ce_provision_base_dir }}/config/templates"
-
-- name: Add defaults lookup paths.
-  set_fact:
-    ce_provision_search_paths_template: "{{ ce_provision_search_paths_template + [ item + '/templates' ] }}"
-  with_items: "{{ ansible_search_path }}"
