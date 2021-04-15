@@ -1,4 +1,13 @@
 ---
+- name: Generate template overrides.
+  include_tasks: template.yml
+  with_items: "{{ _overrides.templates }}"
+  loop_control:
+    loop_var: override_template
+  when:
+    - _overrides.templates is defined
+    - _overrides.templates | length
+
 - name: Generate files overrides.
   include_tasks: file.yml
   with_items: "{{ _overrides.files }}"
