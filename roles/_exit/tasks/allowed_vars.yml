@@ -47,4 +47,4 @@
     - ce_provision_extra_vars_computed is defined
     - _ce_provision_extra_vars_git_changed.stdout
   become: true
-  become_user: ce_provision.username
+  become_user: "{{ ce_provision.username }}"
