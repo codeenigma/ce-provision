@@ -4,6 +4,8 @@
     dest: "{{ _ce_provision_build_tmp_dir }}/extra"
     version: "{{ ce_provision.extra_repository_branch }}"
   delegate_to: localhost
+  become: true
+  become_user: ce_provision.username
 
 - name: Check if file exists.
   stat:
