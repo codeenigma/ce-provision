@@ -10,6 +10,7 @@
   template:
     src: vars.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
+    mode: "0755"
   delegate_to: localhost
   when: ce_provision_extra_vars_computed is defined
 
