@@ -4,6 +4,7 @@
   when:
     - ce_provision.extra_repository
     - ce_provision.extra_repository_vars_file
+    - ce_provision.extra_repository_push
 
 - name: Store current playbook md5.
   copy:

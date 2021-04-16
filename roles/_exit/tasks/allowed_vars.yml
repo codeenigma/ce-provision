@@ -1,5 +1,3 @@
-- debug:
-    msg: "{{ nginx }}"
 - name: Compute custom variables.
   set_fact:
     ce_provision_extra_vars_computed: "{{ ce_provision_extra_vars_computed | default({}) | combine({item.name: lookup('vars', item.name)}, recursive=True) }}"
