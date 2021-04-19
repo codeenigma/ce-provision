@@ -49,8 +49,8 @@
   command: "git push origin {{ ce_provision.extra_repository_branch }}"
   args:
     chdir: "{{ _ce_provision_build_tmp_dir }}/extra"
+  become: true
+  become_user: "{{ ce_provision.username }}"
   when:
     - ce_provision_extra_vars_computed is defined
     - _ce_provision_extra_vars_git_changed.stdout
-  become: true
-  become_user: "{{ ce_provision.username }}"
