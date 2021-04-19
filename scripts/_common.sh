@@ -42,6 +42,10 @@ parse_options(){
           shift
           TARGET_PROVISION_PLAYBOOK="$1"
         ;;
+      "--playbooks-dir")
+          shift
+          TARGET_PROVISION_PLAYBOOKS_DIR="$1"
+        ;;
       "--ansible-extra-vars")
           shift
           ANSIBLE_EXTRA_VARS="$1"
