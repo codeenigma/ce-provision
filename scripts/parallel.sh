@@ -52,5 +52,5 @@ fi
 
 # Trigger} builds of all playbooks.
 for PLAYBOOK in "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOKS_DIR/"*.yml; do
-    /bin/sh "$OWN_DIR/scripts/provision.sh" --playbook "$PLAYBOOK" "$@" &
+    /bin/sh "$OWN_DIR/scripts/provision.sh" --playbook "$TARGET_PROVISION_PLAYBOOKS_DIR/$(basename "$PLAYBOOK")" "$@" &
 done 
