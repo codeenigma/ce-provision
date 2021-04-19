@@ -4,7 +4,7 @@ set -eu
 
 usage(){
   echo 'parallel.sh [OPTIONS] --repo <git repo to provision> --branch <branch to provision> --playbooks-dir <path to playbook dir>'
-  echo 'Provision a target.'
+  echo 'Provision multiple targets in parallel.'
   echo ''
   echo 'Mandatory arguments:'
   echo '--repo: Path to a remote git repo. The "provision" user must have read access to it.'
