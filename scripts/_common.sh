@@ -17,6 +17,7 @@ BUILD_ID=""
 FORCE_PLAY="no"
 DRY_RUN="no"
 VERBOSE="no"
+PARALLEL_RUN="no"
 BOTO_PROFILE=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
@@ -42,9 +43,8 @@ parse_options(){
           shift
           TARGET_PROVISION_PLAYBOOK="$1"
         ;;
-      "--playbooks-dir")
-          shift
-          TARGET_PROVISION_PLAYBOOKS_DIR="$1"
+      "--parallel")
+          PARALLEL_RUN="yes"
         ;;
       "--ansible-extra-vars")
           shift
@@ -122,6 +122,9 @@ cleanup_build_tmp_dir(){
 # Trigger actual Ansible job.
 ansible_play(){
   ANSIBLE_CMD="/usr/bin/ansible-playbook $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  if [ "$PARALLEL_RUN" = "yes" ]; then
+    ANSIBLE_CMD="/usr/local/bin/ansible-parallel $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/*.yml"
+  fi
   if [ "$DRY_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
   fi
