@@ -14,7 +14,9 @@
   delegate_to: localhost
   become: true
   become_user: "{{ ce_provision.username }}"
-  when: ce_provision_extra_vars_computed is defined
+  when:
+    - ce_provision_extra_vars_computed is defined
+    - ce_provision_extra_vars_computed | length > 1
 
 - name: Check if configuration changed.
   command: "git status -s"
