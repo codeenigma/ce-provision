@@ -46,9 +46,15 @@
   set_fact:
     ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
 
-- name: Ensure Git is installed.
+- name: Ensure dependencies are installed.
   apt:
-    pkg: ["git", "python-dnspython"]
+    pkg: ["git", "python-dnspython", "python3-pip"]
+    state: present
+
+- name: Install ansible-parallel.
+  pip:
+    executable: pip3
+    name: ansible-parallel
     state: present
 
 # This is needed for "pushing" in certain cases.
