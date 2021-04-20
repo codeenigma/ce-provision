@@ -123,7 +123,7 @@ cleanup_build_tmp_dir(){
 ansible_play(){
   ANSIBLE_CMD="/usr/bin/ansible-playbook $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
   if [ "$PARALLEL_RUN" = "yes" ]; then
-    ANSIBLE_CMD="/usr/local/bin/ansible-parallel $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/*.yml"
+    ANSIBLE_CMD="/usr/bin/ansible-playbook {}"
   fi
   if [ "$DRY_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
@@ -134,7 +134,11 @@ ansible_play(){
   if [ -n "$BOTO_PROFILE" ]; then
     export AWS_PROFILE="$BOTO_PROFILE"
   fi
-  $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
+  if [ "$PARALLEL_RUN" = "yes" ]; then
+    parallel --lb "$ANSIBLE_CMD" --extra-vars "\"$ANSIBLE_DEFAULT_EXTRA_VARS\"" --extra-vars "\"$ANSIBLE_EXTRA_VARS\"" ::: "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/"*.yml
+  else
+    $ANSIBLE_CMD --extra-vars "\"$ANSIBLE_DEFAULT_EXTRA_VARS\"" --extra-vars "\"$ANSIBLE_EXTRA_VARS\""
+  fi
   return $?
 }
 
