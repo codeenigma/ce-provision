@@ -48,13 +48,7 @@
 
 - name: Ensure dependencies are installed.
   apt:
-    pkg: ["git", "python-dnspython", "python3-pip"]
-    state: present
-
-- name: Install ansible-parallel.
-  pip:
-    executable: pip3
-    name: ansible-parallel
+    pkg: ["git", "python-dnspython", "parallel"]
     state: present
 
 # This is needed for "pushing" in certain cases.
