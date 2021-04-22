@@ -9,7 +9,7 @@
 
 - name: Install files overrides.
   copy:
-    src: "{{ _ce_provision_build_tmp_dir }}/extra/files/{{ override_file.src }}"
+    src: "{{ _ce_provision_build_tmp_dir }}/extra/{{ override_file.src }}"
     dest: "{{ override_file.dest }}"
     force: true
     mode: "{{ override_file.mode | default('0666') }}"
