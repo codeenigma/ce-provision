@@ -10,7 +10,7 @@ def allowed_vars(original, policies):
                 if allowed.get('allow'):
                     filtered[orig_key] = {}
                     for allow in allowed['allow']:
-                        if orig_value.get(allow):
+                        if allow in orig_value:
                             filtered[orig_key][allow] = orig_value.get(allow)
     return filtered
 
