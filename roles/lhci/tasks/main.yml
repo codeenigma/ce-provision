@@ -1,0 +1,6 @@
+---
+- name: Install "lhci/cli" node.js package.
+  npm:
+    name: "@lhci/cli"
+    production: true
+    global: true
