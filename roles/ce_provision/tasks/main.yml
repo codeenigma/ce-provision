@@ -125,3 +125,9 @@
     state: directory
     owner: "{{ ce_provision.username }}"
     recurse: true
+
+- name: Install Prometheus Process Exporter.
+  command:
+    cmd: ansible-galaxy install cloudalchemy.process_exporter
+  become: true
+  become_user: "{{ ce_provision.username }}"
