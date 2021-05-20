@@ -1,0 +1,27 @@
+- name: Create an S3 bucket.
+  amazon.aws.s3_bucket:
+    profile: "{{ aws_s3_bucket.aws_profile }}"
+    region: "{{ aws_s3_bucket.region }}"
+    name: "{{ aws_s3_bucket.name }}"
+    tags: "{{ aws_s3_bucket.tags | combine( { 'Name': aws_s3_bucket.name } ) }}"
+    state: present
+  register: _aws_s3_bucket_bucket
+
+- name: Create a matching policy.
+  community.aws.iam_managed_policy:
+    profile: "{{ aws_s3_bucket.aws_profile }}"
+    region: "{{ aws_s3_bucket.region }}"
+    policy_name: "{{ aws_s3_bucket.name }}"
+    policy:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Action: "s3:*"
+          Resource: "arn:aws:s3:::{{ aws_s3_bucket.name }}"
+    make_default: true
+    state: present
+  register: _aws_s3_bucket_bucket_policy
+
+- name: Register aws_s3_bucket results.
+  set_fact:
+    aws_s3_bucket: "{{ aws_s3_bucket | combine( { '_result': { aws_s3_bucket.name : { 'bucket':  _aws_s3_bucket_bucket, 'policy': _aws_s3_bucket_bucket_policy } } } ) }}"

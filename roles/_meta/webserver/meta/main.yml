@@ -3,11 +3,10 @@ dependencies:
   - role: _meta/common_base
   - role: firewall
   - role: ssh_server
-  - role: pam_ldap
-  - role: pam_linotp
   - role: user_provision
   - role: user_deploy
   - role: mysql_client
+  - role: nodejs
   - role: php-cli
   - role: php-fpm
   - role: opcache
