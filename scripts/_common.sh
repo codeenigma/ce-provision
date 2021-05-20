@@ -17,6 +17,7 @@ BUILD_ID=""
 FORCE_PLAY="no"
 DRY_RUN="no"
 VERBOSE="no"
+PARALLEL_RUN="no"
 BOTO_PROFILE=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
@@ -41,6 +42,9 @@ parse_options(){
       "--playbook")
           shift
           TARGET_PROVISION_PLAYBOOK="$1"
+        ;;
+      "--parallel")
+          PARALLEL_RUN="yes"
         ;;
       "--ansible-extra-vars")
           shift
@@ -118,6 +122,9 @@ cleanup_build_tmp_dir(){
 # Trigger actual Ansible job.
 ansible_play(){
   ANSIBLE_CMD="/usr/bin/ansible-playbook $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  if [ "$PARALLEL_RUN" = "yes" ]; then
+    ANSIBLE_CMD="/usr/bin/ansible-playbook {}"
+  fi
   if [ "$DRY_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
   fi
@@ -127,7 +134,11 @@ ansible_play(){
   if [ -n "$BOTO_PROFILE" ]; then
     export AWS_PROFILE="$BOTO_PROFILE"
   fi
-  $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
+  if [ "$PARALLEL_RUN" = "yes" ]; then
+    parallel --lb  --halt soon,fail=1 "$ANSIBLE_CMD" --extra-vars "\"$ANSIBLE_DEFAULT_EXTRA_VARS\"" --extra-vars "\"$ANSIBLE_EXTRA_VARS\"" ::: "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/"*.yml
+  else
+    $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
+  fi
   return $?
 }
 

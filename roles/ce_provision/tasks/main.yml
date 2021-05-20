@@ -46,9 +46,9 @@
   set_fact:
     ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
 
-- name: Ensure Git is installed.
+- name: Ensure dependencies are installed.
   apt:
-    pkg: ["git", "python-dnspython"]
+    pkg: ["git", "python-dnspython", "parallel"]
     state: present
 
 # This is needed for "pushing" in certain cases.
@@ -60,7 +60,7 @@
 
 - name: Setup Git identity email.
   command:
-    cmd: "git config --global user.email {{ ce_provision.username }}@{{ domain_name }}"
+    cmd: "git config --global user.email {{ ce_provision.username }}@{{ _domain_name }}"
   become: true
   become_user: "{{ ce_provision.username }}"
 

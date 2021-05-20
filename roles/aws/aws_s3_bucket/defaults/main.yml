@@ -1,0 +1,8 @@
+aws_s3_bucket:
+  aws_profile: "{{ _aws_profile }}"
+  region: eu-west-3
+  name: "example"
+  tags:
+    Name: "example"
+  state: "present"
+  _result: {}

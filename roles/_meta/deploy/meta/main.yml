@@ -1,13 +1,13 @@
 ---
 dependencies:
-  - role: _meta/common_base
-  - role: ssh_server
   - role: user_provision
+  - role: _meta/common_base
+  - role: _meta/aws_client_instance
   - role: ce_deploy
+  - role: aws/aws_credentials
   - role: gitlab
-  # - role: jenkins
-  - role: docker_registry
-  - role: haproxy
+  - role: gitlab_runner
+  - role: ssh_server
   - role: sops
   - role: gpg_key
   - role: pam_ldap

@@ -1,0 +1,7 @@
+---
+dependencies:
+  - role: aws/aws_provision_ec2_keypair
+  - role: aws/aws_vpc
+  - role: aws/aws_vpc_subnet
+  - role: aws/aws_iam_role
+  - role: aws/aws_cloudwatch_log_group
