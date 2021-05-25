@@ -69,7 +69,6 @@ This requires boto and AWS-CLI on the provisioning server.
 ```yaml
 aws_iam_saml:
   aws_profile: "{{ _aws_profile }}" # Boto profile to use for AWS connections
-  region: "{{ _region }}" # AWS region to use, if applicable
   tags: [] # AWS tags to apply
   aws_account_alias: "" # IAM account alias - human readable name to order SSO page
   provider_name: "SAMLProvider" # The name of your SAML provider in the AWS console
