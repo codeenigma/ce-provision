@@ -2,7 +2,9 @@
 
 <!--TOC-->
 <!--ENDTOC-->
+
 ## Configuration
+
 Because of the size of the gitlab.rb file, it is impractical to try to parameterized it.
 Only a few basic variables are thus provided. To further customize it, the recommended approach is to leverage the "override" system and provide a custom template.
 
@@ -19,7 +21,7 @@ ldap_client:
   bindpw: ""
 
 gitlab:
-  server_name: "gitlab.{{ domain_name }}"
+  server_name: "gitlab.{{ _domain_name }}"
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
     handling: selfsigned
   unicorn_worker_processes: 2

@@ -21,7 +21,7 @@ haproxy:
     - name: default
       ip: 127.0.0.1
       port: 8080
-      domain: "{{ domain_name }}"
+      domain: "{{ _domain_name }}"
 
 ```
 
