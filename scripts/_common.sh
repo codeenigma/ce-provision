@@ -16,6 +16,7 @@ BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
 FORCE_PLAY="no"
 DRY_RUN="no"
+LIST_TASKS="no"
 VERBOSE="no"
 PARALLEL_RUN="no"
 BOTO_PROFILE=""
@@ -59,6 +60,9 @@ parse_options(){
         ;;
       "--dry-run")
           DRY_RUN="yes"
+        ;;
+      "--list-tasks")
+          LIST_TASKS="yes"
         ;;
       "--verbose")
           VERBOSE="yes"
@@ -127,6 +131,9 @@ ansible_play(){
   fi
   if [ "$DRY_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
+  fi
+  if [ "$LIST_TASKS" = "yes" ]; then
+    ANSIBLE_CMD="$ANSIBLE_CMD --list-tasks"
   fi
   if [ "$VERBOSE" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD -vvvv"
