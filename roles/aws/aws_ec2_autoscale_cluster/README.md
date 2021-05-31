@@ -29,7 +29,7 @@ aws_ec2_autoscale_cluster:
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not.
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
-  desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size }}"
+  desired_capacity: 0 # Zero means use min_size.
   min_size: 4
   max_size: 8
   # Security groups for the instances cluster.
