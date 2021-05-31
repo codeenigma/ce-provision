@@ -189,7 +189,7 @@
     wait_for_instances: true
     lc_check: true
     wait_timeout: 3000
-    desired_capacity: "{{ [ [ aws_ec2_autoscale_cluster_running_instances.instances | length, aws_ec2_autoscale_cluster.max_size ] | min, 1 ] | max }}"
+    desired_capacity: "{{ aws_ec2_autoscale_cluster.desired_capacity | default(aws_ec2_autoscale_cluster.min_size) }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
