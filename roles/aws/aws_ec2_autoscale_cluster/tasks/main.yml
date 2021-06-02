@@ -107,6 +107,8 @@
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       operation: create
+  when:
+    - aws_ec2_autoscale_cluster.ami_refresh == true
 
 - name: Gather AMI image from name.
   ec2_ami_info:
