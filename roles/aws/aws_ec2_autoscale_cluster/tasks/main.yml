@@ -4,7 +4,7 @@
   set_fact:
     _aws_ec2_autoscale_cluster_unique_name: "{{ aws_ec2_autoscale_cluster.name }}-{{ ansible_date_time.iso8601_basic_short }}"
 
-- name: Gather VPC information
+- name: Gather VPC information.
   ec2_vpc_net_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
@@ -49,7 +49,7 @@
   loop_control:
     loop_var: subnet
 
-- name: Create RDS instance
+- name: Create RDS instance.
   include_role:
     name: aws/aws_rds
   vars:
@@ -75,7 +75,7 @@
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds
 
-- name: Create EFS volume
+- name: Create EFS volume.
   include_role:
     name: aws/aws_efs
   vars:
@@ -130,7 +130,7 @@
     name: "{{ aws_ec2_autoscale_cluster.iam_role_name }}"
   register: _aws_ec2_autoscale_cluster_iam_role_info
 
-- name: Create Launch Configuration
+- name: Create Launch Configuration.
   community.aws.ec2_lc:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
@@ -148,7 +148,7 @@
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
   register: _aws_ec2_lc_created
 
-- name: Create a Target group for port 80
+- name: Create a Target group for port 80.
   community.aws.elb_target_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -264,17 +264,18 @@
     name: aws/aws_cloudfront_distribution
   vars:
     aws_cloudfront_distribution:
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
       viewer_certificate:
         acm_certificate_arn: "{{ aws_ec2_autoscale_cluster.cf_certificate_ARN }}"
       origins:
-        - domain_name: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}" # ALB DNS name
+        - domain_name: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}"
           id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
       default_cache_behavior:
         target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
   when:
     - aws_ec2_autoscale_cluster.cf_certificate_ARN | length > 1
 
-- name: Add a DNS record in route 53
+- name: Add a DNS record in route 53.
   community.aws.route53:
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     profile: "{{ aws_ec2_autoscale_cluster.route_53.aws_profile }}"
@@ -286,7 +287,7 @@
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
 
-- name: Create peering VPC connections
+- name: Create peering VPC connections.
   include_tasks: peering.yml
   with_items: "{{ aws_ec2_autoscale_cluster.peering }}"
   loop_control:
