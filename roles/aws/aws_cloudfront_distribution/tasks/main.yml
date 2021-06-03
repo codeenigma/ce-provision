@@ -1,0 +1,19 @@
+---
+- name: Create a CloudFront distribution.
+  community.aws.cloudfront_distribution:
+    profile: "{{ aws_cloudfront_distribution.aws_profile }}"
+    region: "{{ aws_cloudfront_distribution.region }}"
+    tags: "{{ aws_cloudfront_distribution.tags }}"
+    state: "{{ aws_cloudfront_distribution.state }}"
+    alias: "{{ aws_cloudfront_distribution.alias }}"
+    origins: "{{ aws_cloudfront_distribution.origins }}"
+    default_cache_behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
+    cache_behaviors: "{{ aws_cloudfront_distribution.cache_behaviors }}"
+    validate_certs: "{{ aws_cloudfront_distribution.validate_certs }}"
+    viewer_certificate: "{{ aws_cloudfront_distribution.viewer_certificate }}"
+    purge_origins: "{{ aws_cloudfront_distribution.purge_existing }}"
+    purge_aliases: "{{ aws_cloudfront_distribution.purge_existing }}"
+    purge_tags: "{{ aws_cloudfront_distribution.purge_existing }}"
+    purge_cache_behaviors: "{{ aws_cloudfront_distribution.purge_existing }}"
+    enabled: "{{ aws_cloudfront_distribution.enabled }}"
+  register: _aws_cloudfront_distribution
