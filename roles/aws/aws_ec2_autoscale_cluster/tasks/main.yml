@@ -107,6 +107,8 @@
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       operation: create
+  when:
+    - aws_ec2_autoscale_cluster.ami_refresh == true
 
 - name: Gather AMI image from name.
   ec2_ami_info:
@@ -114,7 +116,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     owners: self
     filters:
-      name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+      name: "{{ aws_ec2_autoscale_cluster.name }}*"
   register: aws_ec2_autoscale_cluster_image
 
 - name: Register latest AMI image.
