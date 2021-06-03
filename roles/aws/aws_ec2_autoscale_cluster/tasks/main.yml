@@ -259,6 +259,21 @@
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
   register: _aws_ec2_autoscale_cluster_alb
 
+- name: Create a CloudFront distribution.
+  include_role:
+    name: aws/aws_cloudfront_distribution
+  vars:
+    aws_cloudfront_distribution:
+      viewer_certificate:
+        acm_certificate_arn: "{{ aws_ec2_autoscale_cluster.cf_certificate_ARN }}"
+      origins:
+        - domain_name: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}" # ALB DNS name
+          id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
+      default_cache_behavior:
+        target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
+  when:
+    - aws_ec2_autoscale_cluster.cf_certificate_ARN | length > 1
+
 - name: Add a DNS record in route 53
   community.aws.route53:
     state: "{{ aws_ec2_autoscale_cluster.state }}"
@@ -266,7 +281,7 @@
     zone: "{{ aws_ec2_autoscale_cluster.route_53.zone }}"
     record: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
     type: CNAME
-    value: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}"
+    value: "{{ _aws_cloudfront_distribution.domain_name if _aws_cloudfront_distribution is defined else _aws_ec2_autoscale_cluster_alb.dns_name }}"
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
