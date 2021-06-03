@@ -283,6 +283,7 @@
     record: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
     type: CNAME
     value: "{{ _aws_cloudfront_distribution.domain_name if _aws_cloudfront_distribution is defined else _aws_ec2_autoscale_cluster_alb.dns_name }}"
+    overwrite: true
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
