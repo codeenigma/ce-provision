@@ -95,6 +95,7 @@
     record: "{{ aws_ec2_with_eip.route_53.record }}"
     type: A
     value: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    overwrite: true
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
@@ -107,6 +108,7 @@
     record: "*.{{ aws_ec2_with_eip.route_53.record }}"
     type: CNAME
     value: "{{ aws_ec2_with_eip.route_53.record }}"
+    overwrite: true
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
