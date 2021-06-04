@@ -30,6 +30,7 @@ aws_ec2_autoscale_cluster:
   encrypt_boot: false # Whether to encrypt the EBS volumes or not.
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_refresh: true # Whether to build a new AMI or not.
+  asg_refresh: true # Whether to build a new ASG or not.
   desired_capacity: 0 # Zero means use min_size.
   min_size: 4
   max_size: 8
