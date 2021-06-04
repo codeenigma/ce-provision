@@ -1,7 +1,3 @@
-- name: Print Security Group to screen.
-  ansible.builtin.debug:
-    var: security_group
-
 - name: Create Security Group.
   ec2_group:
     name: "{{ security_group.name }}"
@@ -13,8 +9,3 @@
     description: "{{ security_group.description }}"
     rules: "{{ security_group.rules }}"
     rules_egress: "{{ security_group.rules_egress | default(omit) }}"
-  register: this_group
-  
-- name: Show stdout for group creation.
-  ansible.builtin.debug:
-    var: this_group.stdout
