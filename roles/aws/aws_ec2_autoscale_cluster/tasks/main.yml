@@ -199,6 +199,8 @@
     target_group_arns:
       - "{{ _aws_ec2_target_group_created.target_group_arn }}"
   register: _aws_ec2_asg_created
+  when:
+    - aws_ec2_autoscale_cluster.asg_refresh
 
 - name: Define default listeners.
   set_fact:
