@@ -5,7 +5,7 @@
     region: "{{ aws_cloudfront_distribution.region }}"
     tags: "{{ aws_cloudfront_distribution.tags }}"
     state: "{{ aws_cloudfront_distribution.state }}"
-    alias: "{{ aws_cloudfront_distribution.alias }}"
+    aliases: "{{ aws_cloudfront_distribution.aliases }}"
     origins: "{{ aws_cloudfront_distribution.origins }}"
     default_cache_behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
     cache_behaviors: "{{ aws_cloudfront_distribution.cache_behaviors }}"

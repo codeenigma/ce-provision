@@ -4,8 +4,8 @@ aws_cloudfront_distribution:
   region: "{{ _aws_region }}"
   tags: {}
   state: present
-  alias: "{{ _domain_name }}" # Primary alias to serve on.
-  aliases: [] # A list of additional aliases to serve on.
+  aliases: # A list of aliases to serve on.
+    - "{{ _domain_name }}"
   validate_certs: false
   viewer_certificate:
     cloudfront_default_certificate: false
