@@ -269,14 +269,6 @@
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
   register: _aws_ec2_autoscale_cluster_alb
 
-- name: Debug ALB output.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_alb
-
-#- name: Grab the listeners for this ALB.
-#  set_fact:
-#    _aws_ec2_autoscale_cluster_alb_listeners: _aws_ec2_autoscale_cluster_alb.listeners
-
 - name: Get ALB listener ARN for port 443.
   set_fact:
     _aws_ec2_autoscale_cluster_alb_listener_ARN: "{{ item.listener_arn }}"
@@ -290,24 +282,25 @@
   ansible.builtin.debug:
     var: _aws_ec2_autoscale_cluster_alb_listener_ARN
 
-- name: Build certificates list.
-  set_fact:
-    _aws_ec2_autoscale_cluster_alb_certificates: "{{ _aws_ec2_autoscale_cluster_alb_certificates | default([]) + [ {'CertificateARN': item} ] }}"
+#- name: Build certificates list.
+#  set_fact:
+#    _aws_ec2_autoscale_cluster_alb_certificates: "{{ _aws_ec2_autoscale_cluster_alb_certificates | default([]) + [ {'CertificateARN': item} ] }}"
+#  when:
+#    - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
+#    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+#  with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
+
+#- name: Debug show certificates.
+#  ansible.builtin.debug:
+#    var: _aws_ec2_autoscale_cluster_alb_certificates
+
+- name: Add extra SSL certificates to the ALB.
+  command:
+    cmd: "aws elbv2 add-listener-certificates --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={ item }"
   when:
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
-
-- name: Debug show certificates.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_alb_certificates
-
-- name: Add extra SSL certificates to the ALB.
-  command:
-    cmd: "aws elbv2 add-listener-certificates --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates {{ _aws_ec2_autoscale_cluster_alb_certificates }}"
-  when:
-    - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
-    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
   register: _api_result
 
 - name: Debug show API call result.
