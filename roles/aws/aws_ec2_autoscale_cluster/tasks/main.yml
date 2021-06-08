@@ -269,6 +269,14 @@
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
   register: _aws_ec2_autoscale_cluster_alb
 
+- name: Debug ALB output.
+  ansible.builtin.debug:
+    var: _aws_ec2_autoscale_cluster_alb
+
+#- name: Add extra SSL certificates to the ALB.
+#  command:
+#    cmd: "aws --listener-arn"
+
 - name: Create a CloudFront distribution.
   include_role:
     name: aws/aws_cloudfront_distribution
