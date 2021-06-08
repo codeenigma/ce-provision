@@ -282,21 +282,9 @@
   ansible.builtin.debug:
     var: _aws_ec2_autoscale_cluster_alb_listener_ARN
 
-#- name: Build certificates list.
-#  set_fact:
-#    _aws_ec2_autoscale_cluster_alb_certificates: "{{ _aws_ec2_autoscale_cluster_alb_certificates | default([]) + [ {'CertificateARN': item} ] }}"
-#  when:
-#    - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
-#    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
-#  with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
-
-#- name: Debug show certificates.
-#  ansible.builtin.debug:
-#    var: _aws_ec2_autoscale_cluster_alb_certificates
-
 - name: Add extra SSL certificates to the ALB.
   command:
-    cmd: "aws elbv2 add-listener-certificates --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
+    cmd: "aws elbv2 add-listener-certificates --region {{ aws_ec2_autoscale_cluster.region }} --profile {{ aws_ec2_autoscale_cluster.aws_profile }} --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
   when:
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
