@@ -296,7 +296,7 @@
   when:
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
-  with_items: "{{ ssl_extra_certificate_ARNs }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
 
 - name: Debug show certificates.
   ansible.builtin.debug:
@@ -308,7 +308,6 @@
   when:
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
-  with_items: "{{ ssl_extra_certificate_ARNs }}"
   register: _api_result
 
 - name: Debug show API call result.
