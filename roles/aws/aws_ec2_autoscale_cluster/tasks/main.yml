@@ -296,7 +296,7 @@
 
 - name: Add extra SSL certificates to the ALB.
   command:
-    cmd: "aws elbv2 add-listener-certificates --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={ item }"
+    cmd: "aws elbv2 add-listener-certificates --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
   when:
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
