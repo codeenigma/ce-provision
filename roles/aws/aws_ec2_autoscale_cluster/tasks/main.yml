@@ -278,10 +278,6 @@
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
   with_items: "{{ _aws_ec2_autoscale_cluster_alb.listeners }}"
 
-- name: Debug show listener ARN.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_alb_listener_ARN
-
 - name: Add extra SSL certificates to the ALB.
   command:
     cmd: "aws elbv2 add-listener-certificates --region {{ aws_ec2_autoscale_cluster.region }} --profile {{ aws_ec2_autoscale_cluster.aws_profile }} --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
@@ -289,11 +285,6 @@
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
-  register: _api_result
-
-- name: Debug show API call result.
-  ansible.builtin.debug:
-    var: _api_result
 
 - name: Create a CloudFront distribution.
   include_role:
