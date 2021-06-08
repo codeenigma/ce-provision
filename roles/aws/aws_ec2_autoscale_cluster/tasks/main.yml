@@ -273,9 +273,44 @@
   ansible.builtin.debug:
     var: _aws_ec2_autoscale_cluster_alb
 
-#- name: Add extra SSL certificates to the ALB.
-#  command:
-#    cmd: "aws --listener-arn"
+- name: Get ALB listener ARN for port 443.
+  set_fact:
+    _aws_ec2_autoscale_cluster_alb_listener_ARN: "{{ item.listener_arn }}"
+  when:
+    - "{{ item.port == 443 }}"
+    - ssl_extra_certificate_ARNs
+    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+  with_items: "{{ _aws_ec2_autoscale_cluster_alb.listeners }}"
+- name: Get listener ARN.
+
+- name: Debug show listener ARN.
+  ansible.builtin.debug:
+    var: _aws_ec2_autoscale_cluster_alb_listener_ARN
+
+- name: Build certificates list.
+  set_fact:
+    _aws_ec2_autoscale_cluster_alb_certificates: "{{ _aws_ec2_autoscale_cluster_alb_certificates | default([]) + [ {'CertificateARN': item} ] }}"
+  when:
+    - ssl_extra_certificate_ARNs
+    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+  with_items: "{{ ssl_extra_certificate_ARNs }}"
+
+- name: Debug show certificates.
+  ansible.builtin.debug:
+    var: _aws_ec2_autoscale_cluster_alb_certificates
+
+- name: Add extra SSL certificates to the ALB.
+  command:
+    cmd: "aws add-listener-certificates --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates {{ _aws_ec2_autoscale_cluster_alb_certificates }}"
+  when:
+    - ssl_extra_certificate_ARNs
+    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+  with_items: "{{ ssl_extra_certificate_ARNs }}"
+  register: _api_result
+
+- name: Debug show API call result.
+  ansible.builtin.debug:
+    var: _api_result
 
 - name: Create a CloudFront distribution.
   include_role:

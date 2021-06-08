@@ -76,6 +76,7 @@ aws_ec2_autoscale_cluster:
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
   cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
+  ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   efs: true # Whether to create an EFS volume.
