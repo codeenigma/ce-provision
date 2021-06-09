@@ -186,7 +186,7 @@
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
 
-- name: Create Autoscale group and spin up new instances.
+- name: Create AutoScale group and spin up new instances.
   community.aws.ec2_asg:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -209,6 +209,43 @@
   register: _aws_ec2_asg_created
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
+
+- name: Create a step scaling AutoScale policy.
+  community.aws.ec2_scaling_policy:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "present"
+    name: "{{ item.name }}"
+    policy_type: "{{ item.policy_type }}"
+    adjustment_type: "{{ item.adjustment_type }}"
+    asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    scaling_adjustment: "{{ item.adjustment }}"
+    min_adjustment_step: "{{ item.adjustment_step }}"
+    metric_aggregation: "{{ item.metric_aggregation }}"
+    step_adjustments: "{{ item.step_adjustments }}"
+  when:
+    - aws_ec2_autoscale_cluster.asg_refresh
+    - aws_ec2_autoscale_cluster.asg_scaling_policies
+    - "{{ item.policy_type == 'StepScaling' }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
+
+- name: Create a simple scaling AutoScale policy.
+  community.aws.ec2_scaling_policy:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "present"
+    name: "{{ item.name }}"
+    policy_type: "{{ item.policy_type }}"
+    adjustment_type: "{{ item.adjustment_type }}"
+    asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    scaling_adjustment: "{{ item.adjustment }}"
+    min_adjustment_step: "{{ item.adjustment_step }}"
+    cooldown: "{{ item.cooldown }}"
+  when:
+    - aws_ec2_autoscale_cluster.asg_refresh
+    - aws_ec2_autoscale_cluster.asg_scaling_policies
+    - "{{ item.policy_type == 'SimpleScaling' }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
 - name: Define default listeners.
   set_fact:
