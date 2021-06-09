@@ -23,6 +23,19 @@ aws_ec2_autoscale_cluster:
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
+  asg_scaling_policies: # List of AutoScale policies. See ec2_scaling_policy module docs for options and details.
+    - name: "{{ _env_type }}-scale-up-policy"
+      policy_type: "SimpleScaling"
+      adjustment_type: "ChangeInCapacity"
+      adjustment: 2
+      adjustment_step: 1 # Only used when adjustment_type is PercentChangeInCapacity.
+      cooldown: 300
+    - name: "{{ _env_type }}-scale-down-policy"
+      policy_type: "SimpleScaling"
+      adjustment_type: "ChangeInCapacity"
+      adjustment: -2
+      adjustment_step: -1 # Only used when adjustment_type is PercentChangeInCapacity.
+      cooldown: 300
   desired_capacity: 0 # Zero means use min_size.
   min_size: 4
   max_size: 8
