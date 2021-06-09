@@ -1,0 +1,9 @@
+---
+# ec2_scaling_policy ARN becomes a possible action
+# see aws_ec2_autoscale_cluster
+
+- name: Create a CloudWatch alarm.
+  community.aws.ec2_metric_alarm:
+    profile: "{{ aws_ec2_metric_alarm.aws_profile }}"
+    region: "{{ aws_ec2_metric_alarm.region }}"
+    state: "{{ aws_ec2_metric_alarm.state }}"

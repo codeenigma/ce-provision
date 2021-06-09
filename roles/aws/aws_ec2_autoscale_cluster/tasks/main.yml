@@ -216,7 +216,6 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "present"
     name: "{{ item.name }}"
-    policy_type: "{{ item.policy_type }}"
     adjustment_type: "{{ item.adjustment_type }}"
     asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
     scaling_adjustment: "{{ item.adjustment }}"
@@ -224,7 +223,6 @@
     metric_aggregation: "{{ item.metric_aggregation }}"
     step_adjustments: "{{ item.step_adjustments }}"
   when:
-    - aws_ec2_autoscale_cluster.asg_refresh
     - aws_ec2_autoscale_cluster.asg_scaling_policies
     - "{{ item.policy_type == 'StepScaling' }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
@@ -235,14 +233,12 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "present"
     name: "{{ item.name }}"
-    policy_type: "{{ item.policy_type }}"
     adjustment_type: "{{ item.adjustment_type }}"
     asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
     scaling_adjustment: "{{ item.adjustment }}"
     min_adjustment_step: "{{ item.adjustment_step }}"
     cooldown: "{{ item.cooldown }}"
   when:
-    - aws_ec2_autoscale_cluster.asg_refresh
     - aws_ec2_autoscale_cluster.asg_scaling_policies
     - "{{ item.policy_type == 'SimpleScaling' }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
