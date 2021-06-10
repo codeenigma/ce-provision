@@ -1,9 +1,21 @@
 ---
-# ec2_scaling_policy ARN becomes a possible action
-# see aws_ec2_autoscale_cluster
-
 - name: Create a CloudWatch alarm.
   community.aws.ec2_metric_alarm:
     profile: "{{ aws_ec2_metric_alarm.aws_profile }}"
     region: "{{ aws_ec2_metric_alarm.region }}"
     state: "{{ aws_ec2_metric_alarm.state }}"
+    name: "{{ aws_ec2_metric_alarm.name }}"
+    description: "{{ aws_ec2_metric_alarm.description }}"
+    metric: "{{ aws_ec2_metric_alarm.metric }}"
+    namespace: "{{ aws_ec2_metric_alarm.namespace }}"
+    statistic: "{{ aws_ec2_metric_alarm.statistic }}"
+    comparison: "{{ aws_ec2_metric_alarm.comparison }}"
+    threshold: "{{ aws_ec2_metric_alarm.threshold }}"
+    unit: "{{ aws_ec2_metric_alarm.unit }}"
+    period: "{{ aws_ec2_metric_alarm.period }}"
+    evaluation_periods: "{{ aws_ec2_metric_alarm.evaluation_periods }}"
+    dimensions: "{{ aws_ec2_metric_alarm.dimensions }}"
+    alarm_actions: "{{ aws_ec2_metric_alarm.alarm_actions }}"
+    insufficient_data_actions: "{{ aws_ec2_metric_alarm.insufficient_data_actions }}"
+    ok_actions: "{{ aws_ec2_metric_alarm.ok_actions }}"
+    treat_missing_data: "{{ aws_ec2_metric_alarm.treat_missing_data }}"
