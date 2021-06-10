@@ -245,21 +245,19 @@
   register: _aws_ec2_autoscale_cluster_simple_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
-- name: Gather created step scaling policies.
+- name: Gather step scaling policies.
   set_fact:
     aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + item }}"
-  with_items: "_aws_ec2_autoscale_cluster_step_scaling_policies.results"
+  with_items: "_aws_ec2_autoscale_cluster_step_scaling_policies"
   when:
     - _aws_ec2_autoscale_cluster_step_scaling_policies
-    - item.arn
 
-- name: Gather created simple scaling policies.
+- name: Gather simple scaling policies.
   set_fact:
     aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + item }}"
-  with_items: "_aws_ec2_autoscale_cluster_simple_scaling_policies.results"
+  with_items: "_aws_ec2_autoscale_cluster_simple_scaling_policies"
   when:
     - _aws_ec2_autoscale_cluster_simple_scaling_policies
-    - item.arn
 
 - name: Debug output of created scaling policies.
   ansible.builtin.debug:
@@ -273,6 +271,7 @@
   when:
     - aws_ec2_autoscale_cluster_scaling_policies
     - item.item.name == {{ _env_type }}-scale-up-policy
+    - item.arn
 
 - name: Set scaling down policy ARN.
   set_fact:
@@ -281,6 +280,7 @@
   when:
     - aws_ec2_autoscale_cluster_scaling_policies
     - item.item.name == {{ _env_type }}-scale-down-policy
+    - item.arn
 
 - name: Create alarm in CloudWatch for auto scaling up.
   include_role:
