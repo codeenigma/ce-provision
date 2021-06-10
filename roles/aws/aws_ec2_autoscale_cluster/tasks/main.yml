@@ -225,6 +225,7 @@
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies
     - "{{ item.policy_type == 'StepScaling' }}"
+  register: _aws_ec2_autoscale_cluster_step_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
 - name: Create a simple scaling AutoScale policy.
@@ -241,9 +242,23 @@
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies
     - "{{ item.policy_type == 'SimpleScaling' }}"
+  register: _aws_ec2_autoscale_cluster_simple_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
-- name: Create alarms for CloudWatch to auto scale.
+- name: Debug output of step scaling policies.
+  ansible.builtin.debug:
+    var: _aws_ec2_autoscale_cluster_step_scaling_policies
+  when: _aws_ec2_autoscale_cluster_step_scaling_policies
+
+- name: Debug output of simple scaling policies.
+  ansible.builtin.debug:
+    var: _aws_ec2_autoscale_cluster_simple_scaling_policies
+  when: _aws_ec2_autoscale_cluster_simple_scaling_policies
+
+#- name: Create alarms for CloudWatch to auto scale.
+#  include_role:
+#    name: aws/aws_ec2_metric_alarm
+#  vars: 
 
 - name: Define default listeners.
   set_fact:
