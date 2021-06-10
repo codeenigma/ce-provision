@@ -278,7 +278,7 @@
   when:
     - aws_ec2_autoscale_cluster_scaling_policies
     - item.item.name == aws_ec2_autoscale_cluster_scaling_up_policy_name
-    - item.arn
+    - item.arn is defined
 
 - name: Debug ARN.
   ansible.builtin.debug:
@@ -288,11 +288,11 @@
 - name: Set scaling down policy ARN.
   set_fact:
     aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
-  with_items: "aws_ec2_autoscale_cluster_scaling_policies"
+  loop: "aws_ec2_autoscale_cluster_scaling_policies"
   when:
     - aws_ec2_autoscale_cluster_scaling_policies
     - item.item.name == {{ _env_type }}-scale-down-policy
-    - item.arn
+    - item.arn is defined
 
 - name: Create alarm in CloudWatch for auto scaling up.
   include_role:
