@@ -243,6 +243,8 @@
     - "{{ item.policy_type == 'SimpleScaling' }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
+- name: Create alarms for CloudWatch to auto scale.
+
 - name: Define default listeners.
   set_fact:
     _aws_ec2_autoscale_cluster_listeners_http:
