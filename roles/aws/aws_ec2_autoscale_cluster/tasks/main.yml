@@ -268,8 +268,13 @@
   with_items: "aws_ec2_autoscale_cluster_scaling_policies"
   when:
     - aws_ec2_autoscale_cluster_scaling_policies
-    - item.item.name == {{ _env_type }}-scale-up-policy
+    - "{{ item.item.name == _env_type + '-scale-up-policy' }}"
     - item.arn
+
+- name: Debug ARN.
+  ansible.builtin.debug:
+    var: aws_ec2_autoscale_cluster_scaling_up_policy_ARN
+  when: aws_ec2_autoscale_cluster_scaling_up_policy_ARN
 
 - name: Set scaling down policy ARN.
   set_fact:
