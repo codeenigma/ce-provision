@@ -215,7 +215,7 @@
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "present"
-    name: "{{ item.name }}"
+    name: "{{ item.name }}-{{ item.policy_type }}"
     adjustment_type: "{{ item.adjustment_type }}"
     asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
     scaling_adjustment: "{{ item.adjustment }}"
@@ -233,7 +233,7 @@
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "present"
-    name: "{{ item.name }}"
+    name: "{{ item.name }}-{{ item.policy_type }}"
     adjustment_type: "{{ item.adjustment_type }}"
     asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
     scaling_adjustment: "{{ item.adjustment }}"
@@ -245,20 +245,27 @@
   register: _aws_ec2_autoscale_cluster_simple_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
-- name: Debug output of step scaling policies.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_step_scaling_policies
+- name: Fetch step scaling policies.
+  set_fact:
+    aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
   when: _aws_ec2_autoscale_cluster_step_scaling_policies
 
-- name: Debug output of simple scaling policies.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_simple_scaling_policies
+- name: Fetch simple scaling policies.
+  set_fact:
+    aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
   when: _aws_ec2_autoscale_cluster_simple_scaling_policies
+
+- name: Debug output of step scaling policies.
+  ansible.builtin.debug:
+    var: aws_ec2_autoscale_cluster_scaling_policies
+  when: aws_ec2_autoscale_cluster_scaling_policies
 
 #- name: Create alarms for CloudWatch to auto scale.
 #  include_role:
 #    name: aws/aws_ec2_metric_alarm
 #  vars: 
+#  with_items: "{{ aws_ec2_autoscale_cluster_scaling_policies }}"
+#  when: aws_ec2_autoscale_cluster_scaling_policies
 
 - name: Define default listeners.
   set_fact:
