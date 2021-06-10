@@ -245,17 +245,15 @@
   register: _aws_ec2_autoscale_cluster_simple_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
-- name: Gather step scaling policies.
+- name: Fetch step scaling policies.
   set_fact:
-    aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + item }}"
-  with_items: "_aws_ec2_autoscale_cluster_step_scaling_policies"
+    aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
   when:
     - _aws_ec2_autoscale_cluster_step_scaling_policies
 
-- name: Gather simple scaling policies.
+- name: Fetch simple scaling policies.
   set_fact:
-    aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + item }}"
-  with_items: "_aws_ec2_autoscale_cluster_simple_scaling_policies"
+    aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
   when:
     - _aws_ec2_autoscale_cluster_simple_scaling_policies
 
