@@ -267,7 +267,7 @@
 
 - name: Debug output of policy names.
   ansible.builtin.debug:
-    var: item.item.name
+    var: item
   with_items: "aws_ec2_autoscale_cluster_scaling_policies"
   when: aws_ec2_autoscale_cluster_scaling_policies
 
