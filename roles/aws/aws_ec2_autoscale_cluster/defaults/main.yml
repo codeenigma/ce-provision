@@ -36,6 +36,25 @@ aws_ec2_autoscale_cluster:
       adjustment: -2
       adjustment_step: -1 # Only used when adjustment_type is PercentChangeInCapacity.
       cooldown: 300
+  asg_cloudwatch_alarms:
+    - name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-up"
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      threshold: 80
+      unit: "Percent"
+      comparison: ">="
+      period: 120
+      evaluation_periods: 3
+    - name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-down"
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      threshold: 40
+      unit: "Percent"
+      comparison: "<="
+      period: 120
+      evaluation_periods: 5
   desired_capacity: 0 # Zero means use min_size.
   min_size: 4
   max_size: 8
