@@ -247,51 +247,53 @@
 
 - name: Fetch step scaling policies.
   set_fact:
-    aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
+    _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
   when:
     - _aws_ec2_autoscale_cluster_step_scaling_policies
 
 - name: Fetch simple scaling policies.
   set_fact:
-    aws_ec2_autoscale_cluster_scaling_policies: "{{ aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
+    _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
   when:
     - _aws_ec2_autoscale_cluster_simple_scaling_policies
 
 - name: Debug output of created scaling policies.
   ansible.builtin.debug:
-    var: aws_ec2_autoscale_cluster_scaling_policies
-  when: aws_ec2_autoscale_cluster_scaling_policies
+    var: _aws_ec2_autoscale_cluster_scaling_policies
+  when: _aws_ec2_autoscale_cluster_scaling_policies
 
 - set_fact:
-    aws_ec2_autoscale_cluster_scaling_up_policy_name: "{{ _env_type }}-scale-up-policy"
+    _aws_ec2_autoscale_cluster_scaling_up_policy_name: "{{ _env_type }}-scale-up-policy"
+
+- set_fact:
+    _aws_ec2_autoscale_cluster_scaling_down_policy_name: "{{ _env_type }}-scale-down-policy"
 
 - name: Debug output of policy names.
   ansible.builtin.debug:
     var: item
-  loop: "{{ aws_ec2_autoscale_cluster_scaling_policies }}"
-  when: aws_ec2_autoscale_cluster_scaling_policies
+  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
+  when: _aws_ec2_autoscale_cluster_scaling_policies
 
 - name: Set scaling up policy ARN.
   set_fact:
-    aws_ec2_autoscale_cluster_scaling_up_policy_ARN: "{{ item.arn }}"
-  loop: "{{ aws_ec2_autoscale_cluster_scaling_policies }}"
+    _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: "{{ item.arn }}"
+  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
   when:
-    - aws_ec2_autoscale_cluster_scaling_policies
-    - item.item.name == aws_ec2_autoscale_cluster_scaling_up_policy_name
+    - _aws_ec2_autoscale_cluster_scaling_policies
+    - item.item.name == _aws_ec2_autoscale_cluster_scaling_up_policy_name
     - item.arn is defined
 
 - name: Debug ARN.
   ansible.builtin.debug:
-    var: aws_ec2_autoscale_cluster_scaling_up_policy_ARN
-  when: aws_ec2_autoscale_cluster_scaling_up_policy_ARN
+    var: _aws_ec2_autoscale_cluster_scaling_up_policy_ARN
 
 - name: Set scaling down policy ARN.
   set_fact:
     aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
-  loop: "aws_ec2_autoscale_cluster_scaling_policies"
+  loop: "_aws_ec2_autoscale_cluster_scaling_policies"
   when:
-    - aws_ec2_autoscale_cluster_scaling_policies
-    - item.item.name == {{ _env_type }}-scale-down-policy
+    - _aws_ec2_autoscale_cluster_scaling_policies
+    - item.item.name == _aws_ec2_autoscale_cluster_scaling_down_policy_name
     - item.arn is defined
 
 - name: Create alarm in CloudWatch for auto scaling up.
@@ -310,10 +312,10 @@
     period: "{{ item.period }}"
     evaluation_periods: "{{ item.evaluation_periods }}"
     alarm_actions:
-      - "{{ aws_ec2_autoscale_cluster_scaling_up_policy_ARN }}"
+      - "{{ _aws_ec2_autoscale_cluster_scaling_up_policy_ARN }}"
   with_items: "aws_ec2_autoscale_cluster.asg_cloudwatch_alarms"
   when:
-    - aws_ec2_autoscale_cluster_scaling_up_policy_ARN
+    - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN
     - item.name == {{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-up
 
 - name: Create alarm in CloudWatch for auto scaling down.
