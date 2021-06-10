@@ -257,22 +257,16 @@
   when:
     - _aws_ec2_autoscale_cluster_simple_scaling_policies
 
-- name: Debug output of created scaling policies.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_scaling_policies
-  when: _aws_ec2_autoscale_cluster_scaling_policies
+#- name: Debug output of created scaling policies.
+#  ansible.builtin.debug:
+#    var: _aws_ec2_autoscale_cluster_scaling_policies
+#  when: _aws_ec2_autoscale_cluster_scaling_policies
 
-- set_fact:
-    _aws_ec2_autoscale_cluster_scaling_up_policy_name: "{{ _env_type }}-scale-up-policy"
-
-- set_fact:
-    _aws_ec2_autoscale_cluster_scaling_down_policy_name: "{{ _env_type }}-scale-down-policy"
-
-- name: Debug output of policy names.
-  ansible.builtin.debug:
-    var: item
-  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
-  when: _aws_ec2_autoscale_cluster_scaling_policies
+#- name: Debug output of policy names.
+#  ansible.builtin.debug:
+#    var: item
+#  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
+#  when: _aws_ec2_autoscale_cluster_scaling_policies
 
 - name: Set scaling up policy ARN.
   set_fact:
@@ -280,20 +274,16 @@
   loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
   when:
     - _aws_ec2_autoscale_cluster_scaling_policies
-    - item.item.name == _aws_ec2_autoscale_cluster_scaling_up_policy_name
+    - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_up_name
     - item.arn is defined
-
-- name: Debug ARN.
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_scaling_up_policy_ARN
 
 - name: Set scaling down policy ARN.
   set_fact:
-    aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
-  loop: "_aws_ec2_autoscale_cluster_scaling_policies"
+    _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
+  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
   when:
     - _aws_ec2_autoscale_cluster_scaling_policies
-    - item.item.name == _aws_ec2_autoscale_cluster_scaling_down_policy_name
+    - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_down_name
     - item.arn is defined
 
 - name: Create alarm in CloudWatch for auto scaling up.
@@ -302,7 +292,7 @@
   vars:
     aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    name: "{{ item.name }}"
+    name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_up_name }}"
     metric: "{{ item.metric }}"
     namespace: "{{ item.namespace }}"
     statistic: "{{ item.statistic }}"
@@ -316,7 +306,7 @@
   with_items: "aws_ec2_autoscale_cluster.asg_cloudwatch_alarms"
   when:
     - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN
-    - item.name == {{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-up
+    - item.scale_direction == 'up'
 
 - name: Create alarm in CloudWatch for auto scaling down.
   include_role:
@@ -324,7 +314,7 @@
   vars:
     aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
-    name: "{{ item.name }}"
+    name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_down_name }}"
     metric: "{{ item.metric }}"
     namespace: "{{ item.namespace }}"
     statistic: "{{ item.statistic }}"
@@ -334,11 +324,11 @@
     period: "{{ item.period }}"
     evaluation_periods: "{{ item.evaluation_periods }}"
     alarm_actions:
-      - "{{ aws_ec2_autoscale_cluster_scaling_down_policy_ARN }}"
+      - "{{ _aws_ec2_autoscale_cluster_scaling_down_policy_ARN }}"
   with_items: "aws_ec2_autoscale_cluster.asg_cloudwatch_alarms"
   when:
-    - aws_ec2_autoscale_cluster_scaling_down_policy_ARN
-    - item.name == {{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-down
+    - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN
+    - item.scale_direction == 'down'
 
 - name: Define default ALB listeners.
   set_fact:
