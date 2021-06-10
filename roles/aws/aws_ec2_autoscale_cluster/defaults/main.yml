@@ -26,13 +26,13 @@ aws_ec2_autoscale_cluster:
   asg_cloudwatch_policy_scale_up_name: "{{ _env_type }}-scale-up-policy"
   asg_cloudwatch_policy_scale_down_name: "{{ _env_type }}-scale-down-policy"
   asg_scaling_policies: # List of AutoScale policies. See ec2_scaling_policy module docs for options and details.
-    - name: "{{ asg_cloudwatch_policy_scale_up_name }}"
+    - name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_up_name }}"
       policy_type: "SimpleScaling"
       adjustment_type: "ChangeInCapacity"
       adjustment: 2
       adjustment_step: 1 # Only used when adjustment_type is PercentChangeInCapacity.
       cooldown: 300
-    - name: "{{ asg_cloudwatch_policy_scale_down_name }}"
+    - name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_down_name }}"
       policy_type: "SimpleScaling"
       adjustment_type: "ChangeInCapacity"
       adjustment: -2
