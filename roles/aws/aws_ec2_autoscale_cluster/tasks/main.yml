@@ -262,13 +262,16 @@
     var: aws_ec2_autoscale_cluster_scaling_policies
   when: aws_ec2_autoscale_cluster_scaling_policies
 
+- set_fact:
+    aws_ec2_autoscale_cluster_scaling_up_policy_name: "{{ _env_type }}-scale-up-policy"
+
 - name: Set scaling up policy ARN.
   set_fact:
     aws_ec2_autoscale_cluster_scaling_up_policy_ARN: "{{ item.arn }}"
   with_items: "aws_ec2_autoscale_cluster_scaling_policies"
   when:
     - aws_ec2_autoscale_cluster_scaling_policies
-    - "{{ item.item.name == _env_type + '-scale-up-policy' }}"
+    - item.item.name == aws_ec2_autoscale_cluster_scaling_up_policy_name
     - item.arn
 
 - name: Debug ARN.
