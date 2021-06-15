@@ -259,10 +259,16 @@
 
 - set_fact:
     _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: ""
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_policies
 
 - set_fact:
     _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: ""
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_policies
 
+# @todo We should support multiple policies. If this built a list
+# then we could potentially loop over it after.
 - name: Set scaling up policy ARN.
   set_fact:
     _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: "{{ item.arn }}"
@@ -272,6 +278,7 @@
     - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_up_name
     - item.arn is defined
 
+# @todo As above.
 - name: Set scaling down policy ARN.
   set_fact:
     _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
@@ -280,20 +287,6 @@
     - _aws_ec2_autoscale_cluster_scaling_policies
     - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_down_name
     - item.arn is defined
-
-- name: Debug alarms var.
-  ansible.builtin.debug:
-    var: aws_ec2_autoscale_cluster.asg_cloudwatch_alarms
-
-- name: Debug with_items output.
-  ansible.builtin.debug:
-    var: item
-  with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
-
-- name: Debug loop output.
-  ansible.builtin.debug:
-    var: item
-  loop: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
 
 - name: Create alarm in CloudWatch for auto scaling up.
   include_role:
