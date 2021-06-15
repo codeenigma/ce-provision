@@ -312,7 +312,7 @@
     evaluation_periods: "{{ item.evaluation_periods }}"
     alarm_actions:
       - "{{ _aws_ec2_autoscale_cluster_scaling_up_policy_ARN }}"
-  loop: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
   when:
     - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN | length > 1
     - item.scale_direction == 'up'
@@ -334,7 +334,7 @@
     evaluation_periods: "{{ item.evaluation_periods }}"
     alarm_actions:
       - "{{ _aws_ec2_autoscale_cluster_scaling_down_policy_ARN }}"
-  loop: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
   when:
     - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN | length > 1
     - item.scale_direction == 'down'
