@@ -4,7 +4,7 @@ aws_ec2_metric_alarm:
   region: "{{ _aws_region }}"
   state: present
   name: ""
-  description: ""
+  description: "Created by Ansible."
   metric: ""
   namespace: "" # The CloudWatch namespace (category) the alarm will appear in.
   statistic: "Average" # Statistical model to apply to the values gathered.
