@@ -299,19 +299,20 @@
   include_role:
     name: aws/aws_ec2_metric_alarm
   vars:
-    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_up_name }}"
-    metric: "{{ item.metric }}"
-    namespace: "{{ item.namespace }}"
-    statistic: "{{ item.statistic }}"
-    comparison: "{{ item.comparison }}"
-    threshold: "{{ item.threshold }}"
-    unit: "{{ item.unit }}"
-    period: "{{ item.period }}"
-    evaluation_periods: "{{ item.evaluation_periods }}"
-    alarm_actions:
-      - "{{ _aws_ec2_autoscale_cluster_scaling_up_policy_ARN }}"
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_up_name }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions:
+        - "{{ _aws_ec2_autoscale_cluster_scaling_up_policy_ARN }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
   when:
     - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN | length > 1
@@ -321,19 +322,20 @@
   include_role:
     name: aws/aws_ec2_metric_alarm
   vars:
-    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_down_name }}"
-    metric: "{{ item.metric }}"
-    namespace: "{{ item.namespace }}"
-    statistic: "{{ item.statistic }}"
-    comparison: "{{ item.comparison }}"
-    threshold: "{{ item.threshold }}"
-    unit: "{{ item.unit }}"
-    period: "{{ item.period }}"
-    evaluation_periods: "{{ item.evaluation_periods }}"
-    alarm_actions:
-      - "{{ _aws_ec2_autoscale_cluster_scaling_down_policy_ARN }}"
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_down_name }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions:
+        - "{{ _aws_ec2_autoscale_cluster_scaling_down_policy_ARN }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
   when:
     - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN | length > 1
