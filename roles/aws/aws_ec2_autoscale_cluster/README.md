@@ -56,7 +56,7 @@ aws_ec2_autoscale_cluster:
       unit: "Percent"
       comparison: "GreaterThanOrEqualToThreshold"
       period: 120
-      evaluation_periods: 3
+      evaluation_periods: 5
     - scale_direction: "down"
       description: "CPU under 40% so scale down."
       metric: "CPUUtilization"

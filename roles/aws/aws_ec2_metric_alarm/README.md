@@ -1,4 +1,13 @@
----
+# EC2 CloudWatch Metric Alarm
+Creates an EC2 alarm for CloudWatch. You can use this role to set any alarm, the EC2 AutoScale role
+uses it to set autoscaling alarms for autoscaling policies if you need an example.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 aws_ec2_metric_alarm:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
@@ -18,3 +27,6 @@ aws_ec2_metric_alarm:
   insufficient_data_actions: [] # List of ARNs of actions to take if the alarm has insufficient data.
   ok_actions: [] # List of ARNs of actions to take if the alarm is in an OK state.
   treat_missing_data: "missing" # What to do if data is missing (see API docs for options).
+```
+
+<!--ENDROLEVARS-->
