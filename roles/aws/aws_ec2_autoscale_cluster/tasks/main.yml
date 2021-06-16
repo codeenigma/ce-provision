@@ -311,7 +311,7 @@
         "AutoScalingGroupName": "{{ aws_ec2_autoscale_cluster.name }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
   when:
-    - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN | length > 1
+    - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN is defined
     - item.scale_direction == 'up'
 
 - name: Create alarm in CloudWatch for auto scaling down.
@@ -337,7 +337,7 @@
         "AutoScalingGroupName": "{{ aws_ec2_autoscale_cluster.name }}"
   with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
   when:
-    - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN | length > 1
+    - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN is defined
     - item.scale_direction == 'down'
 
 - name: Define default ALB listeners.
