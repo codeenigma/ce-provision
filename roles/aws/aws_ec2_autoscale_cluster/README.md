@@ -31,6 +31,42 @@ aws_ec2_autoscale_cluster:
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
+  asg_scaling_policies: # List of AutoScale policies. See ec2_scaling_policy module docs for options and details.
+    - name: "{{ _env_type }}-scale-up-policy"
+      policy_type: "SimpleScaling"
+      adjustment_type: "ChangeInCapacity"
+      adjustment: 2
+      adjustment_step: 1 # Only used when adjustment_type is PercentChangeInCapacity.
+      cooldown: 300
+    - name: "{{ _env_type }}-scale-down-policy"
+      policy_type: "SimpleScaling"
+      adjustment_type: "ChangeInCapacity"
+      adjustment: -2
+      adjustment_step: -1 # Only used when adjustment_type is PercentChangeInCapacity.
+      cooldown: 300
+  asg_cloudwatch_alarm_scale_up_name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-up"
+  asg_cloudwatch_alarm_scale_down_name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-down"
+  asg_cloudwatch_alarms:
+    - scale_direction: "up"
+      description: "CPU over 80% so scale up."
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      threshold: 80
+      unit: "Percent"
+      comparison: "GreaterThanOrEqualToThreshold"
+      period: 120
+      evaluation_periods: 5
+    - scale_direction: "down"
+      description: "CPU under 40% so scale down."
+      metric: "CPUUtilization"
+      namespace: "AWS/EC2"
+      statistic: "Average"
+      threshold: 40
+      unit: "Percent"
+      comparison: "LessThanOrEqualToThreshold"
+      period: 120
+      evaluation_periods: 5
   desired_capacity: 0 # Zero means use min_size.
   min_size: 4
   max_size: 8
