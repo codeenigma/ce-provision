@@ -186,7 +186,7 @@
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
 
-- name: Create Autoscale group and spin up new instances.
+- name: Create AutoScale group and spin up new instances.
   community.aws.ec2_asg:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -210,7 +210,137 @@
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
 
-- name: Define default listeners.
+- name: Create step scaling AutoScale policies.
+  community.aws.ec2_scaling_policy:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "present"
+    name: "{{ item.name }}-{{ item.policy_type }}"
+    adjustment_type: "{{ item.adjustment_type }}"
+    asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    scaling_adjustment: "{{ item.adjustment }}"
+    min_adjustment_step: "{{ item.adjustment_step }}"
+    metric_aggregation: "{{ item.metric_aggregation }}"
+    step_adjustments: "{{ item.step_adjustments }}"
+  when:
+    - aws_ec2_autoscale_cluster.asg_scaling_policies
+    - "{{ item.policy_type == 'StepScaling' }}"
+  register: _aws_ec2_autoscale_cluster_step_scaling_policies
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
+
+- name: Create simple scaling AutoScale policies.
+  community.aws.ec2_scaling_policy:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    state: "present"
+    name: "{{ item.name }}-{{ item.policy_type }}"
+    adjustment_type: "{{ item.adjustment_type }}"
+    asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    scaling_adjustment: "{{ item.adjustment }}"
+    min_adjustment_step: "{{ item.adjustment_step }}"
+    cooldown: "{{ item.cooldown }}"
+  when:
+    - aws_ec2_autoscale_cluster.asg_scaling_policies
+    - "{{ item.policy_type == 'SimpleScaling' }}"
+  register: _aws_ec2_autoscale_cluster_simple_scaling_policies
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
+
+- name: Fetch step scaling policies.
+  set_fact:
+    _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
+  when:
+    - _aws_ec2_autoscale_cluster_step_scaling_policies
+
+- name: Fetch simple scaling policies.
+  set_fact:
+    _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
+  when:
+    - _aws_ec2_autoscale_cluster_simple_scaling_policies
+
+- set_fact:
+    _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: ""
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_policies
+
+- set_fact:
+    _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: ""
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_policies
+
+# @todo We should support multiple policies. If this built a list
+# then we could potentially loop over it after.
+- name: Set scaling up policy ARN.
+  set_fact:
+    _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: "{{ item.arn }}"
+  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_policies
+    - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_up_name
+    - item.arn is defined
+
+# @todo As above.
+- name: Set scaling down policy ARN.
+  set_fact:
+    _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
+  loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_policies
+    - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_down_name
+    - item.arn is defined
+
+- name: Create alarm in CloudWatch for auto scaling up.
+  include_role:
+    name: aws/aws_ec2_metric_alarm
+  vars:
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_up_name }}"
+      description: "{{ item.description }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions:
+        - "{{ _aws_ec2_autoscale_cluster_scaling_up_policy_ARN }}"
+      dimensions:
+        "AutoScalingGroupName": "{{ aws_ec2_autoscale_cluster.name }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_up_policy_ARN is defined
+    - item.scale_direction == 'up'
+
+- name: Create alarm in CloudWatch for auto scaling down.
+  include_role:
+    name: aws/aws_ec2_metric_alarm
+  vars:
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarm_scale_down_name }}"
+      description: "{{ item.description }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions:
+        - "{{ _aws_ec2_autoscale_cluster_scaling_down_policy_ARN }}"
+      dimensions:
+        "AutoScalingGroupName": "{{ aws_ec2_autoscale_cluster.name }}"
+  with_items: "{{ aws_ec2_autoscale_cluster.asg_cloudwatch_alarms }}"
+  when:
+    - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN is defined
+    - item.scale_direction == 'down'
+
+- name: Define default ALB listeners.
   set_fact:
     _aws_ec2_autoscale_cluster_listeners_http:
       Protocol: HTTP
