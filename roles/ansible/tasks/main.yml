@@ -23,7 +23,7 @@
 
 - name: Install Ansible.
   command:
-    cmd: pip install ansible
+    cmd: sudo pip install ansible
   become: false
 
 - name: Install ansible-lint.
