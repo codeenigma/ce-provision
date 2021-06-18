@@ -21,6 +21,9 @@
   when:
     - aws_cloudwatch_agent.use_credentials
 
+- name: Start the agent
+  command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+
 - name: Generate AWS credentials
   template:
     src: credentials.j2
