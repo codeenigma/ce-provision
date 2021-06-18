@@ -1,20 +1,30 @@
 ---
-- name: Add repository key for Ansible.
+- name: Ensure old Ansible versions are not installed.
+  apt:
+    pkg: ["ansible"]
+    state: absent
+
+- name: Remove old repository key for Ansible.
   apt_key:
     id: 93C4A3FD7BB9C367
     keyserver: keyserver.ubuntu.com
-    state: present
+    state: absent
 
-- name: Add repository for Ansible.
+- name: Remove old repository for Ansible.
   apt_repository:
     repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
-    state: present
+    state: absent
 
-- name: Ensure Ansible is installed.
+- name: Ensure Ansible dependencies are installed.
   apt:
-    pkg: ["ansible", "python-pip", "yamllint"]
+    pkg: ["python-pip", "yamllint"]
     state: present
     update_cache: true
+
+- name: Install Ansible.
+  command:
+    cmd: sudo pip install ansible
+  become: false
 
 - name: Install ansible-lint.
   command:
