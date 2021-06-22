@@ -1,0 +1,11 @@
+---
+- name: Ensure old pip versions are not installed.
+  apt:
+    pkg: ["python-pip"]
+    state: absent
+
+- name: Ensure Ansible dependencies are installed.
+  apt:
+    pkg: ["python3-pip"]
+    state: present
+    update_cache: true
