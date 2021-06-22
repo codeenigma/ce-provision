@@ -33,6 +33,6 @@
   become: false
 
 - name: Install ansible-lint.
-  command:
-    cmd: pip3 install ansible-lint
-  become: false
+  ansible.builtin.pip:
+    name: ansible-lint
+    executable: pip3
