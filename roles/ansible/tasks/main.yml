@@ -1,10 +1,5 @@
 ---
-- name: Ensure old Ansible versions are not installed.
-  apt:
-    pkg: ["ansible"]
-    state: absent
-
-- name: Remove old repository key for Ansible.
+- name: Remove old PPA repository key for Ansible.
   apt_key:
     id: 93C4A3FD7BB9C367
     keyserver: keyserver.ubuntu.com
@@ -15,18 +10,29 @@
     repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
     state: absent
 
+- name: Ensure Ansible is not installed by pip.
+  command:
+    cmd: sudo pip uninstall ansible
+  become: false
+
+- name: Ensure old boto versions are not installed.
+  apt:
+    pkg: ["python-botocore", "python-urllib3", "python-pip"]
+    state: absent
+
 - name: Ensure Ansible dependencies are installed.
   apt:
-    pkg: ["python-pip", "yamllint"]
+    pkg: ["python3-pip", "yamllint"]
     state: present
     update_cache: true
 
-- name: Install Ansible.
+# Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
+- name: Remove and re-install Ansible.
   command:
-    cmd: sudo pip install ansible
+    cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
   become: false
 
 - name: Install ansible-lint.
-  command:
-    cmd: pip install ansible-lint
-  become: false
+  ansible.builtin.pip:
+    name: ansible-lint
+    executable: pip3

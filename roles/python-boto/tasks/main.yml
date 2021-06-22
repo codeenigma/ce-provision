@@ -1,7 +1,5 @@
 ---
-- name: Ensure boto is installed.
-  apt:
-    pkg: ["python-boto", "python-boto3"]
-    state: present
-    update_cache: true
-    cache_valid_time: 240
+- name: Ensure boto3 is installed.
+  ansible.builtin.pip:
+    name: boto3
+    executable: pip3
