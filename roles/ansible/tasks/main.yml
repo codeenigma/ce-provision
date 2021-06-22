@@ -1,9 +1,4 @@
 ---
-- name: Ensure old Ansible versions are not installed.
-  apt:
-    pkg: ["ansible"]
-    state: absent
-
 - name: Remove old repository key for Ansible.
   apt_key:
     id: 93C4A3FD7BB9C367
@@ -21,12 +16,33 @@
     state: present
     update_cache: true
 
-- name: Install Ansible.
+- name: Ensure Ansible is not installed by pip.
   command:
-    cmd: sudo pip install ansible
+    cmd: sudo pip uninstall ansible
+  become: false
+
+# Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
+- name: Remove and re-install Ansible.
+  command:
+    cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
+  become: false
+
+- name: Ensure old boto versions are not installed.
+  apt:
+    pkg: ["python-botocore", "python-urllib3"]
+    state: absent
+
+- name: Install latest boto3.
+  command:
+    cmd: pip3 install boto3
+  become: false
+
+- name: Install the latest 'passlib' library for password generation.
+  command:
+    cmd: pip3 install passlib
   become: false
 
 - name: Install ansible-lint.
   command:
-    cmd: pip install ansible-lint
+    cmd: pip3 install ansible-lint
   become: false
