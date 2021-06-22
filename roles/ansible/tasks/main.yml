@@ -1,33 +1,39 @@
 ---
 - name: Remove old PPA repository key for Ansible.
-  apt_key:
+  ansible.builtin.apt_key:
     id: 93C4A3FD7BB9C367
     keyserver: keyserver.ubuntu.com
     state: absent
 
 - name: Remove old repository for Ansible.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
     state: absent
 
+- name: Check pip is still installed.
+  ansible.builtin.stat:
+    path: /usr/bin/pip
+  register: _path_to_pip
+
 - name: Ensure Ansible is not installed by pip.
-  command:
+  ansible.builtin.command:
     cmd: sudo pip uninstall ansible
   become: false
+  when: _path_to_pip.stat.exists
 
 - name: Set up pip3.
-  include_role:
+  ansible.builtin.include_role:
     name: python-pip
 
 - name: Ensure Ansible dependencies are installed.
-  apt:
+  ansible.builtin.apt:
     pkg: ["yamllint"]
     state: present
     update_cache: true
 
 # Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
 - name: Remove and re-install Ansible.
-  command:
+  ansible.builtin.shell:
     cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
   become: false
 
