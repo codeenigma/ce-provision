@@ -15,14 +15,13 @@
     cmd: sudo pip uninstall ansible
   become: false
 
-- name: Ensure old boto versions are not installed.
-  apt:
-    pkg: ["python-botocore", "python-urllib3", "python-pip"]
-    state: absent
+- name: Set up pip3.
+  include_role:
+    name: python-pip
 
 - name: Ensure Ansible dependencies are installed.
   apt:
-    pkg: ["python3-pip", "yamllint"]
+    pkg: ["yamllint"]
     state: present
     update_cache: true
 
