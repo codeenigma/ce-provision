@@ -1,12 +1,15 @@
 ---
 - name: Ensure nginx is installed.
-  apt:
-    name:
-      - nginx
-      - python-passlib
+  ansible.builtin.apt:
+    name: nginx
     state: present
     update_cache: true
     cache_valid_time: 240
+
+- name: Ensure passlib is installed.
+  ansible.builtin.pip:
+    name: passlib
+    executable: pip3
 
 - name: Copy main nginx config.
   template:
