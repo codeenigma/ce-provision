@@ -1,4 +1,16 @@
 ---
+- name: Ensure old AWS client versions are not installed.
+  apt:
+    pkg: ["awscli"]
+    state: absent
+
+- name: Delete AWS client to force a reinstall.
+  ansible.builtin.file:
+    path: /usr/local/bin/aws
+    state: absent
+  when:
+    - aws_cli.refresh
+
 - name: Check if we already have an AWS cli bin.
   stat:
     path: "/usr/local/bin/aws"
