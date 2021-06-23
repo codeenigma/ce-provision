@@ -12,4 +12,5 @@
 
 - name: Ensure python3 is the default binary.
   ansible.builtin.command:
-    cmd: sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+    cmd: update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+  become: yes
