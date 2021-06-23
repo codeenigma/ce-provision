@@ -17,8 +17,8 @@
 
 - name: Ensure Ansible is not installed by pip.
   ansible.builtin.command:
-    cmd: sudo pip uninstall ansible -y
-  become: false
+    cmd: pip uninstall ansible -y
+  become: yes
   when: _path_to_pip.stat.exists
 
 - name: Set up pip3.
