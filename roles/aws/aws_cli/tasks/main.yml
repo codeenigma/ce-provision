@@ -1,6 +1,6 @@
 ---
 - name: Ensure old AWS client versions are not installed.
-  apt:
+  ansible.builtin.apt:
     pkg: ["awscli"]
     state: absent
 
@@ -12,12 +12,12 @@
     - aws_cli.refresh
 
 - name: Check if we already have an AWS cli bin.
-  stat:
+  ansible.builtin.stat:
     path: "/usr/local/bin/aws"
   register: aws_cli_bin
 
 - name: Fetch and extract AWS cli.
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: /tmp
     remote_src: true
@@ -25,7 +25,7 @@
     - not aws_cli_bin.stat.exists
 
 - name: Install AWS cli.
-  command:
+  ansible.builtin.command:
     cmd: /tmp/aws/install --install-dir /opt/aws-cli --bin-dir /usr/local/bin
   when:
     - not aws_cli_bin.stat.exists
