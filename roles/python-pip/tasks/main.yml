@@ -6,6 +6,6 @@
 
 - name: Ensure pip3 is installed.
   apt:
-    pkg: ["python3-pip"]
+    pkg: ["python3-pip", "python3-setuptools"]
     state: present
     update_cache: true
