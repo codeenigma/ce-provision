@@ -6,7 +6,7 @@
 
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "ansible-galaxy install -r {{ ce_provision.local_dir }}/default-requirements.yml"
+    cmd: "ansible-galaxy install -r {{ ce_provision.local_dir }}/roles/ce_provision/default-requirements.yml"
   become: true
   become_user: "{{ ce_provision.username }}"
 
@@ -58,10 +58,15 @@
   set_fact:
     ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
 
-- name: Ensure dependencies are installed.
-  apt:
-    pkg: ["git", "python-dnspython", "parallel"]
+- name: Ensure APT dependencies are installed.
+  ansible.builtin.apt:
+    pkg: ["git", "parallel"]
     state: present
+
+- name: Ensure pip dependencies are installed.
+  ansible.builtin.pip:
+    name: dnspython
+    executable: pip3
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
