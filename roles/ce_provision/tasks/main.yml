@@ -2,7 +2,7 @@
 - name: Check if ansible-galaxy custom requirements file exists.
   stat:
     path: "{{ ce_provision.galaxy_custom_requirements_file }}"
-  register: ce_provision_has_custom_galaxy_requirements
+  register: ce_provision_custom_galaxy_requirements
 
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
@@ -15,7 +15,7 @@
     cmd: "ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}"
   become: true
   become_user: "{{ ce_provision.username }}"
-  when: ce_provision_has_custom_galaxy_requirements
+  when: ce_provision_custom_galaxy_requirements.stat.exists
 
 - name: Create the provision group for provisioning.
   group:
