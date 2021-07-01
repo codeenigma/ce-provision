@@ -14,10 +14,12 @@ ANSIBLE_DEFAULT_EXTRA_VARS=""
 BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
+PROVISION_USER="controller"
 FORCE_PLAY="no"
 DRY_RUN="no"
 LIST_TASKS="no"
 VERBOSE="no"
+LINT="no"
 PARALLEL_RUN="no"
 BOTO_PROFILE=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
@@ -55,6 +57,10 @@ parse_options(){
           shift
           BUILD_WORKSPACE="$1"
         ;;
+      "--user")
+          shift
+          PROVISION_USER="$1"
+        ;;
       "--force")
           FORCE_PLAY="yes"
         ;;
@@ -66,6 +72,9 @@ parse_options(){
         ;;
       "--verbose")
           VERBOSE="yes"
+        ;;
+      "--lint")
+          LINT="yes"
         ;;
       "--own-branch")
           shift
@@ -125,12 +134,22 @@ cleanup_build_tmp_dir(){
 }
 # Trigger actual Ansible job.
 ansible_play(){
-  # Ubuntu PPA repo installed
-  if [ -f "/usr/bin/ansible-playbook" ]; then
-    ANSIBLE_BIN="/usr/bin/ansible-playbook"
-  # or pip installed
+  if [ "$LINT" = "yes" ]; then
+    # apt repo installed
+    if [ -f "/usr/local/bin/ansible-lint" ]; then
+      ANSIBLE_BIN="/usr/local/bin/ansible-lint"
+    # or pip installed
+    else
+      ANSIBLE_BIN="/home/$PROVISION_USER/.local/bin/ansible-lint"
+    fi
   else
-    ANSIBLE_BIN="/usr/local/bin/ansible-playbook"
+    # apt repo installed
+    if [ -f "/usr/bin/ansible-playbook" ]; then
+      ANSIBLE_BIN="/usr/bin/ansible-playbook"
+    # or pip installed
+    else
+      ANSIBLE_BIN="/usr/local/bin/ansible-playbook"
+    fi
   fi
   ANSIBLE_CMD="$ANSIBLE_BIN $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
   if [ "$PARALLEL_RUN" = "yes" ]; then
