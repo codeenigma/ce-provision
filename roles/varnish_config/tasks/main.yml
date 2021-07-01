@@ -6,4 +6,6 @@
     owner: root
     group: root
     mode: 0644
-  notify: restart varnish
+  notify:
+    - reload systemd
+    - restart varnish
