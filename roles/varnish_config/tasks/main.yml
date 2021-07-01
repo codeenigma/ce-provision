@@ -2,7 +2,7 @@
 - name: Copy Varnish default VCL.
   template:
     src: "default.vcl.j2"
-    dest: "{{ varnish.varnish_config_path }}/default.vcl"
+    dest: "{{ geerlingguy.varnish.varnish_config_path }}/default.vcl"
     owner: root
     group: root
     mode: 0644
