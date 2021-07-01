@@ -1,0 +1,15 @@
+---
+# Defaults file for varnish_config, other variables exist from importing geerlingguy.varnish and can be overriden
+
+varnish_config:
+  allowed_purge_IP: []
+
+  # List of upstream proxies we trust to set X-Forwarded-For correctly, use either the CIDR or list all the IPs
+  upstream_proxy_cidr: ""
+  upstream_proxies: []
+
+  pipe_large_assets: false
+
+  bypass_cache_paths: "install\.php|update\.php|cron\.php"
+
+  strip_cookies: "(^|;\s*)(_[_a-z]+|has_js|AWSELB|cookie-agreed)=[^;]*"
