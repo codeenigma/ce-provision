@@ -24,13 +24,9 @@ acl purge {
 
 # List of upstream proxies we trust to set X-Forwarded-For correctly.
 acl upstream_proxy {
-{% if varnish_config.upstream_proxy_cidr is not none %}
-  "{{ varnish_config.upstream_proxy_cidr }}";
-{% else %}
-  {% for proxy in varnish_config.upstream_proxies %}
+{% for proxy in varnish_config.upstream_proxies %}
   "{{ proxy }}";
-  {% endfor %}
-{% endif %}
+{% endfor %}
 }
 
 sub vcl_recv {
@@ -82,7 +78,7 @@ sub vcl_recv {
     }
   }
 
-{% if varnish_config.redirect_host is not none %}
+{% if varnish_config.redirect_host%}
   if (req.http.host ~ "^{{ varnish_config.redirect_host }}") {
     return (synth (750, ""));
   }

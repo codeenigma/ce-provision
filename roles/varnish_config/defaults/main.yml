@@ -4,8 +4,7 @@
 varnish_config:
   allowed_purge_IP: []
 
-  # List of upstream proxies we trust to set X-Forwarded-For correctly, use either the CIDR or list all the IPs
-  upstream_proxy_cidr: ""
+  # List of upstream proxies we trust to set X-Forwarded-For correctly, use either CIDR or list all the IPs
   upstream_proxies: []
 
   pipe_large_assets: false
