@@ -25,7 +25,7 @@ acl purge {
 # List of upstream proxies we trust to set X-Forwarded-For correctly.
 acl upstream_proxy {
 {% if varnish_config.upstream_proxy_cidr is defined %}
-  "{{ varnish_config.upstream_proxy_cidr }};
+  "{{ varnish_config.upstream_proxy_cidr }}";
 {% else %}
   {% for proxy in varnish_config.upstream_proxies %}
   "{{ proxy }}";
