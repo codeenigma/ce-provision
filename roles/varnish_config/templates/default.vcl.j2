@@ -24,7 +24,7 @@ acl purge {
 
 # List of upstream proxies we trust to set X-Forwarded-For correctly.
 acl upstream_proxy {
-{% if varnish_config.upstream_proxy_cidr is defined %}
+{% if varnish_config.upstream_proxy_cidr is not empty %}
   "{{ varnish_config.upstream_proxy_cidr }}";
 {% else %}
   {% for proxy in varnish_config.upstream_proxies %}
@@ -56,7 +56,7 @@ sub vcl_recv {
       /* Non-RFC2616 or CONNECT which is weird. */
       return (pipe);
   }
-{% if varnish_config.pipe_large_assets is defined %}
+{% if varnish_config.pipe_large_assets %}
   if(req.url ~ "\.(7z|bz2|rar|tar|tgz|zip|iso|dmg|pkg)") {
     return(pipe);
   }
@@ -82,13 +82,13 @@ sub vcl_recv {
     }
   }
 
-{% if varnish_config.redirect_host is defined %}
+{% if varnish_config.redirect_host is not empty %}
   if (req.http.host ~ "^{{ varnish_config.redirect_host }}") {
     return (synth (750, ""));
   }
 {% endif %}
 
-{%if varnish_config.forced_host_header is defined %}
+{%if varnish_config.forced_host_header is not empty %}
   set req.http.host = "{{ varnish_config.forced_host_header }}";
 {% endif %}
 
@@ -157,7 +157,7 @@ sub vcl_recv {
    }
  }
 
-{% if varnish_config.redirect_host is defined %}
+{% if varnish_config.redirect_host is not empty %}
 sub vcl_synth {
   if (resp.status == 750) {
     set resp.status = 301;
@@ -166,7 +166,7 @@ sub vcl_synth {
   }
 }
 {% endif %}
-{% if varnish_config.pipe_large_assets is defined %}
+{% if varnish_config.pipe_large_assets %}
 sub vcl_pipe {
   // http://www.varnish-cache.org/ticket/451
   // This forces every pipe request to be the first one.
