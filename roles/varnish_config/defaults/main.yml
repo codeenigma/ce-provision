@@ -12,4 +12,4 @@ varnish_config:
 
   bypass_cache_paths: "install\.php|update\.php|cron\.php"
 
-  strip_cookies: "(^|;\s*)(_[_a-z]+|has_js|AWSELB|cookie-agreed)=[^;]*"
+  strip_cookies: '(^|;\s*)(_[_a-z]+|has_js|AWSELB|cookie-agreed)=[^;]*'
