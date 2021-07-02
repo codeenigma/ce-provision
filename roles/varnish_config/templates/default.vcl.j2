@@ -88,7 +88,7 @@ sub vcl_recv {
   }
 {% endif %}
 
-{%if varnish_config.forced_host_header is not none %}
+{%if varnish_config.forced_host_header %}
   set req.http.host = "{{ varnish_config.forced_host_header }}";
 {% endif %}
 
@@ -157,7 +157,7 @@ sub vcl_recv {
    }
  }
 
-{% if varnish_config.redirect_host is not none %}
+{% if varnish_config.redirect_host %}
 sub vcl_synth {
   if (resp.status == 750) {
     set resp.status = 301;

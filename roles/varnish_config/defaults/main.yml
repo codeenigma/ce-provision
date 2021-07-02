@@ -14,5 +14,7 @@ varnish_config:
 
   strip_cookies: (^|;\s*)(_[_a-z]+|has_js|AWSELB|cookie-agreed)=[^;]*
 
-  redirect_host: ""
-  forced_host_header: ""
+  redirect_host: false
+  redirect_host_destination: ""
+
+  forced_host_header: false
