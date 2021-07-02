@@ -1,6 +1,12 @@
----
-# Defaults file for varnish_config, other variables exist from importing geerlingguy.varnish and can be overriden
+# varnish-config
+Installs and configures Varnish, with 6.4 being the default version. Depends on geerlingguy.varnish which does the setup bit, varnish-config handles the default.vcl file.
+<!--TOC-->
+<!--ENDTOC-->
 
+<!--ROLEVARS-->
+## Default variables
+```yaml
+---
 varnish_config:
   # List of IPs that are allowed to ask for content purge.
   allowed_purge_IP: []
@@ -15,3 +21,7 @@ varnish_config:
   strip_cookies: (^|;\s*)(_[_a-z]+|has_js|AWSELB|cookie-agreed)=[^;]*
   # List of upstream proxies we trust to set X-Forwarded-For correctly, use either CIDR or list all the IPs.
   upstream_proxies: []
+
+```
+
+<!--ENDROLEVARS-->
