@@ -1,0 +1,11 @@
+---
+- name: Copy Varnish default VCL.
+  template:
+    src: "default.vcl.j2"
+    dest: "{{ varnish_config_path }}/default.vcl"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - restart varnish
