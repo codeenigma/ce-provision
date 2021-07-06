@@ -34,6 +34,9 @@
       "playbook_file": "{{ ami_debian_buster.playbook_file }}",
       "inventory_directory": "{{ _ce_provision_base_dir }}/hosts",
       "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/id_rsa.pub",
+      {% if ami_debian_buster.groups is defined and ami_debian_buster.groups | length %}
+      "groups": {{ ami_debian_buster.groups | to_json }},
+      {% endif %}
       "ansible_env_vars": 
       [ 
         "ANSIBLE_FORCE_COLOR=True", 
@@ -45,8 +48,12 @@
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}
+        {% if ami_debian_buster.extra_vars is defined and ami_debian_buster.extra_vars | length %}
+        "--extra-vars", 
+        "{{ ami_debian_buster.extra_vars }}",
+        {% endif %}        
 				"--extra-vars", 
-				"{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true}"
+				"{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true}"        
 			 ]
   }]
 }

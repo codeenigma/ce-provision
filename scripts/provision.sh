@@ -9,17 +9,19 @@ usage(){
   echo 'Mandatory arguments:'
   echo '--repo: Path to a remote git repo. The "provision" user must have read access to it.'
   echo '--branch: The branch to provision.'
-  echo '--playbook: Relative path to an ansible playbook within the repo.'
+  echo '--playbook: Relative path to an ansible playbook within the repo. Can be a folder containing plays if the --parallel option is used.'
   echo ''
   echo 'Available options:'
   echo '--ansible-extra-vars: Variable to pass as --extra-vars arguments to ansible-playbook. Make sure to escape them properly.'
   echo '--workspace: a local existing clone of the repo/branch (if your deployment tool already has one). This will skip the cloning/fetching of the repo.'
   echo '--force: bypass the md5 checks on playbooks and play them regardless.'
   echo '--dry-run: Do not perform any action but run the playbooks in --check mode.'
+  echo '--list-tasks: Do not perform any action but run the playbooks with --list-tasks.'
   echo '--verbose: Detailled informations. This can potentially leak sensitive information in the output'
   echo '--own-branch: Branch to use for the main stack repository'
   echo '--config-branch: Branch to use for the main stack config repository'
   echo '--boto-profile: Name of a profile to export as AWS_PROFILE before calling Ansible'
+  echo '--parallel: Run all playbooks in the --playbook directory in parallel (using ansible-parallel)'
 }
 
 # Common processing.

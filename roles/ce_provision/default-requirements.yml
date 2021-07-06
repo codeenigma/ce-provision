@@ -1,0 +1,8 @@
+---
+collections:
+  - name: community.aws
+  - name: amazon.aws
+
+roles:
+  - name: cloudalchemy.process_exporter
+  - name: geerlingguy.varnish

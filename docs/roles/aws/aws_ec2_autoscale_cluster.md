@@ -24,7 +24,6 @@ aws_ec2_autoscale_cluster:
       public_subnet: public-c
   instance_type: t2.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
-  ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   root_volume_size: 40
   ebs_optimized: true
@@ -48,6 +47,8 @@ aws_ec2_autoscale_cluster:
   health_check_unhealthy_count: 2
   tags:
     Name: "example"
+  # An IAM Role name to associate with instances.
+  iam_role_name: "example"
   # Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
   peering:
     - name: utility-server.example.com
@@ -68,7 +69,7 @@ aws_ec2_autoscale_cluster:
   # Set the zone to empty to skip.
   route_53:
     zone: "example.com"
-    record: "*.{{ domain_name }}"
+    record: "*.{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html

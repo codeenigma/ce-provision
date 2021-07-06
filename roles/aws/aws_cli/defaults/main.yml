@@ -1,0 +1,3 @@
+---
+aws_cli:
+  refresh: false # Set to true to upgrade the AWS client

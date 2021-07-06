@@ -1,0 +1,171 @@
+vcl 4.0;
+
+# This is a basic VCL configuration file for varnish.  See the vcl(7)
+# man page for details on VCL syntax and semantics.
+#
+# Default backend definition.  Set this to point to your content
+# server.
+
+backend default {
+  .host = "{{ varnish_default_backend_host }}";
+  .port = "{{ varnish_default_backend_port }}";
+  .connect_timeout = 120s;
+  .first_byte_timeout = 120s;
+  .between_bytes_timeout = 120s;
+}
+
+acl purge {
+  "localhost";
+  "127.0.0.1";
+{% for IP in varnish_config.allowed_purge_IP %}
+  "{{ IP }}";
+{% endfor %}
+}
+
+# List of upstream proxies we trust to set X-Forwarded-For correctly.
+acl upstream_proxy {
+{% for proxy in varnish_config.upstream_proxies %}
+  "{{ proxy }}";
+{% endfor %}
+}
+
+sub vcl_recv {
+
+  # If the connection didn't come from the Nginx SSL terminator...
+  if (client.ip !~ upstream_proxy) {
+    # Throw away all headers that we only trust when they come from the SSL
+    # terminator.
+    unset req.http.X-Forwarded-Proto;
+    unset req.http.X-Forwarded-For;
+    # Force the X-Forwarded-For header to be that of the real IP
+    set req.http.X-Forwarded-For = regsub(client.ip, ":.*", "");
+  }
+
+  if (req.method != "GET" &&
+    req.method != "HEAD" &&
+    req.method != "PUT" &&
+    req.method != "POST" &&
+    req.method != "TRACE" &&
+    req.method != "OPTIONS" &&
+    req.method != "PURGE" &&
+    req.method != "DELETE") {
+      /* Non-RFC2616 or CONNECT which is weird. */
+      return (pipe);
+  }
+{% if varnish_config.pipe_large_assets %}
+  if(req.url ~ "\.(7z|bz2|rar|tar|tgz|zip|iso|dmg|pkg)") {
+    return(pipe);
+  }
+{% endif %}
+
+  if (req.method != "GET" && req.method != "HEAD" && req.method != "PURGE") {
+    /* We only deal with GET and HEAD by default */
+    return (pass);
+  }
+
+  # Mitigate httpoxy vuln
+  unset req.http.proxy;
+
+  # Check the incoming request type is "PURGE", not "GET" or "POST"
+  if (req.method == "PURGE") {
+    # Check if the ip coresponds with the acl purge
+    if (!client.ip ~ purge) {
+      # Return error code 405 (Forbidden) when not
+      return (synth(405, "Not allowed."));
+    }
+    else {
+      return(purge);
+    }
+  }
+
+{% if varnish_config.redirect_host%}
+  if (req.http.host ~ "^{{ varnish_config.redirect_host }}") {
+    return (synth (750, ""));
+  }
+{% endif %}
+
+{%if varnish_config.forced_host_header %}
+  set req.http.host = "{{ varnish_config.forced_host_header }}";
+{% endif %}
+
+  // Remove has_js and Google Analytics cookies.
+  set req.http.Cookie = regsuball(req.http.Cookie, "{{ varnish_config.strip_cookies }}", "");
+
+  // Remove a ";" prefix, if present.
+  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
+  // Remove empty cookies.
+  if (req.http.Cookie ~ "^\s*$") {
+    unset req.http.Cookie;
+  }
+
+  if (req.http.Authorization || req.http.Cookie) {
+    /* Not cacheable by default */
+    return (pass);
+  }
+
+  // Skip the Varnish cache for install, update, and cron
+  if (req.url ~ "{{ varnish_config.bypass_cache_paths }}") {
+    return (pass);
+  }
+
+  // Skip the Varnish cache for ELB Health checks
+  if (req.http.user-agent ~ "ELB-HealthChecker") {
+    return (pass);
+  }
+
+  if (req.url ~ "\.(jpeg|jpg|png|gif|ico|js|css|txt|gz|zip|lzma|bz2|tgz|tbz)$") {
+    unset req.http.cookie;
+  }
+
+  return (hash);
+}
+
+ sub vcl_hash {
+   if (req.http.Cookie) {
+     hash_data(req.http.Cookie);
+   }
+
+   # Ensure we have a separate bin for Safari as it has a different cache-conrol
+   # header.
+   if (req.http.user-agent ~ "Safari" && !req.http.user-agent ~ "Chrome") {
+     hash_data("safari-disable-cache-control");
+   }
+
+   # Use special internal SSL hash for https content
+   # This is necessary so that we don't serve back cached objects from
+   # Varnish that contain http:// plaintext assets
+   if (req.http.X-Forwarded-Proto) {
+     hash_data(req.http.X-Forwarded-Proto);
+   }
+ }
+
+ // Strip any cookies before an image/js/css is inserted into cache.
+ sub vcl_backend_response {
+   if (bereq.url ~ "\.(jpeg|jpg|png|gif|ico|js|css|txt|gz|zip|lzma|bz2|tgz|tbz)$") {
+     // For Varnish 2.0 or earlier, replace beresp with obj:
+     // unset obj.http.set-cookie;
+     unset beresp.http.set-cookie;
+   }
+   # Force Safari to always check the server as it doesn't respect Vary: cookie.
+   # See https://bugs.webkit.org/show_bug.cgi?id=71509
+   if (bereq.http.user-agent ~ "Safari" && !bereq.http.user-agent ~ "Chrome") {
+     set beresp.http.cache-control = "no-cache";
+   }
+ }
+
+{% if varnish_config.redirect_host %}
+sub vcl_synth {
+  if (resp.status == 750) {
+    set resp.status = 301;
+    set resp.http.Location = "{{ varnish_config.redirect_host_destination }}" + req.url;
+    return(deliver);
+  }
+}
+{% endif %}
+{% if varnish_config.pipe_large_assets %}
+sub vcl_pipe {
+  // http://www.varnish-cache.org/ticket/451
+  // This forces every pipe request to be the first one.
+  set bereq.http.connection = "close";
+}
+{% endif %}

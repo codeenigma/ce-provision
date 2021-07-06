@@ -4,16 +4,24 @@
     dest: "{{ _ce_provision_build_tmp_dir }}/extra"
     version: "{{ ce_provision.extra_repository_branch }}"
   delegate_to: localhost
+  become: true
+  become_user: "{{ ce_provision.username }}"
 
 - name: Check if file exists.
   stat:
     path: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
+  delegate_to: localhost
+  become: true
+  become_user: "{{ ce_provision.username }}"
   register: _extra_repository_vars_file
 
 - name: Include custom variables.
   include_vars:
     file: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
     name: _ce_provision_extra_vars
+  delegate_to: localhost
+  become: true
+  become_user: "{{ ce_provision.username }}"
   when:
     - _extra_repository_vars_file.stat.exists
 

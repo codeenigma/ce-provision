@@ -1,12 +1,15 @@
 ---
 - name: Ensure nginx is installed.
-  apt:
-    name:
-      - nginx
-      - python-passlib
+  ansible.builtin.apt:
+    name: nginx
     state: present
     update_cache: true
     cache_valid_time: 240
+
+- name: Ensure passlib is installed.
+  ansible.builtin.pip:
+    name: passlib
+    executable: pip3
 
 - name: Copy main nginx config.
   template:
@@ -60,12 +63,17 @@
     path: "/etc/nginx/sites-enabled"
     state: directory
 
+- name: Check if we have an AWS Cloudwatch folder.
+  ansible.builtin.stat:
+    path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d
+  register: _nginx_cloudwatch_dir
+
 - name: Generates AWS Cloudwatch default config.
   template:
     src: cloudwatch-main.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-main.json
   when:
-    - is_local is not defined or not is_local
+    - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
 - name: Generate domain specific configuration.
   include_tasks: domain.yml

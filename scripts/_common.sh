@@ -16,7 +16,9 @@ BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
 FORCE_PLAY="no"
 DRY_RUN="no"
+LIST_TASKS="no"
 VERBOSE="no"
+PARALLEL_RUN="no"
 BOTO_PROFILE=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
@@ -42,6 +44,9 @@ parse_options(){
           shift
           TARGET_PROVISION_PLAYBOOK="$1"
         ;;
+      "--parallel")
+          PARALLEL_RUN="yes"
+        ;;
       "--ansible-extra-vars")
           shift
           ANSIBLE_EXTRA_VARS="$1"
@@ -55,6 +60,9 @@ parse_options(){
         ;;
       "--dry-run")
           DRY_RUN="yes"
+        ;;
+      "--list-tasks")
+          LIST_TASKS="yes"
         ;;
       "--verbose")
           VERBOSE="yes"
@@ -117,9 +125,22 @@ cleanup_build_tmp_dir(){
 }
 # Trigger actual Ansible job.
 ansible_play(){
-  ANSIBLE_CMD="/usr/bin/ansible-playbook $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  # Ubuntu PPA repo installed
+  if [ -f "/usr/bin/ansible-playbook" ]; then
+    ANSIBLE_BIN="/usr/bin/ansible-playbook"
+  # or pip installed
+  else
+    ANSIBLE_BIN="/usr/local/bin/ansible-playbook"
+  fi
+  ANSIBLE_CMD="$ANSIBLE_BIN $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  if [ "$PARALLEL_RUN" = "yes" ]; then
+    ANSIBLE_CMD="$ANSIBLE_BIN {}"
+  fi
   if [ "$DRY_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --check"
+  fi
+  if [ "$LIST_TASKS" = "yes" ]; then
+    ANSIBLE_CMD="$ANSIBLE_CMD --list-tasks"
   fi
   if [ "$VERBOSE" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD -vvvv"
@@ -127,7 +148,11 @@ ansible_play(){
   if [ -n "$BOTO_PROFILE" ]; then
     export AWS_PROFILE="$BOTO_PROFILE"
   fi
-  $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
+  if [ "$PARALLEL_RUN" = "yes" ]; then
+    parallel --lb  --halt soon,fail=1 "$ANSIBLE_CMD" --extra-vars "\"$ANSIBLE_DEFAULT_EXTRA_VARS\"" --extra-vars "\"$ANSIBLE_EXTRA_VARS\"" ::: "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/"*.yml
+  else
+    $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
+  fi
   return $?
 }
 

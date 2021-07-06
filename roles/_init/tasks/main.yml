@@ -15,12 +15,26 @@
     mode: "0666"
   delegate_to: localhost
 
-- name: Compute current playbook md5
-  shell: 'find {{ playbook_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
+- name: Build the list of directories to scan for changes.
+  set_fact:
+    _init_vars_dirs_list: "{{ _init.vars_dirs + [ playbook_dir ] }}"
+
+- name: Compute files md5 hash.
+  shell: 'find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
   args:
     warn: false
   delegate_to: "localhost"
-  register: current_play_dir_md5
+  register: _init_vars_dirs_md5
+  with_items: "{{ _init_vars_dirs_list }}"
+  loop_control:
+    loop_var: _init_vars_dir
+
+- name: Combine files md5 hash.
+  set_fact:
+    current_play_dir_md5: "{{ current_play_dir_md5 | default() + _init_vars_dir_md5.stdout }}"
+  with_items: "{{ _init_vars_dirs_md5.results }}"
+  loop_control:
+    loop_var: _init_vars_dir_md5
 
 - name: Lookup current playbook md5
   set_fact:
@@ -28,8 +42,17 @@
 
 - meta: end_play
   when:
-    - current_play_dir_md5.stdout == previous_play_dir_md5
+    - current_play_dir_md5 == previous_play_dir_md5
     - not _ce_provision_force_play
+
+- name: Include vars directories.
+  include_vars:
+    dir: "{{ _init_vars_dir_include }}"
+    extensions:
+      - "yml"
+  with_items: "{{ _init.vars_dirs }}"
+  loop_control:
+    loop_var: _init_vars_dir_include
 
 # @todo This should be removed/refactored
 - name: Ensure /opt/bin directory exists.
