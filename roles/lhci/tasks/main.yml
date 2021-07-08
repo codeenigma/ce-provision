@@ -20,6 +20,7 @@
       - xfonts-75dpi
       - xfonts-cyrillic
       - xfonts-scalable
+    default_release: buster-backports
     state: present
 
 - name: Configure Xvfb to start on boot.
