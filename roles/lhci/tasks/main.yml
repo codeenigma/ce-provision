@@ -26,7 +26,6 @@
 - name: Configure Xvfb to start on boot.
   ansible.builtin.shell: |
     Xvfb -ac :99 -screen 0 1280x1024x16 &
-    export DISPLAY=:99
 
 - name: Install Google Chrome.
   ansible.builtin.apt:
