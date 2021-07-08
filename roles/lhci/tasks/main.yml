@@ -1,6 +1,45 @@
 ---
+- name: Add Google Chrome key.
+  ansible.builtin.shell: wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+
+- name: Install Google Chrome repo.
+  ansible.builtin.apt_repository:
+    repo: deb http://dl.google.com/linux/chrome/deb/ stable main
+    state: present
+    filename: google-chrome
+
+- name: Install Google Chrome "headful" mode dependencies.
+  ansible.builtin.apt:
+    name:
+      - xorg
+      - xvfb
+      - gtk2-engines-pixbuf
+      - dbus-x11
+      - xfonts-base
+      - xfonts-100dpi
+      - xfonts-75dpi
+      - xfonts-cyrillic
+      - xfonts-scalable
+    state: present
+
+- name: Configure Xvfb to start on boot.
+  ansible.builtin.shell: |
+    Xvfb -ac :99 -screen 0 1280x1024x16 &
+    export DISPLAY=:99
+
+- name: Install Google Chrome.
+  ansible.builtin.apt:
+    name: google-chrome-stable
+    state: present
+
 - name: Install "lhci/cli" node.js package.
-  npm:
+  ansible.builtin.npm:
     name: "@lhci/cli"
+    production: true
+    global: true
+
+- name: Install "lighthouse" node.js package.
+  ansible.builtin.npm:
+    name: "lighthouse"
     production: true
     global: true
