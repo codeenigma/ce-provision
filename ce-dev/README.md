@@ -43,7 +43,17 @@ When testing locally, you can put `is_local: yes` in the list of variables in yo
 
 Or you can include the 'common.yml' vars file, as it will set all the needed variables to be able to work locally and call ansible-playbook directly without going through the wrapper script (see below).
 
-### 5. Run, amend/create your roles, rince and repeat
+### 5. Ensure your hosts are properly configured
+
+If you run step 6 without hosts configured you will get a `skipping: no hosts matched` message and nothing will happen. There needs to be a `hosts` or `hosts.yml` file in your config directory, which is fetched during the Pre-requesites step above, for example:
+
+* https://github.com/codeenigma/ce-provision-config-example/blob/master/hosts/hosts.yml
+
+You need to ensure this exists and the correct IP addresses are defined (you can check this with `ping` or by looking at the `/etc/hosts` file on the host machine). Note, other formats are also valid. See the docs for details:
+
+* https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html
+
+### 6. Run, amend/create your roles, rince and repeat
 
 `ce-dev shell`
 
