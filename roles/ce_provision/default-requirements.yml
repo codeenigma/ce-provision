@@ -5,3 +5,4 @@ collections:
 
 roles:
   - name: cloudalchemy.process_exporter
+  - name: geerlingguy.varnish

@@ -169,6 +169,8 @@ ansible_play(){
   fi
   if [ "$PARALLEL_RUN" = "yes" ]; then
     parallel --lb  --halt soon,fail=1 "$ANSIBLE_CMD" --extra-vars "\"$ANSIBLE_DEFAULT_EXTRA_VARS\"" --extra-vars "\"$ANSIBLE_EXTRA_VARS\"" ::: "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/"*.yml
+  elif [ "$LINT" = "yes" ]; then
+    $ANSIBLE_CMD
   else
     $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
   fi
