@@ -3,7 +3,7 @@ ami_debian_buster:
   aws_profile: "{{ _aws_profile }}"
   region: us-east-2
   instance_type: t2.micro
-  ami_name: "{{ domain_name }}"
+  ami_name: "example"
   encrypt_boot: false
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
   # Operation can be one of:
@@ -12,3 +12,11 @@ ami_debian_buster:
   # - delete: Delete image and snapshots.
   #@todo find better names.
   operation: ensure
+  # Ansible groups to add the target to. Useful for picking up group_vars.
+  groups: []
+  # groups:
+  #   - "all"
+  #   - "example"
+  # A string of additional arguments to pass as ansible --extra-vars.
+  # It must me escaped already, and will be passed as-is.
+  extra_vars: ""

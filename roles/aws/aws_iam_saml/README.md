@@ -69,8 +69,9 @@ This requires boto and AWS-CLI on the provisioning server.
 ```yaml
 aws_iam_saml:
   aws_profile: "{{ _aws_profile }}" # Boto profile to use for AWS connections
-  region: "{{ _region }}" # AWS region to use, if applicable
-  tags: [] # AWS tags to apply
+  region: "eu-west-2" # AWS region to use
+  tags: {} # Dict of AWS tags to apply
+    #Tagname: "TagValue"
   aws_account_alias: "" # IAM account alias - human readable name to order SSO page
   provider_name: "SAMLProvider" # The name of your SAML provider in the AWS console
   admin_role: "Administrators" # The name of your admin IAM role in the AWS console
@@ -88,6 +89,7 @@ aws_iam_saml:
   saml_include_path: "" # Location to save the AWS admin include
   saml_sp_path: "" # Location to save account-specific SP in
   saml_sp_certificate: "" # The value for the X509Certificate
+
 ```
 
 <!--ENDROLEVARS-->

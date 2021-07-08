@@ -15,7 +15,7 @@ ldap_client:
   bindpw: ""
 
 jenkins:
-  server_name: "jenkins.{{ domain_name }}"
+  server_name: "jenkins.{{ _domain_name }}"
   ssl_handling: "ssl_selfsigned"
   listen_http_port: -1
   listen_https_port: 8884

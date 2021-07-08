@@ -21,7 +21,7 @@ aws_vpc_subnet:
       name: example.
       # Wether to create a dedicated security group allowing internal traffic.
       security_group: false
-  tags:
+  tags: {}
     #Type: "util"
   state: present
 
