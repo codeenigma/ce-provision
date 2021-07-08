@@ -1,10 +1,4 @@
 ---
-- name: Add community AWS roles.
-  command:
-    cmd: ansible-galaxy collection install community.aws amazon.aws
-  become: true
-  become_user: "{{ ce_provision.username }}"
-
 - name: Create the provision group for provisioning.
   group:
     name: "{{ ce_provision.username }}"
@@ -46,10 +40,15 @@
   set_fact:
     ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
 
-- name: Ensure Git is installed.
-  apt:
-    pkg: ["git", "python-dnspython"]
+- name: Ensure APT dependencies are installed.
+  ansible.builtin.apt:
+    pkg: ["git", "parallel"]
     state: present
+
+- name: Ensure pip dependencies are installed.
+  ansible.builtin.pip:
+    name: dnspython
+    executable: pip3
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
@@ -60,7 +59,7 @@
 
 - name: Setup Git identity email.
   command:
-    cmd: "git config --global user.email {{ ce_provision.username }}@{{ domain_name }}"
+    cmd: "git config --global user.email {{ ce_provision.username }}@{{ _domain_name }}"
   become: true
   become_user: "{{ ce_provision.username }}"
 
@@ -125,3 +124,21 @@
     state: directory
     owner: "{{ ce_provision.username }}"
     recurse: true
+
+- name: Check if ansible-galaxy custom requirements file exists.
+  stat:
+    path: "{{ ce_provision.galaxy_custom_requirements_file }}"
+  register: ce_provision_custom_galaxy_requirements
+
+- name: Install mandatory ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "ansible-galaxy install -r {{ ce_provision.local_dir }}/roles/ce_provision/default-requirements.yml"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+- name: Install custom ansible-galaxy roles and collections.
+  ansible.builtin.shell:
+    cmd: cd {{ ce_provision.local_dir }} && ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  when: ce_provision_custom_galaxy_requirements.stat.exists

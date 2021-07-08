@@ -13,3 +13,8 @@ ce_provision:
   extra_repository_vars_file: "custom.yml"
   extra_repository_allowed_vars: []
   local_dir: "/home/{{ _ce_provision.username }}/ce-provision"
+
+_init:
+  # A list of var directories to include. We only support .yml extensions.
+  # This is used to detect if the playbook must re-run or not.
+  vars_dirs: []

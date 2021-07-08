@@ -14,7 +14,7 @@ aws_rds:
     - subnet-aaaaaaaa
     - subnet-bbbbbbbb
   name: example
-  tags: []
+  tags: {}
   db_instance_class: db.m5.large
   state: present
   description: example
