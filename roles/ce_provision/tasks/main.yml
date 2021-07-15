@@ -132,7 +132,7 @@
 
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "ansible-galaxy install -r {{ ce_provision.local_dir }}/roles/ce_provision/default-requirements.yml"
+    cmd: "ansible-galaxy install -r {{ ce_provision.local_dir }}/roles/ce_provision/meta/requirements.yml"
   become: true
   become_user: "{{ ce_provision.username }}"
 
