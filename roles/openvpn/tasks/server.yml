@@ -74,6 +74,27 @@
     - private/client.key
     - private/server.key
 
+- name: install openvpn ldap auth package
+  ansible.builtin.package:
+    name: "openvpn-auth-ldap"
+    state: present
+    when:
+      - openvpn.ldap.auth
+
+- name: ensure ldap config directory exists
+  ansible.builtin.file:
+    path: "{{ openvpn_configuration_directory }}/auth"
+    state: directory
+    mode: "0755"
+
+- name: place auth-ldap.conf
+  ansible.builtin.template:
+    src: auth-ldap.conf.j2
+    dest: "{{ openvpn_configuration_directory }}/auth/auth-ldap.conf"
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: place server.conf
   ansible.builtin.template:
     src: server.conf.j2
