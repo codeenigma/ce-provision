@@ -68,3 +68,13 @@ openvpn:
   force_redirect_gateway: false
   compress: false
   custom_directives: []
+  ldap:
+    auth: false
+    # String containing your ldap urls (for example: ldaps://ldap.example.com,ldaps://ldap2.example.com)
+    url: ldaps://ldap.example.com,ldaps://ldap2.example.com
+    tls: false
+    tls_cert: /etc/ldap/ssl/ldap.CA.pem
+    timeout: 15
+    basedn: dc=example,dc=com
+    group_basedn: ou=Groups,dc=example,dc=com
+    group_filter: (|(cn=vpnguests)(cn=sysadmins))
