@@ -34,10 +34,9 @@
 # Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
 - name: Remove and re-install Ansible.
   ansible.builtin.shell:
-    cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
+    cmd: sudo apt-get -y remove ansible && sudo python -m pip install ansible
   become: false
 
 - name: Install ansible-lint.
   ansible.builtin.pip:
     name: ansible-lint
-    executable: pip3

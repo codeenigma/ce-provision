@@ -9,7 +9,6 @@
 - name: Ensure pip dependencies are installed.
   ansible.builtin.pip:
     name: pymysql
-    executable: pip3
 
 - name: Copy debian.cnf credentials file.
   template:
