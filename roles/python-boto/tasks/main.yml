@@ -7,4 +7,3 @@
 - name: Ensure boto3 is installed.
   ansible.builtin.pip:
     name: boto3
-    executable: pip3

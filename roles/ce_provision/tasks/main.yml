@@ -48,7 +48,6 @@
 - name: Ensure pip dependencies are installed.
   ansible.builtin.pip:
     name: dnspython
-    executable: pip3
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.

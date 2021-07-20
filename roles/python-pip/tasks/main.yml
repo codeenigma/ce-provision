@@ -14,3 +14,7 @@
   ansible.builtin.command:
     cmd: update-alternatives --install /usr/bin/python python /usr/bin/python3 1
   become: true
+
+- name: Ensure pip is upgraded to latest version.
+  ansible.builtin.command:
+    cmd: python -m pip install -U pip
