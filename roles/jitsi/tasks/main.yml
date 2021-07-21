@@ -1,0 +1,44 @@
+---
+- name: Add Jitsi key.
+  ansible.builtin.shell: wget -q -O - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add -
+
+- name: Install Jitsi repo.
+  ansible.builtin.apt_repository:
+    repo: deb https://download.jitsi.org stable/
+    state: present
+    filename: jitsi-stable
+
+- name: Update system settings for Jitsi.
+  blockinfile:
+    path: /etc/systemd/system.conf
+    block: |
+      DefaultLimitNOFILE=65000
+      DefaultLimitNPROC=65000
+      DefaultTasksMax=65000
+
+- name: Force systemd to reread configs.
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Write interactive hostname value for automated installation.
+  ansible.builtin.command: "debconf-set-selections <<< 'jitsi-videobridge2 jitsi-videobridge/jvb-hostname string {{ jitsi.server_name }}';"
+  become: true
+
+- name: Write interactive cert selection value for automated installation.
+  ansible.builtin.command: debconf-set-selections <<< 'jitsi-meet jitsi-meet/cert-choice select Generate a new self-signed certificate (You will later get a chance to obtain a Let'\''s encrypt certificate)';
+  become: true
+
+- name: Install Jitsi.
+  ansible.builtin.apt:
+    name: jitsi-meet
+    state: present
+
+# We don't use our 'ssl' role because Jitsi handles this better with a built-in script.
+- name: Install LetsEncrypt certificate.
+  ansible.builtin.command: "echo '{{ jitsi.email }}' | /usr/share/jitsi-meet/scripts/install-letsencrypt-cert.sh"
+  become: true
+
+- name: Make Jitsi is restarted and running.
+  ansible.builtin.systemd:
+    state: restarted
+    name: jitsi-videobridge2
