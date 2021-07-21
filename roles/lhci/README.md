@@ -29,5 +29,20 @@ ci:
 
 Using this example and executing `lhci collect && lhci upload` in the same directory will make it run a test against https://www.example.local/ and store the report files in `./reports` relative to `lighthouserc.yml`.
 
+You can enable VNC support for an environment by setting the `lhci.enable_vnc` variable to `true` which will install the `x11vnc` package on the target machine. Once this is installed, you can either manually or with CI export your `Xvfb` display from that machine like so:
+
+```
+x11vnc -display :99 &
+```
+
+Note, this is not protected and should not be enabled in general. See also the ce-deploy CI counterpart: https://github.com/codeenigma/ce-deploy/tree/1.x/roles/lhci_run
+
 <!--ROLEVARS-->
+## Default variables
+```yaml
+---
+lhci:
+  enable_vnc: false
+```
+
 <!--ENDROLEVARS-->
