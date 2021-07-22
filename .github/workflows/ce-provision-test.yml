@@ -22,7 +22,8 @@ jobs:
         if: ${{ always() }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y ansible-lint yamllint shellcheck
+          sudo apt-get install -y python3-pip yamllint shellcheck
+          sudo pip3 install ansible-base ansible-lint
           find ./roles -name "*.yml"  | xargs ansible-lint
           yamllint ./roles
           cd scripts && shellcheck *.sh
