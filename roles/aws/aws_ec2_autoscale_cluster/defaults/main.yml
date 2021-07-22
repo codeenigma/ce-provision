@@ -78,6 +78,8 @@ aws_ec2_autoscale_cluster:
   health_check_timeout: 5
   health_check_healthy_count: 5
   health_check_unhealthy_count: 2
+  # ALB settings
+  elb_idle_timeout: 60
   tags:
     Name: "example"
   # An IAM Role name to associate with instances.
@@ -109,5 +111,6 @@ aws_ec2_autoscale_cluster:
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
+  alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
   efs: true # Whether to create an EFS volume.
   efs_encrypt: false # Whether to encrypt the EFS volume

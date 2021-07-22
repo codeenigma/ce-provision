@@ -14,6 +14,7 @@ usage(){
   echo 'Available options:'
   echo '--ansible-extra-vars: Variable to pass as --extra-vars arguments to ansible-playbook. Make sure to escape them properly.'
   echo '--workspace: a local existing clone of the repo/branch (if your deployment tool already has one). This will skip the cloning/fetching of the repo.'
+  echo '--user: Linux user executing the script (defaults to controller).'
   echo '--force: bypass the md5 checks on playbooks and play them regardless.'
   echo '--dry-run: Do not perform any action but run the playbooks in --check mode.'
   echo '--list-tasks: Do not perform any action but run the playbooks with --list-tasks.'
@@ -22,6 +23,7 @@ usage(){
   echo '--config-branch: Branch to use for the main stack config repository'
   echo '--boto-profile: Name of a profile to export as AWS_PROFILE before calling Ansible'
   echo '--parallel: Run all playbooks in the --playbook directory in parallel (using ansible-parallel)'
+  echo '--lint: Run ansible-lint against the playbooks instead of executing them.'
 }
 
 # Common processing.
