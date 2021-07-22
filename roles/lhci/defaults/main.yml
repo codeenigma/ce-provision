@@ -1,0 +1,3 @@
+---
+lhci:
+  enable_vnc: false
