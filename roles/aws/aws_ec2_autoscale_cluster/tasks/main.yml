@@ -397,6 +397,7 @@
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
     security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
+    idle_timeout: "{{ aws_ec2_autoscale_cluster.elb_idle_timeout }}"
   register: _aws_ec2_autoscale_cluster_alb
 
 - name: Get ALB listener ARN for port 443.
