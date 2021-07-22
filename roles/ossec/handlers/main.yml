@@ -7,7 +7,7 @@
     state: restarted
 
 - name: stop ossec-authd
-  ignore_errors: true
+  failed_when: false
   command: "pkill ossec-authd"
 
 - name: start ossec-authd
