@@ -1,22 +1,43 @@
 ---
-- name: Add repository key for Ansible.
-  apt_key:
+- name: Remove old PPA repository key for Ansible.
+  ansible.builtin.apt_key:
     id: 93C4A3FD7BB9C367
     keyserver: keyserver.ubuntu.com
-    state: present
+    state: absent
 
-- name: Add repository for Ansible.
-  apt_repository:
+- name: Remove old repository for Ansible.
+  ansible.builtin.apt_repository:
     repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
-    state: present
+    state: absent
 
-- name: Ensure Ansible is installed.
-  apt:
-    pkg: ["ansible", "python-pip", "yamllint"]
+- name: Check pip is still installed.
+  ansible.builtin.stat:
+    path: /usr/bin/pip
+  register: _path_to_pip
+
+- name: Ensure Ansible is not installed by pip.
+  ansible.builtin.command:
+    cmd: pip uninstall ansible -y
+  become: true
+  when: _path_to_pip.stat.exists
+
+- name: Set up pip3.
+  ansible.builtin.include_role:
+    name: python-pip
+
+- name: Ensure Ansible dependencies are installed.
+  ansible.builtin.apt:
+    pkg: ["yamllint"]
     state: present
     update_cache: true
 
-- name: Install ansible-lint.
-  command:
-    cmd: pip install ansible-lint
+# Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
+- name: Remove and re-install Ansible.
+  ansible.builtin.shell:
+    cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
   become: false
+
+- name: Install ansible-lint.
+  ansible.builtin.pip:
+    name: ansible-lint
+    executable: pip3

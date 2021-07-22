@@ -3,3 +3,10 @@ skip_list:
   - '301'
   - '701'
   - '306'
+  - '303'
+  - unnamed-task
+  - risky-file-permissions
+  - role-name
+  - no-handler
+  - var-naming
+  - no-jinja-nesting

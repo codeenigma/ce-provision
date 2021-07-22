@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}"
+      },
+      "Action": "sts:AssumeRoleWithSAML",
+      "Condition": {
+        "StringEquals": {
+          "SAML:aud": "https://signin.aws.amazon.com/saml"
+        },
+        "ForAnyValue:StringLike": {
+          "saml:edupersonaffiliation": [{% for group in aws_iam_saml.admin_groups[:-1] %}
+            "{{ group }}",{% endfor %}
+            "{{ aws_iam_saml.admin_groups|last }}"
+          ]
+        }
+      }
+    }
+  ]
+}

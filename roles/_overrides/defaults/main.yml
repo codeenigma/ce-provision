@@ -1,5 +1,17 @@
 ---
 _overrides:
-  templates: []
+  # A list of files to override.
   files: []
-#@todo  services: []
+  # files:
+  #   - src: "php/php.ini" # This is relative to the "extra" config, or to the playbook.
+  #     dest: "/etc/php7.4/fpm/php.ini"
+  #     mode: "0755"
+  #     owner: "root"
+  #     group: "root"
+  links: []
+  # links:
+  #   - src: "/mnt/assets" # This is absolute, on the target.
+  #     dest: "/var/www/static"
+  #     mode: "0755"
+  #     owner: "nginx"
+  #     group: "nginx"

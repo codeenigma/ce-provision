@@ -14,13 +14,15 @@ aws_efs:
   name: example
   # If false, we omit tags enterly and leave them as is.
   purge_tags: false
-  tags: []
+  tags: {}
   state: present
   wait: true
   # Subnets names.
   subnets: []
   # SG names. Note, the assumption is that all subnets have the same SGs.
   security_groups: []
+  # Whether to encrypt the volume or not.
+  encrypt: false
 
 ```
 

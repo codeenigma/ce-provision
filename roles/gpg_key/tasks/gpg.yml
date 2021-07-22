@@ -2,34 +2,34 @@
 # We assume a single key by user. Grepping on the email throws errors if we have no keys already.
 # @todo Find a better solution.
 - name: Check if we already have a key.
-  shell:
+  ansible.builtin.command:
     cmd: "gpg --list-secret-keys"
   register: user_ansible_gpg_key_exists
   become: true
   become_user: "{{ gpg_user.username }}"
 
 - name: Ensure we have an usable Pinentry program.
-  apt:
+  ansible.builtin.apt:
     pkg: ["pinentry-tty"]
     state: present
   when: not user_ansible_gpg_key_exists.stdout
 
 - name: Create GPG template.
-  template:
+  ansible.builtin.template:
     src: "gpg.j2"
     dest: "/tmp/gpg-{{ gpg_user.username }}"
     mode: "0666"
   when: not user_ansible_gpg_key_exists.stdout
 
 - name: Generate GPG key.
-  shell:
+  ansible.builtin.command:
     cmd: "export GPG_TTY=$(tty); gpgconf --kill gpg-agent; gpg-agent --daemon; gpg --batch --generate-key /tmp/gpg-{{ gpg_user.username }}"
   become: true
   become_user: "{{ gpg_user.username }}"
   when: not user_ansible_gpg_key_exists.stdout
 
 - name: Gather key ID.
-  shell:
+  ansible.builtin.command:
     cmd: "gpg --list-secret-keys {{ gpg_user.email }} | grep '^  '"
   become: true
   become_user: "{{ gpg_user.username }}"
@@ -39,7 +39,7 @@
     - not user_ansible_gpg_key_exists.stdout
 
 - name: Publish GPG key to openpgp.org.
-  command:
+  ansible.builtin.command:
     cmd: "gpg --keyserver {{ server }} --send-keys {{ user_ansible_gpg_key_id.stdout }}"
   become: true
   become_user: "{{ gpg_user.username }}"

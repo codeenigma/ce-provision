@@ -7,10 +7,11 @@ def allowed_vars(original, policies):
     for orig_key, orig_value in original.items():
         for allowed in policies:
             if allowed['name'] == orig_key:
-                if allowed.get('deny'):
-                    for deny in allowed['deny']:
-                        orig_value.pop(deny, None)
-                filtered[orig_key] = orig_value
+                if allowed.get('allow'):
+                    filtered[orig_key] = {}
+                    for allow in allowed['allow']:
+                        if allow in orig_value:
+                            filtered[orig_key][allow] = orig_value.get(allow)
     return filtered
 
 

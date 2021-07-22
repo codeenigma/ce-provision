@@ -66,4 +66,4 @@
   when:
     - not domain.access_log == "/var/log/nginx/access.log"
     - not domain.error_log == "/var/log/nginx/error.log"
-    - is_local is not defined or not is_local
+    - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir

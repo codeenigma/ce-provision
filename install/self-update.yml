@@ -18,9 +18,11 @@
         repo: "{{ ce_provision.config_repository }}"
         accept_hostkey: yes
         dest: "{{ ce_provision.local_dir }}/config"
+        version: "{{ ce_provision.config_repository_branch  | default('master') }}"
       become: yes
       become_user: "{{ ce_provision.username }}"
       when: ce_provision.config_repository is defined and ce_provision.config_repository
+
     - name: Check if we have a config directory.
       stat:
         path: "{{ ce_provision.local_dir }}/config"

@@ -10,7 +10,7 @@ location @phpprocess {
     fastcgi_index index.php;
     fastcgi_param SCRIPT_FILENAME $request_filename;
     fastcgi_intercept_errors on;
-    fastcgi_read_timeout 60;
+    fastcgi_read_timeout {{ nginx.fastcgi_read_timeout }};
     include fastcgi_params;
     fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
@@ -90,7 +90,7 @@ location ~ ^/sites/.*/files/.* {
 }
 
 # Core and contrib assets can be pretty much anywhere.
-location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot)$ {
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf)$ {
     try_files $uri @rewrite =404;
 }
 

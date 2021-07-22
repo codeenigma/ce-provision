@@ -12,12 +12,19 @@
   set_fact:
     aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
-#@todo https://github.com/ansible/ansible/issues/54174
+- name: Gather IAM role info.
+  community.aws.iam_role_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    name: "{{ aws_ec2_with_eip.iam_role_name }}"
+  register: _aws_ec2_with_eip_iam_role_info
+
 - name: Create EC2 instance.
-  ec2_instance:
+  community.aws.ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     key_name: "{{ aws_ec2_with_eip.key_name }}"
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
+    instance_role: "{{ _aws_ec2_with_eip_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     region: "{{ aws_ec2_with_eip.region }}"
     image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
@@ -88,6 +95,7 @@
     record: "{{ aws_ec2_with_eip.route_53.record }}"
     type: A
     value: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    overwrite: true
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
@@ -100,6 +108,7 @@
     record: "*.{{ aws_ec2_with_eip.route_53.record }}"
     type: CNAME
     value: "{{ aws_ec2_with_eip.route_53.record }}"
+    overwrite: true
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0

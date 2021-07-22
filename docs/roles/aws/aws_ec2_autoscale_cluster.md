@@ -24,10 +24,10 @@ aws_ec2_autoscale_cluster:
       public_subnet: public-c
   instance_type: t2.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
-  ami_name: "example" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
   root_volume_size: 40
   ebs_optimized: true
+  encrypt_boot: false # Whether to encrypt the EBS volumes or not.
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   min_size: 4
   max_size: 8
@@ -49,6 +49,8 @@ aws_ec2_autoscale_cluster:
   elb_idle_timeout: 60
   tags:
     Name: "example"
+  # An IAM Role name to associate with instances.
+  iam_role_name: "example"
   # Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
   peering:
     - name: utility-server.example.com
@@ -61,6 +63,7 @@ aws_ec2_autoscale_cluster:
     #engine_version: 5.7.9
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.
+    storage_encrypted: false # Whether to encrypt the RDS instance or not.
     master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
     master_user_password: hellothere
     multi_az: true
@@ -68,13 +71,13 @@ aws_ec2_autoscale_cluster:
   # Set the zone to empty to skip.
   route_53:
     zone: "example.com"
-    record: "*.{{ domain_name }}"
+    record: "*.{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
-  # Wether to create an EFS volume.
-  efs: true
+  efs: true # Whether to create an EFS volume.
+  efs_encrypt: false # Whether to encrypt the EFS volume
 
 ```
 

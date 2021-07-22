@@ -4,7 +4,7 @@
   vars_files:
     - common.yml
   vars:
-    - domain_name: provision-controller.local
+    - _domain_name: provision-controller.local
     - project_name: provision
   tasks:
     - import_role:
@@ -18,3 +18,7 @@
         src: "../git-hooks"
         dest: "/home/ce-dev/ce-provision/.git/hooks"
         state: link
+    - import_role:
+        name: aws/aws_cli
+    - import_role:
+        name: aws/aws_credentials
