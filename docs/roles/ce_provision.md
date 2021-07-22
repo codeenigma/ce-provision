@@ -32,6 +32,8 @@ ce_provision:
   extra_repository_allowed_vars: []
   # List of additional groups to add the user to.
   groups: []
+  # File containing default roles and collections to install via Ansible Galaxy.
+  galaxy_custom_requirements_file: "/home/{{ _ce_provision.username }}/ce-provision/config/files/galaxy-requirements.yml"
 
 ```
 
