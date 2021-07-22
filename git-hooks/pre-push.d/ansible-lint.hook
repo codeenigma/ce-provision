@@ -3,7 +3,7 @@
 # Rename to ansible-lint.hook and alter to your needs.
 GIT_DIR=$(git rev-parse --show-toplevel 2> /dev/null)
 ROLES_LIST=$(cd "$GIT_DIR" && find roles/ -type d -name "tasks" -exec dirname {} \;)
-ANSIBLE_LINT="/home/ce-dev/.local/bin/ansible-lint"
+ANSIBLE_LINT="/usr/local/bin/ansible-lint"
 PROVISION_CONTAINER="provision-controller"
 CONTAINER_BASE_PATH="/home/ce-dev/ce-provision"
 OS=$(uname -s)

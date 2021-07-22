@@ -18,7 +18,7 @@
 
 - name: Force systemd to reread configs.
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 - name: Write interactive hostname value for automated installation.
   ansible.builtin.command: "debconf-set-selections <<< 'jitsi-videobridge2 jitsi-videobridge/jvb-hostname string {{ jitsi.server_name }}';"
