@@ -43,6 +43,7 @@
     - flat
     - matomo
     - mautic
+    - proxy
     - simplesamlphp
     - symfony3
     - symfony4
