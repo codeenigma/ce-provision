@@ -1,0 +1,4 @@
+---
+jitsi:
+  server_name: "{{ _domain_name }}"
+  email: admin@example.com

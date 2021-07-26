@@ -84,6 +84,8 @@ aws_ec2_autoscale_cluster:
   health_check_timeout: 5
   health_check_healthy_count: 5
   health_check_unhealthy_count: 2
+  # ALB settings
+  elb_idle_timeout: 60
   tags:
     Name: "example"
   # An IAM Role name to associate with instances.
