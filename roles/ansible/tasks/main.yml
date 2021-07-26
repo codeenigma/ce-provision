@@ -40,3 +40,4 @@
 - name: Install ansible-lint.
   ansible.builtin.pip:
     name: ansible-lint
+    executable: pip3
