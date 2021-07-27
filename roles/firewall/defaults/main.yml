@@ -17,6 +17,7 @@ firewall:
   application_policy: SKIP
   ipv6: "yes"
   ipt_modules: "nf_conntrack_ftp nf_nat_ftp nf_conntrack_netbios_ns"
+  nat: false
   # Defaults IPs to whitelist. Do not override directly in playbooks, but set them in group_vars from your "private" config.
   _outbound_defaults: []
   _inbound_defaults: []
