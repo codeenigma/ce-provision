@@ -96,7 +96,7 @@
       # be processed
       COMMIT
     insertbefore: "^# Don't delete these required lines"
-    when: firewall.nat
+  when: firewall.nat
 
 - name: Configure Additional Firewall Rules.
 
