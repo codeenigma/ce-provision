@@ -1,5 +1,5 @@
 ---
-- name: Install UFW
+- name: Install UFW.
   apt:
     pkg: ["ufw"]
     state: present
@@ -23,11 +23,15 @@
   when:
     - hostvars[inventory_hostname]['public_ip_address'] is defined
 
-- name: Reset firewall
+- name: Enable firewall.
+  ufw:
+    state: enabled
+
+- name: Reset firewall.
   ufw:
     state: reset
 
-- name: Replace Default UFW Config
+- name: Replace Default UFW Config.
   template:
     src: ufw.j2
     dest: /etc/default/ufw
@@ -58,7 +62,7 @@
     loop_var: ip
   when: firewall.ipv6
 
-- name: Define inbound IPs
+- name: Define inbound IPs.
   set_fact:
     _firewall_inbound: "{{ firewall.inbound + firewall._inbound_defaults }}"
 
@@ -66,19 +70,35 @@
   set_fact:
     _firewall_outbound: "{{ firewall.outbound + firewall._outbound_defaults }}"
 
-- name: Allow firewall inbound rules
+- name: Allow firewall inbound rules.
   include_tasks: inbound.yml
   with_items: "{{ _firewall_inbound }}"
   loop_control:
     loop_var: inbound
 
-- name: Allow firewall outbound rules
+- name: Allow firewall outbound rules.
   include_tasks: outbound.yml
   with_items: "{{ _firewall_outbound }}"
   loop_control:
     loop_var: outbound
 
-- name: Configure Additional Firewall Rules
+
+- name: Enable NAT.
+  blockinfile:
+    path: /etc/ufw/before.rules
+    block: |
+      # NAT table rules
+      *nat
+      :POSTROUTING ACCEPT [0:0]
+      # Forward traffic through eth0 - Change to match you out-interface
+      -A POSTROUTING -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
+      # don't delete the 'COMMIT' line or these nat table rules won't
+      # be processed
+      COMMIT
+    insertbefore: "^# Don't delete these required lines"
+    when: firewall.nat
+
+- name: Configure Additional Firewall Rules.
 
   # https://docs.ansible.com/ansible/latest/modules/ufw_module.html#parameters
 
@@ -90,6 +110,8 @@
     from_port: "{{ item.from_port | default(omit) }}"
     insert: "{{ item.insert | default(omit) }}"
     interface: "{{ item.interface | default(omit) }}"
+    interface_in: "{{ item.interface_in| default(omit) }}"
+    interface_out: "{{ item.interface_out | default(omit) }}"
     log: "{{ item.log | default(omit) }}"
     logging: "{{ item.logging | default(omit) }}"
     name: "{{ item.name | default(omit) }}"
