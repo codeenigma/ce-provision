@@ -27,10 +27,6 @@
   ufw:
     state: enabled
 
-- name: Reset firewall.
-  ufw:
-    state: reset
-
 - name: Replace Default UFW Config.
   template:
     src: ufw.j2
