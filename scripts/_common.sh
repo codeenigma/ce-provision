@@ -14,7 +14,6 @@ ANSIBLE_DEFAULT_EXTRA_VARS=""
 BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
-PROVISION_USER="controller"
 FORCE_PLAY="no"
 DRY_RUN="no"
 LIST_TASKS="no"
@@ -56,10 +55,6 @@ parse_options(){
       "--workspace")
           shift
           BUILD_WORKSPACE="$1"
-        ;;
-      "--user")
-          shift
-          PROVISION_USER="$1"
         ;;
       "--force")
           FORCE_PLAY="yes"
