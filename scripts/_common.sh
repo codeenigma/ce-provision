@@ -136,20 +136,9 @@ cleanup_build_tmp_dir(){
 ansible_play(){
   if [ "$LINT" = "yes" ]; then
     # apt repo installed
-    if [ -f "/usr/local/bin/ansible-lint" ]; then
-      ANSIBLE_BIN="/usr/local/bin/ansible-lint"
-    # or pip installed
-    else
-      ANSIBLE_BIN="/home/$PROVISION_USER/.local/bin/ansible-lint"
-    fi
+    ANSIBLE_BIN=$(command -v ansible-lint)
   else
-    # apt repo installed
-    if [ -f "/usr/bin/ansible-playbook" ]; then
-      ANSIBLE_BIN="/usr/bin/ansible-playbook"
-    # or pip installed
-    else
-      ANSIBLE_BIN="/usr/local/bin/ansible-playbook"
-    fi
+    ANSIBLE_BIN=$(command -v ansible-playbook)
   fi
   ANSIBLE_CMD="$ANSIBLE_BIN $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
   if [ "$PARALLEL_RUN" = "yes" ]; then
@@ -170,7 +159,7 @@ ansible_play(){
   if [ "$PARALLEL_RUN" = "yes" ]; then
     parallel --lb  --halt soon,fail=1 "$ANSIBLE_CMD" --extra-vars "\"$ANSIBLE_DEFAULT_EXTRA_VARS\"" --extra-vars "\"$ANSIBLE_EXTRA_VARS\"" ::: "$BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK/"*.yml
   elif [ "$LINT" = "yes" ]; then
-    $ANSIBLE_CMD
+    $ANSIBLE_CMD -c "$ANSIBLE_CONFIG"
   else
     $ANSIBLE_CMD --extra-vars "$ANSIBLE_DEFAULT_EXTRA_VARS" --extra-vars "$ANSIBLE_EXTRA_VARS"
   fi
