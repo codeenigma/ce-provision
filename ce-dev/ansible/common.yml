@@ -13,7 +13,7 @@ user_provision:
   username: ce-dev
   utility_host: "localhost"
   utility_username: ce-dev
-  sudoer: yes
+  sudoer: true
   groups: []
 _ce_provision_build_tmp_dir: /tmp
 _ce_provision_base_dir: /home/ce-dev/ce-provision
