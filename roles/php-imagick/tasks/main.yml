@@ -1,0 +1,8 @@
+- name: Install PHP Extension Imagick.
+  apt:
+    pkg:
+      - "php{{ version }}-imagick"
+    state: present
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
