@@ -59,6 +59,7 @@ aws_cloudfront_distribution:
         forward: whitelist
         whitelisted_names:
           - "SESS*"
+          - "SSESS*"
       headers:
         - 'Accept'
         - 'Authorization'
