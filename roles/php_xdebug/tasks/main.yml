@@ -1,24 +1,16 @@
 ---
 - name: Ensure xdebug is not installed.
   apt:
-    pkg: php-xdebug
+    pkg: "php{{ php.version[0] }}-xdebug"
     state: absent
     purge: true
   when:
     - not xdebug.cli
     - not xdebug.fpm
 
-- name: Remove trace output folder.
+- name: Remove output folder.
   file:
-    path: "{{ xdebug.trace_output_dir }}"
-    state: absent
-  when:
-    - not xdebug.cli
-    - not xdebug.fpm
-
-- name: Remove profiler output folder.
-  file:
-    path: "{{ xdebug.profiler_output_dir }}"
+    path: "{{ xdebug.output_dir }}"
     state: absent
   when:
     - not xdebug.cli
@@ -26,21 +18,15 @@
 
 - name: Ensure xdebug is installed.
   apt:
-    pkg: php-xdebug
+    pkg: "php{{ php.version[0] }}-xdebug"
     state: present
     update_cache: true
     cache_valid_time: 240
   when: xdebug.cli or xdebug.fpm
 
-- name: Create trace output folder.
+- name: Create output folder.
   file:
-    path: "{{ xdebug.trace_output_dir }}"
-    state: directory
-  when: xdebug.cli or xdebug.fpm
-
-- name: Create profiler output folder.
-  file:
-    path: "{{ xdebug.profiler_output_dir }}"
+    path: "{{ xdebug.output_dir }}"
     state: directory
   when: xdebug.cli or xdebug.fpm
 
