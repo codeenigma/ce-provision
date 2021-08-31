@@ -66,17 +66,28 @@
     - ce_dev_host_platform is defined
     - ce_dev_host_platform == "darwin"
 
+- name: Ensure cli/conf.d exists
+  stat:
+    path: "/etc/php/{{ php.version[0] }}/cli/conf.d"
+  register: cli_confd_dir
+  when: xdebug.cli
+
 - name: Copy xdebug configuration in place.
   template:
     src: 30-xdebug-dev.ini.j2
-    dest: "/etc/php/{{ version }}/cli/conf.d/30-xdebug-dev.ini"
+    dest: "/etc/php/{{ php.version[0] }}/cli/conf.d/30-xdebug-dev.ini"
     owner: root
     group: root
     mode: "0644"
-  when: xdebug.cli
-  with_items: "{{ php.version }}"
-  loop_control:
-    loop_var: version
+  when:
+    - xdebug.cli
+    - cli_confd_dir.stat.exists
+
+- name: Ensure fpm/conf.d exists
+  stat:
+    path: "/etc/php/{{ php.version[0] }}/fpm/conf.d"
+  register: fpm_confd_dir
+  when: xdebug.fpm
 
 - name: Copy xdebug configuration in place.
   template:
@@ -85,7 +96,6 @@
     owner: root
     group: root
     mode: "0644"
-  when: xdebug.fpm
-  with_items: "{{ php.version }}"
-  loop_control:
-    loop_var: version
+  when:
+    - xdebug.fpm
+    - fpm_confd_dir.stat.exists
