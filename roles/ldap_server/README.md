@@ -9,7 +9,7 @@ By default the role simply installs `slapd` and nothing else. However, you can i
 
 * `slapcat -n 0 > /path/to/my/backup.ldif`
 
-Place this file in the directory referenced in the `configs_path` variable and set `import_config` to `true` and Ansible will attempt to import your config. You may have your config spread across multiple LDIF files, this is fine - put them all in the same directory and name them alphabetically if process order is important. By default the role expects the config to be stored in your `ce-provision-config` repository.
+Place this file in the directory referenced in the `ldap_server.config.path` variable and set `ldap_server.config.import` to `true` and Ansible will attempt to import your config. You may have your config spread across multiple LDIF files, this is fine - put them all in the same directory and name them alphabetically if process order is important. By default the role expects the config to be stored in your `ce-provision-config` repository.
 
 SSL is optional but if you do use it then you will be obliged to use the `manual` handling type of the SSL role, because LDAP expects a separate CA certificate file and only `manual` supports that. See the `ssl` role documentation for details.
 
