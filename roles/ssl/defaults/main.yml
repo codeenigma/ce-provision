@@ -10,6 +10,7 @@ ssl:
   # For "manual" handling, this is the content of the certificate.
   # If you want to to provide a file instead, use lookup('file', '/path/on/the/controller') as the value.
   # For "unmanaged" handling, this must be set to the absolute path on the target.
+  # For "manual" handling you can optionally include a ca_cert variable if your CA cert must be a separate file.
   cert: |
     -----BEGIN CERTIFICATE-----
     f34XAAVI+R04k0TLUcfeU4/8QYQ3qY1aDvwonT3PE6VYRAGMGJflz//133EquNUR
