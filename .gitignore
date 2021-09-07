@@ -5,5 +5,7 @@
 /build
 /config
 /hosts
+/templates
+/files
 /ansible.cfg
 *geerlingguy*
