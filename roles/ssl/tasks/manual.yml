@@ -16,6 +16,10 @@
   set_fact:
     _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.cert"
 
+- name: Define CA cert path.
+  set_fact:
+    _ssl_current_ca_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.CA.cert"
+
 - name: Check if we have an existing SSL key.
   stat:
     path: "{{ _ssl_current_key_path }}"
@@ -29,6 +33,17 @@
     group: root
     mode: 0644
   when: not ssl_key.stat.exists
+
+- name: Copy CA cert file to destination
+  copy:
+    content: "{{ ssl.ca_cert }}"
+    dest: "{{ _ssl_current_ca_cert_path }}"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - not ssl_key.stat.exists
+    - ssl.ca_cert is defined
 
 - name: Copy private key file to destination
   copy:
