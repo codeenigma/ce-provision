@@ -36,6 +36,16 @@
     owner: root
     group: root
     mode: 0644
+  register: _ldap_server_slapd_config
+
+- name: Stop slapd service.
+  ansible.builtin.include_role:
+    name: process_manager
+  vars:
+    process_manager:
+      process_name: slapd
+  when:
+    - _ldap_server_slapd_config.changed or ldap_server.config.import
 
 - name: Purge existing LDAP schema files.
   ansible.builtin.file:
@@ -71,13 +81,6 @@
   when:
     - _ldap_server_ldifs.stat.exists
     - ldap_server.config.import
-
-- name: Stop slapd service.
-  ansible.builtin.include_role:
-    name: process_manager
-  vars:
-    process_manager:
-      process_name: slapd
 
 - name: Delete existing slapd config prior to import.
   ansible.builtin.file:
@@ -122,6 +125,8 @@
     name: slapd
     state: started
     enabled: true
+  when:
+    - _ldap_server_slapd_config.changed or ldap_server.config.import
 
 - name: Set up replication.
   ansible.builtin.include_tasks: replication.yml
