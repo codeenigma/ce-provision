@@ -5,18 +5,29 @@
 - set_fact:
     _ldap_server_bind_pwd_hash: "{{ '{{ _ldap_server_bind_pwd }}' | password_hash('sha512') }}"
 
+- name: Check for existence of bind user on host.
+  community.general.ldap_search:
+    dn: "{{ ldap_server.replication.searchbase }}"
+    bind_dn: "{{ ldap_server.replication.admin_cn }},{{ ldap_server.replication.searchbase }}"
+    bind_pw: "{{ ldap_server.replication.admin_pwd }}"
+    filter: "({{ ldap_server.replication.bind_cn }})"
+    scope: onelevel
+  register: _ldap_server_bind_user
+  delegate_to: "{{ ldap_server.replication.host }}"
+
 - name: Create bind user on host.
   community.general.ldap_entry:
-    dn: "{{ ldap_server.replication.bind_dn }}"
+    dn: "{{ ldap_server.replication.bind_cn }},{{ ldap_server.replication.searchbase }}"
     objectClass:
       - simpleSecurityObject
       - organizationalRole
     attributes:
       description: "Replication user for {{ _domain_name }}"
       userPassword: "{CRYPT}{{ _ldap_server_bind_pwd_hash }}"
-    bind_dn: "{{ ldap_server.replication.admin_dn }}"
+    bind_dn: "{{ ldap_server.replication.admin_cn }},{{ ldap_server.replication.searchbase }}"
     bind_pw: "{{ ldap_server.replication.admin_pwd }}"
   delegate_to: "{{ ldap_server.replication.host }}"
+  when: not _ldap_server_bind_user.results
 
 - name: Set replication config.
   community.general.ldap_attrs:
@@ -31,20 +42,15 @@
             interval={{ ldap_server.replication.interval }}
             searchbase="{{ ldap_server.replication.searchbase }}"
             bindmethod=simple
-            binddn="{{ ldap_server.replication.bind_dn }}"
+            binddn="{{ ldap_server.replication.bind_cn }},{{ ldap_server.replication.searchbase }}"
             credentials="{{ _ldap_server_bind_pwd }}"
 
 - name: Stop slapd service.
-  ansible.builtin.service:
-    name: slapd
-    state: stopped
-
-# This is defending against a specific bug with Docker and the init script - https://stackoverflow.com/questions/30671693
-# @TODO: refactor this to be a role based on this - https://stackoverflow.com/a/69017642/896690
-- name: Ensure running slapd processes are killed.
-  ansible.builtin.command:
-    cmd: pkill slapd
-  ignore_errors: true
+  ansible.builtin.include_role:
+    name: process_manager
+  vars:
+    process_manager:
+      process_name: slapd
 
 - name: Delete existing LDAP data before restarting replication.
   ansible.builtin.file:
@@ -63,3 +69,4 @@
   ansible.builtin.service:
     name: slapd
     state: started
+    enabled: true

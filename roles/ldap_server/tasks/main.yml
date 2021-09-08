@@ -1,18 +1,18 @@
 ---
+- name: Stop slapd service.
+  ansible.builtin.include_role:
+    name: process_manager
+  when: ldap_server.slapd.purge
+  vars:
+    process_manager:
+      process_name: slapd
+
 - name: Purge existing LDAP server installation.
   ansible.builtin.apt:
     pkg: ["slapd", "ldapscripts"]
     state: absent
     purge: true
   when: ldap_server.slapd.purge
-
-# This is defending against a specific bug with Docker and the init script - https://stackoverflow.com/questions/30671693
-# @TODO: refactor this to be a role based on this - https://stackoverflow.com/a/69017642/896690
-- name: Ensure running slapd processes are killed.
-  ansible.builtin.command:
-    cmd: pkill slapd
-  when: ldap_server.slapd.purge
-  ignore_errors: true
 
 - name: Ensure LDAP and dependencies are installed.
   ansible.builtin.apt:
@@ -73,16 +73,11 @@
     - ldap_server.config.import
 
 - name: Stop slapd service.
-  ansible.builtin.service:
-    name: slapd
-    state: stopped
-
-# This is defending against a specific bug with Docker and the init script - https://stackoverflow.com/questions/30671693
-# @TODO: refactor this to be a role based on this - https://stackoverflow.com/a/69017642/896690
-- name: Ensure running slapd processes are killed.
-  ansible.builtin.command:
-    cmd: pkill slapd
-  ignore_errors: true
+  ansible.builtin.include_role:
+    name: process_manager
+  vars:
+    process_manager:
+      process_name: slapd
 
 - name: Delete existing slapd config prior to import.
   ansible.builtin.file:
@@ -126,6 +121,7 @@
   ansible.builtin.service:
     name: slapd
     state: started
+    enabled: true
 
 - name: Set up replication.
   ansible.builtin.include_tasks: replication.yml
