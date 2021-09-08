@@ -9,7 +9,7 @@ By default the role simply installs `slapd` and nothing else. However, you can i
 
 * `slapcat -n 0 > /path/to/my/backup.ldif`
 
-Place this file in the directory referenced in the `configs_path` variable and set `import_config` to `true` and Ansible will attempt to import your config. You may have your config spread across multiple LDIF files, this is fine - put them all in the same directory and name them alphabetically if process order is important. By default the role expects the config to be stored in your `ce-provision-config` repository.
+Place this file in the directory referenced in the `ldap_server.config.path` variable and set `ldap_server.config.import` to `true` and Ansible will attempt to import your config. You may have your config spread across multiple LDIF files, this is fine - put them all in the same directory and name them alphabetically if process order is important. By default the role expects the config to be stored in your `ce-provision-config` repository.
 
 SSL is optional but if you do use it then you will be obliged to use the `manual` handling type of the SSL role, because LDAP expects a separate CA certificate file and only `manual` supports that. See the `ssl` role documentation for details.
 
@@ -87,11 +87,11 @@ ldap_server:
   replication:
     host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
     port: "636"
-    admin_dn: "cn=admin,dc=example,dc=com" # the admin user, assumed to be the same on host and consumer
-    admin_pwd: "" # the host admin bind password
-    bind_dn: "cn={{ _domain_name }},dc=example,dc=com" # the user on the host with read access to fetch changes
-    bind_pwd: "" # the desired replication user password - will be generated if not provided
     searchbase: "dc=example,dc=com"
+    admin_cn: "cn=admin" # the admin user's canonical name, assumed to be the same on host and consumer
+    admin_pwd: "" # the host admin bind password
+    bind_cn: "cn={{ _domain_name }}" # the canonical name of the user on the host with read access to fetch changes
+    bind_pwd: "" # the desired replication user password - will be generated if not provided
     interval: "00:00:07:00" # defaults to every 7 minutes
 
 ```
