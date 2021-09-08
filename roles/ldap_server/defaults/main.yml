@@ -1,0 +1,29 @@
+---
+ldap_server:
+  slapd:
+    user: openldap
+    services: "ldap:/// ldapi:/// ldaps:///"
+    ulimit: "8192"
+    options: ""
+    purge: false # Use this only for a completely clean install.
+  # For safety, by default no config handling will occur. Use these variables to enable and provide LDIF files.
+  config:
+    import: false
+    # The path to your LDIF files which define your schema.
+    # All organisations have a different schema so this should be kept in your config repository.
+    # Execution order can be important, so ensure your files are named in alphabetical order.
+    path: "{{ _ce_provision_base_dir }}/config/files/ldap_server/config"
+    purge: false
+  # If you do not want SSL you can set this to an empty list.
+  ssl: # @see the 'ssl' role.
+    domain: "{{ _domain_name }}"
+    handling: manual # LDAP needs to use 'manual' SSL handling because a separate CA certificate is required.
+  replication:
+    host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
+    port: "636"
+    searchbase: "dc=example,dc=com"
+    admin_cn: "cn=admin" # the admin user's canonical name, assumed to be the same on host and consumer
+    admin_pwd: "" # the host admin bind password
+    bind_cn: "cn={{ _domain_name }}" # the canonical name of the user on the host with read access to fetch changes
+    bind_pwd: "" # the desired replication user password - will be generated if not provided
+    interval: "00:00:07:00" # defaults to every 7 minutes
