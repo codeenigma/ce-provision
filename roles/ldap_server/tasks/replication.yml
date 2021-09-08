@@ -46,16 +46,11 @@
             credentials="{{ _ldap_server_bind_pwd }}"
 
 - name: Stop slapd service.
-  ansible.builtin.service:
-    name: slapd
-    state: stopped
-
-# This is defending against a specific bug with Docker and the init script - https://stackoverflow.com/questions/30671693
-# @TODO: refactor this to be a role based on this - https://stackoverflow.com/a/69017642/896690
-- name: Ensure running slapd processes are killed.
-  ansible.builtin.command:
-    cmd: pkill slapd
-  ignore_errors: true
+  ansible.builtin.include_role:
+    name: process_manager
+  vars:
+    process_manager:
+      process_name: slapd
 
 - name: Delete existing LDAP data before restarting replication.
   ansible.builtin.file:
@@ -74,3 +69,4 @@
   ansible.builtin.service:
     name: slapd
     state: started
+    enabled: true

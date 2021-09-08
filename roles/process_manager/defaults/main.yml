@@ -1,0 +1,4 @@
+---
+process_manager:
+  operation: stop
+  process_name: "" # the name of the process to manage

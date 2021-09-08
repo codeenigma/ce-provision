@@ -1,0 +1,18 @@
+---
+- ansible.builtin.set_fact:
+    _process_manager_service: "{{ process_manager.process_name }}.service"
+
+- name: "Check services for existence of {{ process_manager.process_name }}."
+  ansible.builtin.service_facts:
+  register: _process_manager_available_services
+
+- ansible.builtin.set_fact:
+    _process_manager_run: "{{ item }}"
+  with_items: "{{ _process_manager_available_services.ansible_facts.services.keys() }}"
+  when: item == _process_manager_service
+
+- name: "Run {{ process_manager.operation }} operation against {{ process_manager.process_name }}."
+  ansible.builtin.include_tasks: "{{ process_manager.operation }}.yml"
+  when:
+    - process_manager.process_name
+    - _process_manager_run is defined
