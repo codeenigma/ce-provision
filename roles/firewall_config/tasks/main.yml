@@ -1,0 +1,36 @@
+---
+# @TODO remove when https://redmine.codeenigma.net/issues/58246 can be done
+- name: Install iptables with backports. # we have to do this in ce-dev or the contrib role will fail
+  ansible.builtin.apt:
+    pkg: ["iptables"]
+    state: present
+    default_release: buster-backports
+  when: is_local
+
+- name: Set general firewall settings.
+  ansible.builtin.include_role:
+    name: geerlingguy.firewall
+
+- name: Load applicable role variables.
+  ansible.builtin.include_vars:
+    file: "{{ item }}.yml"
+  loop: "{{ firewall_config.roles }}"
+  loop_control:
+    label: "{{ item }}"
+
+- ansible.builtin.set_fact:
+    _firewall_config_allowed_tcp_ports: []
+
+- name: Set all TCP ports allowed by selected roles.
+  ansible.builtin.set_fact:
+    _firewall_config_allowed_tcp_ports: "{{ _firewall_config_allowed_tcp_ports + item.value }}"
+  with_dict: "{{ firewall_config.firewall_allowed_tcp_ports }}"
+
+- name: Set variables for firewall role.
+  set_fact:
+    firewall_allowed_tcp_ports: "{{ _firewall_config_allowed_tcp_ports }}"
+
+- name: Apply firewall rules.
+  ansible.builtin.import_role:
+    name: geerlingguy.firewall
+ 

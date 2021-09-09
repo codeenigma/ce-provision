@@ -1,0 +1,5 @@
+---
+firewall_config:
+  roles:
+    - web_open
+    - ssh_open

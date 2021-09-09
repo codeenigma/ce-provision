@@ -1,0 +1,8 @@
+---
+# General settings - see https://github.com/geerlingguy/ansible-role-firewall/blob/master/defaults/main.yml
+firewall_state: started
+firewall_enabled_at_boot: true
+firewall_enable_ipv6: false
+firewall_log_dropped_packets: true
+firewall_disable_ufw: true
+firewall_allowed_tcp_ports: [ "22" ]

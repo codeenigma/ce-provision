@@ -1,0 +1,6 @@
+---
+firewall_config:
+  firewall_allowed_tcp_ports:
+    web_open:
+      - "80"
+      - "443"
