@@ -137,7 +137,7 @@
   become_user: "{{ ce_provision.username }}"
 
 - name: Install custom ansible-galaxy roles and collections.
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: "ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}"
   become: true
   become_user: "{{ ce_provision.username }}"
