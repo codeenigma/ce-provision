@@ -138,7 +138,7 @@
 
 - name: Install custom ansible-galaxy roles and collections.
   ansible.builtin.shell:
-    cmd: cd {{ ce_provision.local_dir }} && ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}
+    cmd: "ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}"
   become: true
   become_user: "{{ ce_provision.username }}"
   when: ce_provision_custom_galaxy_requirements.stat.exists
