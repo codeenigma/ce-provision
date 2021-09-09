@@ -1,5 +1,5 @@
 ---
 firewall_config:
-  roles:
+  rulesets:
     - web_open
     - ssh_open
