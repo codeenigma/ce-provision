@@ -100,9 +100,9 @@
         - "{{ _aws_sns_topic_info.topic_arn | default('') }}"
       dimensions:
         "DBInstanceIdentifier": "{{ _rds_instance_info.db_instance_identifier }}"
-  with_items: "{{ aws_rds.cloudwatch_alarms }}"
+  with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
   when:
-    - aws_rds.cloudwatch_alarms
+    - aws_rds.rds_cloudwatch_alarms
 
 - name: (Re) set facts for instance.
   set_fact:
