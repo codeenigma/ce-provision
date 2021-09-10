@@ -71,6 +71,24 @@
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
+      rds_cloudwatch_alarms:
+        - "{{ aws_ec2_autoscale_cluster.rds.cloudwatch_alarms }}"
+      sns:
+        sns: "{{ aws_ec2_autoscale_cluster.rds.sns.sns }}"
+        name: "{{ aws_ec2_autoscale_cluster.rds.sns.name }}"
+        display_name: "{{ aws_ec2_autoscale_cluster.rds.sns.display_name }}"
+        delivery_policy:
+          default_healthy_retry_policy:
+            min_delay_target: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.min_delay_target }}"
+            max_delay_target: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.max_delay_target }}"
+            num_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_retries }}"
+            num_max_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_max_retries }}"
+            num_no_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_no_delay_retries }}"
+            num_min_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_min_delay_retries }}"
+            backoff_function: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.backoff_function }}"
+          disable_subscription_overrides: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.disable_subscription_overrides }}"
+        subscriptions:
+          - "{{ aws_ec2_autoscale_cluster.rds.sns.subscriptions }}"
   when:
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds

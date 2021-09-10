@@ -1,0 +1,29 @@
+# AWS SNS
+Creates an SNS topic and subscription.
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
+aws_sns:
+  name: "alarms" # Name of the alarm.
+  display_name: "" # Display name for the topic, for when the topic is owned by this AWS account.
+  delivery_policy: # This will always use the http delivery policy.
+    default_healthy_retry_policy:
+      min_delay_target: 20
+      max_delay_target: 20
+      num_retries: 3
+      num_max_delay_retries: 0
+      num_no_delay_retries: 0
+      num_min_delay_retries: 0
+      backoff_function: "linear"
+    disable_subscription_overrides: false
+  subscriptions: [] # A list of subscriptions.
+  # subscriptions:
+  #   - endpoint: "admin@example.com"
+  #     protocol: "email" # email or sms for now.
+
+```
+
+<!--ENDROLEVARS-->

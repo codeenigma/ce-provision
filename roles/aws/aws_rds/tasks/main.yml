@@ -51,6 +51,59 @@
     #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
   register: _rds_instance_info
 
+- name: Create SNS topic.
+  include_role:
+    name: aws/aws_sns
+  vars:
+    aws_sns:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_rds.sns.name }}"
+      display_name: "{{ aws_rds.sns.display_name }}"
+      delivery_policy:
+        default_healthy_retry_policy:
+          min_delay_target: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.min_delay_target }}"
+          max_delay_target: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.max_delay_target }}"
+          num_retries: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.num_retries }}"
+          num_max_delay_retries: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.num_max_retries }}"
+          num_no_delay_retries: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.num_no_delay_retries }}"
+          num_min_delay_retries: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.num_min_delay_retries }}"
+          backoff_function: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.backoff_function }}"
+        disable_subscription_overrides: "{{ aws_rds.sns.delivery_policy.disable_subscription_overrides }}"
+      subscriptions:
+        - "{{ aws_rds.sns.subscriptions }}"
+  register: _aws_sns_topic_info
+  when:
+    - aws_rds.sns.sns is defined
+    - aws_rds.sns.sns
+
+- name: Create RDS CloudWatch alarms.
+  include_role:
+    name: aws/aws_ec2_metric_alarm
+  vars:
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ item.name }}"
+      description: "{{ item.description }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions:
+        - "{{ _aws_sns_topic_info.topic_arn | default('') }}"
+      ok_actions:
+        - "{{ _aws_sns_topic_info.topic_arn | default('') }}"
+      dimensions:
+        "DBInstanceIdentifier": "{{ _rds_instance_info.db_instance_identifier }}"
+  with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
+  when:
+    - aws_rds.rds_cloudwatch_alarms
+
 - name: (Re) set facts for instance.
   set_fact:
     aws_rds_facts: "{{ aws_rds_facts | default({}) }}"
