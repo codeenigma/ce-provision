@@ -1,5 +1,40 @@
 ---
 firewall_config:
+  # General settings
+  # See https://github.com/geerlingguy/ansible-role-firewall/blob/master/defaults/main.yml
+  firewall_state: started
+  firewall_enabled_at_boot: true
+  firewall_enable_ipv6: false
+  firewall_log_dropped_packets: true
+  firewall_disable_ufw: true
+  firewall_allowed_tcp_ports: [ "22" ] # initially open port 22 so we don't lose connection
   rulesets:
-    - web_open
     - ssh_open
+
+  # Ruleset definitions
+  # Permitted rule lists
+  # firewall_allowed_tcp_ports
+  # firewall_allowed_udp_ports
+  # firewall_forwarded_tcp_ports
+  # firewall_forwarded_udp_ports
+  # firewall_additional_rules
+  # firewall_ip6_additional_rules
+  ssh_open:
+    firewall_allowed_tcp_ports:
+      - "22"
+  web_open:
+    firewall_allowed_tcp_ports:
+      - "80"
+      - "443"
+  ftp_open:
+    firewall_allowed_tcp_ports:
+      - "20"
+      - "21"
+  sftp_open:
+    firewall_allowed_tcp_ports:
+      - "989"
+      - "990"
+  ossec:
+    firewall_allowed_udp_ports:
+      - "1514"
+      - "1515"
