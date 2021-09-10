@@ -82,7 +82,7 @@
             min_delay_target: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.min_delay_target }}"
             max_delay_target: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.max_delay_target }}"
             num_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_retries }}"
-            num_max_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_max_retries }}"
+            num_max_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_max_delay_retries }}"
             num_no_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_no_delay_retries }}"
             num_min_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.num_min_delay_retries }}"
             backoff_function: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy.default_healthy_retry_policy.backoff_function }}"
