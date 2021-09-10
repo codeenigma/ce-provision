@@ -38,7 +38,7 @@
   loop: "{{ firewall_config.rulesets }}"
   loop_control:
     label: "{{ item }}"
-  when: firewall_config.{{ item }}.firewall_allowed_tcp_ports is defined
+  when: "firewall_config.{{ item }}.firewall_allowed_tcp_ports is defined"
 
 - name: Set all UDP ports allowed by selected rulesets.
   ansible.builtin.set_fact:
@@ -46,7 +46,7 @@
   loop: "{{ firewall_config.rulesets }}"
   loop_control:
     label: "{{ item }}"
-  when: firewall_config.{{ item }}.firewall_allowed_udp_ports is defined
+  when: "firewall_config.{{ item }}.firewall_allowed_udp_ports is defined"
 
 - name: Set all TCP port forwarding from selected rulesets.
   ansible.builtin.set_fact:
@@ -54,7 +54,7 @@
   loop: "{{ firewall_config.rulesets }}"
   loop_control:
     label: "{{ item }}"
-  when: firewall_config.{{ item }}.firewall_forwarded_tcp_ports is defined
+  when: "firewall_config.{{ item }}.firewall_forwarded_tcp_ports is defined"
 
 - name: Set all UDP port forwarding from selected rulesets.
   ansible.builtin.set_fact:
@@ -62,7 +62,7 @@
   loop: "{{ firewall_config.rulesets }}"
   loop_control:
     label: "{{ item }}"
-  when: firewall_config.{{ item }}.firewall_forwarded_udp_ports is defined
+  when: "firewall_config.{{ item }}.firewall_forwarded_udp_ports is defined"
 
 - name: Set any custom IPv4 rules in the selected rulesets.
   ansible.builtin.set_fact:
@@ -70,7 +70,7 @@
   loop: "{{ firewall_config.rulesets }}"
   loop_control:
     label: "{{ item }}"
-  when: firewall_config.{{ item }}.firewall_additional_rules is defined
+  when: "firewall_config.{{ item }}.firewall_additional_rules is defined"
 
 - name: Set any custom IPv6 rules in the selected rulesets.
   ansible.builtin.set_fact:
@@ -78,7 +78,7 @@
   loop: "{{ firewall_config.rulesets }}"
   loop_control:
     label: "{{ item }}"
-  when: firewall_config.{{ item }}.firewall_ip6_additional_rules is defined
+  when: "firewall_config.{{ item }}.firewall_ip6_additional_rules is defined"
 
 # Set the variables the firewall manager role is expecting with our newly created settings
 - name: Set variables for firewall role.
