@@ -100,57 +100,57 @@ aws_ec2_autoscale_cluster:
     master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
     master_user_password: hellothere
     multi_az: true
-  rds_cloudwatch_alarms:
-    - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
-      description: "Average database free storage space over the last 10 minutes too low."
-      metric: "FreeStorageSpace"
-      namespace: "AWS/RDS"
-      statistic: "Average"
-      threshold: 20000000000
-      unit: "Bytes"
-      comparison: "LessThanOrEqualToThreshold"
-      period: 600
-      evaluation_periods: 1
-    - name: "example_cpu_utilization_too_high_{{ _env_type }}_asg"
-      description: "Average database CPU utilization over last 10 minutes too high."
-      metric: "CPUUtilization"
-      namespace: "AWS/RDS"
-      statistic: "Average"
-      threshold: 65
-      unit: "Percent"
-      comparison: "GreaterThanOrEqualToThreshold"
-      period: 600
-      evaluation_periods: 1
-    - name: "example_freeable_memory_too_low_{{ _env_type }}_asg"
-      description: "Average database freeable memory over last 10 minutes too low, performance may suffer."
-      metric: "FreeableMemory"
-      namespace: "AWS/RDS"
-      statistic: "Average"
-      threshold: 100000000
-      unit: "Bytes"
-      comparison: "LessThanThreshold"
-      period: 600
-      evaluation_periods: 1
-    - name: "example_disk_queue_depth_too_high_{{ _env_type }}_asg"
-      description: "Average database disk queue depth over last 10 minutes too high, performance may suffer."
-      metric: "DiskQueueDepth"
-      namespace: "AWS/RDS"
-      statistic: "Average"
-      threshold: 64
-      unit: "Count"
-      comparison: "GreaterThanThreshold"
-      period: 600
-      evaluation_periods: 1
-    - name: "example_swap_usage_too_high_{{ _env_type }}_asg"
-      description: "Average database swap usage over last 10 minutes too high, performance may suffer."
-      metric: "SwapUsage"
-      namespace: "AWS/RDS"
-      statistic: "Average"
-      threshold: 256000000
-      unit: "Bytes"
-      comparison: "GreaterThanThreshold"
-      period: 600
-      evaluation_periods: 1
+    cloudwatch_alarms:
+      - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
+        description: "Average database free storage space over the last 10 minutes too low."
+        metric: "FreeStorageSpace"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 20000000000
+        unit: "Bytes"
+        comparison: "LessThanOrEqualToThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_cpu_utilization_too_high_{{ _env_type }}_asg"
+        description: "Average database CPU utilization over last 10 minutes too high."
+        metric: "CPUUtilization"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 65
+        unit: "Percent"
+        comparison: "GreaterThanOrEqualToThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_freeable_memory_too_low_{{ _env_type }}_asg"
+        description: "Average database freeable memory over last 10 minutes too low, performance may suffer."
+        metric: "FreeableMemory"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 100000000
+        unit: "Bytes"
+        comparison: "LessThanThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_disk_queue_depth_too_high_{{ _env_type }}_asg"
+        description: "Average database disk queue depth over last 10 minutes too high, performance may suffer."
+        metric: "DiskQueueDepth"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 64
+        unit: "Count"
+        comparison: "GreaterThanThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_swap_usage_too_high_{{ _env_type }}_asg"
+        description: "Average database swap usage over last 10 minutes too high, performance may suffer."
+        metric: "SwapUsage"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 256000000
+        unit: "Bytes"
+        comparison: "GreaterThanThreshold"
+        period: 600
+        evaluation_periods: 1
   # Add an CNAM record tied to the ALB.
   # Set the zone to empty to skip.
   route_53:
