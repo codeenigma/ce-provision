@@ -72,7 +72,7 @@
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
       rds_cloudwatch_alarms:
-        - "{{ aws_ec2_autoscale_cluster.rds.cloudwatch_alarms }}"
+        - "{{ aws_ec2_autoscale_cluster.rds.rds_cloudwatch_alarms }}"
       sns:
         sns: "{{ aws_ec2_autoscale_cluster.rds.sns.sns }}"
         name: "{{ aws_ec2_autoscale_cluster.rds.sns.name }}"
