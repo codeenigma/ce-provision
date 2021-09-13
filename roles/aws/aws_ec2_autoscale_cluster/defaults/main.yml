@@ -155,16 +155,14 @@ aws_ec2_autoscale_cluster:
       sns: true
       name: "Notify-Email"
       display_name: "" # Display name for the topic, for when the topic is owned by this AWS account.
-      delivery_policy: # This will always use the http delivery policy.
-        default_healthy_retry_policy:
-          min_delay_target: 20
-          max_delay_target: 20
-          num_retries: 3
-          num_max_delay_retries: 0
-          num_no_delay_retries: 0
-          num_min_delay_retries: 0
-          backoff_function: "linear"
-        disable_subscription_overrides: false
+      delivery_policy_default_healthy_retry_policy_min_delay_target: 20
+      delivery_policy_default_healthy_retry_policy_max_delay_target: 20
+      delivery_policy_default_healthy_retry_policy_num_retries: 3
+      delivery_policy_default_healthy_retry_policy_num_max_delay_retries: 0
+      delivery_policy_default_healthy_retry_policy_num_no_delay_retries: 0
+      delivery_policy_default_healthy_retry_policy_num_min_delay_retries: 0
+      delivery_policy_default_healthy_retry_policy_backoff_function: "linear"
+      delivery_policy_disable_subscription_overrides: false
       subscriptions:
         - endpoint: "admin@example.com"
           protocol: "email"
