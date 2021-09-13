@@ -16,4 +16,4 @@
           backoffFunction: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.backoff_function }}"
         disableSubscriptionOverrides: "{{ aws_sns.delivery_policy.disable_subscription_overrides }}"
     subscriptions:
-      - "{{ aws_sns.subscriptions }}"
+      "{{ aws_sns.subscriptions }}"
