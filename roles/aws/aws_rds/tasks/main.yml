@@ -71,7 +71,7 @@
           backoff_function: "{{ aws_rds.sns.delivery_policy.default_healthy_retry_policy.backoff_function }}"
         disable_subscription_overrides: "{{ aws_rds.sns.delivery_policy.disable_subscription_overrides }}"
       subscriptions:
-        - "{{ aws_rds.sns.subscriptions }}"
+        "{{ aws_rds.sns.subscriptions }}"
   register: _aws_sns_topic_info
   when:
     - aws_rds.sns.sns is defined
