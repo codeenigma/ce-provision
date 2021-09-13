@@ -7,12 +7,18 @@
     delivery_policy:
       http:
         defaultHealthyRetryPolicy:
-          minDelayTarget: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.min_delay_target }}"
-          maxDelayTarget: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.max_delay_target }}"
-          numRetries: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.num_retries }}"
-          numMaxDelayRetries: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.num_max_delay_retries }}"
-          numNoDelayRetries: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.num_no_delay_retries }}"
-          numMinDelayRetries: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.num_min_delay_retries }}"
+          minDelayTarget: |
+            {{ aws_sns.delivery_policy.default_healthy_retry_policy.min_delay_target }}
+          maxDelayTarget: |
+            {{ aws_sns.delivery_policy.default_healthy_retry_policy.max_delay_target }}
+          numRetries: |
+            {{ aws_sns.delivery_policy.default_healthy_retry_policy.num_retries }}
+          numMaxDelayRetries: |
+            {{ aws_sns.delivery_policy.default_healthy_retry_policy.num_max_delay_retries }}
+          numNoDelayRetries: |
+            {{ aws_sns.delivery_policy.default_healthy_retry_policy.num_no_delay_retries }}
+          numMinDelayRetries: |
+            {{ aws_sns.delivery_policy.default_healthy_retry_policy.num_min_delay_retries }}
           backoffFunction: "{{ aws_sns.delivery_policy.default_healthy_retry_policy.backoff_function }}"
         disableSubscriptionOverrides: "{{ aws_sns.delivery_policy.disable_subscription_overrides }}"
     subscriptions:
