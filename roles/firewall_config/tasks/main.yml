@@ -24,6 +24,7 @@
 # These match to the main role defaults
 # https://github.com/geerlingguy/ansible-role-firewall/blob/master/defaults/main.yml
 - ansible.builtin.set_fact:
+    _firewall_config_ruleset_rules: []
     _firewall_config_allowed_tcp_ports: []
     _firewall_config_allowed_udp_ports: []
     _firewall_config_forwarded_tcp_ports: []
@@ -31,54 +32,61 @@
     _firewall_config_additional_rules: []
     _firewall_config_ip6_additional_rules: []
 
+- name: Collect all the rules associated with selected rulesets.
+  ansible.builtin.set_fact:
+    _firewall_config_ruleset_rules: "{{ _firewall_config_ruleset_rules + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') }}"
+  loop: "{{ firewall_config.rulesets }}"
+  loop_control:
+    label: "{{ item }}"
+
 # Do the merging of role variables into lists
-- name: Set all TCP ports allowed by selected rulesets.
+- name: Collate allowed TCP ports.
   ansible.builtin.set_fact:
-    _firewall_config_allowed_tcp_ports: "{{ _firewall_config_allowed_tcp_ports + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') | map(attribute='firewall_allowed_tcp_ports') }}"
-  loop: "{{ firewall_config.rulesets }}"
+    _firewall_config_allowed_tcp_ports: "{{ _firewall_config_allowed_tcp_ports + item['firewall_allowed_tcp_ports'] }}"
+  loop: "{{ _firewall_config_ruleset_rules }}"
   loop_control:
-    label: "{{ item }}"
-  when: "firewall_config.{{ item }}.firewall_allowed_tcp_ports is defined"
+    label: "{{ item['firewall_allowed_tcp_ports'] | default('none') }}"
+  when: item['firewall_allowed_tcp_ports'] is defined
 
-- name: Set all UDP ports allowed by selected rulesets.
+- name: Collate allowed UDP ports.
   ansible.builtin.set_fact:
-    _firewall_config_allowed_udp_ports: "{{ _firewall_config_allowed_udp_ports + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') | map(attribute='firewall_allowed_udp_ports') }}"
-  loop: "{{ firewall_config.rulesets }}"
+    _firewall_config_allowed_udp_ports: "{{ _firewall_config_allowed_udp_ports + item['firewall_allowed_udp_ports'] }}"
+  loop: "{{ _firewall_config_ruleset_rules }}"
   loop_control:
-    label: "{{ item }}"
-  when: "firewall_config.{{ item }}.firewall_allowed_udp_ports is defined"
+    label: "{{ item['firewall_allowed_udp_ports'] | default('none') }}"
+  when: item['firewall_allowed_udp_ports'] is defined
 
-- name: Set all TCP port forwarding from selected rulesets.
+- name: Collate forwarded TCP ports.
   ansible.builtin.set_fact:
-    _firewall_config_forwarded_tcp_ports: "{{ _firewall_config_forwarded_tcp_ports + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') | map(attribute='firewall_forwarded_tcp_ports') }}"
-  loop: "{{ firewall_config.rulesets }}"
+    _firewall_config_forwarded_tcp_ports: "{{ _firewall_config_forwarded_tcp_ports + item['firewall_forwarded_tcp_ports'] }}"
+  loop: "{{ _firewall_config_ruleset_rules }}"
   loop_control:
-    label: "{{ item }}"
-  when: "firewall_config.{{ item }}.firewall_forwarded_tcp_ports is defined"
+    label: "{{ item['firewall_forwarded_tcp_ports'] | default('none') }}"
+  when: item['firewall_forwarded_tcp_ports'] is defined
 
-- name: Set all UDP port forwarding from selected rulesets.
+- name: Collate forwarded UDP ports.
   ansible.builtin.set_fact:
-    _firewall_config_forwarded_udp_ports: "{{ _firewall_config_forwarded_udp_ports + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') | map(attribute='firewall_forwarded_udp_ports') }}"
-  loop: "{{ firewall_config.rulesets }}"
+    _firewall_config_forwarded_udp_ports: "{{ _firewall_config_forwarded_udp_ports + item['firewall_forwarded_udp_ports'] }}"
+  loop: "{{ _firewall_config_ruleset_rules }}"
   loop_control:
-    label: "{{ item }}"
-  when: "firewall_config.{{ item }}.firewall_forwarded_udp_ports is defined"
+    label: "{{ item['firewall_forwarded_udp_ports'] | default('none') }}"
+  when: item['firewall_forwarded_udp_ports'] is defined
 
-- name: Set any custom IPv4 rules in the selected rulesets.
+- name: Collate additional iptables rules.
   ansible.builtin.set_fact:
-    _firewall_config_additional_rules: "{{ _firewall_config_additional_rules + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') | map(attribute='firewall_additional_rules') }}"
-  loop: "{{ firewall_config.rulesets }}"
+    _firewall_config_additional_rules: "{{ _firewall_config_additional_rules + item['firewall_additional_rules'] }}"
+  loop: "{{ _firewall_config_ruleset_rules }}"
   loop_control:
-    label: "{{ item }}"
-  when: "firewall_config.{{ item }}.firewall_additional_rules is defined"
+    label: "{{ item['firewall_additional_rules'] | default('none') }}"
+  when: item['firewall_additional_rules'] is defined
 
-- name: Set any custom IPv6 rules in the selected rulesets.
+- name: Collate additional IPv6 iptables rules.
   ansible.builtin.set_fact:
-    _firewall_config_ip6_additional_rules: "{{ _firewall_config_ip6_additional_rules + firewall_config | dict2items | selectattr('key', 'match', item) | map(attribute='value') | map(attribute='firewall_ip6_additional_rules') }}"
-  loop: "{{ firewall_config.rulesets }}"
+    _firewall_config_ip6_additional_rules: "{{ _firewall_config_ip6_additional_rules + item['firewall_ip6_additional_rules'] }}"
+  loop: "{{ _firewall_config_ruleset_rules }}"
   loop_control:
-    label: "{{ item }}"
-  when: "firewall_config.{{ item }}.firewall_ip6_additional_rules is defined"
+    label: "{{ item['firewall_ip6_additional_rules'] | default('none') }}"
+  when: item['firewall_ip6_additional_rules'] is defined
 
 # Set the variables the firewall manager role is expecting with our newly created settings
 - name: Set variables for firewall role.
