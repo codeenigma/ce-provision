@@ -5,7 +5,9 @@
     pkg: ["iptables"]
     state: present
     default_release: buster-backports
-  when: is_local
+  when:
+    - is_local is defined
+    - is_local
 
 - name: Shift general firewall settings to expected variables.
   ansible.builtin.set_fact:
