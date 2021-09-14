@@ -39,7 +39,7 @@ git remote add origin git@github.com:codeenigma/ce-provision.git
 
 You can start creating playbooks in the ce-dev/ansible/local directory which is .gitignored (copy them from the examples folder).
 
-When testing locally, you can put `is_local: yes` in the list of variables in your playbook. This will prevent certain roles from being installed, such as if you're including the **nginx** role, which has a dependency on the **aws/aws_cloudwatch_agent** role _except_ for when `is_local` is defined.
+When testing locally, you can put `is_local: true` in the list of variables in your playbook. This will prevent certain roles from being installed, such as if you're including the **nginx** role, which has a dependency on the **aws/aws_cloudwatch_agent** role _except_ for when `is_local` is defined.
 
 Or you can include the 'common.yml' vars file, as it will set all the needed variables to be able to work locally and call ansible-playbook directly without going through the wrapper script (see below).
 

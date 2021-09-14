@@ -1,0 +1,10 @@
+[Unit]
+Description=Frontail instance, reachable at port 9001
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/frontail --ui-highlight --pid-path /tmp/frontail.pid {{ frontail.error_log }} {{ frontail.access_log }}
+
+[Install]
+WantedBy=multi-user.target 
