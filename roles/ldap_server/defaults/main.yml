@@ -14,7 +14,7 @@ ldap_server:
     # Execution order can be important, so ensure your files are named in alphabetical order.
     path: "{{ _ce_provision_base_dir }}/config/files/ldap_server/config"
     purge: false
-  # If you do not want SSL you can set this to an empty list.
+  # If you do not want SSL you can set this to an empty dict or set handling to "unmanaged".
   ssl: # @see the 'ssl' role.
     domain: "{{ _domain_name }}"
     handling: manual # LDAP needs to use 'manual' SSL handling because a separate CA certificate is required.
