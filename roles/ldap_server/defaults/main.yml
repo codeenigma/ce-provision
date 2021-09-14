@@ -14,10 +14,12 @@ ldap_server:
     # Execution order can be important, so ensure your files are named in alphabetical order.
     path: "{{ _ce_provision_base_dir }}/config/files/ldap_server/config"
     purge: false
-  # If you do not want SSL you can set this to an empty dict or set handling to "unmanaged".
-  ssl: # @see the 'ssl' role.
+  ssl: # @see the 'ssl' role - does nothing by default.
     domain: "{{ _domain_name }}"
-    handling: manual # LDAP needs to use 'manual' SSL handling because a separate CA certificate is required.
+    handling: "unmanaged" # LDAP needs to use 'manual' handling for SSL because a separate CA certificate is required.
+    key: ""
+    cert: ""
+    ca_cert: ""
   replication:
     host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
     port: "636"
