@@ -48,6 +48,8 @@ So Ansible will apply my custom `ssh_restricted` ruleset and the built-in `web_o
 ```yaml
 ---
 firewall_config:
+  # Because firewall.bash isn't overwritten once it exists we need to delete it to apply rule changes.
+  purge: true
   # General settings
   # See https://github.com/geerlingguy/ansible-role-firewall/blob/master/defaults/main.yml
   firewall_state: started
