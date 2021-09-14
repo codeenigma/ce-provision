@@ -126,10 +126,9 @@
   loop_control:
     label: "{{ item.path }}"
 
-- name: Generate SSL keys.
+- name: Generate SSL keys if provided.
   ansible.builtin.include_role:
     name: ssl
-  when: ldap_server.ssl is defined
   vars:
     ssl: "{{ ldap_server.ssl }}"
 
@@ -138,8 +137,6 @@
     name: slapd
     state: started
     enabled: true
-  when:
-    - _ldap_server_slapd_config.changed or ldap_server.config.import
 
 - name: Set up replication.
   ansible.builtin.include_tasks: replication.yml
