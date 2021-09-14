@@ -129,7 +129,7 @@
 - name: Generate SSL keys.
   ansible.builtin.include_role:
     name: ssl
-  when: ldap_server.ssl is defined
+  when: ldap_server.ssl
   vars:
     ssl: "{{ ldap_server.ssl }}"
 
