@@ -1,4 +1,5 @@
 ---
+# @TODO replace hardcoded defaultHealthyRetryPolicy values with variables when we solve the dict string issue.
 - name: Create an SNS topic and subscription.
   community.aws.sns_topic:
     name: "{{ aws_sns.name }}"
