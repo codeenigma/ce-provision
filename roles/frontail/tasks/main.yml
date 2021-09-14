@@ -17,4 +17,4 @@
   ansible.builtin.systemd:
     name: frontail
     state: started
-    enabled: yes
+    enabled: true
