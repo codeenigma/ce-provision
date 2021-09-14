@@ -4,3 +4,17 @@
     name: frontail
     production: true
     global: true
+
+- name: Copy systemd service file to server
+  ansible.builtin.template:
+    src: frontail.service.j2
+    dest: "/etc/systemd/system/frontail.service"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Start frontail
+  ansible.builtin.systemd:
+    name: frontail
+    state: started
+    enabled: yes
