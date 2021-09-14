@@ -93,9 +93,9 @@
       period: "{{ item.period }}"
       evaluation_periods: "{{ item.evaluation_periods }}"
       alarm_actions:
-        - "{{ _aws_sns_topic_info.topic_arn | default('') }}"
+        - "{{ _aws_sns_topic_info.sns_topic.topic_arn | default([]) }}"
       ok_actions:
-        - "{{ _aws_sns_topic_info.topic_arn | default('') }}"
+        - "{{ _aws_sns_topic_info.sns_topic.topic_arn | default([]) }}"
       dimensions:
         "DBInstanceIdentifier": "{{ _rds_instance_info.db_instance_identifier }}"
   with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
