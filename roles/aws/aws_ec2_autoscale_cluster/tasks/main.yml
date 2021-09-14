@@ -71,6 +71,22 @@
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
+      rds_cloudwatch_alarms:
+        - "{{ aws_ec2_autoscale_cluster.rds.rds_cloudwatch_alarms }}"
+      sns:
+        sns: "{{ aws_ec2_autoscale_cluster.rds.sns.sns }}"
+        name: "{{ aws_ec2_autoscale_cluster.rds.sns.name }}"
+        display_name: "{{ aws_ec2_autoscale_cluster.rds.sns.display_name }}"
+        delivery_policy_default_healthy_retry_policy_min_delay_target: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_min_delay_target }}"
+        delivery_policy_default_healthy_retry_policy_max_delay_target: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_max_delay_target }}"
+        delivery_policy_default_healthy_retry_policy_num_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_num_retries }}"
+        delivery_policy_default_healthy_retry_policy_num_max_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_num_max_delay_retries }}"
+        delivery_policy_default_healthy_retry_policy_num_no_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_num_no_delay_retries }}"
+        delivery_policy_default_healthy_retry_policy_num_min_delay_retries: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_num_min_delay_retries }}"
+        delivery_policy_default_healthy_retry_policy_backoff_function: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_default_healthy_retry_policy_backoff_function }}"
+        delivery_policy_disable_subscription_overrides: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_disable_subscription_overrides }}"
+        subscriptions:
+          "{{ aws_ec2_autoscale_cluster.rds.sns.subscriptions }}"
   when:
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds
