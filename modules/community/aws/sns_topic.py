@@ -356,10 +356,9 @@ class SnsTopicManager(object):
             changed = True
 
             # Ensure delivery_policy attributes are cast as integers
-            self.delivery_policy.http.defaultHealthyRetryPolicy.minDelayTarget = int(self.delivery_policy.http.defaultHealthyRetryPolicy.minDelayTarget)
-            self.delivery_policy.http.defaultHealthyRetryPolicy.maxDelayTarget = int(self.delivery_policy.http.defaultHealthyRetryPolicy.maxDelayTarget)
-            self.delivery_policy.http.defaultHealthyRetryPolicy.numRetries = int(self.delivery_policy.http.defaultHealthyRetryPolicy.numRetries)
-            self.delivery_policy.http.defaultHealthyRetryPolicy.numMaxDelayRetries = int(self.delivery_policy.http.defaultHealthyRetryPolicy.numMaxDelayRetries)
+            for setting, value in self.delivery_policy.http.defaultHealthyRetryPolicy:
+              if setting is not 'backoffFunction': # this is the only item that should be a string
+                self.delivery_policy.http.defaultHealthyRetryPolicy[setting] = int(value)
 
             self.attributes_set.append('delivery_policy')
             if not self.check_mode:
