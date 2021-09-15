@@ -70,7 +70,6 @@
       delivery_policy_disable_subscription_overrides: "{{ aws_rds.sns.delivery_policy_disable_subscription_overrides }}"
       subscriptions:
         "{{ aws_rds.sns.subscriptions }}"
-  register: _aws_sns_topic_info
   when:
     - aws_rds.sns.sns is defined
     - aws_rds.sns.sns
