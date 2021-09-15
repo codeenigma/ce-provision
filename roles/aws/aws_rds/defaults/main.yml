@@ -19,7 +19,7 @@ aws_rds:
   master_user_password: hellothere
   publicly_accessible: false # Wether to allocate an IP address
   security_groups: []
-  rds_cloudwatch_alarms:
+  rds_cloudwatch_alarms: # name will have the RDS identifier prepended.
     - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
       description: "Average database free storage space over the last 10 minutes too low."
       metric: "FreeStorageSpace"
