@@ -1,0 +1,20 @@
+---
+# @TODO replace hardcoded defaultHealthyRetryPolicy values with variables when we solve the dict string issue.
+- name: Create an SNS topic and subscription.
+  community.aws.sns_topic:
+    name: "{{ aws_sns.name }}"
+    state: "present"
+    display_name: "{{ aws_sns.display_name }}"
+    delivery_policy:
+      http:
+        defaultHealthyRetryPolicy:
+          minDelayTarget: 20
+          maxDelayTarget: 20
+          numRetries: 3
+          numMaxDelayRetries: 0
+          numNoDelayRetries: 0
+          numMinDelayRetries: 0
+          backoffFunction: "linear"
+        disableSubscriptionOverrides: false
+    subscriptions:
+      "{{ aws_sns.subscriptions }}"
