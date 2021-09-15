@@ -75,6 +75,12 @@
     - aws_rds.sns.sns is defined
     - aws_rds.sns.sns
 
+- debug: Show SNS info.
+    msg: "{{ _aws_sns_topic_info }}"
+
+- debug: Show SNS ARN.
+    msg: "{{ _aws_sns_topic_info.sns_arn }}"
+
 - name: Set alarm/ok action info.
   set_fact:
     _alarm_actions:
