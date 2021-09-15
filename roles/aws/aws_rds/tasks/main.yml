@@ -81,7 +81,7 @@
       - "{{ _aws_sns_topic_info.sns_arn }}"
   when:
     - _aws_sns_topic_info is defined
-    - aws_sns_topic_info.sns_arn
+    - _aws_sns_topic_info.sns_arn
 
 - name: Create RDS CloudWatch alarms.
   include_role:
