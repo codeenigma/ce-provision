@@ -18,3 +18,4 @@
         disableSubscriptionOverrides: false
     subscriptions:
       "{{ aws_sns.subscriptions }}"
+  register: _aws_sns_topic_info

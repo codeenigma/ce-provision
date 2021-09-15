@@ -70,18 +70,9 @@
       delivery_policy_disable_subscription_overrides: "{{ aws_rds.sns.delivery_policy_disable_subscription_overrides }}"
       subscriptions:
         "{{ aws_rds.sns.subscriptions }}"
-  register: _aws_sns_topic_info
   when:
     - aws_rds.sns.sns is defined
     - aws_rds.sns.sns
-
-- name: Show SNS info.
-  debug:
-    msg: "{{ _aws_sns_topic_info }}"
-
-- name: Show SNS ARN.
-  debug:
-    msg: "{{ _aws_sns_topic_info.sns_arn }}"
 
 - name: Set alarm/ok action info.
   set_fact:
@@ -98,7 +89,7 @@
     aws_ec2_metric_alarm:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      name: "{{ item.name }}"
+      name: "{{ _rds_instance_info.db_instance_identifier }}_{{ item.name }}"
       description: "{{ item.description }}"
       metric: "{{ item.metric }}"
       namespace: "{{ item.namespace }}"
