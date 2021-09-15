@@ -354,6 +354,13 @@ class SnsTopicManager(object):
         if self.delivery_policy and ('DeliveryPolicy' not in topic_attributes or
                                      self._compare_delivery_policies(self.delivery_policy, json.loads(topic_attributes['DeliveryPolicy']))):
             changed = True
+
+            # Ensure delivery_policy attributes are cast as integers
+            self.delivery_policy.http.defaultHealthyRetryPolicy.minDelayTarget = int(self.delivery_policy.http.defaultHealthyRetryPolicy.minDelayTarget)
+            self.delivery_policy.http.defaultHealthyRetryPolicy.maxDelayTarget = int(self.delivery_policy.http.defaultHealthyRetryPolicy.maxDelayTarget)
+            self.delivery_policy.http.defaultHealthyRetryPolicy.numRetries = int(self.delivery_policy.http.defaultHealthyRetryPolicy.numRetries)
+            self.delivery_policy.http.defaultHealthyRetryPolicy.numMaxDelayRetries = int(self.delivery_policy.http.defaultHealthyRetryPolicy.numMaxDelayRetries)
+
             self.attributes_set.append('delivery_policy')
             if not self.check_mode:
                 try:
