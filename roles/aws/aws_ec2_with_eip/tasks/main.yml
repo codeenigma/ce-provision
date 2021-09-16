@@ -126,8 +126,8 @@
       description: "This metric auto recovers EC2 instances"
       metric: "StatusCheckFailed_System"
       namespace: "AWS/EC2"
-      statistic: "Minimum"
-      comparison: ">="
+      statistic: "Maximum"
+      comparison: "GreaterThanOrEqualToThreshold"
       threshold: 1.0
       unit: "Count"
       period: 60
