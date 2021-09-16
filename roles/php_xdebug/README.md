@@ -22,7 +22,6 @@ xdebug:
   # You can of course set it explicitely to the relevant value for your use case.
   remote_host: auto # Default to docker.for.mac.localhost when used in ce-dev on a Mac OS host, and to 127.0.0.1 in all other cases.
   remote_connect_back: auto # Default to 0 when used in ce-dev on a Mac OS host, and to 1 in all other cases.
-
 ```
 
 <!--ENDROLEVARS-->

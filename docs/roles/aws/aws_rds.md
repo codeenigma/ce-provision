@@ -14,7 +14,7 @@ aws_rds:
     - subnet-aaaaaaaa
     - subnet-bbbbbbbb
   name: example
-  tags: []
+  tags: {}
   db_instance_class: db.m5.large
   state: present
   description: example
@@ -27,6 +27,72 @@ aws_rds:
   master_user_password: hellothere
   publicly_accessible: false # Wether to allocate an IP address
   security_groups: []
+  rds_cloudwatch_alarms: # name will have the RDS identifier prepended.
+    - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
+      description: "Average database free storage space over the last 10 minutes too low."
+      metric: "FreeStorageSpace"
+      namespace: "AWS/RDS"
+      statistic: "Average"
+      threshold: 20000000000
+      unit: "Bytes"
+      comparison: "LessThanOrEqualToThreshold"
+      period: 600
+      evaluation_periods: 1
+    - name: "example_cpu_utilization_too_high_{{ _env_type }}_asg"
+      description: "Average database CPU utilization over last 10 minutes too high."
+      metric: "CPUUtilization"
+      namespace: "AWS/RDS"
+      statistic: "Average"
+      threshold: 65
+      unit: "Percent"
+      comparison: "GreaterThanOrEqualToThreshold"
+      period: 600
+      evaluation_periods: 1
+    - name: "example_freeable_memory_too_low_{{ _env_type }}_asg"
+      description: "Average database freeable memory over last 10 minutes too low, performance may suffer."
+      metric: "FreeableMemory"
+      namespace: "AWS/RDS"
+      statistic: "Average"
+      threshold: 100000000
+      unit: "Bytes"
+      comparison: "LessThanThreshold"
+      period: 600
+      evaluation_periods: 1
+    - name: "example_disk_queue_depth_too_high_{{ _env_type }}_asg"
+      description: "Average database disk queue depth over last 10 minutes too high, performance may suffer."
+      metric: "DiskQueueDepth"
+      namespace: "AWS/RDS"
+      statistic: "Average"
+      threshold: 64
+      unit: "Count"
+      comparison: "GreaterThanThreshold"
+      period: 600
+      evaluation_periods: 1
+    - name: "example_swap_usage_too_high_{{ _env_type }}_asg"
+      description: "Average database swap usage over last 10 minutes too high, performance may suffer."
+      metric: "SwapUsage"
+      namespace: "AWS/RDS"
+      statistic: "Average"
+      threshold: 256000000
+      unit: "Bytes"
+      comparison: "GreaterThanThreshold"
+      period: 600
+      evaluation_periods: 1
+  sns:
+    sns: false
+    name: "Notify-Email"
+    display_name: "" # Display name for the topic, for when the topic is owned by this AWS account.
+    delivery_policy_default_healthy_retry_policy_min_delay_target: 20
+    delivery_policy_default_healthy_retry_policy_max_delay_target: 20
+    delivery_policy_default_healthy_retry_policy_num_retries: 3
+    delivery_policy_default_healthy_retry_policy_num_max_delay_retries: 0
+    delivery_policy_default_healthy_retry_policy_num_no_delay_retries: 0
+    delivery_policy_default_healthy_retry_policy_num_min_delay_retries: 0
+    delivery_policy_default_healthy_retry_policy_backoff_function: "linear"
+    delivery_policy_disable_subscription_overrides: false
+    subscriptions:
+      - endpoint: "admin@example.com"
+        protocol: "email"
 
 ```
 
