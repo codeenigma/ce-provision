@@ -1,0 +1,20 @@
+---
+- name: Create an SNS topic and subscription.
+  sns_topic:
+    name: "{{ aws_sns.name }}"
+    state: "present"
+    display_name: "{{ aws_sns.display_name }}"
+    delivery_policy:
+      http:
+        defaultHealthyRetryPolicy:
+          minDelayTarget: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_min_delay_target }}"
+          maxDelayTarget: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_max_delay_target }}"
+          numRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_retries }}"
+          numMaxDelayRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_max_delay_retries }}"
+          numNoDelayRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_no_delay_retries }}"
+          numMinDelayRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_min_delay_retries }}"
+          backoffFunction: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_backoff_function }}"
+        disableSubscriptionOverrides: "{{ aws_sns.delivery_policy_disable_subscription_overrides }}"
+    subscriptions:
+      "{{ aws_sns.subscriptions }}"
+  register: _aws_sns_topic_info
