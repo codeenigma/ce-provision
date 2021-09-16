@@ -33,7 +33,8 @@ ce_provision:
   # List of additional groups to add the user to.
   groups: []
   # File containing default roles and collections to install via Ansible Galaxy.
-  galaxy_custom_requirements_file: "{{ ce_provision.local_dir }}/config/files/galaxy-requirements.yml"
+  # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
+  galaxy_custom_requirements_file: "/home/{{ _ce_provision.username }}/ce-provision/config/files/galaxy-requirements.yml"
 
 ```
 
