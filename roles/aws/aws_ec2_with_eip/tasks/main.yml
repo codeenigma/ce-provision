@@ -134,3 +134,4 @@
       evaluation_periods: 2
       alarm_actions: ["arn:aws:automate:{{ aws_ec2_with_eip.region }}:ec2:recover"]
       dimensions: { "InstanceId": "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}" }
+  when: aws_ec2_with_eip.autorecover
