@@ -33,6 +33,7 @@ aws_ec2_with_eip:
     record: "{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
     wildcard: true # Creates a matching wildcard CNAME
+  autorecover: true # Creates an EC2 autorecovery alarm to recover the machine if a system failure occurs.
 
 ```
 
