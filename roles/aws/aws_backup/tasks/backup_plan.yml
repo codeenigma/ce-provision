@@ -1,0 +1,24 @@
+---
+- name: Gather backup copy facts.
+  ansible.builtin.set_fact:
+    _backup_copy: true
+  when: aws_backup.copy_vault.region | length > 0
+
+- name: Create the 'backup-yaml-input.yml' file for plan creation.
+  ansible.builtin.template:
+    src: backup-yaml-input.yml.j2
+    dest: "/tmp/aws_backup/{{ _env_type }}/{{ plan.name }}-backup-yaml-input.yml"
+    owner: "{{ ce_provision.username }}"
+    group: "{{ ce_provision.username }}"
+  when: plan.rules | length > 0
+
+- name: Gather info about the newly created yml file.
+  ansible.builtin.stat:
+    path: "/tmp/aws_backup/{{ _env_type }}/{{ plan.name }}-backup-yaml-input.yml"
+  register: _aws_backup_plan_stat
+
+- name: Create a backup plan.
+  ansible.builtin.command: >
+    aws backup create-backup-plan --backup-plan file:///tmp/aws_backup/{{ _env_type }}/{{ plan.name }}-backup-yaml-input.yml --cli-input-yaml
+  register: _backup_plan_created
+  when: _aws_backup_plan_stat.stat.exists

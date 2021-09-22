@@ -1,0 +1,35 @@
+---
+- name: Create backup vault without user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }}
+  register: _vault_created
+  when: aws_backup.vault.encryption_key == "Default"
+
+- name: Create backup vault with user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --encryption-key {{ aws_backup.vault.encryption_key }}
+  register: _vault_created
+  when: aws_backup.vault.encryption_key != "Default"
+
+- name: Create off-site backup vault without user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.copy_vault.name }} --region {{ aws_backup.copy_vault.region }}
+  register: _copy_vault_created
+  when:
+    - aws_backup_copy_vault.region is defined
+    - aws_backup.copy_vault.encryption_key == "Default"
+
+- name: Create off-site backup vault with user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.copy_vault.name }} --encryption-key {{ aws_backup.copy_vault.encryption_key }} --region {{ aws_backup.copy_vault.region }}
+  register: _copy_vault_created
+  when:
+    - aws_backup_copy_vault.region is defined
+    - aws_backup.copy_vault.encryption_key != "Default"
+
+- name: Create backup plans.
+  include_tasks: backup_plan.yml
+  with_items: "{{ aws_backup.plans }}"
+  loop_control:
+    loop_var: plan
+  when: aws_backup.plans | length
