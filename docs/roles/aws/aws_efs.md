@@ -23,6 +23,7 @@ aws_efs:
   security_groups: []
   # Whether to encrypt the volume or not.
   encrypt: false
+  backup: "ExampleDev"
 
 ```
 

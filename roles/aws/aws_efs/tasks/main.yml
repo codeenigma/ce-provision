@@ -38,3 +38,17 @@
     purge_tags: "{{ aws_efs.purge_tags }}"
     targets: "{{ _aws_efs_targets.values() | list }}"
     encrypt: "{{ aws_efs.encrypt }}"
+  register: aws_efs_created
+
+- name: Assign resource to backup plan.
+  include_role:
+    name: aws/aws_backup
+    tasks_from: resource
+  vars:
+    backup:
+      backup_plan_id: "{{ aws_efs.backup }}"
+      resource_name: "EFS-{{ aws_efs.name }}-{{ _env_type }}"
+      resource_arn: "{{ aws_efs_created.arn }}"
+  when:
+    - aws_efs.backup is defined
+    - aws_efs.backup | length > 0
