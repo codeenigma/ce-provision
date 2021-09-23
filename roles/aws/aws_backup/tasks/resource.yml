@@ -1,4 +1,4 @@
---- 
+---
 - name: Get backup plan info.
   ansible.builtin.set_fact:
     _backup_plan_id: "{{ backup_plan_info[aws_backup.backup.backup_plan_name] }}"
