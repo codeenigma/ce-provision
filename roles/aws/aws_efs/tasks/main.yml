@@ -46,9 +46,10 @@
     tasks_from: resource
   vars:
     backup:
-      backup_plan_id: "{{ aws_efs.backup }}"
-      resource_name: "EFS-{{ aws_efs.name }}-{{ _env_type }}"
-      resource_arn: "{{ aws_efs_created.arn }}"
+      backup_plan_name: "{{ aws_efs.backup }}"
+      selection_name: "EFS-{{ aws_efs.name }}-{{ _env_type }}"
+      resource_id: "{{ aws_efs_created.file_system_id }}"
+      resource_type: "file-system"
   when:
     - aws_efs.backup is defined
     - aws_efs.backup | length > 0

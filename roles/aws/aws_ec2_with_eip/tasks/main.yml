@@ -135,3 +135,17 @@
       alarm_actions: ["arn:aws:automate:{{ aws_ec2_with_eip.region }}:ec2:recover"]
       dimensions: { "InstanceId": "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}" }
   when: aws_ec2_with_eip.autorecover
+
+- name: Assign resource to backup plan.
+  include_role:
+    name: aws/aws_backup
+    tasks_from: resource
+  vars:
+    backup:
+      backup_plan_name: "{{ aws_ec2_with_ip.backup }}"
+      selection_name: "EC2-{{ aws_ec2_with_eip.instance_name }}-{{ _env_type }}"
+      resource_id: "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}"
+      resource_type: "instance"
+  when:
+    - aws_ec2_with_ip.backup is defined
+    - aws_ec2_with_ip.backup | length > 0

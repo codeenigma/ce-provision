@@ -1,1 +1,34 @@
----
+--- 
+- name: Get backup plan info.
+  ansible.builtin.set_fact:
+    _backup_plan_id: "{{ backup_plan_info[aws_backup.backup.backup_plan_name] }}"
+
+- name: Gather AWS account ID if it isn't already set.
+  amazon.aws.aws_caller_info:
+    profile: "{{ _aws_profile }}"
+  delegate_to: localhost
+  register: caller_info
+  when: caller_info is not defined
+
+- name: Set IAM role ARN for backups.
+  ansible.builtin.set_fact:
+    _iam_role_arn: "arn:aws:iam::{{ caller_info.account }}:role/service-role/AWSBackupDefaultServiceRole"
+  when: aws_backup.backup.iam_role_arn == "Default"
+
+- name: Set IAM role ARN for backups.
+  ansible.builtin.set_fact:
+    _iam_role_arn: "{{ aws_backup.backup.iam_role_arn }}"
+  when: aws_backup.backup.iam_role_arn != "Default"
+
+- name: Construct AWS ARN for the resource.
+  vars:
+    arn_construct:
+      instance: "ec2"
+      file-system: "elasticfilesystem"
+      db: "rds"
+  ansible.builtin.set_fact:
+    _resource_arn: "arn:aws:{{ arn_construct[aws_backup.backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ aws_backup.backup.resource_type }}:{{ aws_backup.backup.resource_id }}"
+
+- name: Assign resource to AWS Backup plan.
+  ansible.builtin.command: >
+    aws backup create-backup-selection --backup-plan-id {{ _backup_plan_id }} --backup-selection "{\"SelectionName\":\"{{ aws_backup.backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"Resources\":[\"{{ _resource_arn }}\"]}"

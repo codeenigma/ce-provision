@@ -48,15 +48,12 @@ aws_backup:
   #             move_to_cold_storage_after_days: 0 # Specifies the number of days after creation that a recovery point is moved to cold storage.
   #             delete_after_days: 0 # Specifies the number of days after creation that a recovery point is deleted.
   #         continuous_backup: false # Specifies whether Backup creates continuous backups.
-  #     resources:
-  #       efs: true
-  #       rds: true
-  #       ebs: true
-  #       ec2: false
   backup:
-    backup_plan_id: ""
-    resource_name: ""
-    resource_arn: ""
+    iam_role_arn: "Default" # Set to the ARN of an existing IAM role or leave as 'Default' to use the AWSBackupDefaultServiceRole role.
+    backup_plan_name: "" # Name of the backup plan to use. Must match one in the plans list.
+    selection_name: "" # Name of the resource assignation; this is set in the roles which create the resources such as aws/aws_ec2_with_eip and aws/aws_efs.
+    resource_id: "" # The unique ID of the resource. For EC2, this is the instance ID. For EFS, the filesystem ID. For RDS, the DB identifier.
+    resource_type: "" # Options are 'instance', 'file-system' and 'db' for EC2, EFS and RDS respectively.
 
 ```
 

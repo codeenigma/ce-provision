@@ -27,6 +27,10 @@
     - aws_backup_copy_vault.region is defined
     - aws_backup.copy_vault.encryption_key != "Default"
 
+- name: Create empty dictionary for backup plan info.
+  ansible.builtin.set_fact:
+    backup_plan_info: {}
+
 - name: Create backup plans.
   include_tasks: backup_plan.yml
   with_items: "{{ aws_backup.plans }}"

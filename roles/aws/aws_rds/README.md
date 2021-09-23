@@ -93,6 +93,7 @@ aws_rds:
     subscriptions:
       - endpoint: "admin@example.com"
         protocol: "email"
+  backup: "{{ _infra_name }}-{{ _env_type }}" # Name of the AWS Backup plan to use to backup the instance.
 
 ```
 
