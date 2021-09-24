@@ -54,12 +54,6 @@
   loop_control:
     loop_var: _init_vars_dir_include
 
-# @todo This should be removed/refactored
-- name: Ensure /opt/bin directory exists.
-  file:
-    path: "/opt/bin"
-    state: directory
-
 - name: Load custom vars file.
   include_tasks: allowed_vars.yml
   when:
