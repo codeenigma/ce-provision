@@ -1,7 +1,7 @@
 ---
 - name: Check if the plan exists.
   ansible.builtin.command: >
-    aws backup list-backup-vaults --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'].BackupPlanName" --output text" --output text
+    aws backup list-backup-vaults --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'].BackupPlanName" --output text
   register: _plan_exists
 
 - name: Gather backup copy facts.
@@ -28,12 +28,12 @@
   register: _backup_plan_created
   when:
     - _aws_backup_plan_stat.stat.exists
-    - _plan_exists.stdout == ""
+    - _plan_exists.stdout | length == 0
 
 - name: Add backup plan info to dictionary.
   ansible.builtin.set_fact:
     backup_plan_info: "{{ backup_plan_info | combine({ plan.name : _backup_plan_created.BackupPlanId }) }}"
-  when: _plan_exists.stdout == ""
+  when: _plan_exists.stdout | length == 0
 
 - name: Tidy up and remove the yaml input file.
   file:
