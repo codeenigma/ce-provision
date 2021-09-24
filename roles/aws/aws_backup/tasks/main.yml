@@ -1,15 +1,32 @@
 ---
+- name: Check if the backup vault already exists.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'].BackupVaultName" --output text
+  register: _vault_exists
+
+- name: Check if the off-site backup vault already exists.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'].BackupVaultName" --output text
+  register: _copy_vault_exists
+  when:
+    - aws_backup_copy_vault.region is defined
+    - aws_backup_copy_vault.region | length > 0
+
 - name: Create backup vault without user-provided KMS key.
   ansible.builtin.command: >
     aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }}
   register: _vault_created
-  when: aws_backup.vault.encryption_key == "Default"
+  when:
+    - aws_backup.vault.encryption_key == "Default"
+    - _vault_exists.stdout == ""
 
 - name: Create backup vault with user-provided KMS key.
   ansible.builtin.command: >
     aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --encryption-key {{ aws_backup.vault.encryption_key }}
   register: _vault_created
-  when: aws_backup.vault.encryption_key != "Default"
+  when:
+    - aws_backup.vault.encryption_key != "Default"
+    - _vault_exists.stdout == ""
 
 - name: Create off-site backup vault without user-provided KMS key.
   ansible.builtin.command: >
@@ -17,7 +34,9 @@
   register: _copy_vault_created
   when:
     - aws_backup_copy_vault.region is defined
+    - aws_backup_copy_vault.region | length > 0
     - aws_backup.copy_vault.encryption_key == "Default"
+    - _copy_vault_exists.stdout == ""
 
 - name: Create off-site backup vault with user-provided KMS key.
   ansible.builtin.command: >
@@ -25,7 +44,9 @@
   register: _copy_vault_created
   when:
     - aws_backup_copy_vault.region is defined
+    - aws_backup_copy_vault.region | length > 0
     - aws_backup.copy_vault.encryption_key != "Default"
+    - _copy_vault_exists.stdout == ""
 
 - name: Create empty dictionary for backup plan info.
   ansible.builtin.set_fact:
