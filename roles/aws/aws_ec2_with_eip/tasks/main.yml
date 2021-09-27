@@ -142,10 +142,10 @@
     tasks_from: resource
   vars:
     backup:
-      backup_plan_name: "{{ aws_ec2_with_ip.backup }}"
+      backup_plan_name: "{{ aws_ec2_with_eip.backup }}"
       selection_name: "EC2-{{ aws_ec2_with_eip.instance_name }}-{{ _env_type }}"
       resource_id: "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}"
       resource_type: "instance"
   when:
-    - aws_ec2_with_ip.backup is defined
-    - aws_ec2_with_ip.backup | length > 0
+    - aws_ec2_with_eip.backup is defined
+    - aws_ec2_with_eip.backup | length > 0
