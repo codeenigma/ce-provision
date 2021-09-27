@@ -9,6 +9,11 @@
     _backup_copy: true
   when: aws_backup.copy_vault.region | length > 0
 
+- name: Create temp directory.
+  file:
+    path: "/tmp/aws_backup/{{ _infra_name }}"
+    state: directory
+
 - name: Create the 'backup-yaml-input.yml' file for plan creation.
   ansible.builtin.template:
     src: backup-yaml-input.yml.j2
