@@ -1,7 +1,7 @@
 ---
 - name: Get backup plan info.
   ansible.builtin.command: >
-    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ aws_backup.backup.backup_plan_name }}'] | [0]" --output json
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ backup.backup_plan_name }}'] | [0]" --output json
   register: _backup_plan_info
 
 - name: Gather AWS account ID if it isn't already set.
