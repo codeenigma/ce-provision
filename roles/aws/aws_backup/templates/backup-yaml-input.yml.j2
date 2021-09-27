@@ -33,6 +33,4 @@ BackupPlan: # [REQUIRED] Specifies the body of a backup plan.
 {% endif %}
     EnableContinuousBackup: {{ rule.continuous_backup | bool }} # Specifies whether Backup creates continuous backups.
 {% endfor %}
-BackupPlanTags: # To help organize your resources, you can assign your own metadata to the resources that you create.
-  KeyName: ''
 CreatorRequestId: '' # Identifies the request and allows failed requests to be retried without the risk of running the operation twice.
