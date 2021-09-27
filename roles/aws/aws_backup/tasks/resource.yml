@@ -30,7 +30,7 @@
     _resource_arn: "arn:aws:{{ arn_construct[aws_backup.backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ aws_backup.backup.resource_type }}:{{ aws_backup.backup.resource_id }}"
 
 - name: Check if the resource selection exists.
-  ansible.builtint.command: >
+  ansible.builtin.command: >
     aws backup list-backup-selections --backup-plan-id {{ _backup_plan_id }} --query "BackupSelectionsList[?SelectionName=='{{ aws_backup.backup.selection_name }}'].SelectionName" --output text
   register: _selection_exists
 
