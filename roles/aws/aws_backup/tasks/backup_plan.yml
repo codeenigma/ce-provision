@@ -29,7 +29,7 @@
 
 - name: Create a backup plan.
   ansible.builtin.command: >
-    aws backup create-backup-plan --backup-plan file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml --cli-input-yaml
+    aws backup create-backup-plan --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml
   register: _backup_plan_created
   when:
     - _aws_backup_plan_stat.stat.exists
