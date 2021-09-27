@@ -54,10 +54,6 @@
   register: _copy_vault_info
   when: _copy_vault_created is defined
 
-- name: Create empty dictionary for backup plan info.
-  ansible.builtin.set_fact:
-    backup_plan_info: {}
-
 - name: Create backup plans.
   include_tasks: backup_plan.yml
   with_items: "{{ aws_backup.plans }}"
