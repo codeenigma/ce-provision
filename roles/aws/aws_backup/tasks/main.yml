@@ -1,12 +1,12 @@
 ---
 - name: Check if the backup vault already exists.
   ansible.builtin.command: >
-    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'].BackupVaultName" --output text
+    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'] | [0]" --output json
   register: _vault_exists
 
 - name: Check if the off-site backup vault already exists.
   ansible.builtin.command: >
-    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'].BackupVaultName" --output text
+    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'] | [0]" --output json
   register: _copy_vault_exists
   when:
     - aws_backup.copy_vault.region is defined
@@ -47,6 +47,12 @@
     - aws_backup.copy_vault.region | length > 0
     - aws_backup.copy_vault.encryption_key != "Default"
     - _copy_vault_exists.stdout | length == 0
+
+- name: Gather off-site backup vault info.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'] | [0]" --output json
+  register: _copy_vault_info
+  when: _copy_vault_created is defined
 
 - name: Create empty dictionary for backup plan info.
   ansible.builtin.set_fact:

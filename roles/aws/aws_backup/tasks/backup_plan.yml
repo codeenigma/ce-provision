@@ -1,7 +1,7 @@
 ---
 - name: Check if the plan exists.
   ansible.builtin.command: >
-    aws backup list-backup-vaults --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'].BackupPlanName" --output text
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'].BackupPlanName" --output text
   register: _plan_exists
 
 - name: Gather backup copy facts.
