@@ -13,7 +13,7 @@ aws_backup:
   #   - name: "ExampleDev"
   #     rules:
   #       - rule_name: "DailyBackups"
-  #         schedule: '0 2 * * *' # A CRON expression in UTC specifying when the job is initiated.
+  #         schedule: '0 2 ? * * *' # A CRON expression in UTC specifying when the job is initiated. ? is in the 'Day of month' position as * cannot be used and it appears Backup uses the year field.
   #         start_window_cancel: 60 # A value in minutes after a backup is scheduled before a job will be cancelled if it doesn't start successfully.
   #         completion_window_cancel: 360 # A value in minutes after a backup job is successfully started before it must be completed or it will be canceled by Backup.
   #         lifecycle: # The lifecycle defines when a protected resource is transitioned to cold storage and when it expires.
