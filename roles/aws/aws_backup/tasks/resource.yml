@@ -28,7 +28,7 @@
       file-system: "elasticfilesystem"
       db: "rds"
   ansible.builtin.set_fact:
-    _resource_arn: "arn:aws:{{ arn_construct[backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ backup.resource_type }}:{{ backup.resource_id }}"
+    _resource_arn: "arn:aws:{{ arn_construct[backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ backup.resource_type }}{% if backup.resource_type == 'db' %}:{% else %}/{% endif %}{{ backup.resource_id }}"
 
 - name: Check if the resource selection exists.
   ansible.builtin.command: >
