@@ -18,7 +18,7 @@
   register: _vault_created
   when:
     - aws_backup.vault.encryption_key == "Default"
-    - _vault_exists.stdout | length == 0
+    - _vault_exists.stdout != "null"
 
 - name: Create backup vault with user-provided KMS key.
   ansible.builtin.command: >
@@ -26,7 +26,7 @@
   register: _vault_created
   when:
     - aws_backup.vault.encryption_key != "Default"
-    - _vault_exists.stdout | length == 0
+    - _vault_exists.stdout != "null"
 
 - name: Create off-site backup vault without user-provided KMS key.
   ansible.builtin.command: >
@@ -36,7 +36,7 @@
     - aws_backup.copy_vault.region is defined
     - aws_backup.copy_vault.region | length > 0
     - aws_backup.copy_vault.encryption_key == "Default"
-    - _copy_vault_exists.stdout | length == 0
+    - _copy_vault_exists.stdout != "null"
 
 - name: Create off-site backup vault with user-provided KMS key.
   ansible.builtin.command: >
@@ -46,7 +46,7 @@
     - aws_backup.copy_vault.region is defined
     - aws_backup.copy_vault.region | length > 0
     - aws_backup.copy_vault.encryption_key != "Default"
-    - _copy_vault_exists.stdout | length == 0
+    - _copy_vault_exists.stdout != "null"
 
 - name: Gather off-site backup vault info.
   ansible.builtin.command: >
