@@ -28,11 +28,11 @@
       file-system: "elasticfilesystem"
       db: "rds"
   ansible.builtin.set_fact:
-    _resource_arn: "arn:aws:{{ arn_construct[aws_backup.backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ aws_backup.backup.resource_type }}:{{ aws_backup.backup.resource_id }}"
+    _resource_arn: "arn:aws:{{ arn_construct[backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ backup.resource_type }}:{{ backup.resource_id }}"
 
 - name: Check if the resource selection exists.
   ansible.builtin.command: >
-    aws backup list-backup-selections --backup-plan-id {{ _backup_plan_info | from_json | json_query('BackupPlanId') }} --query "BackupSelectionsList[?SelectionName=='{{ aws_backup.backup.selection_name }}'].SelectionName" --output text
+    aws backup list-backup-selections --backup-plan-id {{ _backup_plan_info | from_json | json_query('BackupPlanId') }} --query "BackupSelectionsList[?SelectionName=='{{ backup.selection_name }}'].SelectionName" --output text
   register: _selection_exists
 
 - name: Assign resource to AWS Backup plan.
