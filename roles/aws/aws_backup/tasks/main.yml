@@ -50,7 +50,7 @@
 
 - name: Gather off-site backup vault info.
   ansible.builtin.command: >
-    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'] | [0]" --output json
+    aws backup list-backup-vaults --region {{ aws_backup.copy_vault.region }} --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'] | [0]" --output json
   register: _copy_vault_info
   when: _copy_vault_created is defined
 
