@@ -59,7 +59,7 @@
     policy: "{{ lookup('template', 'access_billing_policy.j2') }}"
     state: present
   delegate_to: localhost
-  register: billing_policy
+  register: _billing_policy
   when:
     - aws_iam_saml.billing_groups is defined
     - aws_iam_saml.billing_groups[0] is defined
@@ -72,9 +72,12 @@
     assume_role_policy_document: "{{ lookup('template', 'assume_billing_policy.j2') }}"
     description: "Billing access only"
     managed_policy:
-      - "{{ billing_policy.policy.arn }}"
+      - "{{ _billing_policy.policy.arn }}"
   delegate_to: localhost
-  when: billing_policy.policy is succeeded
+  when:
+    - aws_iam_saml.billing_groups is defined
+    - aws_iam_saml.billing_groups[0] is defined
+    - _billing_policy.policy is succeeded
 
 - name: Clone SimpleSAMLphp repo
   git:
