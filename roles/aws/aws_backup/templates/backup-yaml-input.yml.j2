@@ -5,26 +5,30 @@ BackupPlan: # [REQUIRED] Specifies the body of a backup plan.
   - RuleName: "{{ rule.rule_name }}"  # [REQUIRED] An optional display name for a backup rule.
     TargetBackupVaultName: "{{ aws_backup.vault.name }}" # [REQUIRED] The name of a logical container where backups are stored.
     ScheduleExpression: "cron({{ rule.schedule }})" # A CRON expression in UTC specifying when Backup initiates a backup job.
-    StartWindowMinutes: "{{ rule.start_window_cancel | int }}" # A value in minutes after a backup is scheduled before a job will be canceled if it doesn't start successfully.
-    CompletionWindowMinutes: "{{ rule.completion_window_cancel | int }}" # A value in minutes after a backup job is successfully started before it must be completed or it will be canceled by Backup.
+    StartWindowMinutes: {{ rule.start_window_cancel | int }} # A value in minutes after a backup is scheduled before a job will be canceled if it doesn't start successfully.
+    CompletionWindowMinutes: {{ rule.completion_window_cancel | int }} # A value in minutes after a backup job is successfully started before it must be completed or it will be canceled by Backup.
+{% if (rule.lifecycle.move_to_cold_storage_after_days is defined and rule.lifecycle.move_to_cold_storage_after_days > 0) or (rule.lifecycle.delete_after_days is defined and rule.lifecycle.delete_after_days > 0) %}
     Lifecycle: # The lifecycle defines when a protected resource is transitioned to cold storage and when it expires.
-      MoveToColdStorageAfterDays: "{{ rule.lifecycle.move_to_cold_storage_after_days | int }}"  # Specifies the number of days after creation that a recovery point is moved to cold storage.
-      DeleteAfterDays: "{{ rule.lifecycle.delete_after_days | int }}" # Specifies the number of days after creation that a recovery point is deleted.
-    RecoveryPointTags: # To help organize your resources, you can assign your own metadata to the resources that you create.
-      KeyName: ''
-{% if _backup_copy is defined and rule.copy_actions.copy %}
-    CopyActions: # An array of CopyAction objects, which contains the details of the copy operation.
-    - Lifecycle:  # Contains an array of Transition objects specifying how long in days before a recovery point transitions to cold storage or is deleted.
-        MoveToColdStorageAfterDays: "{{ rule.copy_actions.lifecycle.move_to_cold_storage_after_days | int }}" # Specifies the number of days after creation that a recovery point is moved to cold storage.
-        DeleteAfterDays: "{{ rule.copy_actions.lifecycle.delete_after_days | int }}" # Specifies the number of days after creation that a recovery point is deleted.
-      DestinationBackupVaultArn: "{{ _copy_vault_created.BackupVaultArn }}" # [REQUIRED] An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup.
+{% if rule.lifecycle.move_to_cold_storage_after_days is defined and rule.lifecycle.move_to_cold_storage_after_days > 0 %}
+      MoveToColdStorageAfterDays: {{ rule.lifecycle.move_to_cold_storage_after_days | int }}  # Specifies the number of days after creation that a recovery point is moved to cold storage.
 {% endif %}
-    EnableContinuousBackup: "{{ rule.continuous_backup }}" # Specifies whether Backup creates continuous backups.
+{% if rule.lifecycle.delete_after_days is defined and rule.lifecycle.delete_after_days > 0 %}
+      DeleteAfterDays: {{ rule.lifecycle.delete_after_days | int }} # Specifies the number of days after creation that a recovery point is deleted.
+{% endif %}
+{% endif %}
+{% if _backup_copy is defined and rule.copy_actions.offsite | bool %}
+    CopyActions: # An array of CopyAction objects, which contains the details of the copy operation.
+{% if (rule.copy_actions.lifecycle.move_to_cold_storage_after_days is defined and rule.copy_actions.lifecycle.move_to_cold_storage_after_days > 0) or (rule.copy_actions.lifecycle.delete_after_days is defined and rule.copy_actions.lifecycle.delete_after_days > 0) %}
+    - Lifecycle:  # Contains an array of Transition objects specifying how long in days before a recovery point transitions to cold storage or is deleted.
+{% if rule.copy_actions.lifecycle.move_to_cold_storage_after_days is defined and rule.copy_actions.lifecycle.move_to_cold_storage_after_days > 0 %}
+        MoveToColdStorageAfterDays: {{ rule.copy_actions.lifecycle.move_to_cold_storage_after_days | int }} # Specifies the number of days after creation that a recovery point is moved to cold storage.
+{% endif %}
+{% if rule.copy_actions.lifecycle.delete_after_days is defined and rule.copy_actions.lifecycle.delete_after_days > 0 %}
+        DeleteAfterDays: {{ rule.copy_actions.lifecycle.delete_after_days | int }} # Specifies the number of days after creation that a recovery point is deleted.
+{% endif %}
+{% endif %}
+      DestinationBackupVaultArn: "{% if _copy_vault_info is defined %}{{ _copy_vault_info.stdout | from_json | json_query('BackupVaultArn') }}{% else %}{{ _copy_vault_exists.stdout | from_json | json_query('BackupVaultArn') }}{% endif %}" # [REQUIRED] An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup.
+{% endif %}
+    EnableContinuousBackup: {{ rule.continuous_backup | bool }} # Specifies whether Backup creates continuous backups.
 {% endfor %}
-  AdvancedBackupSettings: # Specifies a list of BackupOptions for each resource type.
-  - ResourceType: ''  # Specifies an object containing resource type and backup options.
-    BackupOptions: # Specifies the backup option for a selected resource.
-      KeyName: ''
-BackupPlanTags: # To help organize your resources, you can assign your own metadata to the resources that you create.
-  KeyName: ''
 CreatorRequestId: '' # Identifies the request and allows failed requests to be retried without the risk of running the operation twice.

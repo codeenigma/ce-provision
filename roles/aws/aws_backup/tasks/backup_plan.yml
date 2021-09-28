@@ -1,8 +1,18 @@
 ---
+- name: Check if the plan exists.
+  ansible.builtin.command: >
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json
+  register: _plan_exists
+
 - name: Gather backup copy facts.
   ansible.builtin.set_fact:
     _backup_copy: true
   when: aws_backup.copy_vault.region | length > 0
+
+- name: Create temp directory.
+  file:
+    path: "/tmp/aws_backup/{{ _infra_name }}"
+    state: directory
 
 - name: Create the 'backup-yaml-input.yml' file for plan creation.
   ansible.builtin.template:
@@ -19,13 +29,17 @@
 
 - name: Create a backup plan.
   ansible.builtin.command: >
-    aws backup create-backup-plan --backup-plan file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml --cli-input-yaml
+    aws backup create-backup-plan --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml
   register: _backup_plan_created
-  when: _aws_backup_plan_stat.stat.exists
+  when:
+    - _aws_backup_plan_stat.stat.exists
+    - _plan_exists.stdout == "null"
 
-- name: Add backup plan info to dictionary.
-  ansible.builtin.set_fact:
-    backup_plan_info: "{{ backup_plan_info | combine({ plan.name : _backup_plan_created.BackupPlanId }) }}"
+- name: Get info about newly created plan.
+  ansible.builtin.command: >
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json
+  register: _backup_plan_created_info
+  when: _backup_plan_created is defined
 
 - name: Tidy up and remove the yaml input file.
   file:

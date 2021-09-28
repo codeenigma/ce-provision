@@ -48,7 +48,7 @@
     backup:
       backup_plan_name: "{{ aws_efs.backup }}"
       selection_name: "EFS-{{ aws_efs.name }}-{{ _env_type }}"
-      resource_id: "{{ aws_efs_created.file_system_id }}"
+      resource_id: "{{ aws_efs_created.efs.file_system_id }}"
       resource_type: "file-system"
   when:
     - aws_efs.backup is defined

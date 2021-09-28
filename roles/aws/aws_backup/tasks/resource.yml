@@ -1,14 +1,15 @@
 ---
 - name: Get backup plan info.
-  ansible.builtin.set_fact:
-    _backup_plan_id: "{{ backup_plan_info[aws_backup.backup.backup_plan_name] }}"
+  ansible.builtin.command: >
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ backup.backup_plan_name }}'] | [0]" --output json
+  register: _backup_plan_info
 
 - name: Gather AWS account ID if it isn't already set.
   amazon.aws.aws_caller_info:
     profile: "{{ _aws_profile }}"
   delegate_to: localhost
   register: caller_info
-  when: caller_info is not defined
+ # when: caller_info is not defined
 
 - name: Set IAM role ARN for backups.
   ansible.builtin.set_fact:
@@ -27,8 +28,14 @@
       file-system: "elasticfilesystem"
       db: "rds"
   ansible.builtin.set_fact:
-    _resource_arn: "arn:aws:{{ arn_construct[aws_backup.backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ aws_backup.backup.resource_type }}:{{ aws_backup.backup.resource_id }}"
+    _resource_arn: "arn:aws:{{ arn_construct[backup.resource_type] }}:{{ _aws_region }}:{{ caller_info.account }}:{{ backup.resource_type }}{% if backup.resource_type == 'db' %}:{% else %}/{% endif %}{{ backup.resource_id }}"
+
+- name: Check if the resource selection exists.
+  ansible.builtin.command: >
+    aws backup list-backup-selections --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --query "BackupSelectionsList[?SelectionName=='{{ backup.selection_name }}'].SelectionName" --output text
+  register: _selection_exists
 
 - name: Assign resource to AWS Backup plan.
   ansible.builtin.command: >
-    aws backup create-backup-selection --backup-plan-id {{ _backup_plan_id }} --backup-selection "{\"SelectionName\":\"{{ aws_backup.backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"Resources\":[\"{{ _resource_arn }}\"]}"
+    aws backup create-backup-selection --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --backup-selection "{\"SelectionName\":\"{{ backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"Resources\":[\"{{ _resource_arn }}\"]}"
+  when: _selection_exists.stdout | length == 0
