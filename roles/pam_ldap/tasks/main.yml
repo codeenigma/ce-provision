@@ -70,7 +70,7 @@
 - name: Copy LDAP key script.
   get_url:
     url: https://raw.githubusercontent.com/codeenigma/ssh-getkey-ldap/master/ssh-getkey-ldap
-    dest: /opt/bin/ssh-getkey-ldap
+    dest: /usr/local/bin/ssh-getkey-ldap
     mode: 0555
     owner: root
 
@@ -87,7 +87,7 @@
 - name: Create wrapper script for LDAP key script.
   template:
     src: ssh-getkey-ldap-wrapper.sh.j2
-    dest: /opt/bin/ssh-getkey-ldap-wrapper.sh
+    dest: /usr/local/bin/ssh-getkey-ldap-wrapper.sh
     mode: "0555"
     owner: root
   when:
@@ -98,7 +98,7 @@
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommand "
-    line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap-wrapper.sh
+    line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap-wrapper.sh
   when:
     - ldap_client.binddn is defined and ldap_client.binddn
 
@@ -106,7 +106,7 @@
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommand "
-    line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap
+    line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap
   when:
     - not ldap_client.binddn
 
