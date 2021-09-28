@@ -20,7 +20,7 @@ aws_backup:
   #           move_to_cold_storage_after_days: 0 # Specifies the number of days after creation that a recovery point is moved to cold storage.
   #           delete_after_days: 35 # Specifies the number of days after creation that a recovery point is deleted.
   #         copy_actions:
-  #           copy: false # If you want to copy the backups from this plan to another region, set to true.
+  #           offsite: false # If you want to copy the backups from this plan to another region, set to true.
   #           lifecycle: # The lifecycle defines when a protected resource is transitioned to cold storage and when it expires.
   #             move_to_cold_storage_after_days: 0 # Specifies the number of days after creation that a recovery point is moved to cold storage.
   #             delete_after_days: 0 # Specifies the number of days after creation that a recovery point is deleted.
@@ -33,7 +33,7 @@ aws_backup:
   #           move_to_cold_storage_after_days: 30 # Specifies the number of days after creation that a recovery point is moved to cold storage.
   #           delete_after_days: 365 # Specifies the number of days after creation that a recovery point is deleted.
   #         copy_actions:
-  #           copy: false # If you want to copy the backups from this plan to another region, set to true.
+  #           offsite: false # If you want to copy the backups from this plan to another region, set to true.
   #           lifecycle: # The lifecycle defines when a protected resource is transitioned to cold storage and when it expires.
   #             move_to_cold_storage_after_days: 0 # Specifies the number of days after creation that a recovery point is moved to cold storage.
   #             delete_after_days: 0 # Specifies the number of days after creation that a recovery point is deleted.

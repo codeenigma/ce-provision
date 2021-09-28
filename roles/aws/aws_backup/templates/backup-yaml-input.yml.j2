@@ -16,9 +16,7 @@ BackupPlan: # [REQUIRED] Specifies the body of a backup plan.
       DeleteAfterDays: {{ rule.lifecycle.delete_after_days | int }} # Specifies the number of days after creation that a recovery point is deleted.
 {% endif %}
 {% endif %}
-    RecoveryPointTags: # To help organize your resources, you can assign your own metadata to the resources that you create.
-      KeyName: ''
-{% if _backup_copy is defined and rule.copy_actions.copy | bool %}
+{% if _backup_copy is defined and rule.copy_actions.offsite | bool %}
     CopyActions: # An array of CopyAction objects, which contains the details of the copy operation.
 {% if (rule.copy_actions.lifecycle.move_to_cold_storage_after_days is defined and rule.copy_actions.lifecycle.move_to_cold_storage_after_days > 0) or (rule.copy_actions.lifecycle.delete_after_days is defined and rule.copy_actions.lifecycle.delete_after_days > 0) %}
     - Lifecycle:  # Contains an array of Transition objects specifying how long in days before a recovery point transitions to cold storage or is deleted.
