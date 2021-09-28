@@ -1,20 +1,27 @@
 ---
 - name: Add repository key for Gitlab Runner.
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
     state: present
 
 - name: Add repository for Gitlab Runner.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main"
     state: present
 
 - name: Add source repository for Gitlab Runner.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main"
     state: present
 
 - name: Ensure Gitlab Runner is installed.
-  apt:
+  ansible.builtin.apt:
     name: "gitlab-runner"
     state: present
+
+- name: Install the Fargate driver.
+  ansible.builtin.get_url:
+    url: https://gitlab-runner-custom-fargate-downloads.s3.amazonaws.com/latest/fargate-linux-amd64
+    dest: /opt/gitlab-runner/fargate
+    mode: 0755
+  when: gitlab_runner.fargate
