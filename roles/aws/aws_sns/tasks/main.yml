@@ -47,3 +47,7 @@
   when:
     - aws_sns.policy is defined
     - aws_sns.policy | length > 0
+
+- name: SNS topic info debug.
+  ansible.builtin.debug:
+    msg: "{{ _aws_sns_topic_info }}"
