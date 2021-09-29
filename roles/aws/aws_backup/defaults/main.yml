@@ -44,3 +44,18 @@ aws_backup:
     selection_name: "" # Name of the resource assignation; this is set in the roles which create the resources such as aws/aws_ec2_with_eip and aws/aws_efs.
     resource_id: "" # The unique ID of the resource. For EC2, this is the instance ID. For EFS, the filesystem ID. For RDS, the DB identifier.
     resource_type: "" # Options are 'instance', 'file-system' and 'db' for EC2, EFS and RDS respectively.
+  sns:
+    sns: false
+    name: "Notify-Email"
+    display_name: "" # Display name for the topic, for when the topic is owned by this AWS account.
+    delivery_policy_default_healthy_retry_policy_min_delay_target: 20
+    delivery_policy_default_healthy_retry_policy_max_delay_target: 20
+    delivery_policy_default_healthy_retry_policy_num_retries: 3
+    delivery_policy_default_healthy_retry_policy_num_max_delay_retries: 0
+    delivery_policy_default_healthy_retry_policy_num_no_delay_retries: 0
+    delivery_policy_default_healthy_retry_policy_num_min_delay_retries: 0
+    delivery_policy_default_healthy_retry_policy_backoff_function: "linear"
+    delivery_policy_disable_subscription_overrides: false
+    subscriptions:
+      - endpoint: "admin@example.com"
+        protocol: "email"
