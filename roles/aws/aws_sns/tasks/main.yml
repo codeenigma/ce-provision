@@ -25,6 +25,7 @@
 - name: Create an SNS topic and subscription with custom policy.
   sns_topic:
     name: "{{ aws_sns.name }}"
+    region: "{{ aws_sns.region }}"
     state: "present"
     display_name: "{{ aws_sns.display_name }}"
     policy:
