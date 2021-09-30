@@ -5,6 +5,7 @@
     region: "{{ aws_sns.region }}"
     state: "present"
     display_name: "{{ aws_sns.display_name }}"
+    purge_subscriptions: "{{ aws_sns.purge_subscriptions }}"
     delivery_policy:
       http:
         defaultHealthyRetryPolicy:
@@ -28,6 +29,7 @@
     region: "{{ aws_sns.region }}"
     state: "present"
     display_name: "{{ aws_sns.display_name }}"
+    purge_subscriptions: "{{ aws_sns.purge_subscriptions }}"
     policy:
       "{{ aws_sns.policy }}"
     delivery_policy:

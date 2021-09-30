@@ -13,6 +13,7 @@
       region: "{{ _aws_region }}"
       name: "{{ aws_backup.sns.name }}"
       display_name: "{{ aws_backup.sns.display_name }}"
+      purge_subscriptions: false
       policy: |
         {
           "Version": "2008-10-17",
