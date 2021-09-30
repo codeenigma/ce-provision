@@ -1,4 +1,4 @@
-TopicArn: "{{ _aws_sns_topic_info.sns_arn }}" # [REQUIRED] The ARN of the topic you want to subscribe to.
+TopicArn: "{{ _aws_sns_topic_info_custom.sns_arn }}" # [REQUIRED] The ARN of the topic you want to subscribe to.
 Protocol: "{{ sub_var.protocol }}" # [REQUIRED] The protocol that you want to use.
 Endpoint: "{{ sub_var.endpoint }}" # The endpoint that you want to receive notifications.
 Attributes: # A map of attributes with their corresponding values.

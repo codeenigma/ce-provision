@@ -78,7 +78,7 @@
 
 - name: Enable notifications for failed backup jobs.
   ansible.builtin.command: >
-    aws backup put-backup-vault-notifications --endpoint-url https://backup.{{ _aws_region }}.amazonaws.com --backup-vault-name {{ aws_backup.vault.name }} --sns-topic-arn {{ _aws_sns_topic_info.sns_arn }} --backup-vault-events BACKUP_JOB_COMPLETED
+    aws backup put-backup-vault-notifications --endpoint-url https://backup.{{ _aws_region }}.amazonaws.com --backup-vault-name {{ aws_backup.vault.name }} --sns-topic-arn {{ _aws_sns_topic_info_custom.sns_arn }} --backup-vault-events BACKUP_JOB_COMPLETED
   when:
     - aws_backup.sns.sns is defined
     - aws_backup.sns.sns

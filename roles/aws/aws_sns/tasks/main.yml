@@ -43,7 +43,7 @@
         disableSubscriptionOverrides: "{{ aws_sns.delivery_policy_disable_subscription_overrides }}"
     subscriptions:
       "{{ aws_sns.subscriptions }}"
-  register: _aws_sns_topic_info
+  register: _aws_sns_topic_info_custom
   when:
     - aws_sns.policy is defined
     - aws_sns.policy | length > 0
