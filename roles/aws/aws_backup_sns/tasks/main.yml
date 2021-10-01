@@ -36,7 +36,7 @@
                 "SNS:AddPermission",
                 "SNS:Subscribe"
               ],
-              "Resource": "arn:aws:sns:region:{{ _aws_account_info_backup.account }}:{{ aws_backup.sns.name }}",
+              "Resource": "arn:aws:sns:{{ _aws_region }}:{{ _aws_account_info_backup.account }}:{{ aws_backup.sns.name }}",
               "Condition": {
                 "StringEquals": {
                   "AWS:SourceOwner": "{{ _aws_account_info_backup.account }}"
