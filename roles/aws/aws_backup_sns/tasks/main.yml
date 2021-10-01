@@ -50,7 +50,7 @@
                 "Service": "backup.amazonaws.com"
               },
               "Action": "SNS:Publish",
-              "Resource": "arn:aws:sns:region:{{ _aws_account_info_backup.account }}:{{ aws_backup.sns.name }}"
+              "Resource": "arn:aws:sns:{{ _aws_region }}:{{ _aws_account_info_backup.account }}:{{ aws_backup.sns.name }}"
             }
           ]
         }
