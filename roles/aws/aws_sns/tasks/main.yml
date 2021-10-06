@@ -5,6 +5,7 @@
     region: "{{ aws_sns.region }}"
     state: "present"
     display_name: "{{ aws_sns.display_name }}"
+    purge_subscriptions: "{{ aws_sns.purge_subscriptions }}"
     delivery_policy:
       http:
         defaultHealthyRetryPolicy:
@@ -19,3 +20,36 @@
     subscriptions:
       "{{ aws_sns.subscriptions }}"
   register: _aws_sns_topic_info
+  when:
+    - aws_sns.policy is not defined or aws_sns.policy | length == 0
+
+- name: Create an SNS topic and subscription with custom policy.
+  sns_topic:
+    name: "{{ aws_sns.name }}"
+    region: "{{ aws_sns.region }}"
+    state: "present"
+    display_name: "{{ aws_sns.display_name }}"
+    purge_subscriptions: "{{ aws_sns.purge_subscriptions }}"
+    policy:
+      "{{ aws_sns.policy }}"
+    delivery_policy:
+      http:
+        defaultHealthyRetryPolicy:
+          minDelayTarget: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_min_delay_target }}"
+          maxDelayTarget: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_max_delay_target }}"
+          numRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_retries }}"
+          numMaxDelayRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_max_delay_retries }}"
+          numNoDelayRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_no_delay_retries }}"
+          numMinDelayRetries: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_num_min_delay_retries }}"
+          backoffFunction: "{{ aws_sns.delivery_policy_default_healthy_retry_policy_backoff_function }}"
+        disableSubscriptionOverrides: "{{ aws_sns.delivery_policy_disable_subscription_overrides }}"
+    subscriptions:
+      "{{ aws_sns.subscriptions }}"
+  register: _aws_sns_topic_info_custom
+  when:
+    - aws_sns.policy is defined
+    - aws_sns.policy | length > 0
+
+- name: SNS topic info debug.
+  ansible.builtin.debug:
+    msg: "{{ _aws_sns_topic_info }}"
