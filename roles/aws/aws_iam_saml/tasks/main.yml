@@ -19,9 +19,8 @@
 - name: Get the current AWS account caller identity information
   amazon.aws.aws_caller_info:
     profile: "{{ aws_iam_saml.aws_profile }}"
-
   delegate_to: localhost
-  register: caller_info
+  register: aws_account_info
 
 - name: Create a role for administrative access
   community.aws.iam_role:
@@ -35,7 +34,7 @@
   delegate_to: localhost
   when:
     - aws_iam_saml.admin_groups is defined
-    - aws_iam_saml.admin_groups[0] | length > 0
+    - aws_iam_saml.admin_groups[0] is defined
 
 - name: Create a role for read-only access
   community.aws.iam_role:
@@ -49,7 +48,7 @@
   delegate_to: localhost
   when:
     - aws_iam_saml.readonly_groups is defined
-    - aws_iam_saml.readonly_groups[0] | length > 0
+    - aws_iam_saml.readonly_groups[0] is defined
 
 - name: Create a customer managed policy for billing access
   community.aws.iam_managed_policy:
@@ -59,10 +58,10 @@
     policy: "{{ lookup('template', 'access_billing_policy.j2') }}"
     state: present
   delegate_to: localhost
-  register: billing_policy
+  register: _billing_policy
   when:
     - aws_iam_saml.billing_groups is defined
-    - aws_iam_saml.billing_groups[0] | length > 0
+    - aws_iam_saml.billing_groups[0] is defined
 
 - name: Create a role for billing access
   community.aws.iam_role:
@@ -72,9 +71,12 @@
     assume_role_policy_document: "{{ lookup('template', 'assume_billing_policy.j2') }}"
     description: "Billing access only"
     managed_policy:
-      - "{{ billing_policy.policy.arn }}"
+      - "{{ _billing_policy.policy.arn }}"
   delegate_to: localhost
-  when: billing_policy.policy is succeeded
+  when:
+    - aws_iam_saml.billing_groups is defined
+    - aws_iam_saml.billing_groups[0] is defined
+    - _billing_policy.policy is succeeded
 
 - name: Clone SimpleSAMLphp repo
   git:
@@ -89,9 +91,9 @@
 - name: Create AWS account include for centralised admin
   template:
     src: "simplesamlphp_admin_include.j2"
-    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_include_path }}/admin_{{ caller_info.account }}.php"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_include_path }}/admin_{{ aws_account_info.account }}.php"
   delegate_to: localhost
-  register: saml_include_template
+  register: _saml_include_template
   when:
     - aws_iam_saml.saml_include_path is defined
     - aws_iam_saml.saml_include_path | length > 0
@@ -102,17 +104,17 @@
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
   when:
-    - saml_include_template is succeeded
+    - _saml_include_template is not skipped
 
 - name: Try a git commit of the AWS account include
-  command: git commit -m "Automated commit - admin access for AWS account {{ caller_info.account }}."
+  command: git commit -m "Automated commit - admin access for AWS account {{ aws_account_info.account }}."
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
   ignore_errors: true
-  register: include_commit
+  register: _include_commit
   when:
-    - saml_include_template is succeeded
+    - _saml_include_template is not skipped
 
 - name: Push the AWS account include
   command: git push origin {{ aws_iam_saml.saml_repository_branch }}
@@ -120,15 +122,15 @@
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
   when:
-    - include_commit is succeeded
-    - saml_include_template is succeeded
+    - _include_commit is succeeded
+    - _saml_include_template is not skipped
 
 - name: Create a SAML service provider for the AWS account
   template:
     src: "simplesamlphp_sp.j2"
-    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_sp_path }}/aws_{{ caller_info.account }}.php"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_sp_path }}/aws_{{ aws_account_info.account }}.php"
   delegate_to: localhost
-  register: saml_sp_template
+  register: _saml_sp_template
   when:
     - aws_iam_saml.saml_sp_path is defined
     - aws_iam_saml.saml_sp_path | length > 0
@@ -139,17 +141,17 @@
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
   when:
-    - saml_sp_template is succeeded
+    - _saml_sp_template is succeeded
 
 - name: Try a git commit of the AWS account service provider
-  command: git commit -m "Automated commit - dedicated SP for AWS account {{ caller_info.account }}."
+  command: git commit -m "Automated commit - dedicated SP for AWS account {{ aws_account_info.account }}."
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
   ignore_errors: true
-  register: sp_commit
+  register: _sp_commit
   when:
-    - saml_sp_template is succeeded
+    - _saml_sp_template is succeeded
 
 - name: Push the AWS account service provider
   command: git push origin {{ aws_iam_saml.saml_repository_branch }}
@@ -157,5 +159,5 @@
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
   when:
-    - sp_commit is succeeded
-    - saml_sp_template is succeeded
+    - _sp_commit is succeeded
+    - _saml_sp_template is succeeded
