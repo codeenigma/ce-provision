@@ -22,7 +22,7 @@
   when: not user_ansible_gpg_key_exists.stdout
 
 - name: Generate GPG key.
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: "export GPG_TTY=$(tty); gpgconf --kill gpg-agent; gpg-agent --daemon; gpg --batch --generate-key /tmp/gpg-{{ gpg_user.username }}"
   become: true
   become_user: "{{ gpg_user.username }}"
