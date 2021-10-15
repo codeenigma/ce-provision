@@ -1,39 +1,39 @@
 ---
 - name: Add repository key for Gitlab.
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
     state: present
 
 - name: Add repository for Gitlab.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
     state: present
 
 - name: Add source repository for Gitlab.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
     state: present
 
 - name: Ensure Gitlab is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "gitlab-ce"
     state: present
     update_cache: true
 
 - name: Generates SSL keys.
-  include_role:
+  ansible.builtin.include_role:
     name: ssl
   when: gitlab.ssl is defined
   vars:
     ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
 
 - name: Copy Gitlab configuration file.
-  template:
+  ansible.builtin.template:
     src: gitlab.rb.j2
     dest: /etc/gitlab/gitlab.rb
 
 - name: Let Gitlab know it's on Docker.
-  copy:
+  ansible.builtin.copy:
     content: "gitlab-docker"
     dest: "/opt/gitlab/embedded/service/gitlab-rails/INSTALLATION_TYPE"
     mode: "0666"
@@ -42,7 +42,7 @@
     - is_local
 
 - name: Copy startup script in place.
-  template:
+  ansible.builtin.template:
     src: docker-init.sh.j2
     dest: "/opt/gitlab-init.sh"
     owner: root
@@ -54,7 +54,7 @@
     - is_local
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ gitlab.overrides }}"
@@ -63,31 +63,36 @@
     - gitlab.overrides | length > 0
 
 - name: Manually restart Gitlab/Docker.
-  command: "/bin/sh /opt/gitlab-init.sh"
+  ansible.builtin.command: "/bin/sh /opt/gitlab-init.sh"
   when:
     - is_local is defined
     - is_local
 
 - name: Stop Gitlab.
-  command: /opt/gitlab/bin/gitlab-ctl stop
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
 
 - name: Reconfigure Gitlab.
-  command: /opt/gitlab/bin/gitlab-ctl reconfigure
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
 
 - name: Restart Gitlab.
-  command: /opt/gitlab/bin/gitlab-ctl start
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
 
+  # @TODO Can these settings go into gitlab.rb?
+  # Seems any ApplicationSetting can - see example: https://gitlab.com/gitlab-org/gitlab-foss/-/issues/17296
 - name: Disable self-register feature
-  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(signup_enabled: false)'"
+  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(signup_enabled: false)'"
 
 - name: Disable DSA keys
-  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(dsa_key_restriction: -1)'"
+  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(dsa_key_restriction: -1)'"
 
 - name: Disable ECDSA
-  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(ecdsa_key_restriction: -1)'"
+  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(ecdsa_key_restriction: -1)'"
 
 - name: Enforce at least 2048bits for RSA
-  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(rsa_key_restriction: 2048)'"
+  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(rsa_key_restriction: 2048)'"
 
 - name: Disable password auth over HTTP/S
-  command: "gitlab-rails runner 'ApplicationSetting.last.update_attributes(password_authentication_enabled_for_git: false)'"
+  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(password_authentication_enabled_for_git: false)'"
+
+- name: Ensure user data and projects are private
+  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(restricted_visibility_levels: [10, 20])'"
