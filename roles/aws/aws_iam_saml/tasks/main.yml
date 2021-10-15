@@ -20,7 +20,7 @@
   amazon.aws.aws_caller_info:
     profile: "{{ aws_iam_saml.aws_profile }}"
   delegate_to: localhost
-  register: aws_account_info
+  register: _aws_account_info
 
 - name: Create a role for administrative access
   community.aws.iam_role:
@@ -91,7 +91,7 @@
 - name: Create AWS account include for centralised admin
   template:
     src: "simplesamlphp_admin_include.j2"
-    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_include_path }}/admin_{{ aws_account_info.account }}.php"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_include_path }}/admin_{{ _aws_account_info.account }}.php"
   delegate_to: localhost
   register: _saml_include_template
   when:
@@ -107,7 +107,7 @@
     - _saml_include_template is not skipped
 
 - name: Try a git commit of the AWS account include
-  command: git commit -m "Automated commit - admin access for AWS account {{ aws_account_info.account }}."
+  command: git commit -m "Automated commit - admin access for AWS account {{ _aws_account_info.account }}."
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
@@ -128,7 +128,7 @@
 - name: Create a SAML service provider for the AWS account
   template:
     src: "simplesamlphp_sp.j2"
-    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_sp_path }}/aws_{{ aws_account_info.account }}.php"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_sp_path }}/aws_{{ _aws_account_info.account }}.php"
   delegate_to: localhost
   register: _saml_sp_template
   when:
@@ -144,7 +144,7 @@
     - _saml_sp_template is succeeded
 
 - name: Try a git commit of the AWS account service provider
-  command: git commit -m "Automated commit - dedicated SP for AWS account {{ aws_account_info.account }}."
+  command: git commit -m "Automated commit - dedicated SP for AWS account {{ _aws_account_info.account }}."
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
