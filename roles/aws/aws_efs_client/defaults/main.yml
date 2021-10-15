@@ -7,7 +7,7 @@ aws_efs_client:
   mounts:
     - path: /mnt/shared
       src: example-efs # This will be translated from the "name"
-      opts: _netdev # See https://docs.aws.amazon.com/efs/latest/ug/mount-fs-auto-mount-onreboot.html
+      opts: _netdev # _netdev tells OS to wait for network before attempting to mount
       state: present
       owner: root
       group: root
