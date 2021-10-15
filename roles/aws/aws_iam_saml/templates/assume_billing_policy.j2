@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}"
+        "Federated": "arn:aws:iam::{{ _aws_account_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}"
       },
       "Action": "sts:AssumeRoleWithSAML",
       "Condition": {
