@@ -114,3 +114,17 @@
 - name: Add instance info.
   set_fact:
     aws_rds_facts: "{{ aws_rds_facts | combine( {aws_rds.name: _rds_instance_info} ) }}"
+
+- name: Assign resource to backup plan.
+  include_role:
+    name: aws/aws_backup
+    tasks_from: resource
+  vars:
+    backup:
+      backup_plan_name: "{{ aws_rds.backup }}"
+      selection_name: "RDS-{{ aws_rds.name }}-{{ _env_type }}"
+      resource_id: "{{ aws_rds.name }}"
+      resource_type: "db"
+  when:
+    - aws_rds.backup is defined
+    - aws_rds.backup | length > 0

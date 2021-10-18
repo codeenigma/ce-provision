@@ -87,6 +87,7 @@
         delivery_policy_disable_subscription_overrides: "{{ aws_ec2_autoscale_cluster.rds.sns.delivery_policy_disable_subscription_overrides }}"
         subscriptions:
           "{{ aws_ec2_autoscale_cluster.rds.sns.subscriptions }}"
+      backup: "{{ aws_ec2_autoscale_cluster.rds.backup }}"
   when:
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds
@@ -102,6 +103,7 @@
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       encrypt: "{{ aws_ec2_autoscale_cluster.efs_encrypt }}"
+      backup: "{{ aws_ec2_autoscale_cluster.efs_backup }}"
       security_groups:
         - "{{ _aws_ec2_autoscale_cluster_security_group.group_name }}"
       purge_tags: true
