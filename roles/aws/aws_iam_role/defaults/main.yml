@@ -6,6 +6,7 @@ aws_iam_role:
   # Which document policy to apply.
   # Current options are 'ec2' or 'ecs'
   policy_document: ec2
+  purge_policies: true # set to false if you want to add policies to an existing role
   tags:
     #Type: "util"
   state: present
