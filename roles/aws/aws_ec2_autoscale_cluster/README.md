@@ -174,6 +174,7 @@ aws_ec2_autoscale_cluster:
       subscriptions:
         - endpoint: "admin@example.com"
           protocol: "email"
+    backup: "{{ _infra_name }}-{{ _env_type }}" # Whether to back up the RDS instance. Set to the plan you want to use, or an empty string if you don't want to back up.
   # Add an CNAM record tied to the ALB.
   # Set the zone to empty to skip.
   route_53:
@@ -188,6 +189,7 @@ aws_ec2_autoscale_cluster:
   alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
   efs: true # Whether to create an EFS volume.
   efs_encrypt: false # Whether to encrypt the EFS volume
+  efs_backup: "{{ _infra_name }}-{{ _env_type }}" # Whether to back up the EFS volume. Set to the plan you want to use, or an empty string if you don't want to back up.
 
 ```
 

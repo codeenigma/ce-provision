@@ -8,6 +8,7 @@
      - [AWS Cloudwatch agent](/roles/aws_cloudwatch_agent)
      - [AWS Infrastructure](/roles/aws)
        - [AMI Debian Buster](/roles/aws/ami_debian_buster)
+       - [AWS Backup](/roles/aws/aws_backup)
        - [AWS CLI](/roles/aws/aws_cli)
        - [AWS CloudFront distribution](/roles/aws/aws_cloudfront_distribution)
        - [Cloudwatch log group](/roles/aws/aws_cloudwatch_log_group)
