@@ -34,7 +34,7 @@ gitlab_runner:
     subnet: "subnet-abcdef123456" # subnet ID
     security_group: "sg-abcdef123456" # SG ID
     task_definition: "my-task:1" # task definition in format name:revision
-    public_ip: false # if your containers need a public IP assigning
+    public_ip: "false" # if your containers need a public IP assigning
     version: "1.4.0" # Fargate platform version
     metadata_dir: "/opt/gitlab-runner/metadata"
     ssh_user: "root"
