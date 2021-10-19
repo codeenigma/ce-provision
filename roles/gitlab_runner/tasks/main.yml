@@ -43,6 +43,7 @@
     dest: /etc/gitlab-runner/config.toml
     owner: root
     group: root
+    force: true
   become: true
   when: gitlab_runner.runners | length > 0
 
@@ -52,6 +53,7 @@
     dest: /etc/gitlab-runner/fargate.toml
     owner: root
     group: root
+    force: true
   become: true
   when:
     - gitlab_runner.install_fargate
