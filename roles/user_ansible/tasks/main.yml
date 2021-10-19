@@ -1,11 +1,12 @@
 ---
 - name: Create the system group.
-  group:
+  ansible.builtin.group:
     name: "{{ user_ansible.username }}"
+    gid: "{{ user_ansible.gid | default(omit) }}"
     system: true
 
 - name: Create additional groups.
-  group:
+  ansible.builtin.group:
     name: "{{ group }}"
     state: present
     system: true
@@ -15,7 +16,7 @@
   when: user_ansible.groups | length
 
 - name: Create the system user.
-  user:
+  ansible.builtin.user:
     name: "{{ user_ansible.username }}"
     shell: /bin/bash
     group: "{{ user_ansible.username }}"
@@ -27,7 +28,7 @@
     groups: "{{ user_ansible.groups }}"
 
 - name: Add user to sudoers.
-  template:
+  ansible.builtin.template:
     src: "sudoer.j2"
     dest: "/etc/sudoers.d/{{ user_ansible.username }}"
     owner: root
@@ -36,7 +37,7 @@
   when: user_ansible.sudoer
 
 - name: Copy SSH public key to target.
-  authorized_key:
+  ansible.builtin.authorized_key:
     key: "{{ key }}"
     user: "{{ user_ansible.username }}"
     state: present

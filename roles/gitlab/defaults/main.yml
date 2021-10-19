@@ -12,6 +12,7 @@ gitlab:
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
     handling: selfsigned
   unicorn_worker_processes: 2
+  puma_worker_processes: 2
   initial_root_password: ""
   ldap: false
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"

@@ -667,7 +667,7 @@ gitlab_rails['initial_root_password'] = "{{ gitlab.initial_root_password }}"
 # unicorn['worker_timeout'] = 60
 ###! Minimum worker_processes is 2 at this moment
 ###! See https://gitlab.com/gitlab-org/gitlab-ce/issues/18771
-unicorn['worker_processes'] = {{ gitlab.unicorn_worker_processes }}
+# unicorn['worker_processes'] = {{ gitlab.unicorn_worker_processes }}
 
 ### Advanced settings
 # unicorn['listen'] = 'localhost'
@@ -698,7 +698,7 @@ unicorn['worker_processes'] = {{ gitlab.unicorn_worker_processes }}
 # puma['enable'] = false
 # puma['ha'] = false
 # puma['worker_timeout'] = 60
-# puma['worker_processes'] = 2
+puma['worker_processes'] = {{ gitlab.puma_worker_processes }}
 # puma['min_threads'] = 1
 # puma['max_threads'] = 16
 
