@@ -34,6 +34,7 @@
     url: https://gitlab-runner-custom-fargate-downloads.s3.amazonaws.com/latest/fargate-linux-amd64
     dest: /opt/gitlab-runner/fargate
     mode: 0755
+  become: true
   when: gitlab_runner.install_fargate
 
 - name: Place Gitlab runner configuration file.
@@ -42,6 +43,7 @@
     dest: /etc/gitlab-runner/config.toml
     owner: root
     group: root
+  become: true
   when: gitlab_runner.runners | length > 0
 
 - name: Place the Fargate configuration file.
@@ -50,6 +52,7 @@
     dest: /etc/gitlab-runner/fargate.toml
     owner: root
     group: root
+  become: true
   when:
     - gitlab_runner.install_fargate
     - gitlab_runner.fargate | length > 0
