@@ -24,6 +24,8 @@
     path: /opt/gitlab-runner
     state: directory
     mode: '0755'
+    owner: root
+    group: root
   when: gitlab_runner.install_fargate
 
 - name: Install the Fargate driver.
