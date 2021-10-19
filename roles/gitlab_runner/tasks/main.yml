@@ -19,6 +19,13 @@
     name: "gitlab-runner"
     state: present
 
+- name: Create the Fargate driver directory if it does not exist.
+  ansible.builtin.file:
+    path: /opt/gitlab-runner
+    state: directory
+    mode: '0755'
+  when: gitlab_runner.install_fargate
+
 - name: Install the Fargate driver.
   ansible.builtin.get_url:
     url: https://gitlab-runner-custom-fargate-downloads.s3.amazonaws.com/latest/fargate-linux-amd64
