@@ -24,4 +24,27 @@
     url: https://gitlab-runner-custom-fargate-downloads.s3.amazonaws.com/latest/fargate-linux-amd64
     dest: /opt/gitlab-runner/fargate
     mode: 0755
-  when: gitlab_runner.fargate
+  when: gitlab_runner.install_fargate
+
+- name: Place Gitlab runner configuration file.
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: /etc/gitlab-runner/config.toml
+    owner: root
+    group: root
+  when: gitlab_runner.runners | length > 0
+
+- name: Place the Fargate configuration file.
+  ansible.builtin.template:
+    src: fargate.toml.j2
+    dest: /etc/gitlab-runner/fargate.toml
+    owner: root
+    group: root
+  when:
+    - gitlab_runner.install_fargate
+    - gitlab_runner.fargate | length > 0
+
+- name: Restart gitlab-runner service.
+  service:
+    name: gitlab-runner
+    state: restarted
