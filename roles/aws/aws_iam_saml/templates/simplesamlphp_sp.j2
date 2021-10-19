@@ -1,9 +1,9 @@
 <?php
 ##########################################
-# AWS SP FOR {{ caller_info.account }} with alias {{ aws_iam_saml.aws_account_alias }}
+# AWS SP FOR {{ _aws_account_info.account }} with alias {{ aws_iam_saml.aws_account_alias }}
 ##########################################
-$metadata['urn:amazon:{{ caller_info.account }}'] = array (
-  'entityid' => 'urn:amazon:{{ caller_info.account }}',
+$metadata['urn:amazon:{{ _aws_account_info.account }}'] = array (
+  'entityid' => 'urn:amazon:{{ _aws_account_info.account }}',
   'description' => array (),
   'name' => array (
     'en' => 'AWS Console Access',
@@ -39,9 +39,9 @@ $metadata['urn:amazon:{{ caller_info.account }}'] = array (
     10 => array(
       'class' => 'core:AttributeAdd',
       'https://aws.amazon.com/SAML/Attributes/Role' => array(
-        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.admin_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
-        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.readonly_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
-        'arn:aws:iam::{{ caller_info.account }}:role/{{ aws_iam_saml.billing_role }},arn:aws:iam::{{ caller_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ _aws_account_info.account }}:role/{{ aws_iam_saml.admin_role }},arn:aws:iam::{{ _aws_account_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ _aws_account_info.account }}:role/{{ aws_iam_saml.readonly_role }},arn:aws:iam::{{ _aws_account_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
+        'arn:aws:iam::{{ _aws_account_info.account }}:role/{{ aws_iam_saml.billing_role }},arn:aws:iam::{{ _aws_account_info.account }}:saml-provider/{{ aws_iam_saml.provider_name }}',
       ),
     ),
 

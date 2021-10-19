@@ -35,6 +35,7 @@
      - [Firewall Config](/roles/firewall_config)
      - [UFW Firewall](/roles/firewall)
      - [Frontail](/roles/frontail)
+     - [Ansible Role: Apache Solr](/roles/geerlingguy.solr)
      - [Gitlab](/roles/gitlab)
      - [Gitlab Runner](/roles/gitlab_runner)
      - [GPG Key](/roles/gpg_key)
