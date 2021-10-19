@@ -12,7 +12,7 @@ gitlab_runner:
       executor: "shell"
     # Example custom executor runner (ECS Fargate)
     #- output_limit: 30000
-    #  name: "Default runner"
+    #  name: "Fargate runner"
     #  url: "https://gitlab.example.com"
     #  token: ""
     #  executor: "custom"
