@@ -11,8 +11,10 @@ check_interval = {{ gitlab_runner.check_interval }}
   url = "{{ runner.url }}"
   token = "{{ runner.token }}"
   executor = "{{ runner.executor }}"
-  {% if 'builds_dir' in runner %}builds_dir = "{{ runner.builds_dir }}"{% endif %}
-  {% if 'cache_dir' in runner %}cache_dir = "{{ runner.cache_dir }}"{% endif %}
+  {% if 'builds_dir' in runner %}builds_dir = "{{ runner.builds_dir }}"
+  {% endif %}
+  {% if 'cache_dir' in runner %}cache_dir = "{{ runner.cache_dir }}"
+  {% endif %}
   [runners.custom_build_dir]
   [runners.cache]
     [runners.cache.s3]
@@ -28,4 +30,5 @@ check_interval = {{ gitlab_runner.check_interval }}
     cleanup_exec = "{{ runner.cleanup_exec }}"
     cleanup_args = {{ runner.cleanup_args }}
 {% endif %}
+
 {% endfor %}
