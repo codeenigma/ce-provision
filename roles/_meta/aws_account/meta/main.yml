@@ -1,4 +1,3 @@
 ---
 dependencies:
   - role: aws/aws_iam_saml
-  - role: aws/aws_backup
