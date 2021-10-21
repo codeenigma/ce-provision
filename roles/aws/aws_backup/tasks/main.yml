@@ -1,7 +1,7 @@
 ---
 - name: Check if the backup vault already exists.
   ansible.builtin.command: >
-    aws backup list-backup-vaults --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'] | [0]" --output json
+    aws backup list-backup-vaults --region {{ _aws_region }} --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'] | [0]" --output json
   register: _vault_exists
 
 - name: Check if the off-site backup vault already exists.
@@ -14,7 +14,7 @@
 
 - name: Create backup vault without user-provided KMS key.
   ansible.builtin.command: >
-    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }}
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --region {{ _aws_region }}
   register: _vault_created
   when:
     - aws_backup.vault.encryption_key == "Default"
@@ -22,7 +22,7 @@
 
 - name: Create backup vault with user-provided KMS key.
   ansible.builtin.command: >
-    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --encryption-key {{ aws_backup.vault.encryption_key }}
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --encryption-key {{ aws_backup.vault.encryption_key }} --region {{ _aws_region }}
   register: _vault_created
   when:
     - aws_backup.vault.encryption_key != "Default"

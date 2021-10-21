@@ -1,7 +1,7 @@
 ---
 - name: Check if the plan exists.
   ansible.builtin.command: >
-    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json
+    aws backup list-backup-plans --region {{ _aws_region }} --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json
   register: _plan_exists
 
 - name: Gather backup copy facts.
@@ -29,7 +29,7 @@
 
 - name: Create a backup plan.
   ansible.builtin.command: >
-    aws backup create-backup-plan --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml
+    aws backup create-backup-plan --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml --region {{ _aws_region }}
   register: _backup_plan_created
   when:
     - _aws_backup_plan_stat.stat.exists
@@ -37,7 +37,7 @@
 
 - name: Get info about newly created plan.
   ansible.builtin.command: >
-    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json --region {{ _aws_region }}
   register: _backup_plan_created_info
   when: _backup_plan_created is defined
 
