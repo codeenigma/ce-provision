@@ -19,6 +19,12 @@
     name: "gitlab-runner"
     state: present
 
+# @TODO register any runners - you can't just include the config
+# Reset the registration token via the API to get a new one
+# Then run the registration command, e.g.
+# gitlab-runner register --url https://gitlab.com/ --registration-token TOKEN_HERE --name fargate-test-runner --run-untagged --executor custom -n
+# This will automatically update /etc/gitlab-runner/config.toml
+
 - name: Create the Fargate driver directory if it does not exist.
   ansible.builtin.file:
     path: /opt/gitlab-runner
@@ -37,16 +43,6 @@
   become: true
   when: gitlab_runner.install_fargate
 
-- name: Place Gitlab runner configuration file.
-  ansible.builtin.template:
-    src: config.toml.j2
-    dest: /etc/gitlab-runner/config.toml
-    owner: root
-    group: root
-    force: true
-  become: true
-  when: gitlab_runner.runners | length > 0
-
 - name: Place the Fargate configuration file.
   ansible.builtin.template:
     src: fargate.toml.j2
@@ -58,6 +54,8 @@
   when:
     - gitlab_runner.install_fargate
     - gitlab_runner.fargate | length > 0
+
+# @TODO inject the executor lines after any Fargate services in config.toml
 
 - name: Restart gitlab-runner service.
   service:
