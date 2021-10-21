@@ -1,7 +1,7 @@
 ---
 - name: Get backup plan info.
   ansible.builtin.command: >
-    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ backup.backup_plan_name }}'] | [0]" --output json
+    aws backup list-backup-plans --region {{ _aws_region }} --query "BackupPlansList[?BackupPlanName=='{{ backup.backup_plan_name }}'] | [0]" --output json
   register: _backup_plan_info
 
 - name: Gather AWS account ID if it isn't already set.
@@ -32,10 +32,10 @@
 
 - name: Check if the resource selection exists.
   ansible.builtin.command: >
-    aws backup list-backup-selections --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --query "BackupSelectionsList[?SelectionName=='{{ backup.selection_name }}'].SelectionName" --output text
+    aws backup list-backup-selections --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --query "BackupSelectionsList[?SelectionName=='{{ backup.selection_name }}'].SelectionName" --output text --region {{ _aws_region }}
   register: _selection_exists
 
 - name: Assign resource to AWS Backup plan.
   ansible.builtin.command: >
-    aws backup create-backup-selection --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --backup-selection "{\"SelectionName\":\"{{ backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"Resources\":[\"{{ _resource_arn }}\"]}"
+    aws backup create-backup-selection --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --backup-selection "{\"SelectionName\":\"{{ backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"Resources\":[\"{{ _resource_arn }}\"]}" --region {{ _aws_region }}
   when: _selection_exists.stdout | length == 0

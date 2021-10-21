@@ -1,7 +1,7 @@
 ---
 - name: Check if the subscription exists already for this topic.
   ansible.builtin.command: >
-    aws sns list-subscriptions-by-topic --topic-arn {{ _aws_sns_topic_info_custom.sns_arn }} --query "Subscriptions[?Endpoint=='{{ sub_var.endpoint }}'] | [0]" --output json
+    aws sns list-subscriptions-by-topic --topic-arn {{ _aws_sns_topic_info_custom.sns_arn }} --query "Subscriptions[?Endpoint=='{{ sub_var.endpoint }}'] | [0]" --output json --region {{ _aws_region }}
   register: _subscription_exists
 
 - name: Create the 'subscribe-yaml-input.yml' file for subscription creation.
@@ -18,7 +18,7 @@
 
 - name: Create SNS subscription.
   ansible.builtin.command: >
-    aws sns subscribe --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/subscribe-yaml-input.yml
+    aws sns subscribe --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/subscribe-yaml-input.yml --region {{ _aws_region }}
   register: _subscription_created
   when:
     - _aws_subscribe_stat.stat.exists
