@@ -39,14 +39,15 @@ gitlab_runner:
     #  cleanup_exec: "/opt/gitlab-runner/fargate"
     #  cleanup_args: '["--config", "/etc/gitlab-runner/fargate.toml", "custom", "cleanup"]'
   install_fargate: false
+  restart: true # set to false if you're applying settings to a server responsible for its own runners
   # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
   fargate:
     cluster: "my-cluster" # ECS cluster name
     region: "eu-west-1"
     subnet: "subnet-abcdef123456" # subnet ID
     security_group: "sg-abcdef123456" # SG ID
-    task_definition: "my-task:1" # task definition in format name:revision
-    public_ip: false # if your containers need a public IP assigning
+    task_definition: "my-task:1" # task definition in format name:revision, if revision is not provided ECS will use latest
+    public_ip: "false" # if your containers need a public IP assigning
     version: "1.4.0" # Fargate platform version
     metadata_dir: "/opt/gitlab-runner/metadata"
     ssh_user: "root"
