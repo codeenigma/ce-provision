@@ -58,7 +58,7 @@
 # @TODO inject the executor lines after any Fargate services in config.toml
 
 - name: Restart gitlab-runner service.
-  service:
+  ansible.builtin.service:
     name: gitlab-runner
     state: restarted
   become: true
