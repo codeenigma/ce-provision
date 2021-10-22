@@ -1,20 +1,64 @@
 ---
 - name: Add repository key for Gitlab Runner.
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
     state: present
 
 - name: Add repository for Gitlab Runner.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main"
     state: present
 
 - name: Add source repository for Gitlab Runner.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main"
     state: present
 
 - name: Ensure Gitlab Runner is installed.
-  apt:
+  ansible.builtin.apt:
     name: "gitlab-runner"
     state: present
+
+# @TODO register any runners - you can't just include the config
+# Reset the registration token via the API to get a new one
+# Then run the registration command, e.g.
+# gitlab-runner register --url https://gitlab.com/ --registration-token TOKEN_HERE --name fargate-test-runner --run-untagged --executor custom -n
+# This will automatically update /etc/gitlab-runner/config.toml
+
+- name: Create the Fargate driver directory if it does not exist.
+  ansible.builtin.file:
+    path: /opt/gitlab-runner
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  when: gitlab_runner.install_fargate
+
+- name: Install the Fargate driver.
+  ansible.builtin.get_url:
+    url: https://gitlab-runner-custom-fargate-downloads.s3.amazonaws.com/latest/fargate-linux-amd64
+    dest: /opt/gitlab-runner/fargate
+    mode: 0755
+  become: true
+  when: gitlab_runner.install_fargate
+
+- name: Place the Fargate configuration file.
+  ansible.builtin.template:
+    src: fargate.toml.j2
+    dest: /etc/gitlab-runner/fargate.toml
+    owner: root
+    group: root
+    force: true
+  become: true
+  when:
+    - gitlab_runner.install_fargate
+    - gitlab_runner.fargate | length > 0
+
+# @TODO inject the executor lines after any Fargate services in config.toml
+
+- name: Restart gitlab-runner service.
+  ansible.builtin.service:
+    name: gitlab-runner
+    state: restarted
+  become: true
