@@ -62,3 +62,4 @@
     name: gitlab-runner
     state: restarted
   become: true
+  when: gitlab_runner.restart
