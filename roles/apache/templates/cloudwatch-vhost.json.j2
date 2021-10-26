@@ -1,0 +1,36 @@
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "{{ domain.access_log }}",
+{% if apache.log_group_prefix is defined and apache.log_group_prefix|length %}
+            "log_group_name": "{{ apache.log_group_prefix }}apache2-access",
+{% else %}
+						"log_group_name": "apache2-access",
+{% endif %}
+{% if domain.log_stream_name is defined and domain.log_stream_name|length %}
+            "log_stream_name": "{{ domain.log_stream_name }}"
+{% else %}
+						"log_stream_name": "{{ apache.log_stream_name }}"
+{% endif %}
+          },
+          {
+            "file_path": "{{ domain.error_log }}",
+{% if apache.log_group_prefix is defined and apache.log_group_prefix|length %}
+            "log_group_name": "{{ apache.log_group_prefix }}apache2-error",
+{% else %}
+						"log_group_name": "apache2-error",
+{% endif %}
+{% if domain.log_stream_name is defined and domain.log_stream_name|length %}
+            "log_stream_name": "{{ domain.log_stream_name }}"
+{% else %}
+						"log_stream_name": "{{ ngapacheinx.log_stream_name }}"
+{% endif %}
+          }
+        ]
+      }
+    }
+  }
+} 
