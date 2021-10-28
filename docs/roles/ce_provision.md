@@ -8,7 +8,7 @@ Installs Code Enigma's infrastructure management stack on a server.
 ```yaml
 ---
 _ce_provision:
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}provision{% endif %}"
+  username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
 
 ce_provision:
   username: "{{ _ce_provision.username }}"
