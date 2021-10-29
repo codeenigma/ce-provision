@@ -55,6 +55,17 @@
     - gitlab_runner.install_fargate
     - gitlab_runner.fargate | length > 0
 
+- name: Ensure the Fargate metadata directory exists.
+  ansible.builtin.file:
+    path: /opt/gitlab-runner/metadata
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  when:
+    - gitlab_runner.install_fargate
+
 # @TODO inject the executor lines after any Fargate services in config.toml
 
 - name: Restart gitlab-runner service.
