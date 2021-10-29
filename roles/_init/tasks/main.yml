@@ -1,14 +1,14 @@
 ---
 - name: Set "tracking" file for the playbook.
-  set_fact:
+  ansible.builtin.set_fact:
     current_play_md5_file: "{{ _ce_provision_build_id }}-{{ playbook_dir | basename }}-{{ inventory_hostname }}"
 
 - name: Sanitize tracking file name.
-  set_fact:
+  ansible.builtin.set_fact:
     current_play_md5_file: "{{ current_play_md5_file | regex_replace('[^A-z0-9]', '') }}"
 
 - name: Make sure file exists.
-  copy:
+  ansible.builtin.copy:
     content: ""
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
     force: false
@@ -16,11 +16,11 @@
   delegate_to: localhost
 
 - name: Build the list of directories to scan for changes.
-  set_fact:
+  ansible.builtin.set_fact:
     _init_vars_dirs_list: "{{ _init.vars_dirs + [ playbook_dir ] }}"
 
 - name: Compute files md5 hash.
-  shell: 'find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
+  ansible.builtin.shell: 'find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
   args:
     warn: false
   delegate_to: "localhost"
@@ -30,33 +30,26 @@
     loop_var: _init_vars_dir
 
 - name: Combine files md5 hash.
-  set_fact:
+  ansible.builtin.set_fact:
     current_play_dir_md5: "{{ current_play_dir_md5 | default() + _init_vars_dir_md5.stdout }}"
   with_items: "{{ _init_vars_dirs_md5.results }}"
   loop_control:
     loop_var: _init_vars_dir_md5
 
 - name: Lookup current playbook md5
-  set_fact:
+  ansible.builtin.set_fact:
     previous_play_dir_md5: "{{ lookup('file', '{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}' ) }}"
 
-- meta: end_play
+- ansible.builtin.meta: end_play
   when:
     - current_play_dir_md5 == previous_play_dir_md5
     - not _ce_provision_force_play
 
 - name: Include vars directories.
-  include_vars:
+  ansible.builtin.include_vars:
     dir: "{{ _init_vars_dir_include }}"
     extensions:
       - "yml"
   with_items: "{{ _init.vars_dirs }}"
   loop_control:
     loop_var: _init_vars_dir_include
-
-- name: Load custom vars file.
-  include_tasks: allowed_vars.yml
-  when:
-    - ce_provision.extra_repository
-    - ce_provision.extra_repository_vars_file
-    - ce_provision.extra_repository_allowed_vars
