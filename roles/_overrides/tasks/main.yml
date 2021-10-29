@@ -1,11 +1,4 @@
 ---
-- name: Load custom vars file.
-  ansible.builtin.include_tasks: allowed_vars.yml
-  when:
-    - ce_provision.extra_repository
-    - ce_provision.extra_repository_vars_file
-    - ce_provision.extra_repository_allowed_vars
-
 - name: Generate files overrides.
   ansible.builtin.include_tasks: file.yml
   with_items: "{{ _overrides.files }}"
