@@ -1,5 +1,5 @@
 - name: Clone custom extra directory.
-  git:
+  ansible.builtin.git:
     repo: "{{ ce_provision.extra_repository }}"
     dest: "{{ _ce_provision_build_tmp_dir }}/extra"
     version: "{{ ce_provision.extra_repository_branch }}"
@@ -8,7 +8,7 @@
   become_user: "{{ ce_provision.username }}"
 
 - name: Check if file exists.
-  stat:
+  ansible.builtin.stat:
     path: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
   delegate_to: localhost
   become: true
@@ -16,7 +16,7 @@
   register: _extra_repository_vars_file
 
 - name: Include custom variables.
-  include_vars:
+  ansible.builtin.include_vars:
     file: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
     name: _ce_provision_extra_vars
   delegate_to: localhost
@@ -26,13 +26,13 @@
     - _extra_repository_vars_file.stat.exists
 
 - name: Filter allowed custom variables.
-  set_fact:
+  ansible.builtin.set_fact:
     ce_provision_extra_vars_filtered: "{{ _ce_provision_extra_vars | allowed_vars(ce_provision.extra_repository_allowed_vars) }}"
   when:
     - _extra_repository_vars_file.stat.exists
 
 - name: Override variables with custom ones.
-  set_fact:
+  ansible.builtin.set_fact:
     "{{ item.name }}": "{{ ce_provision_extra_vars_filtered[item.name] }}"
   when:
     - _extra_repository_vars_file.stat.exists
