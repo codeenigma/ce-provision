@@ -1,11 +1,11 @@
 ---
 - name: Ensure Redis is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "redis-server"
     state: present
 
 - name: Copy Redis configuration in place.
-  template:
+  ansible.builtin.template:
     src: redis.conf.j2
     dest: "/etc/redis/redis.conf"
     owner: redis
@@ -13,7 +13,7 @@
     mode: 0640
 
 - name: Copy Redis sysctl configuration in place.
-  template:
+  ansible.builtin.template:
     src: redis.sysctl.j2
     dest: "/etc/sysctl.d/02-redis.conf"
     owner: root
@@ -22,13 +22,13 @@
   when: redis.vm_overcommit_memory
 
 - name: Remove Redis sysctl configuration in place.
-  file:
+  ansible.builtin.file:
     path: "/etc/sysctl.d/02-redis.conf"
     state: absent
   when: not redis.vm_overcommit_memory
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ redis.overrides }}"
@@ -37,7 +37,7 @@
     - redis.overrides | length > 0
 
 - name: Restart Redis.
-  service:
+  ansible.builtin.service:
     name: redis-server
     state: restarted
     enabled: true

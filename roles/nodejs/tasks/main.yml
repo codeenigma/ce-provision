@@ -1,25 +1,25 @@
 ---
 - name: Add repository key for NodeJS repository.
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
     state: present
 
 - name: Add repository for NodeJS.
-  apt_repository: repo='deb https://deb.nodesource.com/node_{{ nodejs.version }} buster main' state=present
+  ansible.builtin.apt_repository: repo='deb https://deb.nodesource.com/node_{{ nodejs.version }} buster main' state=present
 
 - name: Add source repository for NodeJS.
-  apt_repository: repo='deb-src https://deb.nodesource.com/node_{{ nodejs.version }} buster main' state=present
+  ansible.builtin.apt_repository: repo='deb-src https://deb.nodesource.com/node_{{ nodejs.version }} buster main' state=present
 
 - name: Add repository key for Yarn repository.
-  apt_key: url=https://dl.yarnpkg.com/debian/pubkey.gpg state=present
+  ansible.builtin.apt_key: url=https://dl.yarnpkg.com/debian/pubkey.gpg state=present
 
 - name: Add repository for Yarn.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb https://dl.yarnpkg.com/debian/ stable main"
     state: present
 
 - name: Pin Node packages.
-  template:
+  ansible.builtin.template:
     src: nodesource.pref.j2
     dest: "/etc/apt/preferences.d/nodesource.pref"
     owner: root
@@ -28,6 +28,6 @@
     force: true
 
 - name: Ensure NodeJS and Yarn are installed.
-  apt:
+  ansible.builtin.apt:
     pkg: ["nodejs", "yarn"]
     state: present

@@ -3,7 +3,7 @@
 #
 
 - name: Install cachetool
-  get_url:
+  ansible.builtin.get_url:
     url: https://gordalina.github.io/cachetool/downloads/cachetool.phar
     dest: /usr/local/bin/cachetool
     owner: root
@@ -11,17 +11,17 @@
     mode: "0755"
 
 - name: Get php-fpm host
-  shell:
+  ansible.builtin.shell:
     cmd: "netstat -anp | grep php-fpm | grep tcp | awk '{print $4}' | cut -d: -f1"
   register: _phpfpm_host
 
 - name: Get php-fpm port
-  shell:
+  ansible.builtin.shell:
     cmd: "netstat -anp | grep php-fpm | grep tcp | awk '{print $4}' | cut -d: -f2"
   register: _phpfpm_port
 
 - name: Copy cachetool config
-  template:
+  ansible.builtin.template:
     src: cachetool.j2
     dest: /etc/cachetool.yml
     owner: root

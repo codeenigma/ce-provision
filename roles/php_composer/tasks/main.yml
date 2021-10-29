@@ -1,5 +1,5 @@
 ---
 - name: Install composer.
-  apt:
+  ansible.builtin.apt:
     pkg: composer
     state: present
