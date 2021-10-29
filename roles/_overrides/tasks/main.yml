@@ -1,6 +1,6 @@
 ---
 - name: Generate files overrides.
-  include_tasks: file.yml
+  ansible.builtin.include_tasks: file.yml
   with_items: "{{ _overrides.files }}"
   loop_control:
     loop_var: override_file
@@ -9,7 +9,7 @@
     - _overrides.files | length
 
 - name: Generate links overrides.
-  include_tasks: link.yml
+  ansible.builtin.include_tasks: link.yml
   with_items: "{{ _overrides.links }}"
   loop_control:
     loop_var: override_link
