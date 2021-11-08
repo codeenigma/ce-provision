@@ -1,5 +1,5 @@
 - name: Install PHP Extension Imagick.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - "php{{ version }}-imagick"
     state: present
