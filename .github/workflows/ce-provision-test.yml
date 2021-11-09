@@ -47,10 +47,11 @@ jobs:
       # Builds the docs
       - name: Build documentation
         run: |
-          contribute/toc.sh
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git checkout ${{ github.event.pull_request.base.ref }}
+          contribute/toc.sh
           git commit -am "GitHub Actions - Rebuilt documentation."
-          git push HEAD:${{ github.event.pull_request.base.ref }}
+          git push
         shell: bash
 
       # Uses the ce-dev stack to run Hugo to format and deploy the docs
