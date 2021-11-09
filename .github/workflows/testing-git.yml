@@ -24,6 +24,9 @@ jobs:
           git branch -a
           git status
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch
+          git branch -a
+          git status
           git checkout ${{ github.event.pull_request.base.ref }}
           contribute/toc.sh
           git commit -am "GitHub Actions - Rebuilt documentation."
