@@ -1,22 +1,22 @@
 ---
 - name: Add key for LinOTP repository.
-  apt_key: keyserver=http://packages.codeenigma.com/debian/codeenigma.pub id=A344A0826FD987C6 state=present
+  ansible.builtin.apt_key: keyserver=http://packages.codeenigma.com/debian/codeenigma.pub id=A344A0826FD987C6 state=present
 
 - name: Add repository for LinOTP.
-  apt_repository: repo='deb http://packages.codeenigma.com/debian buster main' state=present
+  ansible.builtin.apt_repository: repo='deb http://packages.codeenigma.com/debian buster main' state=present
 
 - name: Ensure libpam-linotp is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: libpam-linotp
     state: present
 
 - name: Generate LinOTP config.
-  template:
+  ansible.builtin.template:
     src: common-linotp.j2
     dest: /etc/pam.d/common-linotp
 
 - name: Enable LinOTP for sudo.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/pam.d/sudo
     insertbefore: "^@include common-auth"
     line: "@include common-linotp"
@@ -24,7 +24,7 @@
   when: pam_linotp.sudo
 
 - name: Enable LinOTP for su.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/pam.d/su
     insertbefore: "^@include common-auth"
     line: "@include common-linotp"
@@ -32,7 +32,7 @@
   when: pam_linotp.su
 
 - name: Enable LinOTP for ssh.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/pam.d/sshd
     insertbefore: "^@include common-auth"
     line: "@include common-linotp"

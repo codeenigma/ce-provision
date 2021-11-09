@@ -1,6 +1,6 @@
 ---
 - name: Install PHP packages.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - "php{{ version }}-cli"
     state: present
@@ -9,31 +9,31 @@
     loop_var: version
 
 - name: Set php version (phar)
-  command: "update-alternatives --set phar /usr/bin/phar{{ version }}"
+  ansible.builtin.command: "update-alternatives --set phar /usr/bin/phar{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
 - name: Set php version (phar.phar)
-  command: "update-alternatives --set phar.phar /usr/bin/phar.phar{{ version }}"
+  ansible.builtin.command: "update-alternatives --set phar.phar /usr/bin/phar.phar{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
 - name: Set php version (php)
-  command: "update-alternatives --set php /usr/bin/php{{ version }}"
+  ansible.builtin.command: "update-alternatives --set php /usr/bin/php{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
 - name: Set php version (php-config)
-  command: "update-alternatives --set php-config /usr/bin/php-config{{ version }}"
+  ansible.builtin.command: "update-alternatives --set php-config /usr/bin/php-config{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
 - name: Copy php.ini for php cli.
-  template:
+  ansible.builtin.template:
     src: php.cli.ini.j2
     dest: "/etc/php/{{ version }}/cli/php.ini"
     force: true
@@ -42,7 +42,7 @@
     loop_var: version
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ php.cli.overrides }}"
@@ -51,5 +51,5 @@
     - php.cli.overrides | length > 0
 
 - name: Setup composer.
-  include_role:
+  ansible.builtin.include_role:
     name: php_composer
