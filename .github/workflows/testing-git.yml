@@ -1,0 +1,31 @@
+name: Testing git
+
+# Run this workflow every time a new commit pushed to your repository
+on: pull_request
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  run-tests:
+    # Name the Job
+    name: Testing git
+    # Set the type of machine to run on
+    runs-on: ubuntu-20.04
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Builds the docs
+      - name: Build documentation
+        run: |
+          pwd
+          git branch -a
+          git status
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git checkout ${{ github.event.pull_request.base.ref }}
+          contribute/toc.sh
+          git commit -am "GitHub Actions - Rebuilt documentation."
+          git push
+        shell: bash
