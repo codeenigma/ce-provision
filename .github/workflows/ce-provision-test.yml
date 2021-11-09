@@ -58,7 +58,11 @@ jobs:
       # Builds the table of contents for the docs
       - name: Documentation (build table of contents)
         if: ${{ github.event.pull_request.base.ref == '1.x' }}
-        run: contribute/toc.sh
+        run: |
+          contribute/toc.sh
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git commit -am "GitHub Actions - Rebuilt documentation."
+          git push
         shell: bash
 
       # Uses the ce-dev stack to run Hugo to build and deploy the docs
@@ -69,10 +73,10 @@ jobs:
           git clone https://github.com/codeenigma/wikis2pages.git
           cd wikis2pages
           /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
-          /bin/sh set-current.sh ce-provision-1.x-travis
+          /bin/sh set-current.sh ce-provision-1.x
           docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
           /bin/sh .github-actions-push.sh
-          cd /home/runner/wikis2pages/public/ce-provision-1.x-travis
+          cd /home/runner/wikis2pages/public/ce-provision-1.x
           git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
           git push ci master
         shell: bash
