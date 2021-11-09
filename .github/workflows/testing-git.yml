@@ -17,6 +17,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Configures global Git variables for committing
+      - name: Configure Git
+        run: |
+          git config --global user.email "sysadm@codeenigma.com"
+          git config --global user.name "Code Enigma CI"
+
       # Builds the docs
       - name: Build documentation
         run: |
