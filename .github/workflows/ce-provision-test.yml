@@ -44,18 +44,17 @@ jobs:
           /bin/bash ce-dev/ansible/examples/test.sh
         shell: bash
 
-      # Builds the table of contents for the docs
-      - name: Documentation (build table of contents)
-        if: ${{ github.event.pull_request.base.ref == '1.x' }}
+      # Builds the docs
+      - name: Build documentation
         run: |
           contribute/toc.sh
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git commit -am "GitHub Actions - Rebuilt documentation."
-          git push
+          git push HEAD:${{ github.event.pull_request.base.ref }}
         shell: bash
 
-      # Uses the ce-dev stack to run Hugo to build and deploy the docs
-      - name: Documentation (build and publish)
+      # Uses the ce-dev stack to run Hugo to format and deploy the docs
+      - name: Publish documentation
         if: ${{ github.event.pull_request.base.ref == '1.x' }}
         run: |
           cd
