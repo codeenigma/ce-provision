@@ -48,6 +48,7 @@ jobs:
       - name: Build documentation
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch
           git checkout ${{ github.event.pull_request.base.ref }}
           contribute/toc.sh
           git commit -am "GitHub Actions - Rebuilt documentation."
