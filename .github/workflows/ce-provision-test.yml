@@ -51,7 +51,7 @@ jobs:
           git fetch
           git checkout ${{ github.event.pull_request.base.ref }}
           contribute/toc.sh
-          git commit -am "GitHub Actions - Rebuilt documentation."
+          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
           git push
         shell: bash
 
