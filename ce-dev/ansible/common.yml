@@ -9,6 +9,7 @@ ce_provision:
   config_repository_branch: "1.x"
   config_repository_skip_checkout: true
   local_dir: "/home/ce-dev/ce-provision"
+  galaxy_custom_requirements_file: ""
 user_provision:
   username: ce-dev
   utility_host: "localhost"
