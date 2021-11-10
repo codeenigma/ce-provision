@@ -70,10 +70,12 @@ build_example(){
   git status
   git branch -a
   echo "### fetching config repo remote"
-  git fetch
+  git fetch origin
+  git branch -a
   echo "### checking out config repo"
   git checkout "$3"
   cd ..
+  pwd
   echo "### fetching ce-provision repo remote"
   git fetch
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
