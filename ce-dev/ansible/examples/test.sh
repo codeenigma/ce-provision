@@ -68,6 +68,11 @@ build_example(){
   git fetch origin
   cd ..
   git fetch origin
+  cat <<EOT >> config/hosts/hosts
+provision-controller
+provision-target
+provision-privileged
+EOT
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook examples/$1/$1.yml --own-branch $2 --config-branch $3"
   # shellcheck disable=SC2086
