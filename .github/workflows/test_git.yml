@@ -1,0 +1,48 @@
+name: Test git
+
+# Run this workflow every time a new commit pushed to your repository
+on: pull_request
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  run-tests:
+    # Name the Job
+    name: Test git
+    # Set the type of machine to run on
+    runs-on: ubuntu-20.04
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Configures global Git variables for committing
+      - name: Configure Git
+        run: |
+          git config --global user.email "sysadm@codeenigma.com"
+          git config --global user.name "Code Enigma CI"
+
+      # Builds the docs
+      - name: Build documentation
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch
+          git checkout docs
+          git checkout ${{ github.event.pull_request.base.ref }}
+          contribute/toc.sh
+          git add docs
+          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin docs
+          git diff --quiet && git diff --staged --quiet
+          git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin docs
+        shell: bash
+
+      # Create docs pull request
+      - name: Run the Action
+        uses: devops-infra/action-pull-request@v0.4.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: docs
+          target_branch: 1.x
+          title: Documentation update.
+          body: "**Automated pull request** created by GitHub Actions because of a documentation update."
