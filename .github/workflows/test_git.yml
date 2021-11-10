@@ -36,11 +36,11 @@ jobs:
         shell: bash
 
       # Create docs pull request
-      - name: Run the Action
+      - name: Create a documentation pull request
         uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          source_branch: docs
+          source_branch: documentation
           target_branch: 1.x
           title: Documentation update.
           body: "**Automated pull request** created by GitHub Actions because of a documentation update."
