@@ -33,8 +33,6 @@ jobs:
           contribute/toc.sh
           git add docs
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
-          git diff --quiet && git diff --staged --quiet
-          git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
         shell: bash
 
       # Create docs pull request
