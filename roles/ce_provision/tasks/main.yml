@@ -1,6 +1,6 @@
 ---
 - name: Load ce_provision variables from _init.
-  ansible.builtin.import_vars: "{{ role_path }}/../_init/defaults/main.yml"
+  ansible.builtin.include_vars: "{{ role_path }}/../_init/defaults/main.yml"
 
 - name: Create the provision group for provisioning.
   ansible.builtin.group:
