@@ -29,7 +29,6 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
           git checkout documentation
-          git checkout ${{ github.event.pull_request.base.ref }}
           contribute/toc.sh
           git add docs
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
