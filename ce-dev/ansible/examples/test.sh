@@ -64,20 +64,6 @@ init_ce_dev(){
 # @param $3
 # ce-provision config repo branch to check out.
 build_example(){
-  cd config
-  pwd
-  echo "### checking config repo status"
-  git status
-  git branch -a
-  echo "### fetching config repo remote"
-  git fetch origin
-  git branch -a
-  echo "### checking out config repo"
-  git checkout "$3"
-  cd ..
-  pwd
-  echo "### fetching ce-provision repo remote"
-  git fetch
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook examples/$1/$1.yml --own-branch $2 --config-branch $3"
   # shellcheck disable=SC2086
