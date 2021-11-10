@@ -1,6 +1,6 @@
 ---
 - name: Install PHP packages.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - "php{{ version }}-fpm"
     state: present
@@ -9,7 +9,7 @@
     loop_var: version
 
 - name: Copy php.ini for php-fpm.
-  template:
+  ansible.builtin.template:
     src: php.fpm.ini.j2
     dest: "/etc/php/{{ version }}/fpm/php.ini"
   with_items: "{{ php.version }}"
@@ -17,7 +17,7 @@
     loop_var: version
 
 - name: Copy default pool configuration.
-  template:
+  ansible.builtin.template:
     dest: "/etc/php/{{ version }}/fpm/pool.d/www.conf"
     src: "www.conf.j2"
     mode: 0555
@@ -26,11 +26,11 @@
     loop_var: version
 
 - name: Setup xdebug.
-  include_role:
+  ansible.builtin.include_role:
     name: php_xdebug
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ php.fpm.overrides }}"
@@ -39,7 +39,7 @@
     - php.fpm.overrides | length > 0
 
 - name: Restart FPM service.
-  service:
+  ansible.builtin.service:
     name: "php{{ version }}-fpm"
     state: restarted
   with_items: "{{ php.version }}"

@@ -82,7 +82,7 @@
     - is_local
 
 - name: Configure procmail to NULL.
-  template:
+  ansible.builtin.template:
     src: procmailrc_null.j2
     dest: "/etc/procmailrc"
     owner: root
@@ -94,7 +94,7 @@
     - is_local
 
 - name: Configure procmail to host directory.
-  template:
+  ansible.builtin.template:
     src: procmailrc_host.j2
     dest: "/etc/procmailrc"
     owner: root
@@ -107,7 +107,7 @@
     - is_local
 
 - name: Configure procmail to local.
-  file:
+  ansible.builtin.file:
     path: /etc/procmailrc
     state: absent
   when:
@@ -117,12 +117,12 @@
 
 # Needed for Docker.
 - name: Stop Postfix
-  command:
+  ansible.builtin.command:
     cmd: /usr/sbin/service postfix stop
     warn: false
 
 - name: Remove trailing lock files.
-  file:
+  ansible.builtin.file:
     path: "{{ lock_file }}"
     state: absent
   with_items:
@@ -132,6 +132,6 @@
     loop_var: lock_file
 
 - name: Restart Postfix
-  command:
+  ansible.builtin.command:
     cmd: /usr/sbin/service postfix start
     warn: false

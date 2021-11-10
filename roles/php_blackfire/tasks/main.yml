@@ -20,15 +20,15 @@
   when: not blackfire.enable
 
 - name: Add key for Blackfire repository.
-  apt_key: url=https://packages.blackfire.io/gpg.key state=present
+  ansible.builtin.apt_key: url=https://packages.blackfire.io/gpg.key state=present
   when: blackfire.enable
 
 - name: Add repository for Blackfire.
-  apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
+  ansible.builtin.apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
   when: blackfire.enable
 
 - name: Ensure Blackfire agent is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "blackfire-agent"
     state: present
     update_cache: true
@@ -36,13 +36,13 @@
   when: blackfire.enable
 
 - name: Ensure Blackfire probe is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "blackfire-php"
     state: present
   when: blackfire.enable
 
 - name: Generate agent server configuration.
-  template:
+  ansible.builtin.template:
     src: agent.j2
     dest: "/etc/blackfire/agent"
     owner: root
@@ -52,7 +52,7 @@
   when: blackfire.enable
 
 - name: Generate agent CLI configuration.
-  template:
+  ansible.builtin.template:
     src: blackfire.ini.j2
     dest: "/home/vagrant/.blackfire.ini"
     owner: vagrant
@@ -63,7 +63,7 @@
     - is_local is defined and is_local
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ blackfire.overrides }}"
@@ -72,7 +72,7 @@
     - blackfire.overrides | length > 0
 
 - name: Ensure Blackfire is restarted.
-  service:
+  ansible.builtin.service:
     name: blackfire-agent
     state: restarted
   when: blackfire.enable

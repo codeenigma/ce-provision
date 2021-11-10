@@ -1,13 +1,13 @@
 ---
 - name: Ensure rkhunter is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "rkhunter"
     state: present
     update_cache: true
     cache_valid_time: 240
 
 - name: Copy rkhunter configuration.
-  template:
+  ansible.builtin.template:
     src: "rkhunter.conf.j2"
     dest: "/etc/rkhunter.conf"
     owner: root
@@ -15,7 +15,7 @@
     mode: 0644
 
 - name: Copy rkhunter default startup configuration.
-  template:
+  ansible.builtin.template:
     src: "rkhunter.default.j2"
     dest: "/etc/default/rkhunter"
     owner: root
@@ -23,7 +23,7 @@
     mode: 0644
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ rkhunter.overrides }}"
