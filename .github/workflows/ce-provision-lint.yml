@@ -15,10 +15,12 @@ jobs:
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         uses: actions/checkout@v2
 
       # Linter checks.
       - name: Run linters.
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip yamllint shellcheck
