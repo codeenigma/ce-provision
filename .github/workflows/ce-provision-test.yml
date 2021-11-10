@@ -61,7 +61,7 @@ jobs:
 
       # Create docs pull request
       - name: Create a documentation pull request
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        if: ${{ github.event.pull_request.head.ref != 'documentation' && github.event.pull_request.base.ref == '1.x' }}
         uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
