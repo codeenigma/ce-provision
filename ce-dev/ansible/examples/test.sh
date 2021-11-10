@@ -59,6 +59,10 @@ init_ce_dev(){
 # Build an example.
 # @param $1
 # Example name.
+# @param $2
+# ce-provision branch to check out.
+# @param $3
+# ce-provision config repo branch to check out.
 build_example(){
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook examples/$1/$1.yml --own-branch $2 --config-branch $3"
