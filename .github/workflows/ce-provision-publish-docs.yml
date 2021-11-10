@@ -22,6 +22,20 @@ jobs:
           git config --global user.email "sysadm@codeenigma.com"
           git config --global user.name "Code Enigma CI"
 
+      # Installs the ce-dev stack
+      - name: Install ce-dev
+        run: |
+          cd /tmp
+          wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
+          export PATH=$PATH:/usr/local/go/bin
+          git clone https://github.com/FiloSottile/mkcert && cd mkcert
+          go build -ldflags "-X main.Version=$(git describe --tags)"
+          sudo mv ./mkcert /usr/local/bin && cd ../
+          sudo chmod +x /usr/local/bin/mkcert
+          rm -Rf mkcert
+          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+
       # Uses the ce-dev stack to run Hugo to format and deploy the docs
       - name: Publish documentation
         run: |
