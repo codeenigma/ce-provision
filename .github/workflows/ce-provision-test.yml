@@ -68,19 +68,3 @@ jobs:
           target_branch: ${{ github.event.pull_request.base.ref }}
           title: Documentation update.
           body: "**Automated pull request** created by GitHub Actions because of a documentation update."
-
-      # Uses the ce-dev stack to run Hugo to format and deploy the docs
-      - name: Publish documentation
-        if: ${{ github.event.pull_request.base.ref == '1.x' }}
-        run: |
-          cd
-          git clone https://github.com/codeenigma/wikis2pages.git
-          cd wikis2pages
-          /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
-          /bin/sh set-current.sh ce-provision-1.x
-          docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
-          /bin/sh .github-actions-push.sh
-          cd /home/runner/wikis2pages/public/ce-provision-1.x
-          git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
-          git push ci master
-        shell: bash
