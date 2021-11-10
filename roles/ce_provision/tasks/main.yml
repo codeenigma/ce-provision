@@ -1,11 +1,14 @@
 ---
+- name: Load ce_provision variables from _init.
+  ansible.builtin.import_vars: "{{ role_path }}/../_init/defaults/main.yml"
+
 - name: Create the provision group for provisioning.
-  group:
+  ansible.builtin.group:
     name: "{{ ce_provision.username }}"
     system: true
 
 - name: Create additional groups.
-  group:
+  ansible.builtin.group:
     name: "{{ group }}"
     state: present
     system: true
@@ -15,7 +18,7 @@
   when: ce_provision.groups | length
 
 - name: Create the provision user for provisioning.
-  user:
+  ansible.builtin.user:
     name: "{{ ce_provision.username }}"
     comment: Provisioning user
     shell: /bin/bash
@@ -31,13 +34,13 @@
     groups: "{{ ce_provision.groups }}"
 
 - name: Fetch back the SSH pub key.
-  fetch:
+  ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
     src: "/home/{{ ce_provision.username }}/.ssh/id_rsa.pub"
 
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
-  set_fact:
+  ansible.builtin.set_fact:
     ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
 
 - name: Ensure APT dependencies are installed.
@@ -52,19 +55,19 @@
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
-  command:
+  ansible.builtin.command:
     cmd: "git config --global user.name {{ ce_provision.username }}"
   become: true
   become_user: "{{ ce_provision.username }}"
 
 - name: Setup Git identity email.
-  command:
+  ansible.builtin.command:
     cmd: "git config --global user.email {{ ce_provision.username }}@{{ _domain_name }}"
   become: true
   become_user: "{{ ce_provision.username }}"
 
 - name: Ensure provision scripts are presents.
-  git:
+  ansible.builtin.git:
     repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git') }}"
     dest: "{{ ce_provision.local_dir }}"
     version: "{{ ce_provision.own_repository_branch  | default('master') }}"
@@ -76,7 +79,7 @@
     - not ce_provision.own_repository_skip_checkout
 
 - name: Checkout config directory.
-  git:
+  ansible.builtin.git:
     repo: "{{ ce_provision.config_repository }}"
     accept_hostkey: true
     dest: "{{ ce_provision.local_dir }}/config"
@@ -88,7 +91,7 @@
     - not ce_provision.config_repository_skip_checkout
 
 - name: Create defaults folders.
-  file:
+  ansible.builtin.file:
     path: "{{ ce_provision.local_dir }}/{{ item }}"
     state: directory
   with_items:
@@ -96,13 +99,13 @@
   when: not ce_provision_has_config_repo
 
 - name: Create default config.
-  copy:
+  ansible.builtin.copy:
     src: ansible.cfg
     dest: "{{ ce_provision.local_dir }}/ansible.cfg"
   when: not ce_provision_has_config_repo
 
 - name: Symlink config folders to /etc/ansible.
-  file:
+  ansible.builtin.file:
     dest: "{{ ce_provision.local_dir }}/{{ item }}"
     src: "{{ ce_provision.local_dir }}/config/{{ item }}"
     state: link
@@ -114,19 +117,19 @@
   when: ce_provision_has_config_repo
 
 - name: Create data dir.
-  file:
+  ansible.builtin.file:
     path: "{{ ce_provision.local_dir }}/data"
     state: directory
 
 - name: Ensure ownership of Ansible folder.
-  file:
+  ansible.builtin.file:
     path: "/home/{{ ce_provision.username }}"
     state: directory
     owner: "{{ ce_provision.username }}"
     recurse: true
 
 - name: Check if ansible-galaxy custom requirements file exists.
-  stat:
+  ansible.builtin.stat:
     path: "{{ ce_provision.galaxy_custom_requirements_file }}"
   register: ce_provision_custom_galaxy_requirements
 

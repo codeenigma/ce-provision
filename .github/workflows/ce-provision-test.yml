@@ -15,21 +15,12 @@ jobs:
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         uses: actions/checkout@v2
-
-      # Linter checks.
-      - name: Run linters.
-        if: ${{ always() }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip yamllint shellcheck
-          pip3 install ansible-base ansible-lint
-          find ./roles -name "*.yml"  | xargs ansible-lint
-          yamllint ./roles
-          cd scripts && shellcheck *.sh
 
       # Installs the ce-dev stack
       - name: Install ce-dev
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           cd /tmp
           wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
@@ -50,29 +41,31 @@ jobs:
 
       # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
           /bin/bash ce-dev/ansible/examples/test.sh
         shell: bash
 
-      # Builds the table of contents for the docs
-      - name: Documentation (build table of contents)
-        if: ${{ github.event.pull_request.base.ref == '1.x' }}
-        run: contribute/toc.sh
+      # Builds the docs
+      - name: Build documentation
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch
+          git checkout documentation
+          contribute/toc.sh
+          git add docs
+          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
         shell: bash
 
-      # Uses the ce-dev stack to run Hugo to build and deploy the docs
-      - name: Documentation (build and publish)
-        if: ${{ github.event.pull_request.base.ref == '1.x' }}
-        run: |
-          cd
-          git clone https://github.com/codeenigma/wikis2pages.git
-          cd wikis2pages
-          /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
-          /bin/sh set-current.sh ce-provision-1.x-travis
-          docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
-          /bin/sh .github-actions-push.sh
-          cd /home/runner/wikis2pages/public/ce-provision-1.x-travis
-          git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
-          git push ci master
-        shell: bash
+      # Create docs pull request
+      - name: Create a documentation pull request
+        if: ${{ github.event.pull_request.head.ref != 'documentation' && github.event.pull_request.base.ref == '1.x' }}
+        uses: devops-infra/action-pull-request@v0.4.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: documentation
+          target_branch: ${{ github.event.pull_request.base.ref }}
+          title: Documentation update.
+          body: "**Automated pull request** created by GitHub Actions because of a documentation update."
