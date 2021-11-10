@@ -19,6 +19,7 @@ jobs:
 
       # Installs the ce-dev stack
       - name: Install ce-dev
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           cd /tmp
           wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
@@ -39,6 +40,7 @@ jobs:
 
       # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
           /bin/bash ce-dev/ansible/examples/test.sh
@@ -46,6 +48,7 @@ jobs:
 
       # Builds the docs
       - name: Build documentation
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
