@@ -64,11 +64,15 @@ init_ce_dev(){
 # @param $3
 # ce-provision config repo branch to check out.
 build_example(){
+  cd config
+  git fetch origin
+  cd ..
+  git fetch origin
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook examples/$1/$1.yml --own-branch $2 --config-branch $3"
   # shellcheck disable=SC2086
   echo "### running docker"
-  sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_CMD
+  sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller "$PROVISION_CMD"
 }
 
 init_ce_dev
