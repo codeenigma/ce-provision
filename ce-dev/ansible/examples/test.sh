@@ -65,6 +65,10 @@ init_ce_dev(){
 # ce-provision config repo branch to check out.
 build_example(){
   cd config
+  pwd
+  echo "### checking config repo status"
+  git status
+  git branch -a
   echo "### fetching config repo remote"
   git fetch
   echo "### checking out config repo"
