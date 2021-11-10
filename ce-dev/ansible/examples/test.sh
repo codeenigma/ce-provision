@@ -56,6 +56,14 @@ init_ce_dev(){
   $CE_DEV_BIN provision
 }
 
+# Update repository.
+# @param $1 absolute path to local repo.
+# @param $2 branch to checkout.
+git_checkout(){
+  git -C "$1" checkout "$2"
+  git -C "$1" pull origin "$2"
+}
+
 # Build an example.
 # @param $1
 # Example name.
@@ -64,6 +72,7 @@ init_ce_dev(){
 # @param $3
 # ce-provision config repo branch to check out.
 build_example(){
+  git_checkout "/home/ce-dev/ce-provision" "$2"
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook examples/$1/$1.yml --own-branch $2 --config-branch $3"
   # shellcheck disable=SC2086
