@@ -6,7 +6,7 @@
 #     state: present
 
 - name: Create cloud-init script
-  template:
+  ansible.builtin.template:
     src: init.sh.j2
     dest: "/var/lib/cloud/scripts/per-instance/mount-sync-tarballs.sh"
     mode: "0755"

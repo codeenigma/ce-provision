@@ -1,6 +1,6 @@
 ---
 - name: Install JRE/JDK packages.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - "openjdk-{{ openjdk.version }}-jre"
       - "openjdk-{{ openjdk.version }}-jdk"

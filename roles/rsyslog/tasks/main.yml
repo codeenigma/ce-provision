@@ -9,6 +9,6 @@
     force: true
 
 - name: restart service.
-  service:
+  ansible.builtin.service:
     name: rsyslog
     state: restarted
