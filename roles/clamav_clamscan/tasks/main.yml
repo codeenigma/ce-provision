@@ -2,14 +2,14 @@
 # tasks file for clamav
 
 - name: Ensure ClamAV packages are installed
-  apt:
+  ansible.builtin.apt:
     pkg: ["clamav"]
     state: present
     update_cache: true
     cache_valid_time: 240
 
 - name: Copy clamscan report config
-  template:
+  ansible.builtin.template:
     src: "clamscan-report.j2"
     dest: "/usr/local/bin/clamscan-report"
     owner: root
@@ -17,7 +17,7 @@
     mode: 0700
 
 - name: Copy clamscan cron config
-  template:
+  ansible.builtin.template:
     src: "clamscan-cron.j2"
     dest: "/etc/cron.d/clamscan_cron"
     owner: root

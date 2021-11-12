@@ -1,6 +1,6 @@
 ---
 - name: Install additional extra packages.
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ apt_extra_packages | list }}"
     state: present
     update_cache: true

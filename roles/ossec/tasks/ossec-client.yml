@@ -2,13 +2,13 @@
 # tasks file for ossec-client
 
 - name: Ensure OSSEC is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: ["ossec-hids-agent"]
     state: present
     update_cache: true
 
 - name: Set logrotate file
-  copy:
+  ansible.builtin.copy:
     src: "ossec-client-logrotate"
     dest: "/etc/logrotate.d/ossec-client"
     owner: root
@@ -16,7 +16,7 @@
     mode: "0644"
 
 - name: Copy OSSEC authentication password.
-  template:
+  ansible.builtin.template:
     src: authd.pass.j2
     dest: "/var/ossec/etc/authd.pass"
     owner: root
@@ -24,4 +24,4 @@
     mode: "0440"
 
 - name: Register client against OSSEC server.
-  command: "/var/ossec/bin/agent-auth -m {{ ossec.serverip }} -P /var/ossec/etc/authd.pass"
+  ansible.builtin.command: "/var/ossec/bin/agent-auth -m {{ ossec.serverip }} -P /var/ossec/etc/authd.pass"

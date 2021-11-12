@@ -2,16 +2,16 @@
 #@todo Configuration is for dev.
 
 - name: Add repository key for MySQL repository.
-  apt_key: keyserver=keyserver.ubuntu.com id=A4A9406876FCBD3C456770C88C718D3B5072E1F5 state=present
+  ansible.builtin.apt_key: keyserver=keyserver.ubuntu.com id=A4A9406876FCBD3C456770C88C718D3B5072E1F5 state=present
 
 - name: Add repository for MySQL.
-  apt_repository: repo='deb http://repo.mysql.com/apt/debian/ buster mysql-5.7' state=present
+  ansible.builtin.apt_repository: repo='deb http://repo.mysql.com/apt/debian/ buster mysql-5.7' state=present
 
 - name: Add source repository for MySQL.
-  apt_repository: repo='deb-src http://repo.mysql.com/apt/debian/ buster mysql-5.7' state=present
+  ansible.builtin.apt_repository: repo='deb-src http://repo.mysql.com/apt/debian/ buster mysql-5.7' state=present
 
 - name: Pin MySQL packages.
-  template:
+  ansible.builtin.template:
     src: mysql.pref.j2
     dest: "/etc/apt/preferences.d/mysql.pref"
     owner: root
@@ -20,13 +20,13 @@
     force: true
 
 - name: Ensure mysql is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "mysql-server"
     state: present
     update_cache: true
 
 - name: Copy MySQL overriding configuration in place.
-  template:
+  ansible.builtin.template:
     src: mysql_dev.cnf.j2
     dest: "/etc/mysql/mysql.conf.d/zz_dev.cnf"
     owner: root
@@ -43,27 +43,27 @@
 #     - blackfire.overrides | length > 0
 
 - name: Restart mysql.
-  service: name=mysql state=restarted enabled=yes
+  ansible.builtin.service: name=mysql state=restarted enabled=yes
 
 - name: Update MySQL root password.
-  shell: >
+  ansible.builtin.shell: >
     mysql -NBe 'GRANT ALL ON *.* TO "root"@"%" IDENTIFIED BY "root" WITH GRANT OPTION;'
   when: is_local is defined and is_local
 
 - name: Update MySQL ce-dev password.
-  shell: >
+  ansible.builtin.shell: >
     mysql -NBe 'GRANT ALL ON *.* TO "ce-dev"@"%" IDENTIFIED BY "ce-dev" WITH GRANT OPTION;'
   when: is_local is defined and is_local
 
 - name: Ensure mysql can write data.
-  file:
+  ansible.builtin.file:
     path: /var/lib/mysql
     owner: mysql
     group: mysql
     recurse: true
 
 - name: Ensure mysql can write PID/lock.
-  file:
+  ansible.builtin.file:
     path: /var/run/mysqld
     owner: mysql
     group: mysql
@@ -71,8 +71,8 @@
     recurse: true
 
 - name: Workaround Docker overlayFS issue.
-  shell: >
+  ansible.builtin.shell: >
     find /var/lib/mysql -type f -exec touch {} \;
 
 - name: Restart mysql.
-  service: name=mysql state=started enabled=yes
+  ansible.builtin.service: name=mysql state=started enabled=yes

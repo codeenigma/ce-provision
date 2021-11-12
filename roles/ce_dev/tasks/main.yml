@@ -2,14 +2,14 @@
 #@todo Grab last version for a given branch.
 
 - name: Fetch and extract ce-dev.
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/codeenigma/ce-dev/releases/download/1.0.9/ce-dev-v1.0.9-linux-x64.tar.gz
     dest: /opt/
     remote_src: true
     mode: 0755
 
 - name: Link to binary.
-  file:
+  ansible.builtin.file:
     src: /opt/ce-dev/bin/ce-dev
     dest: /usr/local/bin/ce-dev
     state: link

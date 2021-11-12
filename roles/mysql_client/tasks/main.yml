@@ -12,7 +12,7 @@
     executable: pip3
 
 - name: Copy debian.cnf credentials file.
-  template:
+  ansible.builtin.template:
     src: "mysql.creds.j2"
     dest: "/home/{{ user_deploy.username }}/.mysql.creds"
     owner: "{{ user_deploy.username }}"
@@ -20,7 +20,7 @@
     mode: 0600
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ mysql_client.overrides }}"

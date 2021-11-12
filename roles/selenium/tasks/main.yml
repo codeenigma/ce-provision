@@ -1,6 +1,6 @@
 ---
 - name: Install Selenium dependencies.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - firefox-esr
       - chromium
@@ -11,39 +11,39 @@
     cache_valid_time: 240
 
 - name: Install VNC.
-  apt:
+  ansible.builtin.apt:
     pkg: tightvncserver
     state: present
   when: selenium.display_manager == 'VNC'
 
 - name: Set Selenium major version
-  set_fact:
+  ansible.builtin.set_fact:
     _selenium_major_version: "{{ selenium.version | regex_replace('\\.[0-9]+$', '') }}"
 
 - name: create Selenium folder.
-  file:
+  ansible.builtin.file:
     path: /opt/selenium
     state: directory
 
 - name: Download Selenium
-  get_url:
+  ansible.builtin.get_url:
     url: "http://selenium-release.storage.googleapis.com/{{ _selenium_major_version }}/selenium-server-standalone-{{ selenium.version }}.jar"
     dest: "/opt/selenium/selenium-server-standalone.jar"
 
 - name: Download GeckoDriver
-  unarchive:
+  ansible.builtin.unarchive:
     src: "https://github.com/mozilla/geckodriver/releases/download/v{{ selenium.gecko_version }}/geckodriver-v{{ selenium.gecko_version }}-linux64.tar.gz"
     dest: /opt/selenium
     remote_src: true
 
 - name: Download ChromeDriver
-  unarchive:
+  ansible.builtin.unarchive:
     src: "https://chromedriver.storage.googleapis.com/{{ selenium.chrome_version }}/chromedriver_linux64.zip"
     dest: /opt/selenium
     remote_src: true
 
 - name: Install init.d service.
-  template:
+  ansible.builtin.template:
     src: "selenium.init.j2"
     dest: /etc/init.d/selenium
     owner: root
@@ -51,7 +51,7 @@
     mode: 0755
 
 - name: Create Selenium start script.
-  template:
+  ansible.builtin.template:
     src: "selenium-daemon-start-{{ selenium.display_manager }}.j2"
     dest: /opt/selenium/selenium-daemon-start
     owner: root
@@ -60,7 +60,7 @@
     force: true
 
 - name: Create selenium stop script.
-  template:
+  ansible.builtin.template:
     src: "selenium-daemon-stop.j2"
     dest: /opt/selenium/selenium-daemon-stop
     owner: root
@@ -68,7 +68,7 @@
     mode: 0555
 
 - name: Create home X dir if needed.
-  file:
+  ansible.builtin.file:
     path: "/home/{{ user_deploy.username }}/.vnc"
     owner: "{{ user_deploy.username }}"
     group: "{{ user_deploy.username }}"
@@ -76,7 +76,7 @@
   when: selenium.display_manager == "VNC"
 
 - name: Create X startup script.
-  template:
+  ansible.builtin.template:
     src: "xstartup.j2"
     dest: "/home/{{ user_deploy.username }}/.vnc/xstartup"
     owner: "{{ user_deploy.username }}"
@@ -85,13 +85,13 @@
   when: selenium.display_manager == "VNC"
 
 - name: Generate VNC password.
-  shell: "echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
+  ansible.builtin.shell: "echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
   become: true
   become_user: "{{ user_deploy.username }}"
   when: selenium.display_manager == "VNC"
 
 - name: Fix VNC folder permissions.
-  file:
+  ansible.builtin.file:
     dest: "/home/{{ user_deploy.username }}/.vnc"
     owner: "{{ user_deploy.username }}"
     group: "{{ user_deploy.username }}"
@@ -99,7 +99,7 @@
   when: selenium.display_manager == "VNC"
 
 - name: Fix VNC password file permissions.
-  file:
+  ansible.builtin.file:
     dest: "/home/{{ user_deploy.username }}/.vnc/passwd"
     owner: "{{ user_deploy.username }}"
     group: "{{ user_deploy.username }}"
@@ -107,6 +107,6 @@
   when: selenium.display_manager == "VNC"
 
 - name: Ensure Selenium is restarted.
-  service:
+  ansible.builtin.service:
     name: selenium
     state: restarted

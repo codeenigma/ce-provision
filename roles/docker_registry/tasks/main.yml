@@ -1,15 +1,15 @@
 ---
 - name: Ensure compose folder exists.
-  file:
+  ansible.builtin.file:
     path: /opt/docker_registry
     state: directory
 
 - name: Copy docker-compose file.
-  template:
+  ansible.builtin.template:
     src: "docker-compose.yml.j2"
     dest: /opt/docker_registry/docker-compose.yml
 
 - name: Spin up the registry instance.
-  command: docker-compose up -d
+  ansible.builtin.command: docker-compose up -d
   args:
     chdir: /opt/docker_registry

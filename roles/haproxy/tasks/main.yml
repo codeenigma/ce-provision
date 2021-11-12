@@ -1,13 +1,13 @@
 ---
 - name: Ensure haproxy is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: haproxy
     state: present
     update_cache: true
     cache_valid_time: 240
 
 - name: Create HAProxy SSL folder.
-  file:
+  ansible.builtin.file:
     path: "/etc/haproxy/ssl"
     state: directory
 
@@ -15,7 +15,7 @@
 #   shell: cat /etc/ssl/private/ssl-cert-snakeoil.key /etc/ssl/certs/ssl-cert-snakeoil.pem > /etc/haproxy/ssl/haproxy.pem
 
 - name: Copy HAProxy configuration.
-  template:
+  ansible.builtin.template:
     src: "{{ haproxy.template }}.cfg.j2"
     dest: "/etc/haproxy/haproxy.cfg"
     owner: root
@@ -24,7 +24,7 @@
     force: true
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ haproxy.overrides }}"
@@ -33,6 +33,6 @@
     - haproxy.overrides | length > 0
 
 - name: Ensure HAProxy is restarted.
-  service:
+  ansible.builtin.service:
     name: haproxy
     state: restarted
