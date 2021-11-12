@@ -26,7 +26,7 @@
     - domain.basic_auth.auth_pass | length > 0
 
 - name: Create basic htauth files.
-  htpasswd:
+  ansible.builtin.htpasswd:
     path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
     name: "{{ domain.basic_auth.auth_user }}"
     password: "{{ _nginx_htauth_pass }}"

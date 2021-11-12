@@ -51,7 +51,7 @@
     mode: 0755
 
 - name: Create Selenium start script.
-  template:
+  ansible.builtin.template:
     src: "selenium-daemon-start-{{ selenium.display_manager }}.j2"
     dest: /opt/selenium/selenium-daemon-start
     owner: root

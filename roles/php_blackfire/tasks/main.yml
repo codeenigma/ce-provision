@@ -1,20 +1,20 @@
 ---
 - name: Ensure Blackfire agent is not installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "blackfire-agent"
     state: absent
     purge: true
   when: not blackfire.enable
 
 - name: Ensure Blackfire probe is not installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "blackfire-php"
     state: absent
     purge: true
   when: not blackfire.enable
 
 - name: Ensure Blackfire local startup is not present.
-  file:
+  ansible.builtin.file:
     path: "/opt/run-parts/blackfire"
     state: absent
   when: not blackfire.enable
