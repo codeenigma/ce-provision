@@ -2,7 +2,7 @@
 dependencies:
   - role: _meta/common_base
   - role: python-pip
-  - role: firewall
+  - role: firewall_config
   - role: ssh_server
   - role: user_provision
   - role: user_deploy
