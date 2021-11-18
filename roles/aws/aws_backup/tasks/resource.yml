@@ -11,10 +11,16 @@
   register: caller_info
  # when: caller_info is not defined
 
+- name: Gather IAM role info for resource assignation.
+  community.aws.iam_role_info:
+    name: "{{ _infra_name }}-backup"
+  register: _backup_role_info
+  when: aws_backup.backup.iam_role_arn == "Default"
+
 - name: Set IAM role ARN for backups.
   ansible.builtin.set_fact:
-    _iam_role_arn: "arn:aws:iam::{{ caller_info.account }}:role/service-role/AWSBackupDefaultServiceRole"
-  when: aws_backup.backup.iam_role_arn == "Default"
+    _iam_role_arn: "{{ _backup_role_info.iam_roles.arn }}"
+  when: _backup_role_info is defined
 
 - name: Set IAM role ARN for backups.
   ansible.builtin.set_fact:

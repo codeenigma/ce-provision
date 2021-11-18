@@ -60,3 +60,23 @@
   loop_control:
     loop_var: plan
   when: aws_backup.plans | length
+
+- name: Create IAM role for backups.
+  ansible.builtin.include_role:
+    name: aws/aws_iam_role
+  vars:
+    aws_iam_role:
+      aws_profile: "{{ _aws_profile }}"
+      region: "{{ _aws_region }}"
+      state: present
+      tags:
+        Ansible: managed
+        Infra: "{{ _infra_name }}"
+        Billing: "{{ _aws_billing_type }}"
+        Env: "{{ _env_type }}"
+      name: "{{ _infra_name }}-backup"
+      managed_policies:
+        - "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+        - "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+      policy_document: backup
+  when: aws_backup.backup.iam_role_arn == "Default"
