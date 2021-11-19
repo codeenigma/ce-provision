@@ -38,3 +38,13 @@
     line: "@include common-linotp"
     state: present
   when: pam_linotp.ssh
+
+- name: Restart nslcd service.
+  ansible.builtin.service:
+    name: nslcd
+    state: restarted
+
+- name: Restart SSH service.
+  ansible.builtin.service:
+    name: ssh
+    state: restarted
