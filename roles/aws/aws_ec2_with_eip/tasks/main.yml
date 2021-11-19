@@ -89,7 +89,7 @@
 
 - name: Add a DNS record in route 53
   community.aws.route53:
-    state: "{{ aws_ec2_with_eip.state }}"
+    state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
     record: "{{ aws_ec2_with_eip.route_53.record }}"
@@ -102,7 +102,7 @@
 
 - name: Add a matching wildcard DNS record
   community.aws.route53:
-    state: "{{ aws_ec2_with_eip.state }}"
+    state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
     record: "*.{{ aws_ec2_with_eip.route_53.record }}"
