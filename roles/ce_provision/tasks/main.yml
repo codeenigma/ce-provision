@@ -50,6 +50,11 @@
     name: dnspython
     executable: pip3
 
+- name: Ensure certifi pip package is installed.
+  ansible.builtin.pip:
+    name: certifi
+    executable: pip3
+
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
   ansible.builtin.command:
