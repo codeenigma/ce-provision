@@ -45,7 +45,7 @@
     pkg: ["git", "parallel"]
     state: present
 
-- name: Ensure pip dependencies are installed.
+- name: Ensure dnspython pip package is installed.
   ansible.builtin.pip:
     name: dnspython
     executable: pip3
