@@ -10,10 +10,10 @@
     dest: /tmp/get-pip.py
 
 - name: Ensure pip3 is installed.
-  ansible.builtin.shell: python3 /tmp/get-pip.py
+  ansible.builtin.command: python3 /tmp/get-pip.py
 
 - name: Rehash pip3 executable in bash cache.
-  ansible.builtin.shell: hash -d pip3
+  ansible.builtin.command: hash -d pip3
 
 - name: Ensure python3 is the default binary.
   ansible.builtin.command:
