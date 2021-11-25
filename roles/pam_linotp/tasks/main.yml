@@ -44,6 +44,11 @@
     name: nslcd
     state: restarted
 
+- name: Restart nscd service.
+  ansible.builtin.service:
+    name: nscd
+    state: restarted
+
 - name: Restart SSH service.
   ansible.builtin.service:
     name: ssh
