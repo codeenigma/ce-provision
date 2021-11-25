@@ -1,6 +1,6 @@
-# AMI Debian Buster
+# EC2 instance with EIP
 
-Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+Creates a new EC2 instance at AWS with a static IP address.
 
 <!--TOC-->
 <!--ENDTOC-->
