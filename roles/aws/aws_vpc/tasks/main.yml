@@ -1,5 +1,5 @@
 - name: Create VPC.
-  ec2_vpc_net:
+  amazon.aws.ec2_vpc_net:
     profile: "{{ aws_vpc.aws_profile }}"
     name: "{{ aws_vpc.name }}"
     cidr_block: "{{ aws_vpc.cidr_block }}"
@@ -9,7 +9,7 @@
   register: _aws_vpc_vpc
 
 - name: Ensure default Security group is tagged.
-  ec2_group:
+  amazon.aws.ec2_group:
     name: "default"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
@@ -20,13 +20,14 @@
     purge_rules: false
 
 - name: Create VPC Security groups.
-  include_tasks: "security_group.yml"
+  ansible.builtin.include_tasks: "security_group.yml"
   with_items: "{{ aws_vpc.security_groups }}"
   loop_control:
     loop_var: security_group
+    label: "{{ item.name }}"
 
 - name: Create IGW
-  ec2_vpc_igw:
+  community.aws.ec2_vpc_igw:
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
@@ -35,7 +36,7 @@
   register: _aws_vpc_gateway
 
 - name: Update Main route table.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_vpc_route
   vars:
     aws_vpc_route:
