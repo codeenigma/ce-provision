@@ -11,7 +11,7 @@ jobs:
   # when a job name is not provided
   run-tests:
     # Name the Job
-    name: Run tests against Ansible code base
+    name: Publish documentation
     # Set the type of machine to run on
     runs-on: ubuntu-20.04
 
