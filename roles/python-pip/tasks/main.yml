@@ -14,11 +14,6 @@
     cmd: python3 /tmp/get-pip.py
   become: true
 
-- name: Rehash pip3 executable in bash cache.
-  ansible.builtin.command:
-    cmd: hash -d pip3
-  become: true
-
 - name: Ensure python3 is the default binary.
   ansible.builtin.command:
     cmd: update-alternatives --install /usr/bin/python python /usr/bin/python3 1
