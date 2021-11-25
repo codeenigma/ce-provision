@@ -24,7 +24,7 @@
   with_items: "{{ aws_vpc.security_groups }}"
   loop_control:
     loop_var: security_group
-    label: "{{ item.name }}"
+    label: "{{ security_group.name }}"
 
 - name: Create IGW
   community.aws.ec2_vpc_igw:
