@@ -1,7 +1,7 @@
 import logging
 import sys
 import json
-import random
+import secrets
 import string
 import argparse
 import os
@@ -72,12 +72,12 @@ if __name__ == "__main__":
             specials = "@$!%*?&-_"
             random_pass = "".join(
                 [
-                    random.choice(string.ascii_uppercase),
-                    random.choice(string.ascii_lowercase),
-                    random.choice(string.digits),
-                    random.choice(specials),
+                    secrets.choice(string.ascii_uppercase),
+                    secrets.choice(string.ascii_lowercase),
+                    secrets.choice(string.digits),
+                    secrets.choice(specials),
                 ] +
-                random.choices(
+                secrets.choices(
                     string.ascii_uppercase
                     + string.ascii_lowercase
                     + string.digits
