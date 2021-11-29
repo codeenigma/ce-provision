@@ -1,6 +1,6 @@
 ---
 
-- import_tasks: local_actions.yml
+- import_tasks: locals.yml
   when:
     - generate_certs
 
