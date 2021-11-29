@@ -1,7 +1,7 @@
 ---
 - block:
 
-  - include_vars: debian.yml 
+  - include_vars: debian.yml
   - name: Add apt repository signing key
     apt_key:
       url: "{{ package_repos.apt.opendistro.gpg }}"
@@ -20,4 +20,4 @@
     register: install
 
   tags:
-    - install 
+    - install

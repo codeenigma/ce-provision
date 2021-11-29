@@ -8,7 +8,6 @@
   tags:
     - generate-certs
 
-
 - block:
 
   - name: Install OpenDistro dependencies
