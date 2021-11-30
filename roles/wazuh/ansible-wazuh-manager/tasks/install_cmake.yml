@@ -15,7 +15,7 @@
 
   - name: Unpack CMake
     unarchive:
-      copy: no
+      copy: false
       dest: /tmp/
       src: "{{ cmake_download.dest }}"
     when: cmake_download.changed

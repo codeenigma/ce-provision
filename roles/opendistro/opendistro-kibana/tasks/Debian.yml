@@ -11,7 +11,7 @@
     apt_repository:
       repo: "{{ package_repos.apt.opendistro.baseurl }}"
       state: present
-      update_cache: yes
+      update_cache: true
 
   - name: Install Kibana
     apt:

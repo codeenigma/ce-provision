@@ -120,9 +120,9 @@
         "backend_roles": ["{{ opendistro_custom_user_role }}"]
       }
     body_format: json
-    validate_certs: no
+    validate_certs: false
     status_code: 200,201,401
-    return_content: yes
+    return_content: true
     timeout: 4
   when:
     - opendistro_custom_user is defined and opendistro_custom_user

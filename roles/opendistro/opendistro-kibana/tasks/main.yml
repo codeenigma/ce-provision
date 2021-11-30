@@ -45,7 +45,7 @@
     state: directory
     owner: kibana
     group: kibana
-    recurse: yes
+    recurse: true
 
 - name: Build and Install Wazuh Kibana Plugin from sources
   import_tasks: build_wazuh_plugin.yml
@@ -61,7 +61,7 @@
     executable: /bin/bash
     creates: /usr/share/kibana/plugins/wazuh/package.json
     chdir: /usr/share/kibana
-  become: yes
+  become: true
   become_user: kibana
   notify: restart kibana
   tags:
@@ -74,7 +74,7 @@
   shell: /usr/share/kibana/node/bin/node {{ node_options }} /usr/share/kibana/src/cli/cli.js --optimize -c {{ kibana_conf_path }}/kibana.yml
   args:
     executable: /bin/bash
-  become: yes
+  become: true
   become_user: kibana
   changed_when: false
   tags:
@@ -93,18 +93,18 @@
     method: DELETE
     user: "admin"
     password: "{{ opendistro_admin_password }}"
-    validate_certs: no
+    validate_certs: false
     status_code: 200, 404
 
 - name: Create wazuh plugin config directory
   file:
     path: /usr/share/kibana/data/wazuh/config/
     state: directory
-    recurse: yes
+    recurse: true
     owner: kibana
     group: kibana
     mode: 0751
-  changed_when: False
+  changed_when: false
 
 - name: Configure Wazuh Kibana Plugin
   template:
@@ -113,7 +113,7 @@
     owner: kibana
     group: kibana
     mode: 0751
-  changed_when: False
+  changed_when: false
 
 - name: Ensure Kibana started and enabled
   service:
