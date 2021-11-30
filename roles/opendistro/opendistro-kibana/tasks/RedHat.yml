@@ -2,7 +2,7 @@
 - block:
 
   - name: RedHat/CentOS/Fedora | Add OpenDistro repo
-    yum_repository:
+    ansible.builtin.yum_repository:
       file: opendistro
       name: opendistro_repo
       description: Opendistro yum repository
@@ -11,7 +11,7 @@
       gpgcheck: true
 
   - name: Install Kibana
-    package:
+    ansible.builtin.package:
       name: "opendistroforelasticsearch-kibana-{{ kibana_opendistro_version }}"
       state: present
     register: install

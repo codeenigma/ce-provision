@@ -1,6 +1,6 @@
 ---
 - name: Debian/Ubuntu | Install apt-transport-https, ca-certificates and acl
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
@@ -12,7 +12,7 @@
 
 - name: Debian/Ubuntu | Installing Wazuh repository key (Ubuntu 14)
   become: true
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -
   args:
@@ -26,7 +26,7 @@
     - not wazuh_custom_packages_installation_agent_enabled
 
 - name: Debian/Ubuntu | Installing Wazuh repository key
-  apt_key:
+  ansible.builtin.apt_key:
     url: "{{ wazuh_agent_config.repo.gpg }}"
     id: "{{ wazuh_agent_config.repo.key_id }}"
   when:
@@ -35,7 +35,7 @@
     - not wazuh_custom_packages_installation_agent_enabled
 
 - name: Debian/Ubuntu | Add Wazuh repositories
-  apt_repository:
+  ansible.builtin.apt_repository:
     filename: wazuh_repo
     repo: "{{ wazuh_agent_config.repo.apt }}"
     state: present
@@ -45,12 +45,12 @@
     - not wazuh_custom_packages_installation_agent_enabled
 
 - name: Debian/Ubuntu | Set Distribution CIS filename for debian
-  set_fact:
+  ansible.builtin.set_fact:
     cis_distribution_filename: cis_debian_linux_rcl.txt
   when: ansible_os_family == "Debian"
 
 - name: Debian/Ubuntu | Install OpenJDK-8 repo
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: 'ppa:openjdk-r/ppa'
     state: present
     update_cache: true
@@ -67,7 +67,7 @@
     - init
 
 - name: Debian/Ubuntu | Install OpenScap
-  apt:
+  ansible.builtin.apt:
     name:
       - libopenscap8
       - xsltproc
@@ -79,7 +79,7 @@
   until: wazuh_agent_OpenScap_package_install is succeeded
 
 - name: Debian/Ubuntu | Get OpenScap installed version
-  shell: "dpkg-query --showformat='${Version}' --show libopenscap8"
+  ansible.builtin.shell: "dpkg-query --showformat='${Version}' --show libopenscap8"
   register: openscap_version
   changed_when: false
   when: wazuh_agent_config.openscap.disable == 'no'
@@ -87,7 +87,7 @@
     - config
 
 - name: Debian/Ubuntu | Check OpenScap version
-  shell: "dpkg --compare-versions '{{ openscap_version.stdout }}' '>=' '1.2'; echo $?"
+  ansible.builtin.shell: "dpkg --compare-versions '{{ openscap_version.stdout }}' '>=' '1.2'; echo $?"
   register: openscap_version_valid
   changed_when: false
   when: wazuh_agent_config.openscap.disable == 'no'

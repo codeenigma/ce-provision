@@ -1,6 +1,6 @@
 ---
 - name: Check if certificates already exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ local_certs_path }}"
   register: certificates_folder
   delegate_to: localhost
@@ -11,66 +11,66 @@
 - block:
 
   - name: Install OpenDistro dependencies
-    apt:
+    ansible.builtin.apt:
       name: [
         'gpg', 'unzip', 'wget', 'curl', 'apt-transport-https', software-properties-common
         ]
       state: present
 
   - name: Install openjdk-11-jdk
-    apt:
+    ansible.builtin.apt:
       name: openjdk-11-jdk
       state: present
     environment:
       JAVA_HOME: /usr
 
   - name: Local action | Create local temporary directory for certificates generation
-    file:
+    ansible.builtin.file:
       path: "{{ local_certs_path }}"
       mode: 0755
       state: directory
 
   - name: Local action | Check that the generation tool exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ local_certs_path }}/search-guard-tlstool-{{ certs_gen_tool_version }}.zip"
     register: tool_package
 
   - name: Local action | Download certificates generation tool
-    get_url:
+    ansible.builtin.get_url:
       url: "{{ certs_gen_tool_url }}"
       dest: "{{ local_certs_path }}/search-guard-tlstool-{{ certs_gen_tool_version }}.zip"
     when: not tool_package.stat.exists
 
   - name: Local action | Extract the certificates generation tool
-    unarchive:
+    ansible.builtin.unarchive:
       src: "{{ local_certs_path }}/search-guard-tlstool-{{ certs_gen_tool_version }}.zip"
       dest: "{{ local_certs_path }}/"
 
   - name: Local action | Add the execution bit to the binary
-    file:
+    ansible.builtin.file:
       dest: "{{ local_certs_path }}/tools/sgtlstool.sh"
       mode: a+x
 
   - name: Local action | Prepare the certificates generation template file
-    template:
+    ansible.builtin.template:
       src: "templates/tlsconfig.yml.j2"
       dest: "{{ local_certs_path }}/config/tlsconfig.yml"
       mode: 0644
     register: tlsconfig_template
 
   - name: Create a directory if it does not exist
-    file:
+    ansible.builtin.file:
       path: "{{ local_certs_path }}/certs/"
       state: directory
       mode: '0755'
 
   - name: Local action | Check if root CA file exists
-    stat:
+    ansible.builtin.stat:
       path: "{{ local_certs_path }}/certs/root-ca.key"
     register: root_ca_file
 
   - name: Local action | Generate the node & admin certificates in local
-    command: >-
+    ansible.builtin.command: >-
       {{ local_certs_path }}/tools/sgtlstool.sh
       -c {{ local_certs_path }}/config/tlsconfig.yml
       -ca -crt
@@ -81,7 +81,7 @@
       - tlsconfig_template.changed
 
   - name: Local action | Generate the node & admin certificates using an existing root CA
-    command: >-
+    ansible.builtin.command: >-
      {{ local_certs_path }}/tools/sgtlstool.sh
      -c {{ local_certs_path }}/config/tlsconfig.yml
      -crt

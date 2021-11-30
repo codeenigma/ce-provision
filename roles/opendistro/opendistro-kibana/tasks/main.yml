@@ -1,7 +1,7 @@
 ---
 
 - name: Stopping early, trying to compile Wazuh Kibana Plugin on Debian 10 is not possible
-  fail:
+  ansible.builtin.fail:
     msg: "It's not possible to compile the Wazuh Kibana plugin on Debian 10 due to: https://github.com/wazuh/wazuh-kibana-app/issues/1924"
   when:
     - build_from_sources
@@ -15,7 +15,7 @@
   when: ansible_os_family == 'Debian'
 
 - name: Remove Kibana configuration file
-  file:
+  ansible.builtin.file:
     # noqa 503
     path: "{{ kibana_conf_path }}/kibana.yml"
     state: absent
@@ -25,7 +25,7 @@
 - import_tasks: security_actions.yml
 
 - name: Copy Configuration File
-  blockinfile:
+  ansible.builtin.blockinfile:
     block: "{{ lookup('template', 'opendistro_kibana.yml.j2') }}"
     dest: "{{ kibana_conf_path }}/kibana.yml"
     create: true
@@ -39,7 +39,7 @@
     - configure
 
 - name: Ensuring Kibana directory owner
-  file:
+  ansible.builtin.file:
     # noqa 208
     path: "/usr/share/kibana"
     state: directory
@@ -48,13 +48,13 @@
     recurse: true
 
 - name: Build and Install Wazuh Kibana Plugin from sources
-  import_tasks: build_wazuh_plugin.yml
+  ansible.builtin.import_tasks: build_wazuh_plugin.yml
   when:
     - build_from_sources is defined
     - build_from_sources
 
 - name: Install Wazuh Plugin (can take a while)
-  shell: >-
+  ansible.builtin.shell: >-
     NODE_OPTIONS="{{ node_options }}" /usr/share/kibana/bin/kibana-plugin install
     {{ wazuh_app_url }}-{{ wazuh_version }}_{{ elastic_stack_version }}-1.zip
   args:
@@ -71,7 +71,7 @@
     - not build_from_sources
 
 - name: Kibana optimization (can take a while)
-  shell: /usr/share/kibana/node/bin/node {{ node_options }} /usr/share/kibana/src/cli/cli.js --optimize -c {{ kibana_conf_path }}/kibana.yml
+  ansible.builtin.shell: /usr/share/kibana/node/bin/node {{ node_options }} /usr/share/kibana/src/cli/cli.js --optimize -c {{ kibana_conf_path }}/kibana.yml
   args:
     executable: /bin/bash
   become: true
@@ -81,14 +81,14 @@
     - skip_ansible_lint
 
 - name: Wait for Elasticsearch port
-  wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }}
+  ansible.builtin.wait_for: host={{ elasticsearch_network_host }} port={{ elasticsearch_http_port }}
 
 - name: Select correct API protocol
-  set_fact:
+  ansible.builtin.set_fact:
     elastic_api_protocol: "{% if kibana_opendistro_security is defined and kibana_opendistro_security %}https{% else %}http{% endif %}"
 
 - name: Attempting to delete legacy Wazuh index if exists
-  uri:
+  ansible.builtin.uri:
     url: "{{ elastic_api_protocol }}://{{ elasticsearch_network_host }}:{{ elasticsearch_http_port }}/.wazuh"
     method: DELETE
     user: "admin"
@@ -97,7 +97,7 @@
     status_code: 200, 404
 
 - name: Create wazuh plugin config directory
-  file:
+  ansible.builtin.file:
     path: /usr/share/kibana/data/wazuh/config/
     state: directory
     recurse: true
@@ -107,7 +107,7 @@
   changed_when: false
 
 - name: Configure Wazuh Kibana Plugin
-  template:
+  ansible.builtin.template:
     src: wazuh.yml.j2
     dest: /usr/share/kibana/data/wazuh/config/wazuh.yml
     owner: kibana
@@ -116,7 +116,7 @@
   changed_when: false
 
 - name: Ensure Kibana started and enabled
-  service:
+  ansible.builtin.service:
     name: kibana
     enabled: true
     state: started

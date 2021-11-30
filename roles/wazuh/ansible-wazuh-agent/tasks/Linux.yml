@@ -14,7 +14,7 @@
     - wazuh_custom_packages_installation_agent_enabled
 
 - name: Linux CentOS/RedHat | Install wazuh-agent
-  yum:
+  ansible.builtin.yum:
     name: wazuh-agent-{{ wazuh_agent_version }}
     state: present
     lock_timeout: '{{ wazuh_agent_yum_lock_timeout }}'
@@ -26,7 +26,7 @@
     - init
 
 - name: Linux Debian | Install wazuh-agent
-  apt:
+  ansible.builtin.apt:
     name: "wazuh-agent={{ wazuh_agent_version }}"
     state: present
     cache_valid_time: 3600
@@ -39,7 +39,7 @@
     - init
 
 - name: Linux | Check if client.keys exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ wazuh_dir }}/etc/client.keys"
   register: client_keys_file
   tags:
@@ -49,7 +49,7 @@
   block:
 
     - name: Copy CA root certificate to verify authd
-      copy:
+      ansible.builtin.copy:
         src: "{{ wazuh_agent_authd.ssl_agent_ca }}"
         dest: "{{ wazuh_dir }}/etc/{{ wazuh_agent_authd.ssl_agent_ca | basename }}"
         mode: 0644
@@ -57,7 +57,7 @@
         - wazuh_agent_authd.ssl_agent_ca is not none
 
     - name: Copy TLS/SSL certificate for agent verification
-      copy:
+      ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ wazuh_dir }}/etc/{{ item | basename }}"
         mode: 0644
@@ -69,7 +69,7 @@
         - wazuh_agent_authd.ssl_agent_key is not none
 
     - name: Linux | Register agent (via authd)
-      shell: >
+      ansible.builtin.shell: >
         {{ wazuh_dir }}/bin/agent-auth
         {% if wazuh_agent_authd.agent_name is defined and wazuh_agent_authd.agent_name != None %}
         -A {{ wazuh_agent_authd.agent_name }}
@@ -100,7 +100,7 @@
         - wazuh_agent_authd.registration_address is not none
 
     - name: Linux | Verify agent registration
-      shell: echo {{ agent_auth_output }} | grep "Valid key received"
+      ansible.builtin.shell: echo {{ agent_auth_output }} | grep "Valid key received"
       when:
         - not client_keys_file.stat.exists or client_keys_file.stat.size == 0
         - wazuh_agent_authd.registration_address is not none
@@ -116,14 +116,14 @@
   block:
 
     - name: Establish target Wazuh Manager for registration task
-      set_fact:
+      ansible.builtin.set_fact:
         target_manager: '{{ manager_primary | length | ternary(manager_primary, manager_fallback) | first }}'
       vars:
         manager_primary: "{{ wazuh_managers | selectattr('register','true') | list }}"
         manager_fallback: "{{ wazuh_managers | list }}"
 
     - name: Linux | Obtain JWT Token
-      uri:
+      ansible.builtin.uri:
         url: '{{ target_manager.api_proto }}://{{ target_manager.address }}:{{ target_manager.api_port }}/security/user/authenticate'
         method: GET
         url_username: '{{ target_manager.api_user }}'
@@ -142,7 +142,7 @@
         - api
 
     - name: Linux | Create the agent key via rest-API
-      uri:
+      ansible.builtin.uri:
         url: '{{ target_manager.api_proto }}://{{ target_manager.address }}:{{ target_manager.api_port }}/agents'
         method: POST
         body_format: json
@@ -168,7 +168,7 @@
         - api
 
     - name: Linux | Validate registered agent key matches manager record
-      uri:
+      ansible.builtin.uri:
         url: '{{ target_manager.api_proto }}://{{ target_manager.address }}:{{ target_manager.api_port }}/agents/{{ agent_id }}/key'
         method: GET
         headers:
@@ -193,7 +193,7 @@
         - api
 
     - name: Linux | Import Key (via rest-API)
-      command: "{{ wazuh_dir }}/bin/manage_agents"
+      ansible.builtin.command: "{{ wazuh_dir }}/bin/manage_agents"
       environment:
         OSSEC_ACTION: i
         OSSEC_AGENT_NAME: '{{ agent_name }}'
@@ -214,18 +214,18 @@
     - api
 
 - name: Linux | Agent registration via auto-enrollment
-  debug:
+  ansible.builtin.debug:
     msg: Agent registration will be performed through enrollment option in templated ossec.conf
   when:  wazuh_agent_config.enrollment.enabled == 'yes'
 
 - name: create wazuh system group
-  group:
+  ansible.builtin.group:
     name: wazuh
     system: true
     state: present
 
 - name: create wazuh system user
-  user:
+  ansible.builtin.user:
     name: wazuh
     system: true
     shell: "/usr/sbin/nologin"
@@ -233,7 +233,7 @@
     createhome: false
 
 - name: Linux | Installing agent configuration (ossec.conf)
-  template:
+  ansible.builtin.template:
     src: var-ossec-etc-ossec-agent.conf.j2
     dest: "{{ wazuh_dir }}/etc/ossec.conf"
     owner: root
@@ -245,7 +245,7 @@
     - config
 
 - name: Linux | Installing local_internal_options.conf
-  template:
+  ansible.builtin.template:
     src: var-ossec-etc-local-internal-options.conf.j2
     dest: "{{ wazuh_dir }}/etc/local_internal_options.conf"
     owner: root
@@ -257,7 +257,7 @@
     - config
 
 - name: Create auto-enrollment password file
-  template:
+  ansible.builtin.template:
     src: authd_pass.j2
     dest: "{{ wazuh_dir }}/etc/authd.pass"
     owner: wazuh
@@ -271,7 +271,7 @@
     - config
 
 - name: Linux | Ensure Wazuh Agent service is started and enabled
-  service:
+  ansible.builtin.service:
     name: wazuh-agent
     enabled: true
     state: started

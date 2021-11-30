@@ -1,6 +1,6 @@
 ---
 - name: Debian/Ubuntu | Install apt-transport-https, ca-certificates and acl
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
@@ -10,13 +10,13 @@
   until: filebeat_ca_packages_install is succeeded
 
 - name: Debian/Ubuntu | Add Elasticsearch apt key.
-  apt_key:
+  ansible.builtin.apt_key:
     url: "{{ elasticrepo.gpg }}"
     id: "{{ elasticrepo.key_id }}"
     state: present
 
 - name: Debian/Ubuntu | Add Filebeat-oss repository.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb {{ elasticrepo.apt }} stable main"
     state: present
     update_cache: true

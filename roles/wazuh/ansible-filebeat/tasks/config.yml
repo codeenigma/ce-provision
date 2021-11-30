@@ -1,6 +1,6 @@
 ---
 - name: Copy Filebeat configuration.
-  template:
+  ansible.builtin.template:
     src: filebeat.yml.j2
     dest: "/etc/filebeat/filebeat.yml"
     owner: root
@@ -10,7 +10,7 @@
   tags: configure
 
 - name: Fetch latest Wazuh alerts template
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/wazuh/wazuh/{{ wazuh_template_branch }}/extensions/elasticsearch/7.x/wazuh-template.json
     dest: "/etc/filebeat/wazuh-template.json"
     owner: root

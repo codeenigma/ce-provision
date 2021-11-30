@@ -1,6 +1,6 @@
 ---
   - name: Install dependencies to build Wazuh packages
-    package:
+    ansible.builtin.package:
       name:
         - make
         - gcc
@@ -11,24 +11,24 @@
       state: present
 
   - name: Removing old files
-    file:
+    ansible.builtin.file:
       path: "/tmp/{{ wazuh_agent_sources_installation.branch }}.tar.gz"
       state: absent
 
   - name: Removing old folders
-    file:
+    ansible.builtin.file:
       path: "/tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}"
       state: absent
 
   - name: Installing policycoreutils-python (RedHat families)
-    package:
+    ansible.builtin.package:
       name:
         - policycoreutils-python
     when:
       - ansible_os_family|lower == "redhat"
 
   - name: Installing policycoreutils-python-utils (Debian families)
-    package:
+    ansible.builtin.package:
       name:
         - libc6-dev
         - curl
@@ -37,21 +37,21 @@
       - ansible_os_family|lower == "debian"
 
   - name: Download required packages from github.com/wazuh/wazuh
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/wazuh/wazuh/archive/{{ wazuh_agent_sources_installation.branch }}.tar.gz"
       dest: "/tmp/{{ wazuh_agent_sources_installation.branch }}.tar.gz"
     delegate_to: "{{ inventory_hostname }}"
     changed_when: false
 
   - name: Create folder to extract Wazuh branch
-    file:
+    ansible.builtin.file:
       path: "/tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}"
       mode: 0755
       state: directory
     changed_when: false
 
   - name: Extract downloaded Wazuh branch from Github # Using shell instead of unarchive due to that module not working properlyh with --strip
-    command: >-
+    ansible.builtin.command: >-
       tar -xzvf /tmp/{{ wazuh_agent_sources_installation.branch }}.tar.gz
       --strip 1
       --directory /tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}
@@ -61,7 +61,7 @@
       warn: false
 
   - name: Clean remaining files from others builds
-    command: "make -C src {{ item }}"
+    ansible.builtin.command: "make -C src {{ item }}"
     args:
       chdir: "/tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}/src/"
     with_items:
@@ -72,7 +72,7 @@
     failed_when: false
 
   - name: Render the "preloaded-vars.conf" file
-    template:
+    ansible.builtin.template:
       src: "templates/preloaded_vars_agent.conf.j2"
       dest: "/tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}/etc/preloaded-vars.conf"
       owner: root
@@ -81,20 +81,20 @@
     changed_when: false
 
   - name: Executing "install.sh" script to build and install the Wazuh Agent
-    shell: ./install.sh > /tmp/build_agent_log.txt
+    ansible.builtin.shell: ./install.sh > /tmp/build_agent_log.txt
     register: installation_result
     changed_when: installation_result == 0
     args:
       chdir: "/tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}"
 
   - name: Cleanup downloaded files
-    file:
+    ansible.builtin.file:
       path: "/tmp/{{ wazuh_agent_sources_installation.branch }}.tar.gz"
       state: absent
     changed_when: false
 
   - name: Cleanup created folders
-    file:
+    ansible.builtin.file:
       path: "/tmp/wazuh-{{ wazuh_agent_sources_installation.branch }}"
       state: absent
     changed_when: false

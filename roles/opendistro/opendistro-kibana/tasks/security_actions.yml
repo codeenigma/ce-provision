@@ -1,7 +1,7 @@
 - block:
 
   - name: Copy the certificates from local to the Kibana instance
-    copy:
+    ansible.builtin.copy:
       src: "{{ local_certs_path }}/certs/{{ item }}"
       dest: /usr/share/kibana
       mode: 0644

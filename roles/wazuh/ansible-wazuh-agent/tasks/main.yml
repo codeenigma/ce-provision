@@ -1,7 +1,7 @@
 ---
 
 - name: Overlay wazuh_agent_config on top of defaults
-  set_fact:
+  ansible.builtin.set_fact:
     wazuh_agent_config: '{{ wazuh_agent_config_defaults | combine(config_layer, recursive=True) }}'
   vars:
     config_layer: '{{ wazuh_agent_config | default({}) }}'

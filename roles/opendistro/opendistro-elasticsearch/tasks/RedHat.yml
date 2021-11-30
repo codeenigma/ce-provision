@@ -2,7 +2,7 @@
 - block:
 
   - name: RedHat/CentOS/Fedora | Add OpenDistro repo
-    yum_repository:
+    ansible.builtin.yum_repository:
       file: opendistro
       name: opendistro_repo
       description: Opendistro yum repository
@@ -12,7 +12,7 @@
     changed_when: false
 
   - name: RedHat/CentOS/Fedora | Install OpenJDK 11
-    yum:
+    ansible.builtin.yum:
       name: java-11-openjdk-devel
       state: present
     when:
@@ -21,18 +21,18 @@
   - name: Amazon Linux | Install OpenJDK 11
     block:
       - name: Install Amazon extras
-        yum:
+        ansible.builtin.yum:
           name: amazon-linux-extras
           state: present
 
       - name: Install OpenJDK 11
-        shell: amazon-linux-extras install java-openjdk11 -y
+        ansible.builtin.shell: amazon-linux-extras install java-openjdk11 -y
 
     when:
       - ansible_distribution == 'Amazon'
 
   - name: RedHat/CentOS/Fedora | Install OpenDistro dependencies
-    yum:
+    ansible.builtin.yum:
       name: "{{ packages }}"
     vars:
       packages:
@@ -40,7 +40,7 @@
       - unzip
 
   - name: Install OpenDistro
-    package:
+    ansible.builtin.package:
       name: opendistroforelasticsearch-{{ opendistro_version }}
       state: present
     register: install

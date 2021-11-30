@@ -1,6 +1,6 @@
 ---
 - name: RedHat/CentOS 5 | Install Wazuh repo
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: wazuh_repo
     description: Wazuh repository
     baseurl: "{{ wazuh_manager_config.repo.yum }}5/"
@@ -15,7 +15,7 @@
   register: repo_v5_manager_installed
 
 - name: RedHat/CentOS/Fedora | Install Wazuh repo
-  yum_repository:
+  ansible.builtin.yum_repository:
     name: wazuh_repo
     description: Wazuh repository
     baseurl: "{{ wazuh_manager_config.repo.yum }}"
@@ -28,7 +28,7 @@
     - not wazuh_custom_packages_installation_manager_enabled
 
 - name: RedHat/CentOS/Fedora | Install openscap
-  package: name={{ item }} state=present
+  ansible.builtin.package: name={{ item }} state=present
   with_items:
     - openscap-scanner
   register: wazuh_manager_openscp_packages_installed
@@ -38,7 +38,7 @@
   when: not (ansible_distribution == "Amazon" and ansible_distribution_major_version == "NA")
 
 - name: CentOS 6 | Install Software Collections (SCL) Repository
-  package: name=centos-release-scl state=present
+  ansible.builtin.package: name=centos-release-scl state=present
   register: wazuh_manager_scl_packages_installed
   until: wazuh_manager_scl_packages_installed is succeeded
   when:
@@ -46,7 +46,7 @@
     - wazuh_manager_config.cluster.disable != 'yes'
 
 - name: RedHat 6 | Enabling Red Hat Software Collections (RHSCL)
-  command: yum-config-manager --enable {{ item }}
+  ansible.builtin.command: yum-config-manager --enable {{ item }}
   with_items:
     - rhui-REGION-rhel-server-rhscl
     - rhel-server-rhscl-6-rpms
@@ -55,7 +55,7 @@
     - wazuh_manager_config.cluster.disable != 'yes'
 
 - name: CentOS/RedHat 6 | Install Python 2.7
-  package: name=python27 state=present
+  ansible.builtin.package: name=python27 state=present
   register: wazuh_manager_python_package_installed
   until: wazuh_manager_python_package_installed is succeeded
   when:
@@ -63,7 +63,7 @@
     - wazuh_manager_config.cluster.disable != 'yes'
 
 - name: RedHat/CentOS/Fedora | Install OpenJDK 1.8
-  yum: name=java-1.8.0-openjdk state=present
+  ansible.builtin.yum: name=java-1.8.0-openjdk state=present
   when:
     - wazuh_manager_config.cis_cat.disable == 'no'
     - wazuh_manager_config.cis_cat.install_java == 'yes'
@@ -71,35 +71,35 @@
     - init
 
 - name: Set Distribution CIS filename for RHEL5/CentOS-5
-  set_fact:
+  ansible.builtin.set_fact:
     cis_distribution_filename: cis_rhel5_linux_rcl.txt
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '5'
 
 - name: Set Distribution CIS filename for RHEL6/CentOS-6
-  set_fact:
+  ansible.builtin.set_fact:
     cis_distribution_filename: cis_rhel6_linux_rcl.txt
   when: ansible_os_family == "RedHat" and ansible_distribution_major_version == '6'
 
 - name: Set Distribution CIS filename for RHEL7/CentOS-7
-  set_fact:
+  ansible.builtin.set_fact:
     cis_distribution_filename: cis_rhel7_linux_rcl.txt
   when:
     - ansible_os_family == "RedHat" and ansible_distribution_major_version == '7'
 
 - name: Set Distribution CIS filename for RHEL7/CentOS-7 (Amazon)
-  set_fact:
+  ansible.builtin.set_fact:
     cis_distribution_filename: cis_rhel7_linux_rcl.txt
   when:
     - ansible_distribution == "Amazon" and ansible_distribution_major_version == "NA"
 
 - name: Install dependencies to build from sources
-  yum:
+  ansible.builtin.yum:
     name: ['make', 'gcc', 'automake', 'autoconf', 'libtool', 'tar', 'openssl-devel', 'gcc-c++']
     state: present
   when: wazuh_manager_sources_installation.enabled
 
 - name: CentOS/RedHat/Amazon | Install wazuh-manager
-  package:
+  ansible.builtin.package:
     name: "wazuh-manager-{{ wazuh_manager_version }}"
     state: "{{ wazuh_manager_package_state }}"
   register: wazuh_manager_main_packages_installed
@@ -120,7 +120,7 @@
     - wazuh_custom_packages_installation_manager_enabled
 
 - name: CentOS/RedHat 6 | Enabling python2.7 and sqlite3
-  replace:
+  ansible.builtin.replace:
     path: /etc/init.d/wazuh-manager
     regexp: 'echo -n "Starting Wazuh-manager: "'
     replace: "echo -n \"Starting Wazuh-manager (EL6): \"; source /opt/rh/python27/enable; export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{{ wazuh_dir }}/framework/lib"
@@ -129,7 +129,7 @@
     - wazuh_manager_config.cluster.disable != 'yes'
 
 - name: Install expect (EL5)
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: "{{ wazuh_manager_package_state }}"
   with_items:

@@ -1,14 +1,14 @@
 ---
 
 - name: Overlay wazuh_manager_config on top of defaults
-  set_fact:
+  ansible.builtin.set_fact:
     wazuh_manager_config: '{{ wazuh_manager_config_defaults | combine(config_layer, recursive=True) }}'
   vars:
     config_layer: '{{ wazuh_manager_config | default({}) }}'
   when: wazuh_manager_config_overlay | bool
 
 - name: "Install dependencies"
-  package:
+  ansible.builtin.package:
     name:
       - unzip
       - openssl
@@ -22,7 +22,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Install expect
-  package:
+  ansible.builtin.package:
     name: expect
     state: "{{ wazuh_manager_package_state }}"
   when:
@@ -30,7 +30,7 @@
   tags: init
 
 - name: Generate SSL files for authd
-  command: "openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:1825 -keyout sslmanager.key -out sslmanager.cert -subj /CN={{ wazuh_manager_fqdn }}/"
+  ansible.builtin.command: "openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:1825 -keyout sslmanager.key -out sslmanager.cert -subj /CN={{ wazuh_manager_fqdn }}/"
   args:
     creates: sslmanager.cert
     chdir: "{{ wazuh_dir }}/etc/"
@@ -39,7 +39,7 @@
   when: wazuh_manager_config.authd.ssl_agent_ca is not none
 
 - name: Copy CA, SSL key and cert for authd
-  copy:
+  ansible.builtin.copy:
     src: "{{ item }}"
     dest: "{{ wazuh_dir }}/etc/{{ item }}"
     mode: 0644
@@ -52,25 +52,25 @@
   when: wazuh_manager_config.authd.ssl_agent_ca is not none
 
 - name: Verifying for old init authd service
-  stat: path=/etc/init.d/ossec-authd
+  ansible.builtin.stat: path=/etc/init.d/ossec-authd
   register: old_authd_service
   tags:
     - config
 
 - name: Verifying for old systemd authd service
-  stat: path=/lib/systemd/system/ossec-authd.service
+  ansible.builtin.stat: path=/lib/systemd/system/ossec-authd.service
   register: old_authd_service
   tags:
     - config
 
 - name: Ensure ossec-authd service is disabled
-  service: name=ossec-authd enabled=no state=stopped
+  ansible.builtin.service: name=ossec-authd enabled=no state=stopped
   when: old_authd_service.stat.exists
   tags:
     - config
 
 - name: Removing old init authd services
-  file: path="{{ item }}" state=absent
+  ansible.builtin.file: path="{{ item }}" state=absent
   with_items:
     - "/etc/init.d/ossec-authd"
     - "/lib/systemd/system/ossec-authd.service"
@@ -79,13 +79,13 @@
     - config
 
 - name: create wazuh system group
-  group:
+  ansible.builtin.group:
     name: wazuh
     system: true
     state: present
 
 - name: create wazuh system user
-  user:
+  ansible.builtin.user:
     name: wazuh
     system: true
     shell: "/usr/sbin/nologin"
@@ -93,7 +93,7 @@
     createhome: false
 
 - name: Installing the local_rules.xml (default local_rules.xml)
-  template: src=var-ossec-rules-local_rules.xml.j2
+  ansible.builtin.template: src=var-ossec-rules-local_rules.xml.j2
             dest="{{ wazuh_dir }}/etc/rules/local_rules.xml"
             owner=wazuh
             group=wazuh
@@ -105,7 +105,7 @@
     - rules
 
 - name: Adding local rules files
-  copy: src="{{ wazuh_manager_config.ruleset.rules_path }}"
+  ansible.builtin.copy: src="{{ wazuh_manager_config.ruleset.rules_path }}"
         dest="{{ wazuh_dir }}/etc/rules/"
         owner=wazuh
         group=wazuh
@@ -117,7 +117,7 @@
     - rules
 
 - name: Installing the local_decoder.xml
-  template: src=var-ossec-rules-local_decoder.xml.j2
+  ansible.builtin.template: src=var-ossec-rules-local_decoder.xml.j2
             dest="{{ wazuh_dir }}/etc/decoders/local_decoder.xml"
             owner=wazuh
             group=wazuh
@@ -129,7 +129,7 @@
     - rules
 
 - name: Adding local decoders files
-  copy: src="{{ wazuh_manager_config.ruleset.decoders_path }}"
+  ansible.builtin.copy: src="{{ wazuh_manager_config.ruleset.decoders_path }}"
         dest="{{ wazuh_dir }}/etc/decoders/"
         owner=wazuh
         group=wazuh
@@ -141,7 +141,7 @@
     - rules
 
 - name: Configure the shared-agent.conf
-  template:
+  ansible.builtin.template:
     src: var-ossec-etc-shared-agent.conf.j2
     dest: "{{ wazuh_dir }}/etc/shared/default/agent.conf"
     owner: wazuh
@@ -156,7 +156,7 @@
     - shared_agent_config is defined
 
 - name: Installing the local_internal_options.conf
-  template: src=var-ossec-etc-local-internal-options.conf.j2
+  ansible.builtin.template: src=var-ossec-etc-local-internal-options.conf.j2
             dest="{{ wazuh_dir }}/etc/local_internal_options.conf"
             owner=root
             group=wazuh
@@ -167,17 +167,17 @@
     - config
 
 - name: Retrieving Agentless Credentials
-  include_vars: agentless_creds.yml
+  ansible.builtin.include_vars: agentless_creds.yml
   tags:
     - config
 
 - name: Retrieving authd Credentials
-  include_vars: authd_pass.yml
+  ansible.builtin.include_vars: authd_pass.yml
   tags:
     - config
 
 - name: Check if syslog output is enabled
-  set_fact: syslog_output=true
+  ansible.builtin.set_fact: syslog_output=true
   when: item.server is not none
   with_items:
     - "{{ wazuh_manager_config.syslog_outputs }}"
@@ -185,7 +185,7 @@
     - config
 
 - name: Check if client-syslog is enabled
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     "grep -c 'ossec-csyslogd' {{ wazuh_dir }}/bin/.process_list | xargs echo"
   args:
@@ -198,7 +198,7 @@
     - config
 
 - name: Enable client-syslog
-  command: "{{ wazuh_dir }}/bin/wazuh-control enable client-syslog"
+  ansible.builtin.command: "{{ wazuh_dir }}/bin/wazuh-control enable client-syslog"
   notify: restart wazuh-manager
   when:
     - csyslog_enabled.stdout == '0' or "skipped" in csyslog_enabled.stdout
@@ -207,7 +207,7 @@
     - config
 
 - name: Check if ossec-agentlessd is enabled
-  shell: |
+  ansible.builtin.shell: |
     set -o pipefail
     "grep -c 'ossec-agentlessd' {{ wazuh_dir }}/bin/.process_list | xargs echo"
   args:
@@ -220,7 +220,7 @@
     - config
 
 - name: Enable ossec-agentlessd
-  command: "{{ wazuh_dir }}/bin/wazuh-control enable agentless"
+  ansible.builtin.command: "{{ wazuh_dir }}/bin/wazuh-control enable agentless"
   notify: restart wazuh-manager
   when:
     - agentlessd_enabled.stdout == '0' or "skipped" in agentlessd_enabled.stdout
@@ -229,7 +229,7 @@
     - config
 
 - name: Checking alert log output settings
-  fail: msg="Please enable json_output or alerts_log options."
+  ansible.builtin.fail: msg="Please enable json_output or alerts_log options."
   when:
     - wazuh_manager_config.json_output == 'no'
     - wazuh_manager_config.alerts_log == 'no'
@@ -238,7 +238,7 @@
     - config
 
 - name: Configure ossec.conf
-  template:
+  ansible.builtin.template:
     src: var-ossec-etc-ossec-server.conf.j2
     dest: "{{ wazuh_dir }}/etc/ossec.conf"
     owner: root
@@ -250,7 +250,7 @@
     - config
 
 - name: Ossec-authd password
-  template:
+  ansible.builtin.template:
     src: authd_pass.j2
     dest: "{{ wazuh_dir }}/etc/authd.pass"
     owner: wazuh
@@ -267,7 +267,7 @@
 - name: Create custom API user
   block:
     - name: Copy create_user script
-      copy:
+      ansible.builtin.copy:
         src: create_user.py
         dest: "{{ wazuh_dir }}/framework/scripts/create_user.py"
         owner: root
@@ -275,7 +275,7 @@
         mode: 0644
 
     - name: Execute create_user script
-      script:
+      ansible.builtin.script:
         chdir: "{{ wazuh_dir }}/framework/scripts/"
         cmd: create_user.py --username "{{ item.username }}" --password "{{ item.password }}"
         executable: "{{ wazuh_dir }}/framework/python/bin/python3"
@@ -289,7 +289,7 @@
     - wazuh_manager_config.cluster.node_type == "master"
 
 - name: Agentless Hosts & Passwd
-  template:
+  ansible.builtin.template:
     src: agentless.j2
     dest: "{{ wazuh_dir }}/agentless/.passlist_tmp"
     owner: root
@@ -301,13 +301,13 @@
     - config
 
 - name: Encode the secret
-  shell: "/usr/bin/base64 {{ wazuh_dir }}/agentless/.passlist_tmp > {{ wazuh_dir }}/agentless/.passlist && rm {{ wazuh_dir }}/agentless/.passlist_tmp"
+  ansible.builtin.shell: "/usr/bin/base64 {{ wazuh_dir }}/agentless/.passlist_tmp > {{ wazuh_dir }}/agentless/.passlist && rm {{ wazuh_dir }}/agentless/.passlist_tmp"
   when: agentless_creds is defined
   tags:
     - config
 
 - name: Ensure Wazuh Manager service is started and enabled.
-  service:
+  ansible.builtin.service:
     name: "wazuh-manager"
     enabled: true
     state: started
@@ -315,7 +315,7 @@
     - config
 
 - name: Create agent groups
-  command: "{{ wazuh_dir }}/bin/agent_groups -a -g {{ item }} -q"
+  ansible.builtin.command: "{{ wazuh_dir }}/bin/agent_groups -a -g {{ item }} -q"
   with_items:
     - "{{ agent_groups }}"
   when:
@@ -323,5 +323,5 @@
   tags: molecule-idempotence-notest
 
 - name: Run uninstall tasks
-  include_tasks: uninstall.yml
+  ansible.builtin.include_tasks: uninstall.yml
   when: not wazuh_manager_sources_installation.enabled

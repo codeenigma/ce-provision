@@ -1,6 +1,6 @@
 ---
 - name: Update cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
   when: (ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "9")
 
@@ -9,12 +9,12 @@
   block:
 
     - name: Add the repository key for Debian's Stretch Backports repository
-      apt_key:
+      ansible.builtin.apt_key:
         keyserver: keyserver.ubuntu.com
         id: 648ACFD622F3D138
 
     - name: Add openjdk repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: "{{ package_repos.apt.openjdk.baseurl }}"
         state: present
         update_cache: true
@@ -23,19 +23,19 @@
 - name: Add Opendistro repository
   block:
     - name: Add apt repository signing key
-      apt_key:
+      ansible.builtin.apt_key:
         url: "{{ package_repos.apt.opendistro.gpg }}"
         state: present
 
     - name: Add Opendistro repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: "{{ package_repos.apt.opendistro.baseurl }}"
         state: present
         filename: 'wazuh-opendistro'
         update_cache: true
 
 - name: Install OpenDistro
-  apt:
+  ansible.builtin.apt:
     name: opendistroforelasticsearch={{ opendistro_version }}-1
     state: present
   register: install

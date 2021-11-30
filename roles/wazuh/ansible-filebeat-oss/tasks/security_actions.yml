@@ -1,7 +1,7 @@
 - block:
 
   - name: Ensure Filebeat SSL key pair directory exists.
-    file:
+    ansible.builtin.file:
       path: "{{ filebeat_ssl_dir }}"
       state: directory
       owner: root
@@ -9,7 +9,7 @@
       mode: 0774
 
   - name: Copy the certificates from local to the Manager instance
-    copy:
+    ansible.builtin.copy:
       src: "{{ local_certs_path }}/certs/{{ item }}"
       dest: "{{ filebeat_ssl_dir }}"
       owner: root

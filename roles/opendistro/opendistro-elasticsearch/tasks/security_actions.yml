@@ -1,6 +1,6 @@
 ---
 - name: Remove demo certs
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   with_items:
@@ -10,20 +10,20 @@
     - "{{ opendistro_conf_path }}/esnode-key.pem"
 
 - name: Configure IP (Private address)
-  set_fact:
+  ansible.builtin.set_fact:
     target_address: "{{ hostvars[inventory_hostname]['private_ip'] if not single_node else elasticsearch_network_host }}"
   when:
     - hostvars[inventory_hostname]['private_ip'] is defined
 
 - name: Configure IP (Public address)
-  set_fact:
+  ansible.builtin.set_fact:
     target_address: "{{ inventory_hostname if not single_node else elasticsearch_network_host }}"
   when:
     - hostvars[inventory_hostname]['private_ip'] is not defined
 
 
 - name: Copy the node & admin certificates to Elasticsearch cluster
-  copy:
+  ansible.builtin.copy:
     src: "{{ local_certs_path }}/certs/{{ item }}"
     dest: /etc/elasticsearch/
     mode: 0644
@@ -39,7 +39,7 @@
     - admin.pem
 
 - name: Copy the OpenDistro security configuration file to cluster
-  blockinfile:
+  ansible.builtin.blockinfile:
     block: "{{ lookup('file', snippet_path ) }}"
     dest: "{{ opendistro_conf_path }}/elasticsearch.yml"
     insertafter: EOF
@@ -48,32 +48,32 @@
     snippet_path: '{{ local_certs_path }}/certs/{{ elasticsearch_node_name }}_elasticsearch_config_snippet.yml'
 
 - name: Prepare the OpenDistro security configuration file
-  replace:
+  ansible.builtin.replace:
     path: "{{ opendistro_conf_path }}/elasticsearch.yml"
     regexp: 'searchguard'
     replace: 'opendistro_security'
   tags: local
 
 - name: Restart elasticsearch with security configuration
-  systemd:
+  ansible.builtin.systemd:
     name: elasticsearch
     state: restarted
 
 - name: Copy the OpenDistro security internal users template
-  template:
+  ansible.builtin.template:
     src: "templates/internal_users.yml.j2"
     dest: "{{ opendistro_sec_plugin_conf_path }}/internal_users.yml"
     mode: 0644
   run_once: true
 
 - name: Hashing the custom admin password
-  command: "{{ opendistro_sec_plugin_tools_path }}/hash.sh -p {{ opendistro_admin_password }}" # noqa 301
+  ansible.builtin.command: "{{ opendistro_sec_plugin_tools_path }}/hash.sh -p {{ opendistro_admin_password }}" # noqa 301
   register: opendistro_admin_password_hashed
   no_log: '{{ opendistro_nolog_sensible | bool }}'
   run_once: true
 
 - name: Set the Admin user password
-  replace:
+  ansible.builtin.replace:
     path: "{{ opendistro_sec_plugin_conf_path }}/internal_users.yml"
     regexp: '(?<=admin:\n  hash: )(.*)(?=)'
     replace: "{{ odfe_password_hash | quote }}"
@@ -83,13 +83,13 @@
 
 # this can also be achieved with password_hash, but it requires dependencies on the controller
 - name: Hash the kibanaserver role/user pasword
-  command: "{{ opendistro_sec_plugin_tools_path }}/hash.sh -p {{ opendistro_kibana_password }}" # noqa 301
+  ansible.builtin.command: "{{ opendistro_sec_plugin_tools_path }}/hash.sh -p {{ opendistro_kibana_password }}" # noqa 301
   register: opendistro_kibanaserver_password_hashed
   no_log: '{{ opendistro_nolog_sensible | bool }}'
   run_once: true
 
 - name: Set the kibanaserver user password
-  replace:
+  ansible.builtin.replace:
     path: "{{ opendistro_sec_plugin_conf_path }}/internal_users.yml"
     regexp: '(?<=kibanaserver:\n  hash: )(.*)(?=)'
     replace: "{{ odfe_password_hash | quote }}"
@@ -98,7 +98,7 @@
   run_once: true
 
 - name: Initialize the OpenDistro security index in elasticsearch
-  command: >
+  ansible.builtin.command: >
     {{ opendistro_sec_plugin_tools_path }}/securityadmin.sh
     -cacert {{ opendistro_conf_path }}/root-ca.pem
     -cert {{ opendistro_conf_path }}/admin.pem
@@ -109,7 +109,7 @@
   run_once: true # noqa 301
 
 - name: Create custom user
-  uri:
+  ansible.builtin.uri:
     url: "https://{{ target_address }}:{{ opendistro_http_port }}/_opendistro/_security/api/internalusers/{{ opendistro_custom_user }}"
     method: PUT
     user: "admin" # Default OpenDistro user is always "admin"
