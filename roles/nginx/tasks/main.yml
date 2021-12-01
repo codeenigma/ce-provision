@@ -81,6 +81,9 @@
   with_items: "{{ nginx.domains }}"
   loop_control:
     loop_var: domain
+  when:
+    - nginx.domains is defined
+    - nginx.domains | length > 0
 
 - name: Trigger overrides
   ansible.builtin.include_role:
