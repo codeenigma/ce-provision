@@ -1,5 +1,5 @@
 - name: Gather security group info.
-  ec2_group_info:
+  amazon.aws.ec2_group_info:
     profile: "{{ aws_rds.aws_profile }}"
     region: "{{ aws_rds.region }}"
     filters:
@@ -8,5 +8,5 @@
   register: _aws_rds_security_group_info
 
 - name: Add security group id.
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_rds_security_group_ids: "{{ _aws_rds_security_group_ids + [ _aws_rds_security_group_info.security_groups[0].group_id ] }}"
