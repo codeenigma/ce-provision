@@ -1,16 +1,16 @@
 ---
 - name: Generate Packer template.
-  template:
+  ansible.builtin.template:
     src: packer.json.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/packer.json"
     mode: "0666"
 
 - name: Inspect Packer configuration.
-  command:
+  ansible.builtin.command:
     cmd: "packer inspect {{ _ce_provision_build_tmp_dir }}/packer.json"
     chdir: "{{ _ce_provision_base_dir }}"
 
 - name: Build AMI.
-  command:
+  ansible.builtin.command:
     cmd: "packer build {{ _ce_provision_build_tmp_dir }}/packer.json"
     chdir: "{{ _ce_provision_base_dir }}"
