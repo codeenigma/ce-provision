@@ -1,0 +1,27 @@
+---
+- name: Check if an AMI image already exists.
+  amazon.aws.ec2_ami_info:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    owners: self
+    filters:
+      name: "{{ aws_ami.ami_name }}"
+  register: ami_base_image
+
+- name: Register latest custom AMI image.
+  ansible.builtin.set_fact:
+    debian_buster_ami_base_image_latest: "{{ ami_base_image.images | sort(attribute='creation_date') | last }}"
+  when:
+    - ami_base_image.images is defined
+    - ami_base_image.images
+
+- name: Delete existing image.
+  ansible.builtin.include_tasks: delete.yml
+  when:
+    #    - aws_ami.operation == 'create' or aws_ami.operation == 'delete'
+    - aws_ami.operation == 'delete'
+
+- name: Create a new image.
+  ansible.builtin.include_tasks: create.yml
+  when:
+    - aws_ami.operation == 'create' or (aws_ami.operation == 'ensure' and not ami_base_image_latest.image_id is defined)

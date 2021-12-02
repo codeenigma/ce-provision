@@ -1,20 +1,13 @@
-# AMI Debian Buster
-Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
-
-## Dependencies
-This requires boto and Packer on the "provisioning" server.
-
-<!--TOC-->
-<!--ENDTOC-->
-<!--ROLEVARS-->
-## Default variables
-```yaml
 ---
-ami_debian_buster:
+aws_ami:
   aws_profile: "{{ _aws_profile }}"
   region: us-east-2
   instance_type: t2.micro
+  virtualization_type: hvm
+  root_device_type: ebs
+  name_filter: "debian-10-amd64-*"
   ami_name: "example"
+  owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   encrypt_boot: false
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
   # Operation can be one of:
@@ -31,7 +24,3 @@ ami_debian_buster:
   # A string of additional arguments to pass as ansible --extra-vars.
   # It must me escaped already, and will be passed as-is.
   extra_vars: ""
-
-```
-
-<!--ENDROLEVARS-->
