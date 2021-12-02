@@ -115,9 +115,9 @@
 # get rid of the lookup below?
 - name: Create new AMI.
   include_role:
-    name: aws/ami_debian_buster
+    name: aws/aws_ami
   vars:
-    ami_debian_buster:
+    aws_ami:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
