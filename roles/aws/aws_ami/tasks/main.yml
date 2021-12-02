@@ -10,7 +10,7 @@
 
 - name: Register latest custom AMI image.
   ansible.builtin.set_fact:
-    debian_buster_ami_base_image_latest: "{{ ami_base_image.images | sort(attribute='creation_date') | last }}"
+    ami_base_image_latest: "{{ ami_base_image.images | sort(attribute='creation_date') | last }}"
   when:
     - ami_base_image.images is defined
     - ami_base_image.images
@@ -18,7 +18,7 @@
 - name: Delete existing image.
   ansible.builtin.include_tasks: delete.yml
   when:
-    #    - aws_ami.operation == 'create' or aws_ami.operation == 'delete'
+    #- aws_ami.operation == 'create' or aws_ami.operation == 'delete'
     - aws_ami.operation == 'delete'
 
 - name: Create a new image.
