@@ -1,5 +1,16 @@
+# AWS AMI
+Creates an image from a selected base with Packer, provisioned with an Ansible Playbook.
+
+## Dependencies
+This requires boto and Packer on the "provisioning" server.
+
+<!--TOC-->
+<!--ENDTOC-->
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
-ami_debian_buster:
+aws_ami:
   aws_profile: "{{ _aws_profile }}"
   region: us-east-2
   instance_type: t2.micro
@@ -20,3 +31,7 @@ ami_debian_buster:
   # A string of additional arguments to pass as ansible --extra-vars.
   # It must me escaped already, and will be passed as-is.
   extra_vars: ""
+
+```
+
+<!--ENDROLEVARS-->

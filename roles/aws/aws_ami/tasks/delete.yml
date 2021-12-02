@@ -1,0 +1,9 @@
+---
+- name: De-register existing image, if any.
+  amazon.aws.ec2_ami:
+    image_id: "{{ ami_base_image_latest.image_id }}"
+    region: "{{ aws_ami.region }}"
+    delete_snapshot: true
+    state: absent
+  when:
+    - ami_base_image_latest.image_id is defined
