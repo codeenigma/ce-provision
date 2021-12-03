@@ -194,7 +194,7 @@
     - aws_ec2_autoscale_cluster.asg_refresh
 
 - name: Gather running instances information.
-  amazon.aws.ec2_instance_info:
+  community.aws.ec2_instance_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:
