@@ -20,7 +20,7 @@
   register: _aws_ec2_with_eip_iam_role_info
 
 - name: Create EC2 instance.
-  community.aws.ec2_instance:
+  amazon.aws.ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     key_name: "{{ aws_ec2_with_eip.key_name }}"
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
