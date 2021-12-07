@@ -74,3 +74,8 @@
     state: restarted
   become: true
   when: gitlab_runner.restart
+
+- name: Run docker_ce role when Fargate driver to be installed.
+  ansible.builtin.include_role:
+    name: docker_ce
+  when: gitlab_runner.install_fargate
