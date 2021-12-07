@@ -79,3 +79,10 @@
   ansible.builtin.include_role:
     name: docker_ce
   when: gitlab_runner.install_fargate
+
+- name: Add the ce-provision user to the docker group.
+  ansible.builtin.user:
+    name: "{{ gitlab_runner.username }}"
+    groups: "{{ gitlab_runner.docker_group }}"
+    append: true
+  when: gitlab_runner.install_fargate
