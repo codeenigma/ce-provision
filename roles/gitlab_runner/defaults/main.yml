@@ -28,6 +28,8 @@ gitlab_runner:
     #  cleanup_args: '["--config", "/etc/gitlab-runner/fargate.toml", "custom", "cleanup"]'
   install_fargate: false
   restart: true # set to false if you're applying settings to a server responsible for its own runners
+  username: "{{ _ce_provision.username }}"
+  docker_group: "docker"
   # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
   fargate:
     cluster: "my-cluster" # ECS cluster name
