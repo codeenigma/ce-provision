@@ -68,6 +68,16 @@
 
 # @TODO inject the executor lines after any Fargate services in config.toml
 
+- name: Place the gitlab-runner service def file.
+  ansible.builtin.template:
+    src: gitlab-runner.service.j2
+    dest: /etc/systemd/system/gitlab-runner.service
+    mode: '0644'
+    owner: root
+    group: root
+    force: true
+  become: true
+
 - name: Restart gitlab-runner service.
   ansible.builtin.service:
     name: gitlab-runner
@@ -86,13 +96,3 @@
     groups: "{{ gitlab_runner.docker_group }}"
     append: true
   when: gitlab_runner.install_fargate
-
-- name: Place the gitlab-runner service def file.
-  ansible.builtin.template:
-    src: gitlab-runner.service.j2
-    dest: /etc/systemd/system/gitlab-runner.service
-    mode: '0644'
-    owner: root
-    group: root
-    force: true
-  become: true
