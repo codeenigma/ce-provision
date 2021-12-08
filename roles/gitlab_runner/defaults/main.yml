@@ -30,7 +30,7 @@ gitlab_runner:
   restart: true # set to false if you're applying settings to a server responsible for its own runners
   username: "{{ _ce_provision.username }}"
   docker_group: "docker"
-  runner_workingdir: "/home/controller/build"
+  runner_workingdir: "/home/{{ _ce_provision.username }}/build"
   runner_config: "/etc/gitlab-runner/config.toml"
   # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
   fargate:
