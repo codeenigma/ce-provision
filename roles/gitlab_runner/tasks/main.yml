@@ -68,6 +68,15 @@
 
 # @TODO inject the executor lines after any Fargate services in config.toml
 
+- name: Ensure the Gitlab runner working directory exists.
+  ansible.builtin.file:
+    path: {{ gitlab_runner.runner_workingdir }}
+    state: directory
+    mode: '0755'
+    owner: {{ gitlab_runner.username }}
+    group: {{ gitlab_runner.username }}
+  become: true
+
 - name: Place the gitlab-runner service def file.
   ansible.builtin.template:
     src: gitlab-runner.service.j2
