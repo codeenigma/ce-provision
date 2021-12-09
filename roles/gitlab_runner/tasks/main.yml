@@ -70,11 +70,11 @@
 
 - name: Ensure the Gitlab runner working directory exists.
   ansible.builtin.file:
-    path: {{ gitlab_runner.runner_workingdir }}
+    path: "{{ gitlab_runner.runner_workingdir }}"
     state: directory
     mode: '0755'
-    owner: {{ gitlab_runner.username }}
-    group: {{ gitlab_runner.username }}
+    owner: "{{ gitlab_runner.username }}"
+    group: "{{ gitlab_runner.username }}"
   become: true
 
 - name: Place the gitlab-runner service def file.
