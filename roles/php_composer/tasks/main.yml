@@ -1,4 +1,9 @@
 ---
+- name: Ensure composer is not installed from repo.
+  ansible.builtin.apt:
+    pkg: ["composer"]
+    state: absent
+
 - name: Install git. # This is a requirement of the Composer role - https://github.com/geerlingguy/ansible-role-composer
   ansible.builtin.apt:
     pkg: git
