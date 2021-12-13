@@ -91,6 +91,7 @@
   ansible.builtin.service:
     name: gitlab-runner
     state: restarted
+    daemon_reload: true
   become: true
   when: gitlab_runner.restart
 
