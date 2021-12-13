@@ -8,3 +8,4 @@ roles:
   - name: cloudalchemy.process_exporter
   - name: geerlingguy.varnish
   - name: geerlingguy.firewall
+  - name: geerlingguy.composer
