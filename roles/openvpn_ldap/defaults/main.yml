@@ -1,5 +1,18 @@
 ---
 openvpn_ldap:
+  # Defaults from https://github.com/robertdebock/ansible-role-openvpn/blob/master/vars/main.yml
+  configuration_directory: /etc/openvpn
+  service: "openvpn@server"
+  # Additional options
+  force_redirect_gateway: true
+  compress: true
+  no_client_cert: true
+  custom_directives: []
+    # - directive 1
+    # - directive 2
+    # - directive N
+
+  # LDAP configuration
   url: ldaps://ldap.example.com,ldaps://ldap2.example.com
   tls: false
   tls_cert: /etc/ldap/ssl/ldap.CA.pem
@@ -9,10 +22,3 @@ openvpn_ldap:
   search_filter: (&(objectClass=posixAccount)(uid=%u))
   group_basedn: ou=Groups,dc=example,dc=com
   group_filter: (|(cn=vpnguests)(cn=sysadmins))
-  force_redirect_gateway: true
-  compress: true
-  no_client_cert: true
-  custom_directives: []
-    # - directive 1
-    # - directive 2
-    # - directive N
