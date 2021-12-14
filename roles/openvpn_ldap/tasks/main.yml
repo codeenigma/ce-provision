@@ -10,7 +10,7 @@
 
 - name: Ensure LDAP config directory exists.
   ansible.builtin.file:
-    path: "{{ openvpn_configuration_directory }}/auth"
+    path: "{{ openvpn_ldap.configuration_directory }}/auth"
     state: directory
     mode: "0755"
 
@@ -26,7 +26,7 @@
 - name: Place auth-ldap.conf file.
   ansible.builtin.template:
     src: auth-ldap.conf.j2
-    dest: "{{ openvpn_configuration_directory }}/auth/auth-ldap.conf"
+    dest: "{{ openvpn_ldap.configuration_directory }}/auth/auth-ldap.conf"
     owner: root
     group: root
     mode: "0644"
@@ -49,46 +49,46 @@
 # Manipulate the server.conf file set by the OpenVPN role in Galaxy
 - name: Prevent pushing DNS servers.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
     search_string: "dhcp-option DNS"
     state: absent
 
 - name: Remove remote-cert-eku assumption.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
     search_string: "remote-cert-eku"
     state: absent
 
 - name: Make forced redirect optional.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
     search_string: "redirect-gateway def1 bypass-dhcp"
     state: absent
   when: not openvpn_ldap.force_redirect_gateway
 
 - name: Enable VPN compression.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
     line: comp-lzo
     create: true
   when: openvpn_ldap.compress
 
 - name: Enable LDAP config.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
-    line: "plugin /usr/lib/openvpn/openvpn-auth-ldap.so {{ openvpn_configuration_directory }}/auth/auth-ldap.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
+    line: "plugin /usr/lib/openvpn/openvpn-auth-ldap.so {{ openvpn_ldap.configuration_directory }}/auth/auth-ldap.conf"
     create: true
 
 - name: Set no client cert required.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
     line: client-cert-not-required
     create: true
   when: openvpn_ldap.no_client_cert
 
 - name: Create custom directives.
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_configuration_directory }}/server.conf"
+    path: "{{ openvpn_ldap.configuration_directory }}/server.conf"
     line: "{{ item }}"
     create: true
   loop: "{{ openvpn_ldap.custom_directives }}"
@@ -96,6 +96,6 @@
 
 - name: Restart OpenVPN.
   ansible.builtin.systemd:
-    name: "{{ openvpn_service }}"
+    name: "{{ openvpn_ldap.service }}"
     state: restarted
     daemon_reload: true
