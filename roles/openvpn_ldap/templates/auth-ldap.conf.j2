@@ -1,0 +1,40 @@
+{{ ansible_managed | comment }}
+
+<LDAP>
+	# LDAP server URL
+	URL             {{ openvpn_ldap.url }}
+
+{% if openvpn_ldap.tls %}
+    # Enable Start TLS
+	TLSEnable       yes
+	# TLS CA Certificate File
+	TLSCACertFile   {{ openvpn_ldap.tls_cert }}
+{% else %}
+	# Enable Start TLS
+	TLSEnable       no
+{% endif %}
+
+	# Network timeout (in seconds)
+	Timeout         {{ openvpn_ldap.timeout }}
+</LDAP>
+
+<Authorization>
+	# Base DN
+	BaseDN          "{{ openvpn_ldap.basedn }}"
+
+
+	# User Search Filter
+	SearchFilter    "{{ openvpn_ldap.search_filter }}"
+
+	# Require Group Membership
+	RequireGroup    true
+
+	<Group>
+		#RFC2307bis	false
+                BaseDN          "{{ openvpn_ldap.group_basedn }}"
+                SearchFilter	"{{ openvpn_ldap.group_filter }}"
+                MemberAttribute memberUid
+                # Add group members to a PF table (disabled)
+                #PFTable        ips_vpn_eng
+	</Group>
+</Authorization>

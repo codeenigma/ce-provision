@@ -1,0 +1,18 @@
+---
+openvpn_ldap:
+  url: ldaps://ldap.example.com,ldaps://ldap2.example.com
+  tls: false
+  tls_cert: /etc/ldap/ssl/ldap.CA.pem
+  tls_cert_local: "" # Set this to the path on the Ansible controller if you want to copy it to the target
+  timeout: '15'
+  basedn: dc=example,dc=com
+  search_filter: (&(objectClass=posixAccount)(uid=%u))
+  group_basedn: ou=Groups,dc=example,dc=com
+  group_filter: (|(cn=vpnguests)(cn=sysadmins))
+  force_redirect_gateway: true
+  compress: true
+  no_client_cert: true
+  custom_directives: []
+    # - directive 1
+    # - directive 2
+    # - directive N
