@@ -16,8 +16,8 @@
 
 - name: Place LDAP CA cert.
   ansible.builtin.copy:
-    src: "{{ open_ldap.tls_cert_local }}"
-    dest: "{{ open_ldap.tls_cert }}"
+    src: "{{ openvpn_ldap.tls_cert_local }}"
+    dest: "{{ openvpn_ldap.tls_cert }}"
     owner: root
     group: root
     mode: "0644"
