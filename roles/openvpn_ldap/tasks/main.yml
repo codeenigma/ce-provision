@@ -21,7 +21,7 @@
     owner: root
     group: root
     mode: "0644"
-  when: open_ldap.tls_cert_local
+  when: openvpn_ldap.tls_cert_local
 
 - name: Place auth-ldap.conf file.
   ansible.builtin.template:
