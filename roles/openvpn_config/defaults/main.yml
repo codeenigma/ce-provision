@@ -1,5 +1,5 @@
 ---
-openvpn_ldap:
+openvpn_config:
   # Defaults from https://github.com/robertdebock/ansible-role-openvpn/blob/master/vars/main.yml
   configuration_directory: /etc/openvpn
   service: "openvpn@server"
@@ -7,7 +7,7 @@ openvpn_ldap:
   force_redirect_gateway: true
   compress: true
   no_client_cert: true
-  custom_directives: []
+  custom_directives: [] # optional list of directives, i.e. push routes
     # - directive 1
     # - directive 2
     # - directive N
