@@ -40,3 +40,6 @@ firewall_config:
     firewall_allowed_udp_ports:
       - "1514"
       - "1515"
+  openvpn:
+    firewall_allowed_udp_ports:
+      - "1194"
