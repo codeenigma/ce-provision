@@ -80,7 +80,7 @@
 - name: Place auth-ldap.conf file.
   ansible.builtin.template:
     src: auth-ldap.conf.j2
-    dest: "{{ openvpn_configuration_directory }}/auth/auth-ldap.conf"
+    dest: "{{ openvpn_config.configuration_directory }}/auth/auth-ldap.conf"
     owner: root
     group: root
     mode: "0644"
