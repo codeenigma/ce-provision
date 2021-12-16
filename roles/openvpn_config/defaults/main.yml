@@ -24,3 +24,7 @@ openvpn_config:
     search_filter: (&(objectClass=posixAccount)(uid=%u))
     group_basedn: ou=Groups,dc=example,dc=com
     group_filter: (|(cn=vpnguests)(cn=sysadmins))
+
+  # PAM configuration
+  pam:
+    install: false
