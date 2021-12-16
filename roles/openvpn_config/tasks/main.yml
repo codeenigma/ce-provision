@@ -60,22 +60,25 @@
     owner: root
     group: root
     mode: "0644"
-  when: openvpn_config.tls_cert_local
+  when:
+    - openvpn_config.ldap.tls_cert_local
+    - openvpn_config.ldap.install
 
-#- name: Ensure LDAP config directory exists.
-#  ansible.builtin.file:
-#    path: "{{ openvpn_ldap.configuration_directory }}/auth"
-#    state: directory
-#    mode: "0755"
+- name: Ensure LDAP config directory exists.
+  ansible.builtin.file:
+    path: "{{ openvpn_ldap.configuration_directory }}/auth"
+    state: directory
+    mode: "0755"
+  when: openvpn_config.ldap.install
 
-# @TODO this config file is obsolete
-#- name: Enable LDAP config.
-#  ansible.builtin.lineinfile:
-#    path: "{{ openvpn_config.configuration_directory }}/server.conf"
-#    line: "plugin /usr/lib/openvpn/openvpn-auth-ldap.so {{ openvpn_config.configuration_directory }}/auth/auth-ldap.conf"
-#    create: true
+- name: Enable LDAP config.
+  ansible.builtin.lineinfile:
+    path: "{{ openvpn_config.configuration_directory }}/server.conf"
+    line: "plugin /usr/lib/openvpn/openvpn-auth-ldap.so {{ openvpn_config.configuration_directory }}/auth/auth-ldap.conf"
+    create: true
+  when: openvpn_config.ldap.install
 
-# Need to support the PAM auth plugin too
+# @TODO Need to support the PAM auth plugin too
 
 # Handle extra directives
 - name: Create custom directives.
