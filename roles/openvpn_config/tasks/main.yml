@@ -55,8 +55,8 @@
 # Handle LDAP configuration
 - name: Place LDAP CA cert.
   ansible.builtin.copy:
-    src: "{{ openvpn_config.tls_cert_local }}"
-    dest: "{{ openvpn_config.tls_cert }}"
+    src: "{{ openvpn_config.ldap.tls_cert_local }}"
+    dest: "{{ openvpn_config.ldap.tls_cert }}"
     owner: root
     group: root
     mode: "0644"
@@ -66,7 +66,7 @@
 
 - name: Ensure LDAP config directory exists.
   ansible.builtin.file:
-    path: "{{ openvpn_ldap.configuration_directory }}/auth"
+    path: "{{ openvpn_config.configuration_directory }}/auth"
     state: directory
     mode: "0755"
   when: openvpn_config.ldap.install
