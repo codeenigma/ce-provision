@@ -64,6 +64,12 @@
     - openvpn_config.ldap.tls_cert_local
     - openvpn_config.ldap.install
 
+- name: Install OpenVPN LDAP auth package.
+  ansible.builtin.package:
+    name: openvpn-auth-ldap
+    state: present
+  when: openvpn_config.ldap.install
+
 - name: Ensure LDAP config directory exists.
   ansible.builtin.file:
     path: "{{ openvpn_config.configuration_directory }}/auth"
