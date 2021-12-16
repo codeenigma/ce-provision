@@ -1,0 +1,4 @@
+---
+- name: Install Prometheus.
+  ansible.builtin.import_role:
+    name: cloudalchemy.prometheus
