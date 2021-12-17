@@ -1,0 +1,3 @@
+---
+alertmanager_config:
+  alertmanager_config_file: "alertmanager.yml.j2"

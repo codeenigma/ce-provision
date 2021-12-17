@@ -1,0 +1,6 @@
+---
+- name: Install Prometheus Alertmanager.
+  ansible.builtin.import_role:
+    name: cloudalchemy.alertmanager
+  vars:
+    alertmanager_config_file: "{{ alertmanager_config.alertmanager_config_file }}"
