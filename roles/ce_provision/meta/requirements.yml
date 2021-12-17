@@ -9,3 +9,4 @@ roles:
   - name: geerlingguy.varnish
   - name: geerlingguy.firewall
   - name: geerlingguy.composer
+  - name: robertdebock.openvpn
