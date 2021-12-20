@@ -3,7 +3,7 @@
   ansible.builtin.import_role:
     name: cloudalchemy.prometheus
   vars:
-    prometheus_config_file: "/home/{{ _ce_provision.username }}/ce-provision/roles/prometheus_config/templates/{{ prometheus_config.prometheus_config_file }}"
+    prometheus_config_file: "{{ prometheus_config.prometheus_config_file }}"
 
 - name: Generates Prometheus default config.
   ansible.builtin.template:

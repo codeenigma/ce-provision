@@ -3,7 +3,7 @@
   ansible.builtin.import_role:
     name: cloudalchemy.alertmanager
   vars:
-    alertmanager_config_file: "/home/{{ _ce_provision.username }}/ce-provision/roles/alertmanager_config/templates/{{ alertmanager_config.alertmanager_config_file }}"
+    alertmanager_config_file: "{{ alertmanager_config.alertmanager_config_file }}"
 
 - name: Generates Alertmanager default config.
   ansible.builtin.template:
