@@ -2,7 +2,7 @@
 
 <LDAP>
     # LDAP server URL
-    URL    {{ openvpn_ldap.url }}
+    URL    {{ openvpn_config.ldap.url }}
 
 {% if openvpn_config.ldap.tls %}
     # Enable Start TLS
