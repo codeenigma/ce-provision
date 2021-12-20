@@ -1,4 +1,4 @@
 ---
 prometheus_config:
-  prometheus_config_file: "prometheus.yml.j2"
+  prometheus_config_file: "/home/{{ _ce_provision.username }}/ce-provision/roles/prometheus_config/templates/prometheus.yml.j2"
   service: "prometheus.service"
