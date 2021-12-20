@@ -1,0 +1,3 @@
+---
+prometheus_config:
+  prometheus_config_file: "prometheus.yml.j2"
