@@ -4,3 +4,14 @@
     name: cloudalchemy.prometheus
   vars:
     prometheus_config_file: "{{ prometheus_config.prometheus_config_file }}"
+
+- name: Generates Prometheus default config.
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+
+- name: Restart Prometheus.
+  ansible.builtin.systemd:
+    name: "{{ prometheus_config.service }}"
+    state: restarted
+    daemon_reload: true
