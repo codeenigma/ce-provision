@@ -1,0 +1,17 @@
+---
+- name: Install Prometheus Alertmanager.
+  ansible.builtin.import_role:
+    name: cloudalchemy.alertmanager
+  vars:
+    alertmanager_config_file: "{{ alertmanager_config.alertmanager_config_file }}"
+
+- name: Generates Alertmanager default config.
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
+    dest: /etc/prometheus/alertmanager.yml
+
+- name: Restart Alertmanager.
+  ansible.builtin.systemd:
+    name: "{{ alertmanager_config.service }}"
+    state: restarted
+    daemon_reload: true
