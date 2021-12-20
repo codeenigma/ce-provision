@@ -1,0 +1,3 @@
+---
+prometheus_config:
+  service: "prometheus.service"
