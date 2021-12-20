@@ -1,10 +1,10 @@
 ---
 - name: Define hosts entries.
-  set_fact:
+  ansible.builtin.set_fact:
     _hosts_entries: "{{ hosts_entries + _default_hosts_entries }}"
 
 - name: Install custom hosts file
-  template:
+  ansible.builtin.template:
     src: etc_hosts.j2
     dest: "{{ hosts_file }}"
     owner: root
@@ -14,12 +14,12 @@
   tags: hosts
 
 - name: Determine if cloud-init file exists.
-  stat:
+  ansible.builtin.stat:
     path: /etc/cloud/cloud.cfg.d/01_debian_cloud.cfg
   register: cloud_init_file
 
 - name: Disable cloud-init manage_etc_hosts.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ cloud_init_file.stat.path }}"
     regexp: "manage_etc_hosts: true"
     line: "manage_etc_hosts: false"

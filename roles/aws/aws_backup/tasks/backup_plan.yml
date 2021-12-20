@@ -1,0 +1,47 @@
+---
+- name: Check if the plan exists.
+  ansible.builtin.command: >
+    aws backup list-backup-plans --region {{ _aws_region }} --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json
+  register: _plan_exists
+
+- name: Gather backup copy facts.
+  ansible.builtin.set_fact:
+    _backup_copy: true
+  when: aws_backup.copy_vault.region | length > 0
+
+- name: Create temp directory.
+  file:
+    path: "/tmp/aws_backup/{{ _infra_name }}"
+    state: directory
+
+- name: Create the 'backup-yaml-input.yml' file for plan creation.
+  ansible.builtin.template:
+    src: backup-yaml-input.yml.j2
+    dest: "/tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml"
+    owner: "{{ ce_provision.username }}"
+    group: "{{ ce_provision.username }}"
+  when: plan.rules | length > 0
+
+- name: Gather info about the newly created yml file.
+  ansible.builtin.stat:
+    path: "/tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml"
+  register: _aws_backup_plan_stat
+
+- name: Create a backup plan.
+  ansible.builtin.command: >
+    aws backup create-backup-plan --cli-input-yaml file:///tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml --region {{ _aws_region }}
+  register: _backup_plan_created
+  when:
+    - _aws_backup_plan_stat.stat.exists
+    - _plan_exists.stdout == "null"
+
+- name: Get info about newly created plan.
+  ansible.builtin.command: >
+    aws backup list-backup-plans --query "BackupPlansList[?BackupPlanName=='{{ plan.name }}'] | [0]" --output json --region {{ _aws_region }}
+  register: _backup_plan_created_info
+  when: _backup_plan_created is defined
+
+- name: Tidy up and remove the yaml input file.
+  file:
+    path: "/tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml"
+    state: absent

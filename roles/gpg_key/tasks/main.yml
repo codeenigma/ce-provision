@@ -1,6 +1,6 @@
 ---
 - name: Generate GPG key.
-  include_tasks: gpg.yml
+  ansible.builtin.include_tasks: gpg.yml
   with_items: "{{ gpg_key }}"
   loop_control:
     loop_var: gpg_user

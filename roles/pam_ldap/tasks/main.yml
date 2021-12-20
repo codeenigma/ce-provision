@@ -1,55 +1,55 @@
 ---
 - name: Ensure libnss-ldapd is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: [libpam-ldapd, libnss-ldapd]
     state: present
 
 - name: Create certificate directory.
-  file:
+  ansible.builtin.file:
     path: /etc/ldap/ssl
     state: directory
   when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
 
 - name: Copy certificate.
-  copy:
+  ansible.builtin.copy:
     src: "{{ pam_ldap.ssl_certificate }}"
     dest: "/etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}"
     mode: "0666"
   when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
 
 - name: Copy nslcd config.
-  template:
+  ansible.builtin.template:
     src: nslcd.conf.j2
     dest: /etc/nslcd.conf
     mode: "0600"
 
 - name: Copy ldap config.
-  template:
+  ansible.builtin.template:
     src: ldap.conf.j2
     dest: /etc/ldap/ldap.conf
     mode: "0666"
 
 - name: Copy nsswitch config.
-  template:
+  ansible.builtin.template:
     src: nsswitch.conf.j2
     dest: /etc/nsswitch.conf
     mode: "0666"
 
 - name: Ensure sudo-ldap is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: sudo-ldap
     state: present
 
 - name: Regenerate configuration from pam_ldap.
-  debconf:
+  ansible.builtin.debconf:
     name: libpam-ldapd
 
 - name: Regenerate configuration from pam_ldap.
-  debconf:
+  ansible.builtin.debconf:
     name: sudo-ldap
 
 - name: Copy PAM configuration.
-  copy:
+  ansible.builtin.copy:
     src: "{{ file }}"
     dest: "/etc/pam.d/{{ file }}"
   with_items:
@@ -62,20 +62,20 @@
     loop_var: file
 
 - name: Ensure sudoers are looked up.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sudo-ldap.conf
     line: "sudoers_base ou=SUDOers,{{ pam_ldap.lookup_base }}"
     state: present
 
 - name: Copy LDAP key script.
-  get_url:
+  ansible.builtin.get_url:
     url: https://raw.githubusercontent.com/codeenigma/ssh-getkey-ldap/master/ssh-getkey-ldap
-    dest: /opt/bin/ssh-getkey-ldap
+    dest: /usr/local/bin/ssh-getkey-ldap
     mode: 0555
     owner: root
 
 - name: Create LDAP key script passwd file.
-  template:
+  ansible.builtin.template:
     src: ldap-bindpw.j2
     dest: /etc/ldap/ldap-bindpw
     mode: "0600"
@@ -85,9 +85,9 @@
     - ldap_client.bindpw is defined and ldap_client.bindpw
 
 - name: Create wrapper script for LDAP key script.
-  template:
+  ansible.builtin.template:
     src: ssh-getkey-ldap-wrapper.sh.j2
-    dest: /opt/bin/ssh-getkey-ldap-wrapper.sh
+    dest: /usr/local/bin/ssh-getkey-ldap-wrapper.sh
     mode: "0555"
     owner: root
   when:
@@ -95,33 +95,38 @@
     - ldap_client.bindpw is defined and ldap_client.bindpw
 
 - name: Configure SSH pub key command if there is a binddn set.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommand "
-    line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap-wrapper.sh
+    line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap-wrapper.sh
   when:
     - ldap_client.binddn is defined and ldap_client.binddn
 
 - name: Configure SSH pub key command if no binddn set.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommand "
-    line: AuthorizedKeysCommand /opt/bin/ssh-getkey-ldap
+    line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap
   when:
     - not ldap_client.binddn
 
 - name: Configure SSH pub key command user.
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "AuthorizedKeysCommandUser "
     line: AuthorizedKeysCommandUser root
 
 - name: Restart nslcd service.
-  service:
+  ansible.builtin.service:
     name: nslcd
     state: restarted
 
+- name: Restart nscd service.
+  ansible.builtin.service:
+    name: nscd
+    state: restarted
+
 - name: Restart SSH service.
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted

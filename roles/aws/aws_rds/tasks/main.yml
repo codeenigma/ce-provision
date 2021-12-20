@@ -1,5 +1,5 @@
 - name: Create DB subnet
-  rds_subnet_group:
+  community.aws.rds_subnet_group:
     name: "{{ aws_rds.name }}"
     state: "{{ aws_rds.state }}"
     subnets: "{{ aws_rds.subnets }}"
@@ -9,17 +9,27 @@
   register: _aws_rds_rds_subnet_group
 
 - name: Reset security groups info
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_rds_security_group_ids: []
 
 - name: Gather security groups info.
-  include_tasks: security_group.yml
+  ansible.builtin.include_tasks: security_group.yml
   with_items: "{{ aws_rds.security_groups }}"
   loop_control:
     loop_var: security_group
 
+- name: Create RDS parameter group
+  community.aws.rds_param_group:
+    state: present
+    name: "{{ aws_rds.db_parameter_group_name }}"
+    description: "{{ aws_rds.db_parameter_group_description }}"
+    engine: "{{ aws_rds.db_parameter_group_engine }}"
+    params: "{{ aws_rds.db_parameters }}"
+    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+  when: aws_rds.db_parameters is defined
+
 - name: Create RDS instance
-  rds_instance:
+  community.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
@@ -28,7 +38,7 @@
     state: "{{ aws_rds.state }}"
     #preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
     engine: "{{ aws_rds.engine }}"
-    #db_parameter_group_name: undefined # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
+    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
     copy_tags_to_snapshot: true
     #character_set_name: undefined # not required. The character set to associate with the DB cluster.
     multi_az: "{{ aws_rds.multi_az }}"
@@ -51,10 +61,80 @@
     #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
   register: _rds_instance_info
 
+- name: Create SNS topic.
+  ansible.builtin.include_role:
+    name: aws/aws_sns
+  vars:
+    aws_sns:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ aws_rds.sns.name }}"
+      display_name: "{{ aws_rds.sns.display_name }}"
+      delivery_policy_default_healthy_retry_policy_min_delay_target: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_min_delay_target }}"
+      delivery_policy_default_healthy_retry_policy_max_delay_target: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_max_delay_target }}"
+      delivery_policy_default_healthy_retry_policy_num_retries: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_num_retries }}"
+      delivery_policy_default_healthy_retry_policy_num_max_delay_retries: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_num_max_delay_retries }}"
+      delivery_policy_default_healthy_retry_policy_num_no_delay_retries: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_num_no_delay_retries }}"
+      delivery_policy_default_healthy_retry_policy_num_min_delay_retries: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_num_min_delay_retries }}"
+      delivery_policy_default_healthy_retry_policy_backoff_function: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_backoff_function }}"
+      delivery_policy_disable_subscription_overrides: "{{ aws_rds.sns.delivery_policy_disable_subscription_overrides }}"
+      subscriptions:
+        "{{ aws_rds.sns.subscriptions }}"
+  when:
+    - aws_rds.sns.sns is defined
+    - aws_rds.sns.sns
+
+- name: Set alarm/ok action info.
+  ansible.builtin.set_fact:
+    _alarm_actions:
+      - "{{ _aws_sns_topic_info.sns_arn }}"
+  when:
+    - _aws_sns_topic_info is defined
+    - _aws_sns_topic_info.sns_arn
+
+- name: Create RDS CloudWatch alarms.
+  ansible.builtin.include_role:
+    name: aws/aws_ec2_metric_alarm
+  vars:
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ _rds_instance_info.db_instance_identifier }}_{{ item.name }}"
+      description: "{{ item.description }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions: "{{ _alarm_actions | default([]) }}"
+      ok_actions: "{{ _alarm_actions | default([]) }}"
+      dimensions:
+        "DBInstanceIdentifier": "{{ _rds_instance_info.db_instance_identifier }}"
+  with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
+  when:
+    - aws_rds.rds_cloudwatch_alarms
+
 - name: (Re) set facts for instance.
-  set_fact:
+  ansible.builtin.set_fact:
     aws_rds_facts: "{{ aws_rds_facts | default({}) }}"
 
 - name: Add instance info.
-  set_fact:
+  ansible.builtin.set_fact:
     aws_rds_facts: "{{ aws_rds_facts | combine( {aws_rds.name: _rds_instance_info} ) }}"
+
+- name: Assign resource to backup plan.
+  ansible.builtin.include_role:
+    name: aws/aws_backup
+    tasks_from: resource
+  vars:
+    backup:
+      backup_plan_name: "{{ aws_rds.backup }}"
+      selection_name: "RDS-{{ aws_rds.name }}-{{ _env_type }}"
+      resource_id: "{{ aws_rds.name }}"
+      resource_type: "db"
+  when:
+    - aws_rds.backup is defined
+    - aws_rds.backup | length > 0

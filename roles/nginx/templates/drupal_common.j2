@@ -90,7 +90,7 @@ location ~ ^/sites/.*/files/.* {
 }
 
 # Core and contrib assets can be pretty much anywhere.
-location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf)$ {
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
     try_files $uri @rewrite =404;
 }
 

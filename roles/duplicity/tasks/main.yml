@@ -1,25 +1,25 @@
 - name: Ensure duplicity is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: duplicity
     state: present
 
 - name: Create install dir.
-  file:
+  ansible.builtin.file:
     path: "{{ duplicity.install_dir }}"
     state: directory
 
 - name: Create binary dir.
-  file:
+  ansible.builtin.file:
     path: "{{ duplicity.install_dir }}/bin"
     state: directory
 
 - name: Create config dir.
-  file:
+  ansible.builtin.file:
     path: "{{ duplicity.install_dir }}/etc"
     state: directory
 
 - name: Copy backup script in place.
-  template:
+  ansible.builtin.template:
     src: duplicity_backup.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_backup"
     owner: root
@@ -27,7 +27,7 @@
     mode: 0700
 
 - name: Copy restore script in place.
-  template:
+  ansible.builtin.template:
     src: duplicity_restore.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_restore"
     owner: root
@@ -35,7 +35,7 @@
     mode: 0700
 
 - name: Copy clean-up script in place.
-  template:
+  ansible.builtin.template:
     src: duplicity_clean.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_clean"
     owner: root
@@ -43,7 +43,7 @@
     mode: 0700
 
 - name: Copy include-exclude filelist.
-  template:
+  ansible.builtin.template:
     src: include-exclude-filelist.j2
     dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-filelist"
     owner: root
@@ -55,7 +55,7 @@
     loop_var: dir
 
 - name: Copy Duplicity cron config.
-  template:
+  ansible.builtin.template:
     src: "duplicity-cron.j2"
     dest: "/etc/cron.d/duplicity_cron"
     owner: root
@@ -63,7 +63,7 @@
     mode: 0644
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ duplicity.overrides }}"

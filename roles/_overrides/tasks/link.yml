@@ -1,6 +1,6 @@
 ---
 - name: Create needed directory.
-  file:
+  ansible.builtin.file:
     path: "{{ override_link.dest | dirname }}"
     state: directory
     mode: "{{ override_link.mode | default('0755') }}"
@@ -8,7 +8,7 @@
     group: "{{ override_link.group | default(omit) }}"
 
 - name: Install links overrides.
-  file:
+  ansible.builtin.file:
     src: "{{ override_link.src }}"
     dest: "{{ override_link.dest }}"
     mode: "{{ override_link.mode | default('0666') }}"

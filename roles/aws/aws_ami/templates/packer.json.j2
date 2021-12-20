@@ -1,41 +1,41 @@
 {
   "variables": 
   {
-    "aws_profile": "{{ ami_debian_buster.aws_profile }}"
+    "aws_profile": "{{ aws_ami.aws_profile }}"
   },
   "builders": 
   [
     {
       "type": "amazon-ebs",
-      "profile": "{{ ami_debian_buster.aws_profile }}",
-      "region": "{{ ami_debian_buster.region }}",
-      "instance_type": "{{ ami_debian_buster.instance_type }}",
+      "profile": "{{ aws_ami.aws_profile }}",
+      "region": "{{ aws_ami.region }}",
+      "instance_type": "{{ aws_ami.instance_type }}",
       "ssh_username": "admin",
-      "ami_name": "{{ ami_debian_buster.ami_name }}",
+      "ami_name": "{{ aws_ami.ami_name }}",
       "associate_public_ip_address": true,
-      "encrypt_boot": "{{ ami_debian_buster.encrypt_boot }}",
+      "encrypt_boot": "{{ aws_ami.encrypt_boot }}",
       "source_ami_filter": {
       "filters": {
-        "virtualization-type": "hvm",
-        "name": "debian-10-amd64-*",
-        "root-device-type": "ebs"
+        "virtualization-type": "{{ aws_ami.virtualization_type }}",
+        "name": "{{ aws_ami.name_filter }}",
+        "root-device-type": "{{ aws_ami.root_device_type }}"
       },
-      "owners": ["136693071363"],
+      "owners": ["{{ aws_ami.owner }}"],
       "most_recent": true
     },
     "tags": 
       {
-      "Name": "{{ ami_debian_buster.ami_name }}"
+      "Name": "{{ aws_ami.ami_name }}"
       }
     }
   ],
   "provisioners": [{
       "type": "ansible",
-      "playbook_file": "{{ ami_debian_buster.playbook_file }}",
+      "playbook_file": "{{ aws_ami.playbook_file }}",
       "inventory_directory": "{{ _ce_provision_base_dir }}/hosts",
       "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/id_rsa.pub",
-      {% if ami_debian_buster.groups is defined and ami_debian_buster.groups | length %}
-      "groups": {{ ami_debian_buster.groups | to_json }},
+      {% if aws_ami.groups is defined and aws_ami.groups | length %}
+      "groups": {{ aws_ami.groups | to_json }},
       {% endif %}
       "ansible_env_vars": 
       [ 
@@ -48,9 +48,9 @@
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}
-        {% if ami_debian_buster.extra_vars is defined and ami_debian_buster.extra_vars | length %}
+        {% if aws_ami.extra_vars is defined and aws_ami.extra_vars | length %}
         "--extra-vars", 
-        "{{ ami_debian_buster.extra_vars }}",
+        "{{ aws_ami.extra_vars }}",
         {% endif %}        
 				"--extra-vars", 
 				"{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true}"        

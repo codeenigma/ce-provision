@@ -1,11 +1,11 @@
 ---
 - name: Ensure memcached is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: memcached
     state: present
 
 - name: Copy memcached configuration in place.
-  template:
+  ansible.builtin.template:
     src: memcached.conf.j2
     dest: "/etc/memcached.conf"
     owner: root
@@ -13,7 +13,7 @@
     mode: 0644
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ memcached.overrides }}"
@@ -22,7 +22,7 @@
     - memcached.overrides | length > 0
 
 - name: Ensure memcached is restarted
-  service:
+  ansible.builtin.service:
     name: memcached
     state: restarted
     enabled: true

@@ -1,6 +1,6 @@
 ---
 - name: Copy rsyslog configuration in place.
-  template:
+  ansible.builtin.template:
     src: "rsyslog.{{ rsyslog.role }}.conf.j2"
     dest: "/etc/rsyslog.conf"
     owner: root
@@ -9,6 +9,6 @@
     force: true
 
 - name: restart service.
-  service:
+  ansible.builtin.service:
     name: rsyslog
     state: restarted

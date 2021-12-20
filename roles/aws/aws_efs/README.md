@@ -23,6 +23,7 @@ aws_efs:
   security_groups: []
   # Whether to encrypt the volume or not.
   encrypt: false
+  backup: "{{ _infra_name }}-{{ _env_type }}" # Name of the AWS Backup plan to use to backup the instance.
 
 ```
 

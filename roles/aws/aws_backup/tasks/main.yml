@@ -1,0 +1,62 @@
+---
+- name: Check if the backup vault already exists.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --region {{ _aws_region }} --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'] | [0]" --output json
+  register: _vault_exists
+
+- name: Check if the off-site backup vault already exists.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --region {{ aws_backup.copy_vault.region }} --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'] | [0]" --output json
+  register: _copy_vault_exists
+  when:
+    - aws_backup.copy_vault.region is defined
+    - aws_backup.copy_vault.region | length > 0
+
+- name: Create backup vault without user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --region {{ _aws_region }}
+  register: _vault_created
+  when:
+    - aws_backup.vault.encryption_key == "Default"
+    - _vault_exists.stdout == "null"
+
+- name: Create backup vault with user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.vault.name }} --encryption-key {{ aws_backup.vault.encryption_key }} --region {{ _aws_region }}
+  register: _vault_created
+  when:
+    - aws_backup.vault.encryption_key != "Default"
+    - _vault_exists.stdout == "null"
+
+- name: Create off-site backup vault without user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.copy_vault.name }} --region {{ aws_backup.copy_vault.region }}
+  register: _copy_vault_created
+  when:
+    - aws_backup.copy_vault.region is defined
+    - aws_backup.copy_vault.region | length > 0
+    - aws_backup.copy_vault.encryption_key == "Default"
+    - _copy_vault_exists.stdout == "null"
+
+- name: Create off-site backup vault with user-provided KMS key.
+  ansible.builtin.command: >
+    aws backup create-backup-vault --backup-vault-name {{ aws_backup.copy_vault.name }} --encryption-key {{ aws_backup.copy_vault.encryption_key }} --region {{ aws_backup.copy_vault.region }}
+  register: _copy_vault_created
+  when:
+    - aws_backup.copy_vault.region is defined
+    - aws_backup.copy_vault.region | length > 0
+    - aws_backup.copy_vault.encryption_key != "Default"
+    - _copy_vault_exists.stdout == "null"
+
+- name: Gather off-site backup vault info.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --region {{ aws_backup.copy_vault.region }} --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.copy_vault.name }}'] | [0]" --output json
+  register: _copy_vault_info
+  when: _copy_vault_created is defined
+
+- name: Create backup plans.
+  include_tasks: backup_plan.yml
+  with_items: "{{ aws_backup.plans }}"
+  loop_control:
+    loop_var: plan
+  when: aws_backup.plans | length

@@ -137,8 +137,6 @@
     name: slapd
     state: started
     enabled: true
-  when:
-    - _ldap_server_slapd_config.changed or ldap_server.config.import
 
 - name: Set up replication.
   ansible.builtin.include_tasks: replication.yml

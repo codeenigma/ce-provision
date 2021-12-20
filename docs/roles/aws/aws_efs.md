@@ -14,7 +14,7 @@ aws_efs:
   name: example
   # If false, we omit tags enterly and leave them as is.
   purge_tags: false
-  tags: []
+  tags: {}
   state: present
   wait: true
   # Subnets names.
@@ -23,6 +23,7 @@ aws_efs:
   security_groups: []
   # Whether to encrypt the volume or not.
   encrypt: false
+  backup: "{{ _infra_name }}-{{ _env_type }}" # Name of the AWS Backup plan to use to backup the instance.
 
 ```
 

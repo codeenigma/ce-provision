@@ -31,6 +31,8 @@ aws_ec2_autoscale_cluster:
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
+  asg_cloudwatch_policy_scale_up_name: "{{ _env_type }}-scale-up-policy"
+  asg_cloudwatch_policy_scale_down_name: "{{ _env_type }}-scale-down-policy"
   asg_scaling_policies: # List of AutoScale policies. See ec2_scaling_policy module docs for options and details.
     - name: "{{ _env_type }}-scale-up-policy"
       policy_type: "SimpleScaling"
@@ -106,6 +108,73 @@ aws_ec2_autoscale_cluster:
     master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
     master_user_password: hellothere
     multi_az: true
+    rds_cloudwatch_alarms:
+      - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
+        description: "Average database free storage space over the last 10 minutes too low."
+        metric: "FreeStorageSpace"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 20000000000
+        unit: "Bytes"
+        comparison: "LessThanOrEqualToThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_cpu_utilization_too_high_{{ _env_type }}_asg"
+        description: "Average database CPU utilization over last 10 minutes too high."
+        metric: "CPUUtilization"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 65
+        unit: "Percent"
+        comparison: "GreaterThanOrEqualToThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_freeable_memory_too_low_{{ _env_type }}_asg"
+        description: "Average database freeable memory over last 10 minutes too low, performance may suffer."
+        metric: "FreeableMemory"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 100000000
+        unit: "Bytes"
+        comparison: "LessThanThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_disk_queue_depth_too_high_{{ _env_type }}_asg"
+        description: "Average database disk queue depth over last 10 minutes too high, performance may suffer."
+        metric: "DiskQueueDepth"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 64
+        unit: "Count"
+        comparison: "GreaterThanThreshold"
+        period: 600
+        evaluation_periods: 1
+      - name: "example_swap_usage_too_high_{{ _env_type }}_asg"
+        description: "Average database swap usage over last 10 minutes too high, performance may suffer."
+        metric: "SwapUsage"
+        namespace: "AWS/RDS"
+        statistic: "Average"
+        threshold: 256000000
+        unit: "Bytes"
+        comparison: "GreaterThanThreshold"
+        period: 600
+        evaluation_periods: 1
+    sns:
+      sns: true
+      name: "Notify-Email"
+      display_name: "" # Display name for the topic, for when the topic is owned by this AWS account.
+      delivery_policy_default_healthy_retry_policy_min_delay_target: 20
+      delivery_policy_default_healthy_retry_policy_max_delay_target: 20
+      delivery_policy_default_healthy_retry_policy_num_retries: 3
+      delivery_policy_default_healthy_retry_policy_num_max_delay_retries: 0
+      delivery_policy_default_healthy_retry_policy_num_no_delay_retries: 0
+      delivery_policy_default_healthy_retry_policy_num_min_delay_retries: 0
+      delivery_policy_default_healthy_retry_policy_backoff_function: "linear"
+      delivery_policy_disable_subscription_overrides: false
+      subscriptions:
+        - endpoint: "admin@example.com"
+          protocol: "email"
+    backup: "{{ _infra_name }}-{{ _env_type }}" # Whether to back up the RDS instance. Set to the plan you want to use, or an empty string if you don't want to back up.
   # Add an CNAM record tied to the ALB.
   # Set the zone to empty to skip.
   route_53:
@@ -117,8 +186,10 @@ aws_ec2_autoscale_cluster:
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
+  alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
   efs: true # Whether to create an EFS volume.
   efs_encrypt: false # Whether to encrypt the EFS volume
+  efs_backup: "{{ _infra_name }}-{{ _env_type }}" # Whether to back up the EFS volume. Set to the plan you want to use, or an empty string if you don't want to back up.
 
 ```
 

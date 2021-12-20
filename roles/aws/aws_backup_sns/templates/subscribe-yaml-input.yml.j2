@@ -1,0 +1,13 @@
+TopicArn: "{{ _aws_sns_topic_info_custom.sns_arn }}" # [REQUIRED] The ARN of the topic you want to subscribe to.
+Protocol: "{{ sub_var.protocol }}" # [REQUIRED] The protocol that you want to use.
+Endpoint: "{{ sub_var.endpoint }}" # The endpoint that you want to receive notifications.
+Attributes: # A map of attributes with their corresponding values.
+  FilterPolicy: |
+    {
+      "State": [
+        {
+          "anything-but": "COMPLETED"
+        }
+      ]
+    }
+ReturnSubscriptionArn: true # Sets whether the response from the Subscribe request includes the subscription ARN, even if the subscription is not yet confirmed.

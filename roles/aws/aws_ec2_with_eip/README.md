@@ -1,6 +1,6 @@
-# AMI Debian Buster
+# EC2 instance with EIP
 
-Creates an image from Debian Buster base with Packer, provisioned with an Ansible Playbook.
+Creates a new EC2 instance at AWS with a static IP address.
 
 <!--TOC-->
 <!--ENDTOC-->
@@ -33,6 +33,8 @@ aws_ec2_with_eip:
     record: "{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
     wildcard: true # Creates a matching wildcard CNAME
+  autorecover: true # Creates an EC2 autorecovery alarm to recover the machine if a system failure occurs.
+  backup: "{{ _infra_name }}-{{ _env_type }}" # Name of the AWS Backup plan to use to backup the instance.
 
 ```
 

@@ -20,7 +20,7 @@
   register: _aws_ec2_with_eip_iam_role_info
 
 - name: Create EC2 instance.
-  community.aws.ec2_instance:
+  community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     key_name: "{{ aws_ec2_with_eip.key_name }}"
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
@@ -89,7 +89,7 @@
 
 - name: Add a DNS record in route 53
   community.aws.route53:
-    state: "{{ aws_ec2_with_eip.state }}"
+    state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
     record: "{{ aws_ec2_with_eip.route_53.record }}"
@@ -102,7 +102,7 @@
 
 - name: Add a matching wildcard DNS record
   community.aws.route53:
-    state: "{{ aws_ec2_with_eip.state }}"
+    state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
     record: "*.{{ aws_ec2_with_eip.route_53.record }}"
@@ -114,3 +114,38 @@
     - aws_ec2_with_eip.route_53.zone | length > 0
     - aws_ec2_with_eip.route_53.wildcard is defined
     - aws_ec2_with_eip.route_53.wildcard
+
+- name: Create EC2 autorecovery alarm.
+  include_role:
+    name: aws/aws_ec2_metric_alarm
+  vars:
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_with_eip.aws_profile }}"
+      region: "{{ aws_ec2_with_eip.region }}"
+      name: "{{ aws_ec2_with_eip.instance_name }}_auto_recovery"
+      description: "This metric auto recovers EC2 instances"
+      metric: "StatusCheckFailed_System"
+      namespace: "AWS/EC2"
+      statistic: "Maximum"
+      comparison: "GreaterThanOrEqualToThreshold"
+      threshold: 1
+      unit: "Count"
+      period: 60
+      evaluation_periods: 2
+      alarm_actions: ["arn:aws:automate:{{ aws_ec2_with_eip.region }}:ec2:recover"]
+      dimensions: { "InstanceId": "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}" }
+  when: aws_ec2_with_eip.autorecover
+
+- name: Assign resource to backup plan.
+  include_role:
+    name: aws/aws_backup
+    tasks_from: resource
+  vars:
+    backup:
+      backup_plan_name: "{{ aws_ec2_with_eip.backup }}"
+      selection_name: "EC2-{{ aws_ec2_with_eip.instance_name }}-{{ _env_type }}"
+      resource_id: "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}"
+      resource_type: "instance"
+  when:
+    - aws_ec2_with_eip.backup is defined
+    - aws_ec2_with_eip.backup | length > 0

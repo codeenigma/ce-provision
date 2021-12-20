@@ -73,30 +73,24 @@ ossec:
       - /var/ossec/etc/shared/cis_rhel5_linux_rcl.txt
 
   command:
-    - {
-        name: "firewall-drop",
-        executable: "firewall-drop.sh",
-        expect: "srcip",
-        timeout_allowed: "yes",
-      }
+    - name: "firewall-drop"
+      executable: "firewall-drop.sh"
+      expect: "srcip"
+      timeout_allowed: "yes"
 
   activeresponse:
-    - {
-        disabled: "no",
-        command: "firewall-drop",
-        location: "all",
-        rules_id: "31151,5712,104130,101071,101132,101238,101251,103011",
-        repeated_offenders: "30,60,120",
-        timeout: "600",
-      }
-    - {
-        disabled: "no",
-        command: "firewall-drop",
-        location: "all",
-        rules_id: "100205",
-        repeated_offenders: "30,60,120",
-        timeout: "3600",
-      }
+    - disabled: "no"
+      command: "firewall-drop"
+      location: "all"
+      rules_id: "31151,5712,104130,101071,101132,101238,101251,103011"
+      repeated_offenders: "30,60,120"
+      timeout: "600"
+    - disabled: "no"
+      command: "firewall-drop"
+      location: "all"
+      rules_id: "100205"
+      repeated_offenders: "30,60,120"
+      timeout: "3600"
 
   remote:
     connection:

@@ -1,5 +1,21 @@
 ---
-- name: Install composer.
-  apt:
-    pkg: composer
+- name: Ensure composer is not installed from repo.
+  ansible.builtin.apt:
+    pkg: ["composer"]
+    state: absent
+
+- name: Install git. # This is a requirement of the Composer role - https://github.com/geerlingguy/ansible-role-composer
+  ansible.builtin.apt:
+    pkg: git
     state: present
+
+- name: Shift general composer settings to expected variables.
+  ansible.builtin.set_fact:
+    composer_keep_updated: "{{ php_composer.keep_updated }}"
+    composer_version: "{{ php_composer.version }}"
+    composer_version_branch: "{{ php_composer.version_branch }}"
+    composer_github_oauth_token: "{{ php_composer.github_oauth_token }}"
+
+- name: Install composer.
+  ansible.builtin.include_role:
+    name: geerlingguy.composer
