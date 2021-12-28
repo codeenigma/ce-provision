@@ -10,8 +10,6 @@
         - "{{ playbook_dir }}/vars/_common"
         - "{{ playbook_dir }}/vars/{{ project_name }}"
   tasks:
-    - debug:
-        msg: "{{ playbook_dir }}"
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
