@@ -1,0 +1,15 @@
+# Common vars for local development.
+ce_provision:
+  username: "ce-dev"
+  own_repository: "https://github.com/codeenigma/ce-provision.git"
+  own_repository_branch: "1.x"
+  own_repository_skip_checkout: true
+  config_repository: "https://github.com/codeenigma/ce-dev-ce-provision-config.git"
+  config_repository_branch: "1.x"
+  config_repository_skip_checkout: true
+  local_dir: "/home/ce-dev/ce-provision"
+  galaxy_custom_requirements_file: ""
+_ce_provision_build_tmp_dir: /tmp
+_ce_provision_data_dir: /tmp
+_ce_provision_build_id: ce-dev
+_ce_provision_force_play: true
