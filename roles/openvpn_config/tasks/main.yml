@@ -93,6 +93,8 @@
     create: true
   when: openvpn_config.ldap.install
 
+# @TODO Optionally replace generated certificates with specific ones
+
 # @TODO Need to support the PAM auth plugin too
 
 # Handle extra directives
@@ -104,6 +106,7 @@
   loop: "{{ openvpn_config.custom_directives }}"
   when: openvpn_config.custom_directives
 
+# @TODO this should be a handler if we change the LDAP config rather than a task
 - name: Restart OpenVPN.
   ansible.builtin.systemd:
     name: "{{ openvpn_config.service }}"
