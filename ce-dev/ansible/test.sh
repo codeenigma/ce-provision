@@ -50,9 +50,11 @@ CE_DEV_BIN="/usr/local/bin/ce-dev"
 
 # Init/reset environment.
 init_ce_dev(){
+  echo "# Configuring ce-dev"
   $CE_DEV_BIN init
   $CE_DEV_BIN destroy
   $CE_DEV_BIN start
+  echo "# Configuring container with ce-provision"
   $CE_DEV_BIN provision
 }
 
@@ -64,23 +66,31 @@ init_ce_dev(){
 # @param $3
 # ce-provision config repo branch to check out.
 build_example(){
+  echo "# Switching to config directory"
   cd config
+  echo "# Fetching git origin for config"
   git fetch origin
+  echo "# Switching to root directory"
   cd ..
+  echo "# Fetching git origin for ce-provision"
   git fetch origin
+  echo "# Adding local hosts entries to container"
   cat <<EOT >> config/hosts/hosts
 provision-controller
 provision-target
 provision-privileged
 EOT
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
-  PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook examples/$1/$1.yml --own-branch $2 --config-branch $3"
+  echo "# Executing $1 project"
+  PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/$1/$1.yml --own-branch $2 --config-branch $3"
   # shellcheck disable=SC2086
   sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_CMD
+  echo "### $1 project completed ###"
 }
 
 init_ce_dev
 
+echo "# Building example projects"
 for EXAMPLE in $EXAMPLES; do
   build_example "$EXAMPLE" "$OWN_BRANCH" "$CONFIG_BRANCH"
 done
