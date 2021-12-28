@@ -1,0 +1,7 @@
+haproxy:
+  template: "haproxy-ssl-passthru"
+  backends:
+    - name: gitlab
+      ip: 127.0.0.1
+      port: 8881
+      domain: "provision-privileged.local"
