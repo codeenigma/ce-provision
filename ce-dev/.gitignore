@@ -2,3 +2,5 @@
 docker-compose.yml
 ansible/local/*
 !ansible/local/.gitkeep
+ansible/vars/provision-target
+ansible/plays/provision-target/*.yml

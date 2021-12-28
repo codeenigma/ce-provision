@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    project_name: "blank"
+    project_name: blank
     _ce_provision_base_dir: /home/ce-dev/ce-provision
     _init:
       vars_dirs:
