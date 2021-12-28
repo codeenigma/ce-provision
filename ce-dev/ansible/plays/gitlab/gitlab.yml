@@ -1,0 +1,22 @@
+---
+- hosts: provision-privileged
+  become: true
+
+  vars:
+    project_name: "gitlab"
+    _ce_provision_base_dir: /home/ce-dev/ce-provision
+    _ce_provision_build_dir: /home/ce-dev/ce-provision/ce-dev/ansible/local
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/ce-dev/ansible/vars/_common"
+        - "{{ _ce_provision_build_dir }}/ce-dev/ansible/vars/{{ project_name }}"
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: gitlab
+    - ansible.builtin.import_role:
+        name: haproxy
+    - ansible.builtin.import_role:
+        name: _exit
