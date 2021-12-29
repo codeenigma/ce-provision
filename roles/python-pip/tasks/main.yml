@@ -10,15 +10,28 @@
     state: present
     update_cache: true
 
+- name: Check to see if pip3 is already there.
+  ansible.builtin.command:
+    cmd: which pip3
+  register: pip3_package
+  ignore_errors: true
+
+- debug:
+    msg: "{{ pip3_package }}"
+
 - name: Fetch Pip installer.
   ansible.builtin.get_url:
     url: https://bootstrap.pypa.io/get-pip.py
     dest: /tmp/get-pip.py
+  when:
+    - pip3_package.rc != 0
 
 - name: Ensure pip3 is installed.
   ansible.builtin.command:
     cmd: python3 /tmp/get-pip.py
   become: true
+  when:
+    - pip3_package.rc != 0
 
 - name: Ensure python3 is the default binary.
   ansible.builtin.command:
