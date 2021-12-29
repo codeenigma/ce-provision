@@ -3,7 +3,7 @@
   become: true
 
   vars:
-    project_name: "gitlab"
+    project_name: gitlab
     _ce_provision_base_dir: /home/ce-dev/ce-provision
     _init:
       vars_dirs:
