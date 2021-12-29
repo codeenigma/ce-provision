@@ -35,10 +35,6 @@
     pkg: ["libsasl2-dev", "libssl-dev"] # python-ldap needs some dev packages
     state: present
 
-- name: Install distutils with pip.
-  ansible.builtin.pip:
-    name: distutils
-
 - name: Install python-ldap with pip.
   ansible.builtin.pip:
     name: python-ldap
