@@ -16,9 +16,6 @@
   register: pip3_package
   ignore_errors: true
 
-- debug:
-    msg: "{{ pip3_package }}"
-
 - name: Fetch Pip installer.
   ansible.builtin.get_url:
     url: https://bootstrap.pypa.io/get-pip.py
