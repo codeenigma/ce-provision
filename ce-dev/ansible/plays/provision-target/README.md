@@ -12,6 +12,7 @@ YAML files in this directory are deliberately ignored because your `provision-ta
   vars:
     project_name: provision-target
     _ce_provision_base_dir: /home/ce-dev/ce-provision
+    _ce_provision_force_play: true
     _init:
       vars_dirs:
         - "{{ _ce_provision_base_dir }}/ce-dev/ansible/vars/_common"
