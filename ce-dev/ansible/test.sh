@@ -10,12 +10,16 @@ usage(){
   echo '--examples: Space separated string of templates to test - defaults to "blank gitlab".'
   echo '--own-branch: Branch to use for the main stack repository'
   echo '--config-branch: Branch to use for the main stack config repository'
+  echo '--no-rebuild: Do not tear down an existing ce-dev stack'
+  echo '--no-provision: Do not run ce-provision against the ce-dev stack'
 }
 
 # Set defaults
 EXAMPLES="blank gitlab"
 OWN_BRANCH="1.x"
 CONFIG_BRANCH="1.x"
+NO_REBUILD=false
+NO_PROVISION=false
 
 # Parse options arguments.
 parse_options(){
@@ -32,6 +36,12 @@ parse_options(){
       "--config-branch")
           shift
           CONFIG_BRANCH="$1"
+        ;;
+      "--no-rebuild")
+          NO_REBUILD=true
+        ;;
+      "--no-provision")
+          NO_PROVISION=true
         ;;
         *)
         usage
@@ -54,8 +64,6 @@ init_ce_dev(){
   $CE_DEV_BIN init
   $CE_DEV_BIN destroy
   $CE_DEV_BIN start
-  echo "# Configuring container with ce-provision"
-  $CE_DEV_BIN provision
 }
 
 # Build an example.
@@ -88,7 +96,14 @@ EOT
   echo "### $1 project completed ###"
 }
 
-init_ce_dev
+if [ $NO_REBUILD = false ]; then
+  init_ce_dev
+fi
+
+if [ $NO_PROVISION = false ]; then
+  echo "# Configuring container with ce-provision"
+  $CE_DEV_BIN provision
+fi
 
 echo "# Building example projects"
 for EXAMPLE in $EXAMPLES; do
