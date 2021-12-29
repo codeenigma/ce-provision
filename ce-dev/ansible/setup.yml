@@ -5,6 +5,7 @@
   vars:
     project_name: provision
     _domain_name: provision-controller.local
+    _ce_provision_force_play: true
     _init:
       vars_dirs:
         - "{{ playbook_dir }}/vars/_common"
