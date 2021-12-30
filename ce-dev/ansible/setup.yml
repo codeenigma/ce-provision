@@ -1,12 +1,18 @@
 ---
 - hosts: provision-controller
-  become: yes
-  vars_files:
-    - common.yml
+  become: true
+
   vars:
-    - _domain_name: provision-controller.local
-    - project_name: provision
+    project_name: provision
+    _domain_name: provision-controller.local
+    _ce_provision_force_play: true
+    _init:
+      vars_dirs:
+        - "{{ playbook_dir }}/vars/_common"
+        - "{{ playbook_dir }}/vars/{{ project_name }}"
   tasks:
+    - ansible.builtin.import_role:
+        name: _init
     - ansible.builtin.import_role:
         name: ce_provision
     - name: Remove example git hooks.
@@ -22,3 +28,5 @@
         name: aws/aws_cli
     - ansible.builtin.import_role:
         name: aws/aws_credentials
+    - ansible.builtin.import_role:
+        name: _exit
