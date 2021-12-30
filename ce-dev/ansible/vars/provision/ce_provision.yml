@@ -14,4 +14,3 @@ _ce_provision_build_dir: /home/ce-dev/ce-provision/ce-dev/ansible/local
 _ce_provision_build_tmp_dir: /tmp
 _ce_provision_data_dir: /tmp
 _ce_provision_build_id: ce-dev
-_ce_provision_force_play: true
