@@ -75,6 +75,7 @@
     path: "{{ openvpn_config.configuration_directory }}/auth"
     state: directory
     mode: "0755"
+  when: openvpn_config.ldap.install
 
 - name: Place auth-ldap.conf file.
   ansible.builtin.template:
