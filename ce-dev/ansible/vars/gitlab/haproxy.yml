@@ -1,8 +1,3 @@
-gitlab:
-  server_name: provision-privileged.local
-  ssl:
-    handling: selfsigned
-  ldap: no
 haproxy:
   template: "haproxy-ssl-passthru"
   backends:

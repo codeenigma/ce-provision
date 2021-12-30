@@ -34,7 +34,7 @@
 
 - name: Ensure LDAP and python-ldap and dependencies are installed.
   ansible.builtin.apt:
-    pkg: ["slapd", "ldapscripts", "libldap2-dev", "libsasl2-dev", "libssl-dev"] # python-ldap needs libldap2-dev
+    pkg: ["slapd", "ldapscripts", "libldap2-dev", "libsasl2-dev", "libssl-dev", "python3-dev"] # python-ldap needs some dev packages
     state: present
   when: is_local is not defined
 
