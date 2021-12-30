@@ -22,7 +22,7 @@ openvpn_config:
     timeout: '15'
     basedn: dc=example,dc=com
     search_filter: (&(objectClass=posixAccount)(uid=%u))
-    require_group: 'true' # set to 'false' to allow any valid user in the basedn to login
+    require_group: true # set to false to allow any valid user in the basedn to login
     group_basedn: ou=Groups,dc=example,dc=com
     group_filter: (|(cn=vpnguests)(cn=sysadmins))
 
