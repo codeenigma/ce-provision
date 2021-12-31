@@ -1,7 +1,21 @@
 ---
+# The Galaxy role creates the certs every time it runs using easy-rsa so we set a vars file:
+# https://github.com/OpenVPN/easy-rsa/blob/master/easyrsa3/vars.example
+- name: Place easy-rsa vars file for SSL cert generation.
+  ansible.builtin.template:
+    src: vars.j2
+    dest: "{{ openvpn_config.easyrsa_path }}/vars"
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - openvpn_config.install
+
 - name: Install OpenVPN server.
   ansible.builtin.include_role:
     name: robertdebock.openvpn
+  when:
+    - openvpn_config.install
 
 # Loop files from https://github.com/robertdebock/ansible-role-openvpn/blob/master/tasks/server.yml#L58
 - name: Ensure keys permission are correct.
@@ -93,7 +107,21 @@
     create: true
   when: openvpn_config.ldap.install
 
-# @TODO Need to support the PAM auth plugin too
+- name: Place openvpn PAM config.
+  ansible.builtin.template:
+    src: openvpn.j2
+    dest: /etc/pam.d/openvpn
+    owner: root
+    group: root
+    mode: "0644"
+  when: openvpn_config.pam.install
+
+- name: Enable PAM config.
+  ansible.builtin.lineinfile:
+    path: "{{ openvpn_config.configuration_directory }}/server.conf"
+    line: "plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn"
+    create: true
+  when: openvpn_config.pam.install
 
 # Handle extra directives
 - name: Create custom directives.
@@ -104,6 +132,7 @@
   loop: "{{ openvpn_config.custom_directives }}"
   when: openvpn_config.custom_directives
 
+# @TODO this should be a handler if we change the LDAP config rather than a task
 - name: Restart OpenVPN.
   ansible.builtin.systemd:
     name: "{{ openvpn_config.service }}"
