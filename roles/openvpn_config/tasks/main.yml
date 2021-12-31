@@ -4,7 +4,7 @@
 - name: Place easy-rsa vars file for SSL cert generation.
   ansible.builtin.template:
     src: vars.j2
-    dest: /etc/openvpn/easy-rsa/vars
+    dest: "{{ openvpn_config.easyrsa_path }}/vars"
     owner: root
     group: root
     mode: "0644"
