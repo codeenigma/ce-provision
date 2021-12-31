@@ -6,6 +6,7 @@ openvpn_config:
   configuration_directory: /etc/openvpn
   easyrsa_path: /usr/share/easy-rsa
   service: "openvpn@server"
+  server_ip_range: "server 10.8.0.0 255.255.255.0"
   # Additional options
   force_redirect_gateway: true
   compress: true

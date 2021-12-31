@@ -74,6 +74,12 @@
     create: true
   when: openvpn_config.no_client_cert
 
+- name: Alter VPN IP range.
+  ansible.builtin.lineinfile:
+    path: "{{ openvpn_config.configuration_directory }}/server.conf"
+    search_string: "server "
+    line: "{{ openvpn_config.server_ip_range }}"
+
 # Handle LDAP configuration
 - name: Place LDAP CA cert.
   ansible.builtin.copy:
@@ -115,6 +121,7 @@
     create: true
   when: openvpn_config.ldap.install
 
+# Handle PAM config
 - name: Place openvpn PAM config.
   ansible.builtin.template:
     src: openvpn.j2
