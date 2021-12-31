@@ -1,4 +1,12 @@
 ---
+- name: "Ensure {{ openvpn_config.easyrsa_path }} exists."
+  ansible.builtin.file:
+    path: "{{ openvpn_config.easyrsa_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 # The Galaxy role creates the certs every time it runs using easy-rsa so we set a vars file:
 # https://github.com/OpenVPN/easy-rsa/blob/master/easyrsa3/vars.example
 - name: Place easy-rsa vars file for SSL cert generation.
