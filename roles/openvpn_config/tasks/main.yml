@@ -93,7 +93,21 @@
     create: true
   when: openvpn_config.ldap.install
 
-# @TODO Need to support the PAM auth plugin too
+- name: Place openvpn PAM config.
+  ansible.builtin.template:
+    src: openvpn.j2
+    dest: /etc/pam.d/openvpn
+    owner: root
+    group: root
+    mode: "0644"
+  when: openvpn_config.pam.install
+
+- name: Enable PAM config.
+  ansible.builtin.lineinfile:
+    path: "{{ openvpn_config.configuration_directory }}/server.conf"
+    line: "plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn"
+    create: true
+  when: openvpn_config.pam.install
 
 # Handle extra directives
 - name: Create custom directives.
@@ -104,6 +118,7 @@
   loop: "{{ openvpn_config.custom_directives }}"
   when: openvpn_config.custom_directives
 
+# @TODO this should be a handler if we change the LDAP config rather than a task
 - name: Restart OpenVPN.
   ansible.builtin.systemd:
     name: "{{ openvpn_config.service }}"
