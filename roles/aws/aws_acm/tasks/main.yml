@@ -1,0 +1,116 @@
+---
+- name: Run aws acm list-certificates.
+  ansible.builtin.command: "aws --profile {{ aws_acm.aws_profile }} --region {{ aws_acm.region }} acm list-certificates"
+  register: _aws_acm_cert_list
+
+- fail: msg="Domain name is undefined"
+  when: aws_acm.domain_name is undefined
+- fail: msg="Route 53 zone is undefined"
+  when: aws_acm.route_53.zone is undefined
+
+- name: Replace JSON output with parsed results.
+  ansible.builtin.set_fact:
+    _aws_acm_cert_list: "{{ _aws_acm_cert_list.stdout | from_json }}"
+
+- name: Refine to the summary list of current certificates.
+  ansible.builtin.set_fact:
+    _aws_acm_cert_list: "{{ _aws_acm_cert_list.CertificateSummaryList|to_json }}"
+
+- name: Explicitly initialise _aws_acm_domain_in_cert_list var.
+  ansible.builtin.set_fact:
+    _aws_acm_domain_in_cert_list: false
+
+- name: Iterate through the certificate list checking for domain.
+  ansible.builtin.set_fact:
+    _aws_acm_domain_in_cert_list: true
+  when: item.DomainName == aws_acm.domain_name
+  with_items: "{{ _aws_acm_cert_list }}"
+
+# @TODO handle tags
+# Note: an ACM certificate that is in Status:pending will be included in the list of certificates outputted by 'aws acm request-certificate'
+- name: Send ACM request if needed.
+  ansible.builtin.command: |
+    aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
+    acm request-certificate \
+    --domain-name "{{ aws_acm.domain_name }}" \
+    --domain-validation-options DomainName="{{ aws_acm.domain_name }}",ValidationDomain="{{ aws_acm.route_53.zone }}" \
+    --validation-method DNS
+  register: _aws_acm_new_certificate
+  when: not _aws_acm_domain_in_cert_list
+
+- name: Parse returned certificate output.
+  ansible.builtin.set_fact:
+    _aws_acm_new_certificate: "{{ _aws_acm_new_certificate.stdout|from_json }}"
+  when: not _aws_acm_domain_in_cert_list
+
+- name: Fetch the new certificate's ARN.
+  ansible.builtin.set_fact:
+    aws_acm_new_certificate_arn: "{{ _aws_acm_new_certificate.CertificateArn }}"
+  when: not _aws_acm_domain_in_cert_list
+
+# Not currently possible to do this with the API, so we just pause 5 seconds - this is usually enough time.
+- name: Wait until the new certificate is properly issued.
+  ansible.builtin.pause:
+    seconds: 5
+  when:
+    - aws_acm_new_certificate_arn is defined
+    - aws_acm.validate
+
+- name: Obtain all information for a the new ACM certificate.
+  community.aws.aws_acm_info:
+    region: "{{ aws_acm.region }}"
+    profile: "{{ aws_acm.aws_profile }}"
+    domain_name: "{{ aws_acm.domain_name }}"
+  register: _aws_acm_new_certificate
+  when:
+    - aws_acm_new_certificate_arn is defined
+    - aws_acm.validate
+
+- name: Add a DNS record in Route 53 for validation.
+  community.aws.route53:
+    state: "{{ aws_acm.route_53.state }}"
+    profile: "{{ aws_acm.route_53.aws_profile }}"
+    zone: "{{ aws_acm.route_53.zone }}"
+    record: "{{ _aws_acm_new_certificate.certificates[0].domain_validation_options[0].resource_record.name }}"
+    type: CNAME
+    value: "{{ _aws_acm_new_certificate.certificates[0].domain_validation_options[0].resource_record.value }}"
+    overwrite: true
+  when:
+    - aws_acm.route_53.zone is defined
+    - aws_acm.route_53.zone | length > 0
+    - aws_acm_new_certificate_arn is defined
+    - aws_acm.validate
+
+- name: Wait for ACM certificate validation to complete.
+  ansible.builtin.command: |
+    aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
+    acm wait certificate-validated \
+    --certificate-arn "{{ aws_acm_new_certificate_arn }}"
+  when:
+    - aws_acm_new_certificate_arn is defined
+    - aws_acm.validate
+
+# Even though we wait for validation, it's still too quick.
+- name: Wait to allow status cache time to update.
+  ansible.builtin.pause:
+    seconds: 5
+  when:
+    - aws_acm_new_certificate_arn is defined
+    - aws_acm.validate
+
+- name: Fetch certificate for later use.
+  ansible.builtin.command: |
+    aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
+    acm get-certificate \
+    --certificate-arn "{{ aws_acm_new_certificate_arn }}"
+  register: _aws_acm_exported_certificate_json
+  when:
+    - aws_acm_new_certificate_arn is defined
+    - aws_acm.export
+    - aws_acm.validate
+
+- name: Replace JSON certificate output with parsed results.
+  ansible.builtin.set_fact:
+    aws_acm_exported_certificate: "{{ _aws_acm_exported_certificate_json.stdout | from_json }}"
+  when:
+    - _aws_acm_exported_certificate_json is defined
