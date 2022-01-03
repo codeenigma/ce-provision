@@ -5,6 +5,7 @@
 
   vars:
     project_name: web
+    is_local: true
     _ce_provision_base_dir: /home/ce-dev/ce-provision
     _ce_provision_force_play: true
     _init:
