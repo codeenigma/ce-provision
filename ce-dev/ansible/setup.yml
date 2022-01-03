@@ -10,6 +10,7 @@
       vars_dirs:
         - "{{ playbook_dir }}/vars/_common"
         - "{{ playbook_dir }}/vars/{{ project_name }}"
+      _ce_provision_force_play: true
   tasks:
     - ansible.builtin.import_role:
         name: _init
