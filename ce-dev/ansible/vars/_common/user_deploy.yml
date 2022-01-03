@@ -1,0 +1,6 @@
+user_deploy:
+  username: ce-dev
+  utility_host: "localhost"
+  utility_username: ce-dev
+  sudoer: false
+  groups: []
