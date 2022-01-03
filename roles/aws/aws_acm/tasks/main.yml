@@ -96,6 +96,7 @@
     seconds: 5
   when:
     - aws_acm_new_certificate_arn is defined
+    - aws_acm.export
     - aws_acm.validate
 
 - name: Fetch certificate for later use.
