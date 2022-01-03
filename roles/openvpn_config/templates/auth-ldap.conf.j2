@@ -26,7 +26,7 @@
     SearchFilter    "{{ openvpn_config.ldap.search_filter }}"
 
     # Require Group Membership
-    RequireGroup    true
+    RequireGroup    {{ openvpn_config.ldap.require_group }}
 
     <Group>
         #RFC2307bis    false
