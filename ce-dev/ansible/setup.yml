@@ -4,6 +4,7 @@
 
   vars:
     project_name: provision
+    is_local: true
     _domain_name: provision-controller.local
     _ce_provision_force_play: true
     _init:
