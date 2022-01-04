@@ -14,6 +14,12 @@
   tasks:
     - ansible.builtin.import_role:
         name: _init
+      vars:
+        _ce_provision_force_play: true
+        _init:
+          vars_dirs:
+            - "{{ playbook_dir }}/vars/_common"
+            - "{{ playbook_dir }}/vars/{{ project_name }}"
     - ansible.builtin.import_role:
         name: ce_provision
     - name: Remove example git hooks.
