@@ -4,12 +4,13 @@
 
   vars:
     project_name: provision
+    is_local: true
     _domain_name: provision-controller.local
-    _ce_provision_force_play: true
     _init:
       vars_dirs:
         - "{{ playbook_dir }}/vars/_common"
         - "{{ playbook_dir }}/vars/{{ project_name }}"
+      force_play: true
   tasks:
     - ansible.builtin.import_role:
         name: _init
