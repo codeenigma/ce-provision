@@ -40,9 +40,11 @@
   ansible.builtin.set_fact:
     previous_play_dir_md5: "{{ lookup('file', '{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}' ) }}"
 
-- ansible.builtin.meta: end_play
+- name: Stop play if playbook md5 is unchanged.
+  ansible.builtin.meta: end_play
   when:
     - current_play_dir_md5 == previous_play_dir_md5
+    - not _init.force_play
     - not _ce_provision_force_play
 
 - name: Include vars directories.
