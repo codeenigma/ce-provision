@@ -90,7 +90,7 @@ provision-privileged
 EOT
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   echo "# Executing $1 project"
-  PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/$1/$1.yml --own-branch $2 --config-branch $3"
+  PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/$1/$1.yml --own-branch $2 --config-branch $3 --force"
   # shellcheck disable=SC2086
   sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_CMD
   echo "### $1 project completed ###"
