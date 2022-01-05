@@ -1,8 +1,8 @@
-user_provision:
+user_deploy:
   username: ce-dev
   utility_host: "localhost"
   utility_username: ce-dev
-  sudoer: true
+  sudoer: false
   groups: []
   ssh_keys:
     - "{{ lookup('file', '{{ _ce_provision_data_dir }}/provision-controller/home/ce-dev/.ssh/id_rsa.pub') }}"

@@ -2,7 +2,7 @@
 dependencies:
   - role: _meta/common_base
   - role: firewall_config
-  - role: ssh_server
+  - { role: ssh_server, when: not is_local }
   - role: user_provision
   - role: user_deploy
   - role: mysql_client
