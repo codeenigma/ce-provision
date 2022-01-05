@@ -1,10 +1,10 @@
 ---
-# Spin up a "blank" instance.
+# Spin up a "web" instance.
 - hosts: provision-target
   become: true
 
   vars:
-    project_name: blank
+    project_name: web
     is_local: true
     _ce_provision_base_dir: /home/ce-dev/ce-provision
     _init:
@@ -17,6 +17,6 @@
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
-        name: _meta/common_base
+        name: _meta/webserver
     - ansible.builtin.import_role:
         name: _exit
