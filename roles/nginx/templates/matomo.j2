@@ -67,7 +67,7 @@ location ~ js/container_.*_preview\.js$ {
 ## disable all access to the following directories
 location ~ /(config|tmp|core|lang) {
     deny all;
-    return 403;
+    return 404; # Advice is to serve 404 for these files instead of a 403
 }
 
 location ~ /\.ht {
