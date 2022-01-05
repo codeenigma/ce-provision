@@ -5,4 +5,5 @@ user_deploy:
   sudoer: false
   groups: []
   ssh_keys:
-    - "{{ lookup('file', '{{ _ce_provision_data_dir }}/provision-controller/home/ce-dev/.ssh/id_rsa.pub') }}"
+    - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbzq9srh/W23MBCx/GmlTO3aJckDjZnCcczAAGtx3rAzGFEtvFgDaZbbHK+ya2SSazzQbfSXmwWAYABtFu6qRmZtDCBKlHhR7rI9MysiACmSX6X6fVIDbCZoVXIZIVGR0wdv52+kMArMktO9Y456jlman5whd3b7VD5LOt1xKQRLVQ7KjsxgQ/hpolSo6ZmsJuJe2xF9NMSfpQetmprTEFoCbXbVOl6XDUVqYsNF/e55A2jXBng2UNluztWQDnaP2sDODPk5uw3Fy6Znk0auYe9CmImUZX5x+BLulJIJWmsDa2+Ls3MCpF9VKPqV/UInETJ5P3ge1ieC8a1dboPL4/T9XERPXuGxeZtISNHwFZ3mGSjrbqFpMpJHZ7G41oGqBOq9dsw4eY3G0YlvMtv8Nqu2MtOQz/nGFSniES6e7Q4aHtBOoCbpJt7tDcpIDy9YfEhgQHxNtdAmt0n7GS71O0HS+15y89EzJ46139vZeuvSUkdgUxhQ5ZWhp1u3/6XyaCKt+SHKH5CbbrXQrfP/g98wm4W6kVAAjtkEXZ6rwsc71WdRLxZr17ArOpG+YVTJ67+iMEgsaEw9bi2DNDVeYl51NmNc4d873iH7d/0gsRq4ECzZwoNB0X9N6n0F5cVjQvx2802FzwHUMA2V8gS64UBuoC2OIv/r3YSkwuplzggw== controller@127.0.0.1"
+    #- "{{ lookup('file', '{{ _ce_provision_data_dir }}/provision-controller/home/ce-dev/.ssh/id_rsa.pub') }}"
