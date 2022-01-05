@@ -100,6 +100,7 @@ EOT
     echo "# In verbose mode"
     PROVISION_CMD="$PROVISION_CMD --verbose"
   fi
+  echo "# Running command: $PROVISION_CMD"
   # shellcheck disable=SC2086
   sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_CMD
   echo "### $1 project completed ###"
