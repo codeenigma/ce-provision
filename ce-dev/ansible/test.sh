@@ -12,6 +12,7 @@ usage(){
   echo '--config-branch: Branch to use for the main stack config repository'
   echo '--no-rebuild: Do not tear down an existing ce-dev stack'
   echo '--no-provision: Do not run ce-provision against the ce-dev stack'
+  echo '--verbose: Run ce-provision and Ansible in verbose mode'
 }
 
 # Set defaults
@@ -20,6 +21,7 @@ OWN_BRANCH="1.x"
 CONFIG_BRANCH="1.x"
 NO_REBUILD=false
 NO_PROVISION=false
+VERBOSE=false
 
 # Parse options arguments.
 parse_options(){
@@ -42,6 +44,9 @@ parse_options(){
         ;;
       "--no-provision")
           NO_PROVISION=true
+        ;;
+      "--verbose")
+          VERBOSE=true
         ;;
         *)
         usage
@@ -91,6 +96,10 @@ EOT
   PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   echo "# Executing $1 project"
   PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/$1/$1.yml --own-branch $2 --config-branch $3 --force"
+  if [ $VERBOSE = true ]; then
+    echo "# In verbose mode"
+    PROVISION_CMD="$PROVISION_CMD --verbose"
+  fi
   # shellcheck disable=SC2086
   sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_CMD
   echo "### $1 project completed ###"
