@@ -9,3 +9,4 @@
 /files
 /ansible.cfg
 *geerlingguy*
+/ce-dev/ansible/vars/*/_aws_credentials.yml
