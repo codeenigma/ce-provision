@@ -44,7 +44,7 @@ jobs:
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          /bin/bash ce-dev/ansible/test.sh --examples "web gitlab" --own-branch ${{ github.event.pull_request.base.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
+          /bin/bash ce-dev/ansible/test.sh --examples web --own-branch ${{ github.event.pull_request.base.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
         shell: bash
 
       # Builds the docs

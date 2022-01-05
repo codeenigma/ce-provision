@@ -1,3 +1,0 @@
-user_root:
-  authorized_keys:
-    - "{{ lookup('file', '{{ _ce_provision_data_dir }}/provision-controller/home/ce-dev/.ssh/id_rsa.pub') }}"
