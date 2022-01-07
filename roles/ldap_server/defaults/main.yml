@@ -14,6 +14,10 @@ ldap_server:
     # Execution order can be important, so ensure your files are named in alphabetical order.
     path: "{{ _ce_provision_base_dir }}/config/files/ldap_server/config"
     purge: false
+    backup: false # set to true to create local backups of LDAP
+    backup_path: /opt/slap-bak
+    backup_minute: "45"
+    backup_hour: "23"
   ssl: # @see the 'ssl' role - does nothing by default.
     domain: "{{ _domain_name }}"
     handling: "unmanaged" # LDAP needs to use 'manual' handling for SSL because a separate CA certificate is required.

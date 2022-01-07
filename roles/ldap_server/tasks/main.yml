@@ -140,3 +140,21 @@
   when:
     - ldap_server.replication.host
     - ldap_server.config.import
+
+- name: Create the slapd backup script.
+  ansible.builtin.template:
+    src: slap-bak.j2
+    dest: /usr/local/bin/slap-bak
+    owner: root
+    group: root
+    mode: 0755
+  when: ldap_server.config.backup
+
+- name: Create cron job for slapd backups.
+  ansible.builtin.cron:
+    name: "ldap backup"
+    minute: "{{ ldap_server.config.backup_minute }}"
+    hour: "{{ ldap_server.config.backup_hour }}"
+    job: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r sudo rm"
+    cron_file: slapd-backup
+  when: ldap_server.config.backup
