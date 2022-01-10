@@ -129,6 +129,25 @@
   vars:
     ssl: "{{ ldap_server.ssl }}"
 
+# LetsEncrypt handling - see https://serverfault.com/a/864655
+- name: Create user for LetsEncrypt.
+  ansible.builtin.user:
+    name: letsencrypt
+    group: letsencrypt
+    system: true
+    create_home: false
+    password: "*"
+    groups: openldap
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
+- name: Allow OpenLDAP to view the LetsEncrypt directory.
+  ansible.builtin.file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: openldap
+    group: letsencrypt
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
 - name: Start slapd service.
   ansible.builtin.service:
     name: slapd
@@ -140,3 +159,21 @@
   when:
     - ldap_server.replication.host
     - ldap_server.config.import
+
+- name: Create the slapd backup script.
+  ansible.builtin.template:
+    src: slap-bak.j2
+    dest: /usr/local/bin/slap-bak
+    owner: root
+    group: root
+    mode: 0755
+  when: ldap_server.config.backup
+
+- name: Create cron job for slapd backups.
+  ansible.builtin.cron:
+    name: "ldap backup"
+    minute: "{{ ldap_server.config.backup_minute }}"
+    hour: "{{ ldap_server.config.backup_hour }}"
+    job: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r sudo rm"
+    cron_file: slapd-backup
+  when: ldap_server.config.backup
