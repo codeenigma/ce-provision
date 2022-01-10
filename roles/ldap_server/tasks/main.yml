@@ -129,6 +129,25 @@
   vars:
     ssl: "{{ ldap_server.ssl }}"
 
+# LetsEncrypt handling - see https://serverfault.com/a/864655
+- name: Create user for LetsEncrypt.
+  ansible.builtin.user:
+    name: letsencrypt
+    group: letsencrypt
+    system: true
+    create_home: false
+    password: "*"
+    groups: openldap
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
+- name: Allow OpenLDAP to view the LetsEncrypt directory.
+  ansible.builtin.file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: openldap
+    group: letsencrypt
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
 - name: Start slapd service.
   ansible.builtin.service:
     name: slapd
