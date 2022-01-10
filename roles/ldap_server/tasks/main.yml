@@ -176,4 +176,5 @@
     hour: "{{ ldap_server.config.backup_hour }}"
     job: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r sudo rm"
     cron_file: slapd-backup
+    user: root
   when: ldap_server.config.backup
