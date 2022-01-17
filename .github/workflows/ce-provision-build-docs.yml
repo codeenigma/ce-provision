@@ -8,7 +8,7 @@ jobs:
   # when a job name is not provided
   build-docs:
     # Name the Job
-    name: Run tests against Ansible code base
+    name: Build the documentation
     # Set the type of machine to run on
     runs-on: ubuntu-20.04
 
