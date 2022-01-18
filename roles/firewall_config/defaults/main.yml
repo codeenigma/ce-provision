@@ -36,6 +36,9 @@ firewall_config:
     firewall_allowed_tcp_ports:
       - "989"
       - "990"
+  letsencrypt:
+    firewall_allowed_tcp_ports:
+      - "80"
   ossec:
     firewall_allowed_udp_ports:
       - "1514"
