@@ -1,7 +1,0 @@
----
-# handlers file for clamav
-
-- name: restart clamav
-  service:
-    name: "clamav-daemon"
-    state: restarted
