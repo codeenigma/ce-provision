@@ -7,3 +7,4 @@ dependencies:
   - { role: hosts, when: ( is_local is not defined or not is_local ) }
   - role: rkhunter
   - role: postfix
+  - role: geerlingguy.clamav
