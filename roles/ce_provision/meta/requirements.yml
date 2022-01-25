@@ -8,4 +8,5 @@ roles:
   - name: geerlingguy.varnish
   - name: geerlingguy.firewall
   - name: geerlingguy.composer
+  - name: geerlingguy.clamav
   - name: robertdebock.openvpn
