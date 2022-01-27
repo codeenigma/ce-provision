@@ -7,11 +7,8 @@
     state: restarted
 
 - name: stop ossec-authd
-  ansible.builtin.include_role:
-    name: process_manager
-  vars:
-    process_manager:
-      process_name: ossec-authd
+  ignore_errors: true
+  command: "pkill ossec-authd"
 
 - name: start ossec-authd
   command: "/var/ossec/bin/ossec-authd -k {{ ssl_facts[ossec.ssl.domain].key }} -x {{ ssl_facts[ossec.ssl.domain].certificate }}"
