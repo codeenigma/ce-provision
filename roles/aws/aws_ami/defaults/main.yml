@@ -24,4 +24,3 @@ aws_ami:
   # A string of additional arguments to pass as ansible --extra-vars.
   # It must me escaped already, and will be passed as-is.
   extra_vars: ""
-  packer_log: "1" # logging to stderr on by default - set to "0" to suppress
