@@ -11,6 +11,8 @@
     chdir: "{{ _ce_provision_base_dir }}"
 
 - name: Build AMI.
-  ansible.builtin.shell:
-    cmd: "PACKER_LOG={{ aws_ami.packer_log }} packer build {{ _ce_provision_build_tmp_dir }}/packer.json"
+  ansible.builtin.command:
+    cmd: "packer build {{ _ce_provision_build_tmp_dir }}/packer.json"
     chdir: "{{ _ce_provision_base_dir }}"
+  environment:
+    PACKER_LOG: "{{ aws_ami.packer_log }}"
