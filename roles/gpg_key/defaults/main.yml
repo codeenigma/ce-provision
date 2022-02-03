@@ -1,8 +1,9 @@
 ---
 gpg_key_servers:
-  - hkps://pgp.mit.edu
-  - hkps://keys.openpgp.org
-  - hkp://keys.gnupg.net
+  send_keys: true
+  servers:
+    - hkps://pgp.mit.edu
+    - hkps://keys.openpgp.org
 gpg_key:
   - username: example # Must exist already on the server.
     publish: false # Whether to publish to HKS public servers.

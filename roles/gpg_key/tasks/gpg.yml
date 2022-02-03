@@ -46,6 +46,7 @@
   when:
     - gpg_user.publish
     - not user_ansible_gpg_key_exists.stdout
-  with_items: "{{ gpg_key_servers }}"
+  with_items: "{{ gpg_key_servers.servers }}"
   loop_control:
     loop_var: server
+  when: "{{ gpg_key_servers.send_keys }}"
