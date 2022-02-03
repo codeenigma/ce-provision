@@ -49,4 +49,3 @@
   with_items: "{{ gpg_key_servers.servers }}"
   loop_control:
     loop_var: server
-  when: "{{ gpg_key_servers.send_keys }}"
