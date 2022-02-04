@@ -32,6 +32,7 @@
   community.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(omit) }}"
     #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
     master_username: "{{ aws_rds.master_username }}"
     master_user_password: "{{ aws_rds.master_user_password }}"
@@ -60,6 +61,16 @@
     engine_version: "{{ aws_rds.engine_version | default(omit) }}"
     #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
   register: _rds_instance_info
+
+- name: Create RDS read replica instance.
+  community.aws.rds_instance:
+    db_instance_identifier: "{{ aws_rds.name }}-replica"
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(omit) }}"
+    db_instance_class: "{{ aws_rds.db_instance_class }}"
+    read_replica: true
+    creation_source: "instance"
+    source_db_instance_identifier: "{{ aws_rds.name }}"
+  when: aws_rds.replica
 
 - name: Create SNS topic.
   ansible.builtin.include_role:
