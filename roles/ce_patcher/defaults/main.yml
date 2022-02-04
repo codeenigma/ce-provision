@@ -1,3 +1,4 @@
 ---
 ce_patcher:
   username: controller
+  reboot: false
