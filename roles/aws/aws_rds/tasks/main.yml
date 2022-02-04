@@ -44,7 +44,7 @@
     wait: true
     region: "{{ aws_rds.region }}"
     engine_version: "{{ aws_rds.engine_version | default(omit) }}"
-  register: _rds_instance_info
+  register: _rds_instance_info_aurora
   when: "'aurora' in aws_rds.engine"
 
 - name: Create Aurora RDS read replica instance.
@@ -161,6 +161,33 @@
   with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
   when:
     - aws_rds.rds_cloudwatch_alarms
+    - _rds_instance_info.db_instance_identifier is defined
+
+- name: Create RDS CloudWatch alarms.
+  ansible.builtin.include_role:
+    name: aws/aws_ec2_metric_alarm
+  vars:
+    aws_ec2_metric_alarm:
+      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      name: "{{ _rds_instance_info_aurora.db_instance_identifier }}_{{ item.name }}"
+      description: "{{ item.description }}"
+      metric: "{{ item.metric }}"
+      namespace: "{{ item.namespace }}"
+      statistic: "{{ item.statistic }}"
+      comparison: "{{ item.comparison }}"
+      threshold: "{{ item.threshold }}"
+      unit: "{{ item.unit }}"
+      period: "{{ item.period }}"
+      evaluation_periods: "{{ item.evaluation_periods }}"
+      alarm_actions: "{{ _alarm_actions | default([]) }}"
+      ok_actions: "{{ _alarm_actions | default([]) }}"
+      dimensions:
+        "DBInstanceIdentifier": "{{ _rds_instance_info_aurora.db_instance_identifier }}"
+  with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
+  when:
+    - aws_rds.rds_cloudwatch_alarms
+    - _rds_instance_info_aurora.db_instance_identifier is defined
 
 - name: (Re) set facts for instance.
   ansible.builtin.set_fact:
