@@ -47,6 +47,26 @@
   register: _rds_instance_info
   when: "'aurora' in aws_rds.engine"
 
+- name: Create Aurora RDS read replica instance.
+  community.aws.rds_instance:
+    db_instance_identifier: "{{ aws_rds.name }}-replica"
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_instance_class: "{{ aws_rds.db_instance_class }}"
+    state: "{{ aws_rds.state }}"
+    engine: "{{ aws_rds.engine }}"
+    copy_tags_to_snapshot: true
+    publicly_accessible: "{{ aws_rds.publicly_accessible }}"
+    profile: "{{ aws_rds.aws_profile }}"
+    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-replica' }) }}"
+    allow_major_version_upgrade: false
+    apply_immediately: true
+    wait: true
+    region: "{{ aws_rds.region }}"
+    engine_version: "{{ aws_rds.engine_version | default(omit) }}"
+  when:
+    - "'aurora' in aws_rds.engine"
+    - aws_rds.replica
+
 - name: Create RDS instance
   community.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
@@ -81,18 +101,6 @@
     #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
   register: _rds_instance_info
   when: "'aurora' not in aws_rds.engine"
-
-- name: Create RDS read replica instance.
-  community.aws.rds_instance:
-    db_instance_identifier: "{{ aws_rds.name }}-replica"
-    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(omit) }}"
-    db_instance_class: "{{ aws_rds.db_instance_class }}"
-    read_replica: true
-    creation_source: "instance"
-    source_db_instance_identifier: "{{ aws_rds.name }}"
-    profile: "{{ aws_rds.aws_profile }}"
-    region: "{{ aws_rds.region }}"
-  when: aws_rds.replica
 
 - name: Create SNS topic.
   ansible.builtin.include_role:
