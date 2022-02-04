@@ -48,7 +48,7 @@
     region: "{{ aws_rds.region }}"
     engine_version: "{{ aws_rds.engine_version | default(omit) }}"
   register: _rds_instance_info
-  when: 'aurora' in aws_rds.engine
+  when: "'aurora' in aws_rds.engine"
 
 - name: Create RDS instance
   community.aws.rds_instance:
@@ -83,7 +83,7 @@
     engine_version: "{{ aws_rds.engine_version | default(omit) }}"
     #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
   register: _rds_instance_info
-  when: 'aurora' not in aws_rds.engine
+  when: "'aurora' not in aws_rds.engine"
 
 - name: Create RDS read replica instance.
   community.aws.rds_instance:
