@@ -90,6 +90,8 @@
     read_replica: true
     creation_source: "instance"
     source_db_instance_identifier: "{{ aws_rds.name }}"
+    profile: "{{ aws_rds.aws_profile }}"
+    region: "{{ aws_rds.region }}"
   when: aws_rds.replica
 
 - name: Create SNS topic.
