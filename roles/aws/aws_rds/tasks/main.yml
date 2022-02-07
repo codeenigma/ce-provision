@@ -102,10 +102,6 @@
   register: _rds_instance_info
   when: "'aurora' not in aws_rds.engine"
 
-- name: Debug _rds_instance_info
-  ansible.builtin.debug:
-    msg: "{{ _rds_instance_info }}"
-
 - name: Create SNS topic.
   ansible.builtin.include_role:
     name: aws/aws_sns
@@ -163,7 +159,7 @@
     - aws_rds.rds_cloudwatch_alarms
     - _rds_instance_info.db_instance_identifier is defined
 
-- name: Create RDS CloudWatch alarms.
+- name: Create Aurora RDS CloudWatch alarms.
   ansible.builtin.include_role:
     name: aws/aws_ec2_metric_alarm
   vars:
