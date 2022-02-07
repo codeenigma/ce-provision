@@ -71,7 +71,6 @@
   community.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
-    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(omit) }}"
     #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
     master_username: "{{ aws_rds.master_username }}"
     master_user_password: "{{ aws_rds.master_user_password }}"
