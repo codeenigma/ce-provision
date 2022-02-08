@@ -1,5 +1,14 @@
 # AWS RDS
 Creates an RDS instance and associated ressources.
+
+If the `engine` variable is set to **aurora-mysql**, you'll need to manually create the Aurora cluster first. Typically, a controller will already exist, so something like this can be run from the controller:
+
+```
+AWS_PROFILE=example aws rds create-db-cluster --db-cluster-identifier example-aurora-cluster --engine aurora-mysql --engine-version 5.7.mysql_aurora.2.10.2 --db-subnet-group-name example-aurora --vpc-security-group-ids sg-abcdefghijklmnop --storage-encrypted --master-username "auroradev" --master-user-password "aurora12345"
+```
+
+You'll need to have created the subnet group first as well as the security groups.
+
 <!--TOC-->
 <!--ENDTOC-->
 
