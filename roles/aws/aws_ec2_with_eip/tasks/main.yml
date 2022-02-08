@@ -29,6 +29,7 @@
     image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
     wait: true
+    termination_protection: "{{ aws_ec2_with_eip.termination_protection }}"
     vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
