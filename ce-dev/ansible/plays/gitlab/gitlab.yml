@@ -16,8 +16,6 @@
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
-        name: gitlab
-    - ansible.builtin.import_role:
-        name: haproxy
+        name: _meta/deploy
     - ansible.builtin.import_role:
         name: _exit
