@@ -20,6 +20,11 @@
   register: _aws_ec2_with_eip_iam_role_info
 
 # Subnet ID is stored in ce-provision's data directory
+- name: Ensure server data directory exists.
+  ansible.builtin.file:
+    path: "{{ _ce_provision_data_dir + '/' + _aws_resource_name }}"
+    state: directory
+
 - name: Ensure subnet file exists.
   ansible.builtin.file:
     path: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
