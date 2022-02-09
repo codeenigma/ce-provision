@@ -21,10 +21,9 @@
 
 # Subnet ID is stored in ce-provision's data directory
 - name: Ensure subnet file exists.
-  ansible.builtin.copy:
-    content: ""
-    dest: "{{ lookup('file', _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id') }}"
-    force: false
+  ansible.builtin.file:
+    path: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
+    state: touch
 
 - name: Try to load subnet from file.
   ansible.builtin.set_fact:
