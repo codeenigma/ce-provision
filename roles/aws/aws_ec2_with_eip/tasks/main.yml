@@ -20,6 +20,11 @@
   register: _aws_ec2_with_eip_iam_role_info
 
 # Subnet ID is stored in ce-provision's data directory
+- name: Ensure subnet file exists.
+  ansible.builtin.file:
+    path: "{{ lookup('file', _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id') }}"
+    state: touch
+
 - name: Try to load subnet from file.
   ansible.builtin.set_fact:
     _aws_ec2_with_eip_vpc_subnet_id: "{{ lookup('file', _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id') }}"
@@ -31,13 +36,13 @@
     region: "{{ aws_ec2_with_eip.aws_region }}"
     filters:
       "tag:Name": "{{ aws_ec2_with_eip.vpc_name }}"
-  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id is not defined )
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length > 0 )
   register: _aws_ec2_with_eip_vpc
 
 - name: Set the VPC id from name.
   ansible.builtin.set_fact:
     _aws_ec2_with_eip_vpc_id: "{{ _aws_ec2_with_eip_vpc.vpcs[0].vpc_id }}"
-  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id is not defined )
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length > 0 )
 
 - name: Gather public subnet information.
   amazon.aws.ec2_vpc_subnet_info:
@@ -47,20 +52,20 @@
       vpc-id: "{{ _aws_ec2_with_eip_vpc_id }}"
       tag:Env: "{{ _env_type }}"
       tag:Profile: "{{ aws_ec2_with_eip.vpc_subnet_profile }}"
-  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id is not defined )
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length > 0 )
   register: _aws_ec2_with_eip_subnets
 
 - name: Pick a subnet at random.
   ansible.builtin.set_fact:
     _aws_ec2_with_eip_vpc_subnet_id: "{{ item.subnet_id }}"
   with_random_choice: "{{ _aws_ec2_with_eip_subnets.subnets }}"
-  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id is not defined )
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length > 0 )
 
 # If we have no stored subnet ID and one has been set in variables this will override whatever might be looked up.
 - name: Load defined subnet from variables.
   ansible.builtin.set_fact:
     _aws_ec2_with_eip_vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
-  when: ( aws_ec2_with_eip.vpc_subnet_id is defined and aws_ec2_with_eip.vpc_subnet_id | length > 0 and _aws_ec2_with_eip_vpc_subnet_id is not defined )
+  when: ( aws_ec2_with_eip.vpc_subnet_id is defined and aws_ec2_with_eip.vpc_subnet_id | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length > 0 )
 
 # Save the subnet ID to file.
 - name: Save the subnet ID in the data directory.
