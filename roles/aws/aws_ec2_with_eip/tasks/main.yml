@@ -38,7 +38,7 @@
 - name: Gather VPC information.
   amazon.aws.ec2_vpc_net_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
-    region: "{{ aws_ec2_with_eip.aws_region }}"
+    region: "{{ aws_ec2_with_eip.region }}"
     filters:
       "tag:Name": "{{ aws_ec2_with_eip.vpc_name }}"
   when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length == 0 )
@@ -52,7 +52,7 @@
 - name: Gather public subnet information.
   amazon.aws.ec2_vpc_subnet_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
-    region: "{{ aws_ec2_with_eip.aws_region }}"
+    region: "{{ aws_ec2_with_eip.region }}"
     filters:
       vpc-id: "{{ _aws_ec2_with_eip_vpc_id }}"
       tag:Env: "{{ _env_type }}"
