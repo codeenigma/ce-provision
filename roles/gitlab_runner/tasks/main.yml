@@ -87,13 +87,10 @@
     force: true
   become: true
 
-- name: Check directory exists.
+- name: Check directory exists. # forces any filesystem caching to clear
   ansible.builtin.stat:
     path: /etc/systemd/system/gitlab-runner.service.d
   register: _service_override_dir
-
-- ansible.builtin.debug:
-    msg: "{{ _service_override_dir }}"
 
 - name: Place the gitlab-runner unit override file. # see https://gitlab.com/gitlab-org/gitlab-runner/-/issues/2422#note_838191146
   ansible.builtin.template:
