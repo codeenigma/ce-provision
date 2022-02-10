@@ -77,6 +77,16 @@
     group: "{{ gitlab_runner.username }}"
   become: true
 
+- name: Ensure the Gitlab runner service override directory exists.
+  ansible.builtin.file:
+    path: /etc/systemd/system/gitlab-runner.service.d
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+    force: true
+  become: true
+
 - name: Place the gitlab-runner unit override file. # see https://gitlab.com/gitlab-org/gitlab-runner/-/issues/2422#note_838191146
   ansible.builtin.template:
     src: override.conf.j2
