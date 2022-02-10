@@ -1,0 +1,8 @@
+---
+gpg_key:
+  - username: ce-dev # Must exist already on the server.
+    publish: false # Whether to publish to HKS public servers.
+    key_type: "RSA"
+    key_length: 4096
+    email: sysadm@codeenigma.com
+    expire: 0
