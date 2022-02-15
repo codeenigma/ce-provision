@@ -24,9 +24,16 @@ ssl:
     79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
     6XoQQlb5mYuLKCzAZws9uceeVH+z
     -----END PRIVATE KEY-----
+
   # For "letsencrypt" handling.
   email: admin@example.com
   http_01_port: 80 # you can set a non-standard port to listen on, but certbot still needs port 80 - see https://letsencrypt.org/docs/challenge-types/#http-01-challenge
+  # For "letsencrypt" auto renewal
+  autorenew: false # set to true to create a cron job to renew LE certs
+  # renewal_minute: "0" # minute to run renewal cron job
+  # renewal_hour: "0" # hour to run renewal cron job
+  # renewal_day: "7" # day to run renewal cron job
+
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
   # eg;
