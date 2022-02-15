@@ -33,7 +33,10 @@
     - ssl.services is defined
 
 - name: Register certificate if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ ssl.domain }} --standalone --preferred-challenges http -d {{ ssl.domain }} --agree-tos -m {{ ssl.email }}"
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ domain }} --standalone --preferred-challenges http -d {{ domain }} --agree-tos -m {{ ssl.email }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
   when:
     - not letsencrypt_cert.stat.exists
 
@@ -49,4 +52,7 @@
 
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
