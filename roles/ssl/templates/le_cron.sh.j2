@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# stop services
+{% for service in ssl.services %}
+service {{ service }} stop
+{% endfor %}
+
+# build bash array of domains
+SITES=()
+{% for domain in ssl.domains %}
+SITES+=("{{ domain }}")
+
+# turn array into certbot compatible sites string
+SITESSTRING=""
+for site in ${SITES[@]}; do
+  SITESSTRING+=" -d $site"
+done
+
+# run certbot
+/usr/bin/certbot certonly --standalone --agree-tos --renew-by-default --http-01-port {{ ssl.http_01_port }} --expand $SITESSTRING
+
+# start services again
+{% for service in ssl.services %}
+service {{ service }} start
+{% endfor %}
