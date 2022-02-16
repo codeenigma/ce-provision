@@ -69,9 +69,9 @@
 - name: Create cron job for certificate renewal.
   ansible.builtin.cron:
     name: "certbot renewal"
-    minute: "{{ ssl.renewal_minute | default("0") }}"
-    hour: "{{ ssl_renewal_hour | default("0") }}"
-    day: "{{ ssl_renewal_day | default("7") }}"
+    minute: "{{ ssl.renewal_minute | default('0') }}"
+    hour: "{{ ssl_renewal_hour | default('0') }}"
+    day: "{{ ssl_renewal_day | default('7') }}"
     job: "/usr/local/bin/le_cron.sh"
     cron_file: le-autorenewal
     user: root
