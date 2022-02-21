@@ -11,3 +11,20 @@
     content: "{{ current_play_dir_md5 }}"
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
   delegate_to: localhost
+
+- name: Find all the role 'defaults' files in the specified paths.
+  ansible.builtin.find:
+    paths: "{{ _exit.roles_path }}"
+    recurse: true
+    file_type: directory
+    patterns: 'defaults'
+  register: _defaults_dirs
+
+- name: Reload variable defaults prior to next run.
+  ansible.builtin.include_vars:
+    dir: "{{ item.path }}"
+    extensions:
+      - "yml"
+  with_items: "{{ _defaults_dirs.files }}"
+  loop_control:
+    label: "{{ item.path }}"
