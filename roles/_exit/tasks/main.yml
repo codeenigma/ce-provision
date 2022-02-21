@@ -11,3 +11,7 @@
     content: "{{ current_play_dir_md5 }}"
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
   delegate_to: localhost
+
+# Clear all existing facts of targeted hosts so Ansible reloads them
+- name: Clear gathered facts from all currently targeted hosts.
+  ansible.builtin.meta: clear_facts
