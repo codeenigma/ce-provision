@@ -1,0 +1,4 @@
+_exit:
+  roles_path:
+    - "{{ _ce_provision_base_dir }}/roles" # ce-provision roles
+    - "$HOME/.ansible/roles" # Galaxy roles
