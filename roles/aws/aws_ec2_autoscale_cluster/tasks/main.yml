@@ -64,6 +64,7 @@
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       engine: "{{ aws_ec2_autoscale_cluster.rds.engine }}"
       engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
+      aurora_reader: "{{ aws_ec2_autoscale_cluster.rds.aurora_reader }}"
       allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
       max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
       storage_encrypted: "{{ aws_ec2_autoscale_cluster.rds.storage_encrypted }}"
