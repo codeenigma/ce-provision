@@ -40,10 +40,6 @@
   ansible.builtin.set_fact:
     previous_play_dir_md5: "{{ lookup('file', '{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}' ) }}"
 
-# If we are here then our play is already running, so it doesn't matter if we overwrite temp host data.
-- name: Refresh inventory to ensure we have correct host information.
-  ansible.builtin.meta: refresh_inventory
-
 - name: Stop play if playbook md5 is unchanged.
   ansible.builtin.meta: end_play
   when:
