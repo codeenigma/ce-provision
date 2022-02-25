@@ -28,11 +28,13 @@ jobs:
       - name: Build documentation
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
+          git checkout -b documentation
           /bin/sh ./contribute/toc.sh
           find . -name "*.md" | xargs git add
+          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
-          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
+          git push origin documentation
         shell: bash
 
       # Create docs pull request
