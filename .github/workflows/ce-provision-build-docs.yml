@@ -37,7 +37,7 @@ jobs:
           git checkout origin/documentation
           find . -name "*.md" | xargs git add
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
-          git push origin documentation
+          git push origin HEAD:documentation
         shell: bash
 
       # Create docs pull request
