@@ -19,7 +19,7 @@ aws_ec2_autoscale_cluster:
   ami_owner: self # Default to self-created image.
   root_volume_size: 30
   root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
-  root_volume_encrypted: false # this should not be left false if you have set encrypt_boot to true in the aws_ami role
+  root_volume_encrypted: "{{ aws_ami.encrypt_boot }}" # in most cases this should match encrypt_boot in the aws_ami role
   root_volume_delete_on_termination: true
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not.
