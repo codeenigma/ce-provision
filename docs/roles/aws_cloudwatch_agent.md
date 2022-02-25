@@ -26,7 +26,7 @@ aws_cloudwatch_agent:
   credentials:
     aws_access_key_id: XXX
     aws_secret_access_key: XXX
-    region: "eu-west-3"
+    region: "{{ _aws_region }}"
 
 ```
 

@@ -33,6 +33,7 @@ jobs:
           git checkout documentation
           contribute/toc.sh
           git add docs
+          git add roles
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
         shell: bash
 

@@ -14,7 +14,7 @@ aws_iam_role:
   # Pass either names or ARNs for the role.
   managed_policies: []
   # Which document policy to apply.
-  # Current options are 'ec2' or 'ecs'
+  # Current options are 'ec2', 'ecs' or 'backup'
   policy_document: ec2
   purge_policies: true # set to false if you want to add policies to an existing role
   tags:

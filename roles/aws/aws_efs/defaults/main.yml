@@ -1,6 +1,6 @@
 aws_efs:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   name: example
   # If false, we omit tags enterly and leave them as is.
   purge_tags: false
