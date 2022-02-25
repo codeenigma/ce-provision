@@ -23,19 +23,19 @@ jobs:
         run: |
           git config --global user.email "sysadm@codeenigma.com"
           git config --global user.name "Code Enigma CI"
+          git config --global pull.rebase false
 
       # Builds the docs
       - name: Build documentation
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch
           git checkout -b documentation
+          git pull origin documentation
           /bin/sh ./contribute/toc.sh
           find . -name "*.md" | xargs git add
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git fetch
-          git config pull.rebase false
-          git pull origin documentation
           git push origin documentation
         shell: bash
 
