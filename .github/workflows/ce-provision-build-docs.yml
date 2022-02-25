@@ -31,10 +31,12 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
-          git checkout -b documentation
-          git pull origin documentation --allow-unrelated-histories
+          git checkout -b ${{ github.event.pull_request.head.ref }}
+          git merge origin/documentation
           /bin/sh ./contribute/toc.sh
           find . -name "*.md" | xargs git add
+          git checkout -b documentation
+          git merge ${{ github.event.pull_request.head.ref }}
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
           git push origin documentation
         shell: bash
