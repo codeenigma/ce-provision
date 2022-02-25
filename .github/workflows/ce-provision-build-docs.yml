@@ -29,10 +29,9 @@ jobs:
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           /bin/sh ./contribute/toc.sh
+          find . -name "*.md" | xargs git add
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
-          git checkout documentation
-          find . -name "*.md" | xargs git add
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
         shell: bash
 
