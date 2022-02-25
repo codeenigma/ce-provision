@@ -1,6 +1,6 @@
 aws_rds:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   multi_az: true
   subnets:
     - subnet-aaaaaaaa
