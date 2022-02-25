@@ -27,11 +27,14 @@ gitlab:
   unicorn_worker_processes: 2
   puma_worker_processes: 2
   initial_root_password: ""
-  ldap: false
+  ldap: false # enable/disable LDAP integration
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
   ldap_lookup_base: "{{ ldap_client.lookup_base }}"
   ldap_binddn: "{{ ldap_client.binddn }}"
   ldap_bindpw: "{{ ldap_client.bindpw }}"
+  prometheus: "true" # enable/disable built-in Prometheus
+  node_exporter: "true" # enable/disable built-in Prometheus Node Exporter
+  alertmanager: "true" # enable/disable built-in Prometheus Alertmanager
   nginx:
     listen_port: 8881
     listen_https: nil
