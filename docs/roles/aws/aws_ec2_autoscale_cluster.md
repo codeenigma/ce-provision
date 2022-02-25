@@ -22,12 +22,15 @@ aws_ec2_autoscale_cluster:
     - az: c
       cidr_block: "10.0.3.128/26"
       public_subnet: public-c
-  instance_type: t2.micro
+  instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
-  root_volume_size: 40
+  root_volume_size: 30
+  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_encrypted: "{{ aws_ami.encrypt_boot }}" # in most cases this should match encrypt_boot in the aws_ami role
+  root_volume_delete_on_termination: true
   ebs_optimized: true
-  encrypt_boot: false # Whether to encrypt the EBS volumes or not.
+  encrypt_boot: "{{ aws_ami.encrypt_boot }}" # Whether to encrypt the EBS volumes or not, taken from the aws_ami role
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
@@ -99,7 +102,7 @@ aws_ec2_autoscale_cluster:
   # Associated RDS instance.
   rds:
     rds: false # wether to create an instance.
-    db_instance_class: db.m5.large
+    db_instance_class: db.t3.medium
     #db_cluster_identifier: example-aurora-cluster
     engine: mariadb
     aurora_reader: false
