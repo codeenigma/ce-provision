@@ -34,6 +34,7 @@ jobs:
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
+          git pull origin documentation
           git push origin documentation
         shell: bash
 
