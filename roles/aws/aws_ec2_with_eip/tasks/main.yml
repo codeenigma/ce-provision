@@ -99,7 +99,9 @@
       - device_name: /dev/xvda
         ebs:
           volume_size: "{{ aws_ec2_with_eip.root_volume_size }}"
-          delete_on_termination: true
+          delete_on_termination: "{{ aws_ec2_with_eip.root_volume_delete_on_termination }}"
+          volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
+          encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: aws_ec2_with_eip_instances
 
 - name: Check if we have an existing EIP.
