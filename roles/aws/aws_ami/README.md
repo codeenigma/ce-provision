@@ -12,9 +12,13 @@ This requires boto and Packer on the "provisioning" server.
 ---
 aws_ami:
   aws_profile: "{{ _aws_profile }}"
-  region: us-east-2
+  region: "{{ _aws_region }}"
   instance_type: t2.micro
+  virtualization_type: hvm
+  root_device_type: ebs
+  name_filter: "debian-10-amd64-*"
   ami_name: "example"
+  owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   encrypt_boot: false
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
   # Operation can be one of:
