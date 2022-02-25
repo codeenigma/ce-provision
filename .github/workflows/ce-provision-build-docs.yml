@@ -29,13 +29,14 @@ jobs:
 
       # Builds the docs
       - name: Build documentation
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        if: ${{ github.event.pull_request.head.ref != 'documentation' && github.event.pull_request.base.ref == '1.x' }}
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
           /bin/sh ./contribute/toc.sh
           find . -name "*.md" | xargs git add
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
+          git pull origin documentation
           git push origin HEAD:documentation
         shell: bash
 
