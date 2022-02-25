@@ -17,12 +17,15 @@ jobs:
       - name: Checkout code
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       # Configures global Git variables for committing
       - name: Configure Git
         run: |
           git config --global user.email "sysadm@codeenigma.com"
           git config --global user.name "Code Enigma CI"
+          git config --global pull.rebase false
 
       # Builds the docs
       - name: Build documentation
@@ -30,20 +33,23 @@ jobs:
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
-          git checkout documentation
-          git merge origin/${{ github.event.pull_request.head.ref }}
+          git checkout -b ${{ github.event.pull_request.head.ref }}
+          git merge origin/documentation
           /bin/sh ./contribute/toc.sh
           find . -name "*.md" | xargs git add
-          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
+          git checkout -b documentation
+          git merge ${{ github.event.pull_request.head.ref }}
+          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
+          git push origin documentation
         shell: bash
 
       # Create docs pull request
       - name: Create a documentation pull request
         if: ${{ github.event.pull_request.head.ref != 'documentation' && github.event.pull_request.base.ref == '1.x' }}
-        uses: devops-infra/action-pull-request@v0.4.2
+        uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: documentation
-          target_branch: ${{ github.event.pull_request.base.ref }}
-          title: Documentation update.
-          body: "**Automated pull request** created by GitHub Actions because of a documentation update."
+          destination_branch: ${{ github.event.pull_request.base.ref }}
+          pr_title: Documentation update.
+          pr_body: "**Automated pull request** created by GitHub Actions because of a documentation update."
