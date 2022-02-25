@@ -17,7 +17,10 @@ aws_ec2_autoscale_cluster:
   instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
-  root_volume_size: 40
+  root_volume_size: 30
+  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_encrypted: false
+  root_volume_delete_on_termination: true
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not.
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
