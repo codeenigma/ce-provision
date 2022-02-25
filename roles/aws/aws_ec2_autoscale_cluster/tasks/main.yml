@@ -169,7 +169,7 @@
       - device_name: /dev/xvda
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
         volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
-        encrypted: "{{ aws_ec2_autoscale_cluster.root_volume_encrypted }}"
+        encrypted: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
         delete_on_termination: "{{ aws_ec2_autoscale_cluster.root_volume_delete_on_termination }}"
   register: _aws_ec2_lc_created
   when:
