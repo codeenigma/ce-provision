@@ -27,10 +27,9 @@ aws_ec2_autoscale_cluster:
   ami_owner: self # Default to self-created image.
   root_volume_size: 30
   root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
-  root_volume_encrypted: "{{ aws_ami.encrypt_boot }}" # in most cases this should match encrypt_boot in the aws_ami role
   root_volume_delete_on_termination: true
   ebs_optimized: true
-  encrypt_boot: "{{ aws_ami.encrypt_boot }}" # Whether to encrypt the EBS volumes or not, taken from the aws_ami role
+  encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
