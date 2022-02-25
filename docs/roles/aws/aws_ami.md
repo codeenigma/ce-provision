@@ -13,7 +13,7 @@ This requires boto and Packer on the "provisioning" server.
 aws_ami:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  instance_type: t2.micro
+  instance_type: t3.micro
   virtualization_type: hvm
   root_device_type: ebs
   name_filter: "debian-10-amd64-*"
