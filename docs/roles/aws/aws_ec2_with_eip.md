@@ -12,7 +12,7 @@ Creates a new EC2 instance at AWS with a static IP address.
 aws_ec2_with_eip:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  instance_type: t2.micro
+  instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_name: "{{ _domain_name }}" # The name of an AMI image to use. Image must exists in the same region.
   ami_owner: self # Default to self-created image.
@@ -21,10 +21,13 @@ aws_ec2_with_eip:
   vpc_subnet_profile: core # if you are looking up subnets we need a Profile tag to search against
   # An IAM Role name to associate with the instance.
   iam_role_name: "example"
-  state: started
+  state: running
   termination_protection: false # set to true to disable termination and avoid accidents
   instance_name: "{{ _domain_name }}"
   root_volume_size: 80
+  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_encrypted: "{{ aws_ami.encrypt_boot }}" # in most cases this should match encrypt_boot in the aws_ami role
+  root_volume_delete_on_termination: true
   ebs_optimized: true
   security_groups: []
   tags:
