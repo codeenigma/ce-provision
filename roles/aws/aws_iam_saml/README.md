@@ -69,7 +69,7 @@ This requires boto and AWS-CLI on the provisioning server.
 ```yaml
 aws_iam_saml:
   aws_profile: "{{ _aws_profile }}" # Boto profile to use for AWS connections
-  region: "eu-west-2" # AWS region to use
+  region: "{{ _aws_region }}" # AWS region to use
   tags: {} # Dict of AWS tags to apply
     #Tagname: "TagValue"
   aws_account_alias: "" # IAM account alias - human readable name to order SSO page

@@ -1,7 +1,7 @@
 ---
 aws_sns:
   name: "alarms" # Name of the topic.
-  region: "eu-west-2" # The region to create the SNS topic.
+  region: "{{ _aws_region }}" # The region to create the SNS topic.
   display_name: "" # Display name for the topic, for when the topic is owned by this AWS account.
   purge_subscriptions: true # Purge subscriptions not specified in the subscriptions list.
   policy: "" # A dictionary containing the policy to use when creating the topic
