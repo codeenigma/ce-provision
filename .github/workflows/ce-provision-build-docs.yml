@@ -31,7 +31,7 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git fetch
           git checkout documentation
-          git merge ${{ github.event.pull_request.head.ref }}
+          git merge origin/${{ github.event.pull_request.head.ref }}
           contribute/toc.sh
           git add docs
           git add roles
