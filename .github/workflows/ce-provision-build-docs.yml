@@ -17,6 +17,8 @@ jobs:
       - name: Checkout code
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
 
       # Configures global Git variables for committing
       - name: Configure Git
