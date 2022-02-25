@@ -13,10 +13,12 @@ _init:
   # A list of var directories to include. We only support .yml extensions.
   # This is used to detect if the playbook must re-run or not.
   vars_dirs: []
+  force_play: false
 
-# ce_provision vars are sometimes needed even when the role isn't used so we define them here
+# ce_provision vars are sometimes needed even when the role isn't used so we define them here.
+# If you are using ce_provision and *not* using _init you can copy these vars to your playbook.
 _ce_provision:
-    username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+  username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
 
 ce_provision:
   username: "{{ _ce_provision.username }}"
