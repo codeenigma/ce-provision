@@ -38,7 +38,6 @@ jobs:
           /bin/sh ./contribute/toc.sh
           find . -name "*.md" | xargs git add
           git checkout -b documentation
-          git merge ${{ github.event.pull_request.head.ref }}
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
           git push origin documentation
         shell: bash
