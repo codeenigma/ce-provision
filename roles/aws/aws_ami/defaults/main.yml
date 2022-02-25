@@ -1,7 +1,7 @@
 ---
 aws_ami:
   aws_profile: "{{ _aws_profile }}"
-  region: us-east-2
+  region: "{{ _aws_region }}"
   instance_type: t2.micro
   virtualization_type: hvm
   root_device_type: ebs
