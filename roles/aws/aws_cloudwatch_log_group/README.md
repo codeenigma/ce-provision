@@ -11,7 +11,7 @@ Manage log groups states and retention policies.
 ---
 aws_cloudwatch_log_group:
   aws_profile: "{{ _aws_profile }}"
-  region: "eu-west-3"
+  region: "{{ _aws_region }}"
   tags: {}
   state: present
   # Number of days to keep logs, in days.
