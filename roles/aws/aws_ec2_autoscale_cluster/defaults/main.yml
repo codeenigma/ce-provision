@@ -1,6 +1,6 @@
 aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   name: "example"
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
   # vpc_name: example-vpc
@@ -90,7 +90,7 @@ aws_ec2_autoscale_cluster:
   # Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
   peering:
     - name: utility-server.example.com
-      region: eu-west-3
+      region: "{{ _aws_region }}"
   # Associated RDS instance.
   rds:
     rds: false # wether to create an instance.
