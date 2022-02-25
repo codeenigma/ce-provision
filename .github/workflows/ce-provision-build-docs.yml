@@ -46,10 +46,10 @@ jobs:
       # Create docs pull request
       - name: Create a documentation pull request
         if: ${{ github.event.pull_request.head.ref != 'documentation' && github.event.pull_request.base.ref == '1.x' }}
-        uses: devops-infra/action-pull-request@v0.4.2
+        uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: documentation
-          target_branch: ${{ github.event.pull_request.base.ref }}
-          title: Documentation update.
-          body: "**Automated pull request** created by GitHub Actions because of a documentation update."
+          destination_branch: ${{ github.event.pull_request.base.ref }}
+          pr_title: Documentation update.
+          pr_body: "**Automated pull request** created by GitHub Actions because of a documentation update."
