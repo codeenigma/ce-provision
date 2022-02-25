@@ -33,8 +33,7 @@ jobs:
           git checkout documentation
           git merge origin/${{ github.event.pull_request.head.ref }}
           /bin/sh ./contribute/toc.sh
-          git add docs
-          git add roles
+          find . -name "*.md" | xargs git add
           git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.' && git push origin documentation
         shell: bash
 
