@@ -29,7 +29,7 @@
 - name: Accept VPC peering request.
   ec2_vpc_peer:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    region: "{{ peering.region }}"
     peering_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
     state: accept # @todo this only works for state present
 
