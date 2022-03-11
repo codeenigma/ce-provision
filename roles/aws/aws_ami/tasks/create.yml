@@ -12,5 +12,12 @@
 
 - name: Build AMI.
   ansible.builtin.command:
-    cmd: "packer build {{ _ce_provision_build_tmp_dir }}/packer.json"
+    cmd: "packer build -on-error={{ aws_ami.on_error }} {{ _ce_provision_build_tmp_dir }}/packer.json"
     chdir: "{{ _ce_provision_base_dir }}"
+  when: not aws_ami.force
+
+- name: Build AMI with force.
+  ansible.builtin.command:
+    cmd: "packer build -on-error={{ aws_ami.on_error }} -force {{ _ce_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ce_provision_base_dir }}"
+  when: aws_ami.force
