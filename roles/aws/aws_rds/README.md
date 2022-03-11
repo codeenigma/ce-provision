@@ -24,7 +24,7 @@ aws_rds:
     - subnet-bbbbbbbb
   name: example
   tags: {}
-  db_instance_class: db.m5.large
+  db_instance_class: db.t3.medium
   state: present
   description: example
   engine: mariadb
