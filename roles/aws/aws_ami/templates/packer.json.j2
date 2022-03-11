@@ -10,7 +10,7 @@
       "profile": "{{ aws_ami.aws_profile }}",
       "region": "{{ aws_ami.region }}",
       "instance_type": "{{ aws_ami.instance_type }}",
-      "ssh_username": "admin",
+      "ssh_username": "{{ aws_ami.ssh_username }}",
       "ami_name": "{{ aws_ami.ami_name }}",
       "associate_public_ip_address": true,
       "encrypt_boot": "{{ aws_ami.encrypt_boot }}",

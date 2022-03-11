@@ -8,6 +8,7 @@ aws_ami:
   name_filter: "debian-10-amd64-*"
   ami_name: "example"
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
+  ssh_username: "admin"
   encrypt_boot: false
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
   force: false # Forces a builder to run when artifacts from a previous build prevent a build from running. May be necessary if on_error is 'abort'
