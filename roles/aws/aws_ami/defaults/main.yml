@@ -8,8 +8,14 @@ aws_ami:
   name_filter: "debian-10-amd64-*"
   ami_name: "example"
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
+  ssh_username: "admin"
   encrypt_boot: false
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
+  force: false # Forces a builder to run when artifacts from a previous build prevent a build from running. May be necessary if on_error is 'abort'
+  # on_error can be one of:
+  # - cleanup (default): cleans up after the previous steps, deleting temporary files and virtual machines.
+  # - abort: exits without any cleanup, which might require the next build to use -force.
+  on_error: "cleanup"
   # Operation can be one of:
   # - create: delete existing image if any and re-create a new one.
   # - ensure: Only create an image if it doesn't already exists.
