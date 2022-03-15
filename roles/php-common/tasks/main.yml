@@ -25,7 +25,6 @@
       - "php{{ version }}-dev"
       - "php{{ version }}-gd"
       - "php{{ version }}-imap"
-      - "php{{ version }}-json"
       - "php{{ version }}-ldap"
       - "php{{ version }}-mbstring"
       - "php{{ version }}-memcached"
@@ -40,6 +39,17 @@
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
+
+- name: Install PHP package JSON when PHP < 8.0.
+  ansible.builtin.apt:
+    pkg:
+      - "php{{ version }}-json"
+    state: present
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
+  when:
+    - version < 8
 
 - name: Setup xdebug.
   ansible.builtin.include_role:
