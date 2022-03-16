@@ -26,9 +26,7 @@
       {% if aws_ami.vpc_filter is defined and aws_ami.vpc_filter | length > 0 %}
       "vpc_filter": {
         "filters": {
-          "tag:Name": "{{ aws_ami.vpc_filter }}",
-          "isDefault": "false",
-          "cidr": "/16"
+          "tag:Name": "{{ aws_ami.vpc_filter }}"
         }
       },
       "subnet_filter": {
