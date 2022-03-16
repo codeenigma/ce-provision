@@ -8,6 +8,8 @@ Creates AWS certificate requests. Allows for passing a validation domain. From t
 
 Additionally, this role attempts to be idempotent by running `aws acm list-certificates` and ensuring that the domain of the cert being requested is not included in the current list of certificates.
 
+Whenever this role runs it will set the `aws_acm_certificate_arn` variable so you have the ARN of the certificate, whether it exists already or it is newly created.
+
 <!--TOC-->
 <!--ENDTOC-->
 
