@@ -23,7 +23,7 @@
         "owners": ["{{ aws_ami.owner }}"],
         "most_recent": true
       },
-      {% if aws_ami.vpc_filter is defined and aws_ami.vpc_filter | length %}
+      {% if aws_ami.vpc_filter is defined and aws_ami.vpc_filter | length > 0 %}
       "vpc_filter": {
         "filters": {
           "tag:Name": "{{ aws_ami.vpc_filter }}",
