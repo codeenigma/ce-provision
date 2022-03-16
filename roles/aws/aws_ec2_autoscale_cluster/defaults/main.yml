@@ -25,6 +25,9 @@ aws_ec2_autoscale_cluster:
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   packer_on_error: cleanup # see aws_ami for details
   packer_force: false # see aws_ami for details
+  packer_vpc:
+    vpc_filter: "" # see aws_ami for details
+    subnet_filter_az: "" # see aws_ami for details
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
   asg_cloudwatch_policy_scale_up_name: "{{ _env_type }}-scale-up-policy"
