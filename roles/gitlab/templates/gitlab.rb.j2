@@ -1345,7 +1345,7 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/
 ################################################################################
 
-# prometheus['enable'] = true
+prometheus['enable'] = {{ gitlab.prometheus }}
 # prometheus['monitor_kubernetes'] = true
 # prometheus['username'] = 'gitlab-prometheus'
 # prometheus['group'] = 'gitlab-prometheus'
@@ -1427,7 +1427,7 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/alertmanager.html
 ################################################################################
 
-# alertmanager['enable'] = true
+alertmanager['enable'] = {{ gitlab.alertmanager }}
 # alertmanager['home'] = '/var/opt/gitlab/alertmanager'
 # alertmanager['log_directory'] = '/var/log/gitlab/alertmanager'
 # alertmanager['admin_email'] = 'admin@example.com'
@@ -1449,7 +1449,7 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 ##! Docs: https://docs.gitlab.com/ce/administration/monitoring/prometheus/node_exporter.html
 ################################################################################
 
-# node_exporter['enable'] = true
+node_exporter['enable'] = {{ gitlab.node_exporter }}
 # node_exporter['home'] = '/var/opt/gitlab/node-exporter'
 # node_exporter['log_directory'] = '/var/log/gitlab/node-exporter'
 # node_exporter['flags'] = {

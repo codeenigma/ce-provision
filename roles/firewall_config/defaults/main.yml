@@ -36,6 +36,9 @@ firewall_config:
     firewall_allowed_tcp_ports:
       - "989"
       - "990"
+  letsencrypt:
+    firewall_allowed_tcp_ports:
+      - "80"
   ossec:
     firewall_allowed_udp_ports:
       - "1514"
@@ -43,3 +46,8 @@ firewall_config:
   openvpn:
     firewall_allowed_udp_ports:
       - "1194"
+    firewall_additional_rules:
+      - "echo 1 > /proc/sys/net/ipv4/ip_forward" # Enable forwarding of IP
+      - "iptables -A INPUT -s 10.8.0.0/24 -i tun0 -j ACCEPT" # Accept traffic from the VPN on all interfaces - change this if you change openvpn_config default addresses
+      - "iptables -A FORWARD -i tun0 -o eth0 -j ACCEPT" # Forward traffic from the VPN interface out via eth0
+      - "iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE" # Replace the source IP with the eth0 public IP when forwarding outbound

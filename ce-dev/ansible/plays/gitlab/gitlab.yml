@@ -4,9 +4,10 @@
 
   vars:
     project_name: gitlab
+    is_local: true
     _ce_provision_base_dir: /home/ce-dev/ce-provision
-    _ce_provision_force_play: true
     _init:
+      force_play: true
       vars_dirs:
         - "{{ _ce_provision_base_dir }}/ce-dev/ansible/vars/_common"
         - "{{ _ce_provision_base_dir }}/ce-dev/ansible/vars/{{ project_name }}"
@@ -15,8 +16,24 @@
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
+        name: user_provision
+    - ansible.builtin.import_role:
+        name: _meta/common_base
+    - ansible.builtin.import_role:
+        name: ce_deploy
+    - ansible.builtin.import_role:
+        name: aws/aws_credentials
+    - ansible.builtin.import_role:
         name: gitlab
     - ansible.builtin.import_role:
-        name: haproxy
+        name: gitlab_runner
+    - ansible.builtin.import_role:
+        name: ssh_server
+    - ansible.builtin.import_role:
+        name: sops
+    - ansible.builtin.import_role:
+        name: gpg_key
+    - ansible.builtin.import_role:
+        name: firewall_config
     - ansible.builtin.import_role:
         name: _exit

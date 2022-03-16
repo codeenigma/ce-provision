@@ -47,11 +47,11 @@
 
 - name: Copy private key file to destination
   ansible.builtin.copy:
-    content: "{{ ssl.private_key }}"
+    content: "{{ ssl.key }}"
     dest: "{{ _ssl_current_key_path }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0400
   when: not ssl_key.stat.exists
 
 - name: Add key/cert pairs to know paths information.

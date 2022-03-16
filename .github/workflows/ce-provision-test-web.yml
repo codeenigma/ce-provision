@@ -1,0 +1,42 @@
+name: Run web server test build
+
+# Run this workflow every time a new commit pushed to your repository
+on: pull_request
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  test-web:
+    # Name the Job
+    name: Run tests against Ansible code base
+    # Set the type of machine to run on
+    runs-on: ubuntu-20.04
+
+    steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        uses: actions/checkout@v2
+
+      # Installs the ce-dev stack
+      - name: Install ce-dev
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        run: |
+          cd /tmp
+          wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
+          export PATH=$PATH:/usr/local/go/bin
+          git clone https://github.com/FiloSottile/mkcert && cd mkcert
+          go build -ldflags "-X main.Version=$(git describe --tags)"
+          sudo mv ./mkcert /usr/local/bin && cd ../
+          sudo chmod +x /usr/local/bin/mkcert
+          rm -Rf mkcert
+          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+
+      # Uses the ce-dev stack to run a test provision
+      - name: Run a test provision
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        run: |
+          git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
+          /bin/bash ce-dev/ansible/test.sh --examples web --own-branch ${{ github.event.pull_request.base.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
+        shell: bash

@@ -19,6 +19,66 @@
     name: "{{ aws_ec2_with_eip.iam_role_name }}"
   register: _aws_ec2_with_eip_iam_role_info
 
+# Subnet ID is stored in ce-provision's data directory
+- name: Ensure server data directory exists.
+  ansible.builtin.file:
+    path: "{{ _ce_provision_data_dir + '/' + _aws_resource_name }}"
+    state: directory
+
+- name: Ensure subnet file exists.
+  ansible.builtin.file:
+    path: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
+    state: touch
+
+- name: Try to load subnet from file.
+  ansible.builtin.set_fact:
+    _aws_ec2_with_eip_vpc_subnet_id: "{{ lookup('file', _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id') }}"
+
+# If we have no stored subnet ID and one has been set in variables this will override whatever might be looked up.
+- name: Load defined subnet from variables.
+  ansible.builtin.set_fact:
+    _aws_ec2_with_eip_vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
+  when: ( aws_ec2_with_eip.vpc_subnet_id is defined and aws_ec2_with_eip.vpc_subnet_id | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length == 0 )
+
+# If we have no stored subnet ID and vpc_name is defined we'll look up available subnets
+- name: Gather VPC information.
+  amazon.aws.ec2_vpc_net_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    filters:
+      "tag:Name": "{{ aws_ec2_with_eip.vpc_name }}"
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length == 0 )
+  register: _aws_ec2_with_eip_vpc
+
+- name: Set the VPC id from name.
+  ansible.builtin.set_fact:
+    _aws_ec2_with_eip_vpc_id: "{{ _aws_ec2_with_eip_vpc.vpcs[0].vpc_id }}"
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length == 0 )
+
+- name: Gather public subnet information.
+  amazon.aws.ec2_vpc_subnet_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    filters:
+      vpc-id: "{{ _aws_ec2_with_eip_vpc_id }}"
+      tag:Env: "{{ _env_type }}"
+      tag:Profile: "{{ aws_ec2_with_eip.vpc_subnet_profile }}"
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length == 0 )
+  register: _aws_ec2_with_eip_subnets
+
+- name: Pick a subnet at random.
+  ansible.builtin.set_fact:
+    _aws_ec2_with_eip_vpc_subnet_id: "{{ item.subnet_id }}"
+  with_random_choice: "{{ _aws_ec2_with_eip_subnets.subnets }}"
+  when: ( aws_ec2_with_eip.vpc_name is defined and aws_ec2_with_eip.vpc_name | length > 0 and _aws_ec2_with_eip_vpc_subnet_id | length == 0 )
+
+# Save the subnet ID to file.
+- name: Save the subnet ID in the data directory.
+  ansible.builtin.template:
+    src: ec2-subnet-id.j2
+    dest: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
+    force: true
+
 - name: Create EC2 instance.
   community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -29,7 +89,8 @@
     image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
     wait: true
-    vpc_subnet_id: "{{ aws_ec2_with_eip.vpc_subnet_id }}"
+    termination_protection: "{{ aws_ec2_with_eip.termination_protection }}"
+    vpc_subnet_id: "{{ _aws_ec2_with_eip_vpc_subnet_id }}"
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
     security_groups: "{{ aws_ec2_with_eip.security_groups }}"
@@ -38,7 +99,9 @@
       - device_name: /dev/xvda
         ebs:
           volume_size: "{{ aws_ec2_with_eip.root_volume_size }}"
-          delete_on_termination: true
+          delete_on_termination: "{{ aws_ec2_with_eip.root_volume_delete_on_termination }}"
+          volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
+          encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: aws_ec2_with_eip_instances
 
 - name: Check if we have an existing EIP.

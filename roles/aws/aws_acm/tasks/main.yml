@@ -16,12 +16,14 @@
   ansible.builtin.set_fact:
     _aws_acm_cert_list: "{{ _aws_acm_cert_list.CertificateSummaryList|to_json }}"
 
-- name: Explicitly initialise _aws_acm_domain_in_cert_list var.
+- name: Explicitly initialise existing cert vars.
   ansible.builtin.set_fact:
+    aws_acm_certificate_arn: ""
     _aws_acm_domain_in_cert_list: false
 
 - name: Iterate through the certificate list checking for domain.
   ansible.builtin.set_fact:
+    aws_acm_certificate_arn: "{{ item.CertificateArn }}"
     _aws_acm_domain_in_cert_list: true
   when: item.DomainName == aws_acm.domain_name
   with_items: "{{ _aws_acm_cert_list }}"
@@ -45,7 +47,7 @@
 
 - name: Fetch the new certificate's ARN.
   ansible.builtin.set_fact:
-    aws_acm_new_certificate_arn: "{{ _aws_acm_new_certificate.CertificateArn }}"
+    aws_acm_certificate_arn: "{{ _aws_acm_new_certificate.CertificateArn }}"
   when: not _aws_acm_domain_in_cert_list
 
 # Not currently possible to do this with the API, so we just pause 5 seconds - this is usually enough time.
@@ -53,7 +55,7 @@
   ansible.builtin.pause:
     seconds: 5
   when:
-    - aws_acm_new_certificate_arn is defined
+    - not _aws_acm_domain_in_cert_list
     - aws_acm.validate
 
 - name: Obtain all information for a the new ACM certificate.
@@ -63,7 +65,7 @@
     domain_name: "{{ aws_acm.domain_name }}"
   register: _aws_acm_new_certificate
   when:
-    - aws_acm_new_certificate_arn is defined
+    - not _aws_acm_domain_in_cert_list
     - aws_acm.validate
 
 - name: Add a DNS record in Route 53 for validation.
@@ -78,7 +80,7 @@
   when:
     - aws_acm.route_53.zone is defined
     - aws_acm.route_53.zone | length > 0
-    - aws_acm_new_certificate_arn is defined
+    - not _aws_acm_domain_in_cert_list
     - aws_acm.validate
 
 - name: Wait for ACM certificate validation to complete.
@@ -87,7 +89,7 @@
     acm wait certificate-validated \
     --certificate-arn "{{ aws_acm_new_certificate_arn }}"
   when:
-    - aws_acm_new_certificate_arn is defined
+    - not _aws_acm_domain_in_cert_list
     - aws_acm.validate
 
 # Even though we wait for validation, it's still too quick.
@@ -95,7 +97,7 @@
   ansible.builtin.pause:
     seconds: 5
   when:
-    - aws_acm_new_certificate_arn is defined
+    - not _aws_acm_domain_in_cert_list
     - aws_acm.export
     - aws_acm.validate
 
@@ -106,7 +108,7 @@
     --certificate-arn "{{ aws_acm_new_certificate_arn }}"
   register: _aws_acm_exported_certificate_json
   when:
-    - aws_acm_new_certificate_arn is defined
+    - not _aws_acm_domain_in_cert_list
     - aws_acm.export
     - aws_acm.validate
 
