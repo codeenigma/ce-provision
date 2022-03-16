@@ -15,17 +15,28 @@
       "associate_public_ip_address": true,
       "encrypt_boot": "{{ aws_ami.encrypt_boot }}",
       "source_ami_filter": {
-      "filters": {
-        "virtualization-type": "{{ aws_ami.virtualization_type }}",
-        "name": "{{ aws_ami.name_filter }}",
-        "root-device-type": "{{ aws_ami.root_device_type }}"
+        "filters": {
+          "virtualization-type": "{{ aws_ami.virtualization_type }}",
+          "name": "{{ aws_ami.name_filter }}",
+          "root-device-type": "{{ aws_ami.root_device_type }}"
+        },
+        "owners": ["{{ aws_ami.owner }}"],
+        "most_recent": true
       },
-      "owners": ["{{ aws_ami.owner }}"],
-      "most_recent": true
-    },
-    "tags": 
-      {
-      "Name": "{{ aws_ami.ami_name }}"
+      {% if aws_ami.vpc_filter is defined and aws_ami.vpc_filter | length > 0 %}
+      "vpc_filter": {
+        "filters": {
+          "tag:Name": "{{ aws_ami.vpc_filter }}"
+        }
+      },
+      "subnet_filter": {
+        "filters": {
+          "tag:Name": "{{ _infra_name }}-{{ _env_type }}-{{ aws_ami.subnet_filter_az }}"
+        }
+      },
+      {% endif %}
+      "tags": {
+        "Name": "{{ aws_ami.ami_name }}"
       }
     }
   ],

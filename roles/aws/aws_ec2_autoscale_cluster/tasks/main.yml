@@ -127,6 +127,8 @@
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
+      vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
+      subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
       force: "{{ aws_ec2_autoscale_cluster.packer_force }}"
       operation: create
   when:
