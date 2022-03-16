@@ -11,3 +11,5 @@ skip_list:
   - var-naming
   - no-jinja-nesting
   - command-instead-of-module
+warn_list:
+  - fqcn-builtins
