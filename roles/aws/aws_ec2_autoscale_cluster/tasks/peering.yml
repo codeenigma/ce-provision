@@ -1,7 +1,7 @@
 ---
 # @todo cross-owner
 - name: Gather peer instance info.
-  ec2_instance_info:
+  amazon.aws.ec2_instance_info:
     filters:
       "tag:Name": "{{ peering.name }}"
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -9,14 +9,14 @@
   register: _aws_ec2_autoscale_cluster_peer_instance
 
 - name: Gather peer VPC information
-  ec2_vpc_net_info:
+  amazon.aws.ec2_vpc_net_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ peering.region }}"
     vpc_ids: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
   register: _aws_ec2_autoscale_cluster_peer_vpc
 
 - name: Create local VPC peering Connection
-  ec2_vpc_peer:
+  community.aws.ec2_vpc_peer:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
@@ -27,21 +27,21 @@
   register: _aws_ec2_autoscale_cluster_peer_connection
 
 - name: Accept VPC peering request.
-  ec2_vpc_peer:
+  community.aws.ec2_vpc_peer:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     peering_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
     state: accept # @todo this only works for state present
 
 - name: Add/replace subnets CIDR block routes.
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes | default([]) + [ { 'dest': subnet.cidr, 'vpc_peering_connection_id': _aws_ec2_autoscale_cluster_peer_connection.peering_id } ] }}"
   with_items: "{{ aws_ec2_autoscale_cluster.subnets }}"
   loop_control:
     loop_var: subnet
 
 - name: Update peer route table.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_vpc_route
   vars:
     aws_vpc_route:
@@ -51,7 +51,7 @@
       routes: "{{ _aws_ec2_autoscale_cluster_peer_routes }}"
 
 - name: Update reverse peer route table.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_vpc_route
   vars:
     aws_vpc_route:
