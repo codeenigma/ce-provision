@@ -2,6 +2,12 @@ aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   name: "example"
+  acm:
+    create_cert: false
+    san_names: "" # space separated list of Subject Alternative Names, e.g. "example.net example.co.uk"
+    route_53:
+      aws_profile: another # the zone might not be in the same account as the certificate
+      zone: example.com
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
   # vpc_name: example-vpc
   subnets:
@@ -182,8 +188,11 @@ aws_ec2_autoscale_cluster:
     record: "*.{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
-  cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
+  cloudfront:
+    create_cert: false
+    create_distribution: false
+    cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.

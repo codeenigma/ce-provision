@@ -367,6 +367,29 @@
     - _aws_ec2_autoscale_cluster_scaling_down_policy_ARN is defined
     - item.scale_direction == 'down'
 
+- name: Create SSL certificate for cluster.
+  ansible.builtin.include_role:
+    name: aws/aws_acm
+  vars:
+    aws_acm:
+      export: false
+      domain_name: "{{ aws_ec2_autoscale_cluster.route_53.record }}" # use the same value as we create the DNS record with later
+      san_names: "{{ aws_ec2_autoscale_cluster.acm.san_names }}"
+      route_53:
+        aws_profile: "{{ aws_ec2_autoscale_cluster.acm.route_53.aws_profile }}"
+        state: present
+        zone: "{{ aws_ec2_autoscale_cluster.acm.route_53.zone }}"
+  when: aws_ec2_autoscale_cluster.acm.create_cert
+
+- name: Default to provided SSL certificate ARN.
+  ansible.builtin.set_fact:
+    _ssl_certificate_ARN: "{{ aws_ec2_autoscale_cluster.ssl_certificate_ARN }}"
+
+- name: If provided, override SSL certificate ARN with the one received from ACM.
+  ansible.builtin.set_fact:
+    _ssl_certificate_ARN: "{{ aws_acm_certificate_arn }}"
+  when: aws_ec2_autoscale_cluster.acm.create_cert
+
 - name: Define default ALB listeners.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_listeners_http:
@@ -392,7 +415,7 @@
       Port: "443"
       SslPolicy: "{{ aws_ec2_autoscale_cluster.alb_ssl_policy }}"
       Certificates:
-        - CertificateArn: "{{ aws_ec2_autoscale_cluster.ssl_certificate_ARN }}"
+        - CertificateArn: "{{ _ssl_certificate_ARN }}"
       DefaultActions:
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -400,12 +423,12 @@
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_listeners: "{{ [ _aws_ec2_autoscale_cluster_listeners_http ] }}"
-  when: aws_ec2_autoscale_cluster.ssl_certificate_ARN | length < 1
+  when: _ssl_certificate_ARN | length < 1
 
 - name: Add HTTPS Listener.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_listeners: "{{ [ _aws_ec2_autoscale_cluster_listeners_redirect, _aws_ec2_autoscale_cluster_listeners_https ] }}"
-  when: aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+  when: _ssl_certificate_ARN | length > 1
 
 - name: Add custom Listeners.
   ansible.builtin.set_fact:
@@ -433,7 +456,7 @@
   when:
     - "{{ item.port == 443 }}"
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
-    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+    - _ssl_certificate_ARN | length > 1
   with_items: "{{ _aws_ec2_autoscale_cluster_alb.listeners }}"
 
 - name: Add extra SSL certificates to the ALB.
@@ -441,8 +464,38 @@
     cmd: "aws elbv2 add-listener-certificates --region {{ aws_ec2_autoscale_cluster.region }} --profile {{ aws_ec2_autoscale_cluster.aws_profile }} --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
   when:
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
-    - aws_ec2_autoscale_cluster.ssl_certificate_ARN | length > 1
+    - _ssl_certificate_ARN | length > 1
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
+
+- name: Create SSL certificate for CloudFront.
+  ansible.builtin.include_role:
+    name: aws/aws_acm
+  vars:
+    aws_acm:
+      export: false
+      region: us-east-1 # Certificate must be in us-east-1 for CloudFront.
+      domain_name: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
+      san_names: "{{ aws_ec2_autoscale_cluster.acm.san_names }}"
+      route_53:
+        aws_profile: "{{ aws_ec2_autoscale_cluster.acm.route_53.aws_profile }}"
+        state: present
+        zone: "{{ aws_ec2_autoscale_cluster.acm.route_53.zone }}"
+  when:
+    - aws_ec2_autoscale_cluster.cloudfront.create_cert
+    - aws_ec2_autoscale_cluster.region != 'us-east-1'
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
+
+- name: Default to provided CloudFront SSL certificate ARN.
+  ansible.builtin.set_fact:
+    _cf_certificate_ARN: "{{ aws_ec2_autoscale_cluster.cloudfront.cf_certificate_ARN }}"
+  when: aws_ec2_autoscale_cluster.cloudfront.create_distribution
+
+- name: If provided, override CloudFront SSL certificate ARN with the one received from ACM.
+  ansible.builtin.set_fact:
+    _cf_certificate_ARN: "{{ aws_acm_certificate_arn }}"
+  when:
+    - aws_ec2_autoscale_cluster.cloudfront.create_cert
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
 - name: Create a CloudFront distribution.
   ansible.builtin.include_role:
@@ -451,14 +504,15 @@
     aws_cloudfront_distribution:
       tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
       viewer_certificate:
-        acm_certificate_arn: "{{ aws_ec2_autoscale_cluster.cf_certificate_ARN }}"
+        acm_certificate_arn: "{{ _cf_certificate_ARN }}"
       origins:
         - domain_name: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}"
           id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
       default_cache_behavior:
         target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
   when:
-    - aws_ec2_autoscale_cluster.cf_certificate_ARN | length > 1
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
+    - _cf_certificate_ARN | length > 1
 
 - name: Add a DNS record in route 53.
   community.aws.route53:
