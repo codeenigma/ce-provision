@@ -169,6 +169,7 @@
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     instance_profile_name: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
+    assign_public_ip: "{{ aws_ec2_autoscale_cluster.assign_public_ip }}"
     volumes:
       - device_name: /dev/xvda
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
