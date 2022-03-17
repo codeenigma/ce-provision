@@ -28,17 +28,49 @@
   when: item.DomainName == aws_acm.domain_name
   with_items: "{{ _aws_acm_cert_list }}"
 
-# @TODO handle tags
+- ansible.builtin.set_fact:
+    _aws_tags_list: []
+    _aws_tags_string: ""
+  when: aws_acm.tags | length > 0
+
+- name: Build list of tags as Key,Value strings.
+  ansible.builtin.set_fact:
+    _aws_tags_list: "{{ _aws_tags_list + [ 'Key=' + item.key + ',' + 'Value=' + item.value ] }}"
+  loop: "{{ aws_acm.tags | dict2items }}"
+  when: aws_acm.tags | length > 0
+
+- name: Turn tag list into space separated string.
+  ansible.builtin.set_fact:
+    _aws_tags_string: "{{ _aws_tags_list | join(' ') }}"
+  when: aws_acm.tags | length > 0
+
 # Note: an ACM certificate that is in Status:pending will be included in the list of certificates outputted by 'aws acm request-certificate'
-- name: Send ACM request if needed.
+- name: Send simple ACM request if needed.
   ansible.builtin.command: |
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
     acm request-certificate \
     --domain-name "{{ aws_acm.domain_name }}" \
     --domain-validation-options DomainName="{{ aws_acm.domain_name }}",ValidationDomain="{{ aws_acm.route_53.zone }}" \
-    --validation-method DNS
+    --validation-method DNS \
+    --tags {{ _aws_tags_string }}
   register: _aws_acm_new_certificate
-  when: not _aws_acm_domain_in_cert_list
+  when:
+    - not _aws_acm_domain_in_cert_list
+    - aws_acm.san_names | length == 0
+
+- name: Send ACM request for a SAN cert if needed.
+  ansible.builtin.command: |
+    aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
+    acm request-certificate \
+    --domain-name "{{ aws_acm.domain_name }}" \
+    --domain-validation-options DomainName="{{ aws_acm.domain_name }}",ValidationDomain="{{ aws_acm.route_53.zone }}" \
+    --subject-alternative-names "{{ aws_acm.san_names }}" \
+    --validation-method DNS \
+    --tags {{ _aws_tags_string }}
+  register: _aws_acm_new_certificate
+  when:
+    - not _aws_acm_domain_in_cert_list
+    - aws_acm.san_names | length > 0
 
 - name: Parse returned certificate output.
   ansible.builtin.set_fact:

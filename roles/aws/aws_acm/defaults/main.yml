@@ -4,6 +4,7 @@ aws_acm:
   aws_profile: "{{ _aws_profile }}"
   tags: "{{ _aws_tags }}"
   domain_name: subdomain.example.com
+  san_names: "" # space separated list of Subject Alternative Names, e.g. "example.net example.co.uk"
   validate: true # you need to set this to false if the validation zone is not in Route 53 or you do not have CLI access
   export: true
   route_53:
