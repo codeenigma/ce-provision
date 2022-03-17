@@ -514,7 +514,8 @@
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
 
-- name: Add a DNS record in route 53.
+# @todo: This needs to loop over the ACM extra domains too - see aws_acm for an example
+- name: Add DNS records in route 53.
   community.aws.route53:
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     profile: "{{ aws_ec2_autoscale_cluster.route_53.aws_profile }}"
