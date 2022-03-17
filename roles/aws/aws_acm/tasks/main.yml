@@ -56,7 +56,17 @@
   register: _aws_acm_new_certificate
   when:
     - not _aws_acm_domain_in_cert_list
-    - aws_acm.san_names | length == 0
+    - not aws_acm.extra_domains | length > 0
+
+- ansible.builtin.set_fact:
+    _acm_san_domains: []
+  when: aws_acm.extra_domains | length > 0
+
+- name: Build a list of additional domains.
+  set_fact:
+    _acm_san_domains: "{{ _acm_san_domains + [ item.domain ] }}"
+  loop: "{{ extra_domains }}"
+  when: aws_acm.extra_domains | length > 0
 
 - name: Send ACM request for a SAN cert if needed.
   ansible.builtin.command: |
@@ -64,13 +74,13 @@
     acm request-certificate \
     --domain-name "{{ aws_acm.domain_name }}" \
     --domain-validation-options DomainName="{{ aws_acm.domain_name }}",ValidationDomain="{{ aws_acm.route_53.zone }}" \
-    --subject-alternative-names "{{ aws_acm.san_names }}" \
+    --subject-alternative-names "{{ _acm_san_domains | join(' ') }}" \
     --validation-method DNS \
     --tags {{ _aws_tags_string }}
   register: _aws_acm_new_certificate
   when:
     - not _aws_acm_domain_in_cert_list
-    - aws_acm.san_names | length > 0
+    - aws_acm.extra_domains | length > 0
 
 - name: Parse returned certificate output.
   ansible.builtin.set_fact:
@@ -100,15 +110,27 @@
     - not _aws_acm_domain_in_cert_list
     - aws_acm.validate
 
-- name: Add a DNS record in Route 53 for validation.
+- name: Build main domain entry DNS settings.
+  ansible.builtin.set_fact:
+    _acm_main_domain:
+      zone: "{{ aws_acm.route_53.zone }}"
+      aws_profile: "{{ aws_acm.route_53.aws_profile }}"
+
+- name: Add main domain to extra_domains so we can loop through it for DNS records.
+  ansible.builtin.set_fact:
+    aws_acm.extra_domains: "{{ aws_acm.extra_domains + [ _acm_main_domain ] }}"
+
+# @todo: need to figure out how to get the correct resource_record back from the API for SAN domains.
+- name: Add a DNS records in Route 53 for validation.
   community.aws.route53:
-    state: "{{ aws_acm.route_53.state }}"
-    profile: "{{ aws_acm.route_53.aws_profile }}"
-    zone: "{{ aws_acm.route_53.zone }}"
+    state: present
+    profile: "{{ item.aws_profile }}"
+    zone: "{{ item.zone }}"
     record: "{{ _aws_acm_new_certificate.certificates[0].domain_validation_options[0].resource_record.name }}"
     type: CNAME
     value: "{{ _aws_acm_new_certificate.certificates[0].domain_validation_options[0].resource_record.value }}"
     overwrite: true
+  loop: "{{ aws_acm.extra_domains }}"
   when:
     - aws_acm.route_53.zone is defined
     - aws_acm.route_53.zone | length > 0
