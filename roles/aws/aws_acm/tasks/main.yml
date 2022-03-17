@@ -68,6 +68,8 @@
   loop: "{{ extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
+# @todo: not sure we need --domain-validation-options - might be for email validation only
+# see https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html
 - name: Send ACM request for a SAN cert if needed.
   ansible.builtin.command: |
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
@@ -118,7 +120,8 @@
 
 - name: Add main domain to extra_domains so we can loop through it for DNS records.
   ansible.builtin.set_fact:
-    aws_acm.extra_domains: "{{ aws_acm.extra_domains + [ _acm_main_domain ] }}"
+    aws_acm:
+      extra_domains: "{{ aws_acm.extra_domains + [ _acm_main_domain ] }}"
 
 # @todo: need to figure out how to get the correct resource_record back from the API for SAN domains.
 - name: Add a DNS records in Route 53 for validation.
