@@ -4,7 +4,10 @@ aws_ec2_autoscale_cluster:
   name: "example"
   acm:
     create_cert: false
-    san_names: "" # space separated list of Subject Alternative Names, e.g. "example.net example.co.uk"
+    extra_domains: [] # list of Subject Alternative Name domains and zones
+    #  - domain: www2.example.com
+    #    zone: example.com
+    #    aws_profile: us-east-1
     route_53:
       aws_profile: another # the zone might not be in the same account as the certificate
       zone: example.com

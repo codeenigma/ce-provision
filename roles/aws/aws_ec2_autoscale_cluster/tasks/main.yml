@@ -376,10 +376,9 @@
     aws_acm:
       export: false
       domain_name: "{{ aws_ec2_autoscale_cluster.route_53.record }}" # use the same value as we create the DNS record with later
-      san_names: "{{ aws_ec2_autoscale_cluster.acm.san_names }}"
+      extra_domains: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
       route_53:
         aws_profile: "{{ aws_ec2_autoscale_cluster.acm.route_53.aws_profile }}"
-        state: present
         zone: "{{ aws_ec2_autoscale_cluster.acm.route_53.zone }}"
   when: aws_ec2_autoscale_cluster.acm.create_cert
 
@@ -477,10 +476,9 @@
       export: false
       region: us-east-1 # Certificate must be in us-east-1 for CloudFront.
       domain_name: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
-      san_names: "{{ aws_ec2_autoscale_cluster.acm.san_names }}"
+      extra_domains: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
       route_53:
         aws_profile: "{{ aws_ec2_autoscale_cluster.acm.route_53.aws_profile }}"
-        state: present
         zone: "{{ aws_ec2_autoscale_cluster.acm.route_53.zone }}"
   when:
     - aws_ec2_autoscale_cluster.cloudfront.create_cert
