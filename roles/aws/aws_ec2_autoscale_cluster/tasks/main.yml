@@ -223,6 +223,7 @@
     health_check_period: 1200
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
+    replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0  else aws_ec2_autoscale_cluster.desired_capacity }}"
     wait_for_instances: true
     lc_check: true
     wait_timeout: 3000
