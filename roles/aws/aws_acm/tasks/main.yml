@@ -116,4 +116,6 @@
   ansible.builtin.set_fact:
     aws_acm_exported_certificate: "{{ _aws_acm_exported_certificate_json.stdout | from_json }}"
   when:
-    - _aws_acm_exported_certificate_json is defined
+    - not _aws_acm_domain_in_cert_list
+    - aws_acm.export
+    - aws_acm.validate
