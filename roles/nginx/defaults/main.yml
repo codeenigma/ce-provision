@@ -42,6 +42,7 @@ nginx:
         auth_enabled: false
         auth_user: "hello"
         auth_pass: "P3nguin!"
+        auth_message: Restricted content
       servers:
         - port: 80
           ssl: false
