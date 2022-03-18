@@ -79,15 +79,24 @@
     --subject-alternative-names "{{ _acm_san_domains | join(' ') }}" \
     --validation-method DNS \
     --tags {{ _aws_tags_string }}
-  register: _aws_acm_new_certificate
+  register: _aws_acm_new_san_certificate
   when:
     - not _aws_acm_domain_in_cert_list
     - aws_acm.extra_domains | length > 0
 
-- name: Parse returned certificate output.
+- name: Parse returned certificate simple certificate output.
   ansible.builtin.set_fact:
-    _aws_acm_new_certificate: "{{ _aws_acm_new_certificate.stdout|from_json }}"
-  when: not _aws_acm_domain_in_cert_list
+    _aws_acm_new_certificate: "{{ _aws_acm_new_certificate.stdout | from_json }}"
+  when:
+    - not _aws_acm_domain_in_cert_list
+    - not aws_acm.extra_domains | length > 0
+
+- name: Parse returned SAN certificate output.
+  ansible.builtin.set_fact:
+    _aws_acm_new_certificate: "{{ _aws_acm_new_san_certificate.stdout | from_json }}"
+  when:
+    - not _aws_acm_domain_in_cert_list
+    - aws_acm.extra_domains | length > 0
 
 - name: Fetch the new certificate's ARN.
   ansible.builtin.set_fact:
