@@ -1,0 +1,1 @@
+_aws_region: "eu-west-1" # fargate config in gitlab-runner needs this
