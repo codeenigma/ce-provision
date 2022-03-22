@@ -63,19 +63,28 @@
   when: aws_acm.extra_domains | length > 0
 
 - name: Build a list of additional domains.
-  set_fact:
+  ansible.builtin.set_fact:
     _acm_san_domains: "{{ _acm_san_domains + [ item.domain ] }}"
   loop: "{{ extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
-# @todo: not sure we need --domain-validation-options - might be for email validation only
-# see https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html
+- name: Initialise the --domain-validation-options string for a SAN cert.
+  ansible.builtin.set_fact:
+    _acm_san_domain_validation_options: "DomainName={{ aws_acm.domain_name }},ValidationDomain={{ aws_acm.route_53.zone }}"
+  when: aws_acm.extra_domains | length > 0
+
+- name: Build the --domain-validation-options string for a SAN cert.
+  ansible.builtin.set_fact:
+    _acm_san_domain_validation_options: "{{ _acm_san_domain_validation_options }} DomainName={{ item.domain }},ValidationDomain={{ item.zone }}"
+  loop: "{{ aws_acm.extra_domains }}"
+  when: aws_acm.extra_domains | length > 0
+
 - name: Send ACM request for a SAN cert if needed.
   ansible.builtin.command: |
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
     acm request-certificate \
     --domain-name "{{ aws_acm.domain_name }}" \
-    --domain-validation-options DomainName="{{ aws_acm.domain_name }}",ValidationDomain="{{ aws_acm.route_53.zone }}" \
+    --domain-validation-options "{{ _acm_san_domain_validation_options }}" \
     --subject-alternative-names "{{ _acm_san_domains | join(' ') }}" \
     --validation-method DNS \
     --tags {{ _aws_tags_string }}
@@ -124,6 +133,7 @@
 - name: Build main domain entry DNS settings.
   ansible.builtin.set_fact:
     _acm_main_domain:
+      domain: "{{ aws_acm.domain_name }}"
       zone: "{{ aws_acm.route_53.zone }}"
       aws_profile: "{{ aws_acm.route_53.aws_profile }}"
 
@@ -132,15 +142,14 @@
     aws_acm:
       extra_domains: "{{ aws_acm.extra_domains + [ _acm_main_domain ] }}"
 
-# @todo: need to figure out how to get the correct resource_record back from the API for SAN domains.
 - name: Add a DNS records in Route 53 for validation.
   community.aws.route53:
     state: present
     profile: "{{ item.aws_profile }}"
     zone: "{{ item.zone }}"
-    record: "{{ _aws_acm_new_certificate.certificates[0].domain_validation_options[0].resource_record.name }}"
+    record: "{{ ( _aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain) )[0].resource_record.name }}"
     type: CNAME
-    value: "{{ _aws_acm_new_certificate.certificates[0].domain_validation_options[0].resource_record.value }}"
+    value: "{{ ( _aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain) )[0].resource_record.value }}"
     overwrite: true
   loop: "{{ aws_acm.extra_domains }}"
   when:
