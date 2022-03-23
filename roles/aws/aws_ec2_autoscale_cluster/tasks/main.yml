@@ -514,16 +514,29 @@
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
 
-# @todo: This needs to loop over the ACM extra domains too - see aws_acm for an example
+- name: Build main domain entry DNS settings.
+  ansible.builtin.set_fact:
+    _aws_ec2_autoscale_cluster_main_domain:
+      domain: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
+      zone: "{{ aws_ec2_autoscale_cluster.route_53.zone }}"
+      aws_profile: "{{ aws_ec2_autoscale_cluster.route_53.aws_profile }}"
+
+- name: Add main domain to extra_domains so we can loop through it for DNS records.
+  ansible.builtin.set_fact:
+    aws_ec2_autoscale_cluster:
+      acm:
+        extra_domains: "{{ aws_ec2_autoscale_cluster.acm.extra_domains + [ _aws_ec2_autoscale_cluster_main_domain ] }}"
+
 - name: Add DNS records in route 53.
   community.aws.route53:
     state: "{{ aws_ec2_autoscale_cluster.state }}"
-    profile: "{{ aws_ec2_autoscale_cluster.route_53.aws_profile }}"
-    zone: "{{ aws_ec2_autoscale_cluster.route_53.zone }}"
-    record: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
+    profile: "{{ item.aws_profile }}"
+    zone: "{{ item.zone }}"
+    record: "{{ item.domain }}"
     type: CNAME
     value: "{{ _aws_cloudfront_distribution.domain_name if _aws_cloudfront_distribution is defined else _aws_ec2_autoscale_cluster_alb.dns_name }}"
     overwrite: true
+  loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
