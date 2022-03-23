@@ -50,7 +50,6 @@
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
     acm request-certificate \
     --domain-name "{{ aws_acm.domain_name }}" \
-    --domain-validation-options DomainName="{{ aws_acm.domain_name }}",ValidationDomain="{{ aws_acm.route_53.zone }}" \
     --validation-method DNS \
     --tags {{ _aws_tags_string }}
   register: _aws_acm_new_certificate
@@ -68,23 +67,11 @@
   loop: "{{ aws_acm.extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
-- name: Initialise the --domain-validation-options string for a SAN cert.
-  ansible.builtin.set_fact:
-    _acm_san_domain_validation_options: "DomainName={{ aws_acm.domain_name }},ValidationDomain={{ aws_acm.route_53.zone }}"
-  when: aws_acm.extra_domains | length > 0
-
-- name: Build the --domain-validation-options string for a SAN cert.
-  ansible.builtin.set_fact:
-    _acm_san_domain_validation_options: "{{ _acm_san_domain_validation_options }} DomainName={{ item.domain }},ValidationDomain={{ item.zone }}"
-  loop: "{{ aws_acm.extra_domains }}"
-  when: aws_acm.extra_domains | length > 0
-
 - name: Send ACM request for a SAN cert if needed.
   ansible.builtin.command: |
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
     acm request-certificate \
     --domain-name "{{ aws_acm.domain_name }}" \
-    --domain-validation-options "{{ _acm_san_domain_validation_options }}" \
     --subject-alternative-names "{{ _acm_san_domains | join(' ') }}" \
     --validation-method DNS \
     --tags {{ _aws_tags_string }}
