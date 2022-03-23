@@ -65,7 +65,7 @@
 - name: Build a list of additional domains.
   ansible.builtin.set_fact:
     _acm_san_domains: "{{ _acm_san_domains + [ item.domain ] }}"
-  loop: "{{ extra_domains }}"
+  loop: "{{ aws_acm.extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
 - name: Initialise the --domain-validation-options string for a SAN cert.
