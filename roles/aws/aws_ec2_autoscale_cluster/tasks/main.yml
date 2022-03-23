@@ -497,24 +497,7 @@
     - aws_ec2_autoscale_cluster.cloudfront.create_cert
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
-- name: Create a CloudFront distribution.
-  ansible.builtin.include_role:
-    name: aws/aws_cloudfront_distribution
-  vars:
-    aws_cloudfront_distribution:
-      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
-      viewer_certificate:
-        acm_certificate_arn: "{{ _cf_certificate_ARN }}"
-      origins:
-        - domain_name: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}"
-          id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
-      default_cache_behavior:
-        target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
-  when:
-    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
-    - _cf_certificate_ARN | length > 1
-
-- name: Initialise the DNS loop var with main domain entry DNS settings.
+- name: Initialise the domains loop var with main domain entry DNS settings.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_dns_all_domains:
       - domain: "{{ aws_ec2_autoscale_cluster.route_53.record }}"
@@ -526,6 +509,34 @@
     _aws_ec2_autoscale_cluster_dns_all_domains: "{{ _aws_ec2_autoscale_cluster_dns_all_domains + [ { 'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile } ] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
   when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
+
+- name: Initialise a list of CloudFront aliases with main domain name.
+  ansible.builtin.set_fact:
+    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [ _domain_name ] }}"
+
+- name: Add extra_domains so we can set up additional CloudFront aliases.
+  ansible.builtin.set_fact:
+    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [ item.domain ] }}"
+  loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
+  when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
+
+- name: Create a CloudFront distribution.
+  ansible.builtin.include_role:
+    name: aws/aws_cloudfront_distribution
+  vars:
+    aws_cloudfront_distribution:
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
+      aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases }}"
+      viewer_certificate:
+        acm_certificate_arn: "{{ _cf_certificate_ARN }}"
+      origins:
+        - domain_name: "{{ _aws_ec2_autoscale_cluster_alb.dns_name }}"
+          id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
+      default_cache_behavior:
+        target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
+  when:
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
+    - _cf_certificate_ARN | length > 1
 
 - name: Add DNS records in route 53.
   community.aws.route53:
