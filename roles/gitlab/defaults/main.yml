@@ -11,6 +11,9 @@ gitlab:
   server_name: "gitlab.{{ _domain_name }}"
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
     handling: selfsigned
+  disable_signup: true
+  disable_signin: false
+  private_projects: true
   unicorn_worker_processes: 2
   puma_worker_processes: 2
   initial_root_password: ""
