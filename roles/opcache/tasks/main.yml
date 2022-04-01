@@ -2,6 +2,7 @@
 # tasks file for opcache
 #
 
+# @todo We could look up PHP version and install the latest for that version
 - name: Install latest cachetool
   ansible.builtin.get_url:
     url: https://gordalina.github.io/cachetool/downloads/cachetool.phar
