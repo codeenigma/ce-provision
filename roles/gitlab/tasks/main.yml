@@ -81,6 +81,7 @@
   # Seems any ApplicationSetting can - see example: https://gitlab.com/gitlab-org/gitlab-foss/-/issues/17296
 - name: Disable self-register feature
   ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(signup_enabled: false)'"
+  when: gitlab.disable_signup
 
 - name: Disable DSA keys
   ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(dsa_key_restriction: -1)'"
@@ -96,3 +97,8 @@
 
 - name: Ensure user data and projects are private
   ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(restricted_visibility_levels: [10, 20])'"
+  when: gitlab.private_projects
+
+- name: Disable standard sign-in dialogue
+  ansible.builtin.command: "gitlab-rails runner 'Gitlab::CurrentSettings.update!(password_authentication_enabled_for_web: false)'"
+  when: gitlab.disable_signin
