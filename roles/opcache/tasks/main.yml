@@ -2,13 +2,23 @@
 # tasks file for opcache
 #
 
-- name: Install cachetool
+- name: Install latest cachetool
   ansible.builtin.get_url:
     url: https://gordalina.github.io/cachetool/downloads/cachetool.phar
     dest: /usr/local/bin/cachetool
     owner: root
     group: root
     mode: "0755"
+  when: opcache.cachetool_version == 'latest'
+
+- name: "Install cachetool version {{ opcache.cachetool_version }}"
+  ansible.builtin.get_url:
+    url: "https://gordalina.github.io/cachetool/downloads/cachetool-{{ opcache.cachetool_version }}.phar"
+    dest: /usr/local/bin/cachetool
+    owner: root
+    group: root
+    mode: "0755"
+  when: opcache.cachetool_version != 'latest'
 
 - name: Get php-fpm host
   ansible.builtin.shell:
