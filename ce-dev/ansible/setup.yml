@@ -1,24 +1,33 @@
 ---
 - hosts: provision-controller
-  become: yes
-  vars_files:
-    - common.yml
+  become: true
+
   vars:
-    - _domain_name: provision-controller.local
-    - project_name: provision
+    project_name: provision
+    is_local: true
+    _domain_name: provision-controller.local
+    _init:
+      vars_dirs:
+        - "{{ playbook_dir }}/vars/_common"
+        - "{{ playbook_dir }}/vars/{{ project_name }}"
+      force_play: true
   tasks:
-    - import_role:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
         name: ce_provision
     - name: Remove example git hooks.
-      file:
+      ansible.builtin.file:
         path: "/home/ce-dev/ce-provision/.git/hooks"
         state: absent
     - name: Create git-hooks link.
-      file:
+      ansible.builtin.file:
         src: "../git-hooks"
         dest: "/home/ce-dev/ce-provision/.git/hooks"
         state: link
-    - import_role:
+    - ansible.builtin.import_role:
         name: aws/aws_cli
-    - import_role:
+    - ansible.builtin.import_role:
         name: aws/aws_credentials
+    - ansible.builtin.import_role:
+        name: _exit

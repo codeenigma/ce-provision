@@ -7,7 +7,7 @@ aws_backup:
   # copy_vault:
   #   name: "Default"
   #   encryption_key: "Default" # An Amazon Resource Name (ARN) that identifies the encryption key to use in the copy region. If 'default', the default AWS encryption key will be used. If NOT 'default', the key must already exist so the ARN can be passed in.
-  #   region: "eu-central-1"
+  #   region: "{{ _aws_region }}"
   plans: [] # A list of backup plans. See below for usage example.
   # plans:
   #   - name: "ExampleDev"
@@ -39,7 +39,7 @@ aws_backup:
   #             delete_after_days: 0 # Specifies the number of days after creation that a recovery point is deleted.
   #         continuous_backup: false # Specifies whether Backup creates continuous backups.
   backup:
-    iam_role_arn: "Default" # Set to the ARN of an existing IAM role or leave as 'Default' to use the AWSBackupDefaultServiceRole role.
+    iam_role_arn: "Default" # Set to the ARN of an existing IAM role or leave as 'Default' to create a role with the name '_infra_name-backup'.
     backup_plan_name: "" # Name of the backup plan to use. Must match one in the plans list.
     selection_name: "" # Name of the resource assignation; this is set in the roles which create the resources such as aws/aws_ec2_with_eip and aws/aws_efs.
     resource_id: "" # The unique ID of the resource. For EC2, this is the instance ID. For EFS, the filesystem ID. For RDS, the DB identifier.

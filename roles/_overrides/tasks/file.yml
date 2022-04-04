@@ -1,6 +1,6 @@
 ---
 - name: Create needed directory.
-  file:
+  ansible.builtin.file:
     path: "{{ override_file.dest | dirname }}"
     state: directory
     mode: "{{ override_file.mode | default('0755') }}"
@@ -8,7 +8,7 @@
     group: "{{ override_file.group | default(omit) }}"
 
 - name: Install files overrides.
-  copy:
+  ansible.builtin.copy:
     src: "{{ _ce_provision_build_tmp_dir }}/extra/{{ override_file.src }}"
     dest: "{{ override_file.dest }}"
     force: true

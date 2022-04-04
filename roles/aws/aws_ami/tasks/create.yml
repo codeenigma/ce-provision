@@ -1,0 +1,23 @@
+---
+- name: Generate Packer template.
+  ansible.builtin.template:
+    src: packer.json.j2
+    dest: "{{ _ce_provision_build_tmp_dir }}/packer.json"
+    mode: "0666"
+
+- name: Inspect Packer configuration.
+  ansible.builtin.command:
+    cmd: "packer inspect {{ _ce_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ce_provision_base_dir }}"
+
+- name: Build AMI.
+  ansible.builtin.command:
+    cmd: "packer build -on-error={{ aws_ami.on_error }} {{ _ce_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ce_provision_base_dir }}"
+  when: not aws_ami.force
+
+- name: Build AMI with force.
+  ansible.builtin.command:
+    cmd: "packer build -on-error={{ aws_ami.on_error }} -force {{ _ce_provision_build_tmp_dir }}/packer.json"
+    chdir: "{{ _ce_provision_base_dir }}"
+  when: aws_ami.force

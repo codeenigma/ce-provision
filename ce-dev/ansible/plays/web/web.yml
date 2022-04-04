@@ -1,0 +1,22 @@
+---
+# Spin up a "web" instance.
+- hosts: provision-target
+  become: true
+
+  vars:
+    project_name: web
+    is_local: true
+    _ce_provision_base_dir: /home/ce-dev/ce-provision
+    _init:
+      force_play: true
+      vars_dirs:
+        - "{{ _ce_provision_base_dir }}/ce-dev/ansible/vars/_common"
+        - "{{ _ce_provision_base_dir }}/ce-dev/ansible/vars/{{ project_name }}"
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: _meta/webserver
+    - ansible.builtin.import_role:
+        name: _exit

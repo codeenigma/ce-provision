@@ -1,32 +1,32 @@
 ---
 - name: Define SSL base path.
-  set_fact:
+  ansible.builtin.set_fact:
     _ssl_base_path: "/etc/ssl/provided"
 
 - name: Create SSL directory.
-  file:
+  ansible.builtin.file:
     path: "{{ _ssl_base_path }}"
     state: directory
 
 - name: Define key path.
-  set_fact:
+  ansible.builtin.set_fact:
     _ssl_current_key_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.key"
 
 - name: Define cert path.
-  set_fact:
+  ansible.builtin.set_fact:
     _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.cert"
 
 - name: Define CA cert path.
-  set_fact:
+  ansible.builtin.set_fact:
     _ssl_current_ca_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.CA.cert"
 
 - name: Check if we have an existing SSL key.
-  stat:
+  ansible.builtin.stat:
     path: "{{ _ssl_current_key_path }}"
   register: ssl_key
 
 - name: Copy public cert file to destination
-  copy:
+  ansible.builtin.copy:
     content: "{{ ssl.cert }}"
     dest: "{{ _ssl_current_cert_path }}"
     owner: root
@@ -35,7 +35,7 @@
   when: not ssl_key.stat.exists
 
 - name: Copy CA cert file to destination
-  copy:
+  ansible.builtin.copy:
     content: "{{ ssl.ca_cert }}"
     dest: "{{ _ssl_current_ca_cert_path }}"
     owner: root
@@ -46,14 +46,14 @@
     - ssl.ca_cert is defined
 
 - name: Copy private key file to destination
-  copy:
-    content: "{{ ssl.private_key }}"
+  ansible.builtin.copy:
+    content: "{{ ssl.key }}"
     dest: "{{ _ssl_current_key_path }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0400
   when: not ssl_key.stat.exists
 
 - name: Add key/cert pairs to know paths information.
-  set_fact:
+  ansible.builtin.set_fact:
     ssl_facts: "{{ ssl_facts | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"

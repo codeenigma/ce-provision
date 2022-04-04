@@ -1,6 +1,6 @@
 ---
 - name: Ensure xdebug is not installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "php{{ php.version[0] }}-xdebug"
     state: absent
     purge: true
@@ -9,7 +9,7 @@
     - not xdebug.fpm
 
 - name: Remove output folder.
-  file:
+  ansible.builtin.file:
     path: "{{ xdebug.output_dir }}"
     state: absent
   when:
@@ -17,7 +17,7 @@
     - not xdebug.fpm
 
 - name: Ensure xdebug is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "php{{ php.version[0] }}-xdebug"
     state: present
     update_cache: true
@@ -25,33 +25,33 @@
   when: xdebug.cli or xdebug.fpm
 
 - name: Create output folder.
-  file:
+  ansible.builtin.file:
     path: "{{ xdebug.output_dir }}"
     state: directory
   when: xdebug.cli or xdebug.fpm
 
 - name: Set remote host (default)
-  set_fact:
+  ansible.builtin.set_fact:
     _xdebug_remote_host: "{{ xdebug.remote_host }}"
 
 - name: Enable xdebug connect back (default)
-  set_fact:
+  ansible.builtin.set_fact:
     _xdebug_remote_connect_back: "{{ xdebug.remote_connect_back }}"
 
 - name: Set remote host (auto)
-  set_fact:
+  ansible.builtin.set_fact:
     _xdebug_remote_host: "127.0.0.1"
   when:
     - xdebug.remote_host == 'auto'
 
 - name: Enable xdebug connect back (auto)
-  set_fact:
+  ansible.builtin.set_fact:
     _xdebug_remote_connect_back: "1"
   when:
     - xdebug.remote_connect_back == 'auto'
 
 - name: Set remote host (Docker for Mac)
-  set_fact:
+  ansible.builtin.set_fact:
     _xdebug_remote_host: "docker.for.mac.localhost"
   when:
     - xdebug.remote_host == "auto"
@@ -59,7 +59,7 @@
     - ce_dev_host_platform == "darwin"
 
 - name: Disable xdebug connect back (Docker for Mac)
-  set_fact:
+  ansible.builtin.set_fact:
     _xdebug_remote_connect_back: "0"
   when:
     - xdebug.remote_connect_back == 'auto'
@@ -67,13 +67,13 @@
     - ce_dev_host_platform == "darwin"
 
 - name: Ensure cli/conf.d exists
-  stat:
+  ansible.builtin.stat:
     path: "/etc/php/{{ php.version[0] }}/cli/conf.d"
   register: cli_confd_dir
   when: xdebug.cli
 
 - name: Copy xdebug configuration in place.
-  template:
+  ansible.builtin.template:
     src: 30-xdebug-dev.ini.j2
     dest: "/etc/php/{{ php.version[0] }}/cli/conf.d/30-xdebug-dev.ini"
     owner: root
@@ -84,13 +84,13 @@
     - cli_confd_dir.stat.exists
 
 - name: Ensure fpm/conf.d exists
-  stat:
+  ansible.builtin.stat:
     path: "/etc/php/{{ php.version[0] }}/fpm/conf.d"
   register: fpm_confd_dir
   when: xdebug.fpm
 
 - name: Copy xdebug configuration in place.
-  template:
+  ansible.builtin.template:
     src: 30-xdebug-dev.ini.j2
     dest: "/etc/php/{{ php.version[0] }}/fpm/conf.d/30-xdebug-dev.ini"
     owner: root

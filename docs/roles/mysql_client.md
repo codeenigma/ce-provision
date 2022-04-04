@@ -13,6 +13,9 @@ mysql_client:
   host: "rds.example.com"
   user: "user"
   password: "password"
+  creds_file_dest: "/home/{{ user_deploy.username }}/.mysql.creds"
+  creds_file_owner: "{{ user_deploy.username }}"
+  creds_file_group: "{{ user_deploy.username }}"
 
 ```
 

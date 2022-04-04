@@ -1,9 +1,10 @@
 ---
 dependencies:
-  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python-apt", "acl"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential"] }
   - role: locales
   - role: user_root
   - role: apt_extra_packages
   - { role: hosts, when: ( is_local is not defined or not is_local ) }
   - role: rkhunter
   - role: postfix
+  - role: geerlingguy.clamav

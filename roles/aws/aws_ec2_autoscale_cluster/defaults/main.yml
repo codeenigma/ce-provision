@@ -1,7 +1,16 @@
 aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   name: "example"
+  acm:
+    create_cert: false
+    extra_domains: [] # list of Subject Alternative Name domains and zones
+    #  - domain: www2.example.com
+    #    zone: example.com
+    #    aws_profile: us-east-1
+    route_53:
+      aws_profile: another # the zone might not be in the same account as the certificate
+      zone: example.com
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
   # vpc_name: example-vpc
   subnets:
@@ -14,13 +23,20 @@ aws_ec2_autoscale_cluster:
     - az: c
       cidr_block: "10.0.3.128/26"
       public_subnet: public-c
-  instance_type: t2.micro
+  instance_type: t3.micro
+  assign_public_ip: false
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
-  root_volume_size: 40
+  root_volume_size: 30
+  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_delete_on_termination: true
   ebs_optimized: true
-  encrypt_boot: false # Whether to encrypt the EBS volumes or not.
+  encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
+  packer_on_error: cleanup # see aws_ami for details
+  packer_force: false # see aws_ami for details
+  packer_vpc_filter: "" # see aws_ami for details
+  packer_subnet_filter_az: "" # see aws_ami for details
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
   asg_cloudwatch_policy_scale_up_name: "{{ _env_type }}-scale-up-policy"
@@ -87,12 +103,14 @@ aws_ec2_autoscale_cluster:
   # Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
   peering:
     - name: utility-server.example.com
-      region: eu-west-3
+      region: "{{ _aws_region }}"
   # Associated RDS instance.
   rds:
     rds: false # wether to create an instance.
-    db_instance_class: db.m5.large
+    db_instance_class: db.t3.medium
+    #db_cluster_identifier: example-aurora-cluster
     engine: mariadb
+    aurora_reader: false
     #engine_version: 5.7.9
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.
@@ -174,8 +192,11 @@ aws_ec2_autoscale_cluster:
     record: "*.{{ _domain_name }}"
     aws_profile: another # Not necessarily the same as the "target" one.
   ssl_certificate_ARN: ""
-  cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
+  cloudfront:
+    create_cert: false
+    create_distribution: false
+    cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.

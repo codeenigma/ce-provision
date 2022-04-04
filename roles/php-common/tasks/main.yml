@@ -1,16 +1,16 @@
 ---
 - name: Add Sury repository key for PHP.
-  apt_key:
+  ansible.builtin.apt_key:
     url: https://packages.sury.org/php/apt.gpg
     state: present
 
 - name: Add Sury repository.
-  apt_repository:
+  ansible.builtin.apt_repository:
     repo: "deb https://packages.sury.org/php/ buster main"
     state: present
 
 - name: Pin Sury packages.
-  template:
+  ansible.builtin.template:
     src: sury.pref.j2
     dest: "/etc/apt/preferences.d/sury.pref"
     owner: root
@@ -19,13 +19,12 @@
     force: true
 
 - name: Install PHP packages.
-  apt:
+  ansible.builtin.apt:
     pkg:
       - "php{{ version }}-curl"
       - "php{{ version }}-dev"
       - "php{{ version }}-gd"
       - "php{{ version }}-imap"
-      - "php{{ version }}-json"
       - "php{{ version }}-ldap"
       - "php{{ version }}-mbstring"
       - "php{{ version }}-memcached"
@@ -41,10 +40,21 @@
   loop_control:
     loop_var: version
 
+- name: Install PHP package JSON when PHP < 8.0.
+  ansible.builtin.apt:
+    pkg:
+      - "php{{ version }}-json"
+    state: present
+  with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
+  when:
+    - version < 8
+
 - name: Setup xdebug.
-  include_role:
+  ansible.builtin.include_role:
     name: php_xdebug
 
 - name: Setup Blackfire.
-  include_role:
+  ansible.builtin.include_role:
     name: php_blackfire

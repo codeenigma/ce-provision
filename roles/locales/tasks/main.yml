@@ -1,24 +1,24 @@
 ---
 - name: Ensure "locales" is installed.
-  apt:
+  ansible.builtin.apt:
     pkg: "locales"
     state: present
     update_cache: true
     cache_valid_time: 240
 
 - name: Copy locales settings.
-  template:
+  ansible.builtin.template:
     src: "locale.gen.j2"
     dest: "/etc/locale.gen"
   register: locales_gen_changed
 
 - name: Define default locale.
-  template:
+  ansible.builtin.template:
     src: "locale.j2"
     dest: "/etc/default/locale"
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ locales.overrides }}"
@@ -27,7 +27,7 @@
     - locales.overrides | length > 0
 
 - name: Generates locales.
-  command: "/usr/sbin/locale-gen"
+  ansible.builtin.command: "/usr/sbin/locale-gen"
   when: locales_gen_changed.changed
 
 - name: Set timezone

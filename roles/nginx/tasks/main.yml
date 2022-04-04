@@ -12,7 +12,7 @@
     executable: pip3
 
 - name: Copy main nginx config.
-  template:
+  ansible.builtin.template:
     src: nginx.conf.j2
     dest: "/etc/nginx/nginx.conf"
     owner: root
@@ -20,13 +20,13 @@
     mode: 0644
 
 - name: Ensure passwords directory exists.
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/passwords
     state: directory
     mode: "0755"
 
 - name: Copy project type-specific configuration in place.
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "/etc/nginx/conf.d/{{ item }}"
     owner: root
@@ -50,17 +50,17 @@
     - wordpress
 
 - name: Ensure log dir exists.
-  file:
+  ansible.builtin.file:
     path: "/var/log/nginx"
     state: directory
 
 - name: Remove existing vhosts
-  file:
+  ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: absent
 
 - name: Recreate vhosts folder
-  file:
+  ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: directory
 
@@ -70,20 +70,23 @@
   register: _nginx_cloudwatch_dir
 
 - name: Generates AWS Cloudwatch default config.
-  template:
+  ansible.builtin.template:
     src: cloudwatch-main.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-main.json
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
 - name: Generate domain specific configuration.
-  include_tasks: domain.yml
+  ansible.builtin.include_tasks: domain.yml
   with_items: "{{ nginx.domains }}"
   loop_control:
     loop_var: domain
+  when:
+    - nginx.domains is defined
+    - nginx.domains | length > 0
 
 - name: Trigger overrides
-  include_role:
+  ansible.builtin.include_role:
     name: _overrides
   vars:
     _overrides: "{{ nginx.overrides }}"
@@ -92,6 +95,6 @@
     - nginx.overrides | length > 0
 
 - name: Ensure Nginx is restarted.
-  service:
+  ansible.builtin.service:
     name: nginx
     state: restarted

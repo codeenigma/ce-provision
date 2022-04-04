@@ -30,26 +30,22 @@
 
 - name: Gather key ID.
   ansible.builtin.command:
-    cmd: "gpg --list-secret-keys {{ gpg_user.email }} | grep '^  '"
+    cmd: "gpg --list-secret-keys {{ gpg_user.email }}"
   become: true
   become_user: "{{ gpg_user.username }}"
-  register: user_ansible_gpg_key_id
+  register: user_ansible_gpg_key
   when:
     - gpg_user.publish
     - not user_ansible_gpg_key_exists.stdout
 
 - name: Publish GPG key to openpgp.org.
   ansible.builtin.command:
-    cmd: "gpg --keyserver {{ server }} --send-keys {{ user_ansible_gpg_key_id.stdout }}"
+    cmd: "gpg --keyserver {{ server }} --send-keys {{ user_ansible_gpg_key.stdout_lines[1] }}"
   become: true
   become_user: "{{ gpg_user.username }}"
   when:
     - gpg_user.publish
     - not user_ansible_gpg_key_exists.stdout
-  with_items:
-    - hkp://hkps.pool.sks-keyservers.net
-    - hkps://pgp.mit.edu
-    - hkps://keys.openpgp.org
-    - hkp://keys.gnupg.net
+  with_items: "{{ gpg_key_servers }}"
   loop_control:
     loop_var: server

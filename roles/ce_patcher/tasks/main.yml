@@ -1,0 +1,20 @@
+---
+- name: Run a dist-upgrade.
+  ansible.builtin.apt:
+    upgrade: dist
+    update_cache: true
+  become: true
+  remote_user: "{{ ce_patcher.username }}"
+
+- name: Remove dependencies that are no longer required.
+  ansible.builtin.apt:
+    autoremove: true
+  become: true
+  remote_user: "{{ ce_patcher.username }}"
+
+- name: Reboot the server.
+  ansible.builtin.reboot:
+    post_reboot_delay: 30
+  become: true
+  remote_user: "{{ ce_patcher.username }}"
+  when: ce_patcher.reboot

@@ -2,7 +2,6 @@
 dependencies:
   - role: user_provision
   - role: _meta/common_base
-  - role: _meta/aws_client_instance
   - role: ce_deploy
   - role: aws/aws_credentials
   - role: gitlab
@@ -12,4 +11,4 @@ dependencies:
   - role: gpg_key
   - role: pam_ldap
   - role: pam_linotp
-  - role: firewall
+  - role: firewall_config

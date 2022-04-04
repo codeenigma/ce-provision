@@ -1,0 +1,36 @@
+---
+aws_ami:
+  aws_profile: "{{ _aws_profile }}"
+  region: "{{ _aws_region }}"
+  instance_type: t3.micro
+  virtualization_type: hvm
+  root_device_type: ebs
+  name_filter: "debian-10-amd64-*"
+  ami_name: "example"
+  owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
+  ssh_username: "admin"
+  encrypt_boot: false
+  #vpc_filter: "example" # If defined, Packer will search for a VPC with the `Name` tag of the value given. vpc_id takes precednece over this if both are defined. This also assumes the VPC is not the default and has a CIDR block of /16.
+  vpc_filter: ""
+  #subnet_filter_az: "a" # If vpc_id and/or vpc_filter are defined, subnet_filter_az MUST be defined and must match an AZ that has public networking.
+  subnet_filter_az: ""
+  playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
+  force: false # Forces a builder to run when artifacts from a previous build prevent a build from running. May be necessary if on_error is 'abort'
+  # on_error can be one of:
+  # - cleanup (default): cleans up after the previous steps, deleting temporary files and virtual machines.
+  # - abort: exits without any cleanup, which might require the next build to use -force.
+  on_error: "cleanup"
+  # Operation can be one of:
+  # - create: delete existing image if any and re-create a new one.
+  # - ensure: Only create an image if it doesn't already exists.
+  # - delete: Delete image and snapshots.
+  #@todo find better names.
+  operation: ensure
+  # Ansible groups to add the target to. Useful for picking up group_vars.
+  groups: []
+  # groups:
+  #   - "all"
+  #   - "example"
+  # A string of additional arguments to pass as ansible --extra-vars.
+  # It must me escaped already, and will be passed as-is.
+  extra_vars: ""

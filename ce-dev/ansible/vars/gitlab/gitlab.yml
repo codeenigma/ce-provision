@@ -1,0 +1,5 @@
+gitlab:
+  server_name: provision-privileged.local
+  ssl:
+    handling: selfsigned
+  ldap: no

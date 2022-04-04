@@ -1,0 +1,4 @@
+firewall_config:
+  rulesets:
+    - ssh_restricted
+    - web_open

@@ -55,11 +55,70 @@
     - gitlab_runner.install_fargate
     - gitlab_runner.fargate | length > 0
 
+- name: Ensure the Fargate metadata directory exists.
+  ansible.builtin.file:
+    path: /opt/gitlab-runner/metadata
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: true
+  when:
+    - gitlab_runner.install_fargate
+
 # @TODO inject the executor lines after any Fargate services in config.toml
+
+- name: Ensure the Gitlab runner working directory exists.
+  ansible.builtin.file:
+    path: "{{ gitlab_runner.runner_workingdir }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ gitlab_runner.username }}"
+    group: "{{ gitlab_runner.username }}"
+  become: true
+
+- name: Ensure the Gitlab runner service override directory exists.
+  ansible.builtin.file:
+    path: /etc/systemd/system/gitlab-runner.service.d
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+    force: true
+  become: true
+
+- name: Check directory exists. # forces any filesystem caching to clear
+  ansible.builtin.stat:
+    path: /etc/systemd/system/gitlab-runner.service.d
+  register: _service_override_dir
+
+- name: Place the gitlab-runner unit override file. # see https://gitlab.com/gitlab-org/gitlab-runner/-/issues/2422#note_838191146
+  ansible.builtin.template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/gitlab-runner.service.d/override.conf
+    mode: '0644'
+    owner: root
+    group: root
+    force: true
+  become: true
 
 - name: Restart gitlab-runner service.
   ansible.builtin.service:
     name: gitlab-runner
     state: restarted
+    daemon_reload: true
   become: true
   when: gitlab_runner.restart
+
+- name: Run docker_ce role when Fargate driver to be installed.
+  ansible.builtin.include_role:
+    name: docker_ce
+  when: gitlab_runner.install_fargate
+
+- name: Add the ce-provision user to the docker group.
+  ansible.builtin.user:
+    name: "{{ gitlab_runner.username }}"
+    groups: "{{ gitlab_runner.docker_group }}"
+    append: true
+  when: gitlab_runner.install_fargate
+

@@ -1,17 +1,17 @@
 ---
 - name: Randomize root password.
-  user:
+  ansible.builtin.user:
     name: root
     state: present
     password: "{{ lookup('password', '/dev/null') | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
 
 - name: Reset authorized keys.
-  file:
+  ansible.builtin.file:
     path: /root/.ssh/authorized_keys
     state: absent
 
 - name: Add authorized keys.
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: root
     state: present
     key: "{{ key }}"
@@ -20,7 +20,7 @@
     loop_var: key
 
 - name: Remove "admin" user.
-  user:
+  ansible.builtin.user:
     name: admin
     state: absent
     remove: true

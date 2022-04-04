@@ -89,8 +89,15 @@ location ~ ^/sites/.*/files/.* {
     try_files $uri @rewrite;
 }
 
+# Allow private files support
+location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does not exist, it must be a private file.
+  try_files $uri @rewrite;
+  expires 7d;
+  log_not_found off;
+}
+
 # Core and contrib assets can be pretty much anywhere.
-location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf)$ {
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
     try_files $uri @rewrite =404;
 }
 

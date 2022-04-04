@@ -1,9 +1,8 @@
 ---
 dependencies:
   - role: _meta/common_base
-  - role: python-pip
-  - role: firewall
-  - role: ssh_server
+  - role: firewall_config
+  - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: user_provision
   - role: user_deploy
   - role: mysql_client

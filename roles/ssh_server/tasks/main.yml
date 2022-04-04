@@ -1,17 +1,17 @@
 ---
 - name: Ensure OpenSSH server is present.
-  apt:
+  ansible.builtin.apt:
     pkg: [openssh-server]
     state: present
 
 - name: Generate main section of the sshd_config file.
-  template:
+  ansible.builtin.template:
     src: sshd_config.j2
     dest: /etc/ssh/sshd_config
     mode: 0400
 
 - name: Ensure groups exist.
-  group:
+  ansible.builtin.group:
     name: "{{ group.name }}"
     state: present
     system: "{% if group.system is defined and not group.system %}no{% else %}yes{% endif %}"
@@ -21,7 +21,7 @@
   when: sshd.groups | length
 
 - name: Generate group section of the sshd_config file.
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: /etc/ssh/sshd_config
     mode: 0400
     marker: "#### {mark} group section {{ group.name }}"
@@ -32,7 +32,7 @@
   when: sshd.groups | length
 
 - name: Generate user section of the sshd_config file.
-  blockinfile:
+  ansible.builtin.blockinfile:
     dest: /etc/ssh/sshd_config
     mode: 0400
     marker: "#### {mark} user section {{ users.names | join(' ') }}"
@@ -52,6 +52,6 @@
 #     - rkhunter.overrides | length > 0
 
 - name: Restart SSH service.
-  service:
+  ansible.builtin.service:
     name: ssh
     state: restarted

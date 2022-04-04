@@ -1,6 +1,6 @@
 ---
 - name: Copy Varnish default VCL.
-  template:
+  ansible.builtin.template:
     src: "default.vcl.j2"
     dest: "{{ varnish_config_path }}/default.vcl"
     owner: root
