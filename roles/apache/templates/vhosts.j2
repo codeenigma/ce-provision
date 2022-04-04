@@ -1,0 +1,32 @@
+### {{ ansible_managed }}
+
+{% for server in domain.servers %}
+<VirtualHost *:{{ server.port }}>
+  ServerName {{ domain.server_name }}
+{% if domain.serveralias is defined %}
+  ServerAlias {{ domain.serveralias }}
+{% endif %}
+{% if server.https_redirect is defined and server.https_redirect %}
+  Redirect / https://{{ domain.server_name }}
+{% endif %}
+{% if domain.webroot is defined %}
+  DocumentRoot "{{ domain.webroot }}"
+  <Directory "{{ domain.webroot }}">
+    Options FollowSymLinks
+    AllowOverride All
+    Order allow,deny
+    allow from all
+  </Directory>
+{% endif %}
+{% if apache.limit_request_body is defined %}
+LimitRequestBody {{ apache.limit_request_body }}
+{% endif %}
+{% if server.ssl %}
+  SSLEngine on
+  SSLCertificateFile {{ ssl_facts[domain.ssl.domain].certificate }};
+  SSLCertificateKeyFile {{ ssl_facts[domain.ssl.domain].key }};
+{% endif %}
+ErrorLog {{ domain.error_log }}
+CustomLog {{ domain.access_log }} combined
+</VirtualHost>
+{% endfor %}
