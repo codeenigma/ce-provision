@@ -1,7 +1,7 @@
 ---
 php:
   version:
-    - 7.3
+    - 7.4
 symfony_env: "{{ _env_type }}"
 apache:
   # Global default config for apache2.conf.
@@ -13,6 +13,7 @@ apache:
     server_names_hash_bucket_size: 256
     access_log: /var/log/apache2-access.log
     error_log: /var/log/apache2-error.log
+    error_log_level: "notice"
   # Group prefix. Useful for grouping by environments.
   log_group_prefix: ""
   # Main log stream for apache (Cloudwatch).

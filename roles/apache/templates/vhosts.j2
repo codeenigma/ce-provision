@@ -19,14 +19,14 @@
   </Directory>
 {% endif %}
 {% if apache.limit_request_body is defined %}
-LimitRequestBody {{ apache.limit_request_body }}
+  LimitRequestBody {{ apache.limit_request_body }}
 {% endif %}
 {% if server.ssl %}
   SSLEngine on
-  SSLCertificateFile {{ ssl_facts[domain.ssl.domain].certificate }};
-  SSLCertificateKeyFile {{ ssl_facts[domain.ssl.domain].key }};
+  SSLCertificateFile {{ ssl_facts[domain.ssl.domain].certificate }}
+  SSLCertificateKeyFile {{ ssl_facts[domain.ssl.domain].key }}
 {% endif %}
-ErrorLog {{ domain.error_log }}
-CustomLog {{ domain.access_log }} combined
+  ErrorLog {{ domain.error_log }}
+  CustomLog {{ domain.access_log }} combined
 </VirtualHost>
 {% endfor %}
