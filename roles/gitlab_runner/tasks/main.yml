@@ -121,4 +121,3 @@
     groups: "{{ gitlab_runner.docker_group }}"
     append: true
   when: gitlab_runner.install_fargate
-
