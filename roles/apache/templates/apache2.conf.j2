@@ -200,7 +200,7 @@ ErrorLog ${APACHE_LOG_DIR}/error.log
 # Possible values include: debug, info, notice, warn, error, crit,
 # alert, emerg.
 #
-LogLevel {{ domain.error_log_level }}
+LogLevel {{ apache.http.error_log_level }}
 
 # Include module configuration:
 Include mods-enabled/*.load
