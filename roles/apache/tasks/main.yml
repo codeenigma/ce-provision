@@ -1,44 +1,98 @@
 ---
-- name: Ensure apache is installed.
+- name: Ensure Apache is installed.
   ansible.builtin.apt:
     name: apache2
     state: present
     update_cache: true
     cache_valid_time: 240
 
-- name: Ensure apache utils are installed.
+- name: Ensure Apache utils are installed.
   ansible.builtin.apt:
     name: apache2-utils
     state: present
     update_cache: true
     cache_valid_time: 240
 
-- name: Copy main apache config.
-  template:
+- name: Ensure Apache FCGI module is installed.
+  ansible.builtin.apt:
+    name: libapache2-mod-fcgid
+    state: present
+    update_cache: true
+    cache_valid_time: 240
+
+- name: Enable Apache modules.
+  community.general.apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache.mods_enabled }}"
+
+# @todo: this should be triggered by a handler if modules change
+- name: Restart apache2 after module changes.
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+
+- name: Copy main Apache config.
+  ansible.builtin.template:
     src: apache2.conf.j2
     dest: "/etc/apache2/apache2.conf"
     owner: root
     group: root
     mode: 0644
 
+- name: Copy PHP config.
+  ansible.builtin.template:
+    src: php-fpm.conf.j2
+    dest: "/etc/apache2/conf-available/php{{ php.version[-1] }}-fpm.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+
+- name: Enable PHP config.
+  ansible.builtin.file:
+    src: "/etc/apache2/conf-available/php{{ php.version[-1] }}-fpm.conf"
+    dest: "/etc/apache2/conf-enabled/php{{ php.version[-1] }}-fpm.conf"
+    state: link
+
+- name: Copy project type-specific configuration in place.
+  ansible.builtin.template:
+    src: "{{ item }}.conf.j2"
+    dest: "/etc/apache2/conf-available/{{ item }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  with_items:
+    - _common
+    - drupal7
+    - flat
+    - nagios
+
+- name: Enable common config.
+  ansible.builtin.file:
+    src: "/etc/apache2/conf-available/_common.conf"
+    dest: "/etc/apache2/conf-enabled/_common.conf"
+    state: link
+
 - name: Ensure passwords directory exists.
-  file:
+  ansible.builtin.file:
     path: /etc/apache2/passwords
     state: directory
     mode: "0755"
 
-- name: Ensure log dir exists.
-  file:
+- name: Ensure log directory exists.
+  ansible.builtin.file:
     path: "/var/log/apache2"
     state: directory
 
-- name: Remove existing vhosts
-  file:
+- name: Remove existing vhosts.
+  ansible.builtin.file:
     path: "/etc/apache2/sites-enabled"
     state: absent
 
-- name: Recreate vhosts folder
-  file:
+- name: Recreate vhosts folder.
+  ansible.builtin.file:
     path: "/etc/apache2/sites-enabled"
     state: directory
 
@@ -48,27 +102,19 @@
   register: _apache2_cloudwatch_dir
 
 - name: Generates AWS Cloudwatch default config.
-  template:
+  ansible.builtin.template:
     src: cloudwatch-main.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/apache2-main.json
   when:
     - _apache2_cloudwatch_dir.stat.isdir is defined and _apache2_cloudwatch_dir.stat.isdir
 
 - name: Generate domain specific configuration.
-  include_tasks: domain.yml
+  ansible.builtin.include_tasks: domain.yml
   with_items: "{{ apache.domains }}"
   loop_control:
     loop_var: domain
 
-- name: Enable Apache mods.
-  file:
-    src: "/etc/apache2/mods-available/{{ item }}"
-    dest: "/etc/apache2/mods-enabled/{{ item }}"
-    state: link
-    mode: 0644
-  with_items: "{{ apache.mods_enabled }}"
-
 - name: Ensure apache2 is restarted.
-  service:
+  ansible.builtin.service:
     name: apache2
     state: restarted

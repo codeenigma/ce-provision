@@ -1,14 +1,17 @@
 ---
 php:
   version:
-    - 7.4
+    - 7.2
 symfony_env: "{{ _env_type }}"
 apache:
   # Global default config for apache2.conf.
   user: www-data
   mods_enabled:
-  - rewrite.load
-  - ssl.load
+  - rewrite
+  - ssl
+  - proxy
+  - proxy_fcgi
+  - fcgid
   http:
     server_names_hash_bucket_size: 256
     access_log: /var/log/apache2-access.log

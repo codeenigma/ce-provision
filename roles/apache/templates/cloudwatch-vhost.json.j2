@@ -26,7 +26,7 @@
 {% if domain.log_stream_name is defined and domain.log_stream_name|length %}
             "log_stream_name": "{{ domain.log_stream_name }}"
 {% else %}
-						"log_stream_name": "{{ ngapacheinx.log_stream_name }}"
+						"log_stream_name": "{{ apache.log_stream_name }}"
 {% endif %}
           }
         ]
