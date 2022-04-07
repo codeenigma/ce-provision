@@ -7,6 +7,7 @@ aws_ami:
   root_device_type: ebs
   name_filter: "debian-10-amd64-*"
   ami_name: "example"
+  cluster_name: "example" # Only used in the 'repack' operation to look up EC2 instances to use for an AMI
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   ssh_username: "admin"
   encrypt_boot: false
@@ -21,10 +22,10 @@ aws_ami:
   # - abort: exits without any cleanup, which might require the next build to use -force.
   on_error: "cleanup"
   # Operation can be one of:
-  # - create: Delete existing image, if any, and re-create a new one.
+  # - create: Create a new image.
   # - ensure: Only create an image if it doesn't already exists.
   # - delete: Delete image and snapshots.
-  # - repack: Delete existing image, if any, and create a new one from an EC2 instance.
+  # - repack: Create a new image from a running EC2 instance.
   #@todo find better names.
   operation: ensure
   # Ansible groups to add the target to. Useful for picking up group_vars.
