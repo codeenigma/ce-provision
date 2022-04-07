@@ -135,6 +135,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+      cluster_name: "{{ aws_ec2_autoscale_cluster.name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
