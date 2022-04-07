@@ -21,9 +21,10 @@ aws_ami:
   # - abort: exits without any cleanup, which might require the next build to use -force.
   on_error: "cleanup"
   # Operation can be one of:
-  # - create: delete existing image if any and re-create a new one.
+  # - create: Delete existing image, if any, and re-create a new one.
   # - ensure: Only create an image if it doesn't already exists.
   # - delete: Delete image and snapshots.
+  # - repack: Delete existing image, if any, and create a new one from an EC2 instance.
   #@todo find better names.
   operation: ensure
   # Ansible groups to add the target to. Useful for picking up group_vars.
@@ -34,3 +35,5 @@ aws_ami:
   # A string of additional arguments to pass as ansible --extra-vars.
   # It must me escaped already, and will be passed as-is.
   extra_vars: ""
+  tags:
+    Name: "example"

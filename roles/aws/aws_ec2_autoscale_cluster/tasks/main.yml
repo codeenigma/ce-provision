@@ -113,6 +113,17 @@
   when:
     - aws_ec2_autoscale_cluster.efs
 
+- name: Gather running instances information.
+  community.aws.ec2_instance_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
+      instance-state-name: ["running"]
+  register: aws_ec2_autoscale_cluster_running_instances
+  when:
+    - aws_ec2_autoscale_cluster.asg_refresh or aws_ec2_autoscale_cluster.ami_refresh
+
 # @todo We should be able to simply "register" here and
 # get rid of the lookup below?
 - name: Create new AMI.
@@ -130,7 +141,7 @@
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
       force: "{{ aws_ec2_autoscale_cluster.packer_force }}"
-      operation: create
+      operation: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}repack{% else %}create{% endif %}"
   when:
     - aws_ec2_autoscale_cluster.ami_refresh
 
@@ -200,17 +211,6 @@
     unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
     modify_targets: false
   register: _aws_ec2_target_group_created
-  when:
-    - aws_ec2_autoscale_cluster.asg_refresh
-
-- name: Gather running instances information.
-  community.aws.ec2_instance_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    filters:
-      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
-      instance-state-name: ["running"]
-  register: aws_ec2_autoscale_cluster_running_instances
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
 
