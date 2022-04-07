@@ -220,8 +220,8 @@
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     launch_config_name: "{{ _aws_ec2_lc_created.name }}"
-    health_check_type: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}ELB{% else %}EC2{% endif %}"
-    health_check_period: 1200
+    health_check_type: "{{ aws_ec2_autoscale_cluster.alb_health_check_type | default(omit) }}"
+    health_check_period: "{{ aws_ec2_autoscale_cluster.alb_health_check_period | default(omit) }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
     replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0  else aws_ec2_autoscale_cluster.desired_capacity }}"
@@ -448,7 +448,7 @@
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
     security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
-    idle_timeout: "{{ aws_ec2_autoscale_cluster.elb_idle_timeout }}"
+    idle_timeout: "{{ aws_ec2_autoscale_cluster.alb_idle_timeout }}"
   register: _aws_ec2_autoscale_cluster_alb
 
 - name: Get ALB listener ARN for port 443.
