@@ -26,6 +26,11 @@
   when:
     - aws_ami.operation == 'create' or (aws_ami.operation == 'ensure' and not ami_base_image_latest.image_id is defined)
 
+- name: Create a new image based on an existing EC2 instance.
+  ansible.builtin.include_tasks: repack.yml
+  when:
+    - aws_ami.operation == 'repack'
+
 - name: Clear the ami_base_image_latest variable.
   ansible.builtin.set_fact:
     ami_base_image_latest: {}
