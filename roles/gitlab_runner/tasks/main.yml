@@ -121,3 +121,5 @@
     groups: "{{ gitlab_runner.docker_group }}"
     append: true
   when: gitlab_runner.install_fargate
+
+# @todo: delete $HOME/.bash_logout for the runner user if it exists
