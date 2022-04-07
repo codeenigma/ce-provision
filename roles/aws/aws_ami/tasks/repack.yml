@@ -1,0 +1,22 @@
+---
+- name: Gather running instances information.
+  amazon.aws.ec2_instance_info:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    filters:
+      image-id: "{{ aws_ami.ami_name }}"
+      instance-state-name: ["running"]
+  register: aws_ami_running_instances
+
+- name: Run playbook over selected EC2 instance.
+  ansible.builtin.include_tasks:
+    file: "{{ aws_ami.playbook_file }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Create an AMI with this EC2 instance.
+  amazon.aws.ec2_ami:
+    instance_id: aws_ami_running_instances[0].instance_id
+    wait: true
+    name: "{{ aws_ami.ami_name }}"
+    tags: "{{ aws_ami.tags }}"
+  when: aws_ami_running_instances.instances | length > 0
