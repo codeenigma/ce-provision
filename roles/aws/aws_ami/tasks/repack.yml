@@ -10,7 +10,7 @@
 
 - name: Set the host to delegate tasks to.
   ansible.builtin.set_fact:
-    _delegate_host: "{{ aws_ami_running_instances[0].private_dns_name }}"
+    _delegate_host: "{{ aws_ami_running_instances.instances[0].private_dns_name }}"
   when: aws_ami_running_instances.instances | length > 0
 
 # Tasks must use `delegate_to: "{{ _delegate_host }}"` to run on the targeted instance
