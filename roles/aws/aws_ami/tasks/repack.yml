@@ -42,7 +42,7 @@
       aws_profile: "{{ aws_ami.aws_profile }}"
       region: "{{ aws_ami.region }}"
       instance_type: t3.micro
-      key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}"
+      key_name: "{{ aws_ami.key_name }}"
       ami_name: "{{ aws_ami.ami_name }}"
       ami_owner: self
       vpc_name: "{{ _infra_name }}"
