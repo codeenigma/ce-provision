@@ -8,8 +8,14 @@
       instance-state-name: ["running"]
   register: aws_ami_running_instances
 
+- name: Set the host to delegate tasks to.
+  ansible.builtin.set_fact:
+    _delegate_host: "{{ aws_ami_running_instances[0].private_dns_name }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+# Tasks must use `delegate_to: "{{ _delegate_host }}"` to run on the targeted instance
 - name: Run provisioning tasks over selected EC2 instance.
-  ansible.builtin.include_tasks:
+  ansible.builtin.import_tasks:
     file: "{{ aws_ami.repack_tasks }}"
   when: aws_ami_running_instances.instances | length > 0
 
