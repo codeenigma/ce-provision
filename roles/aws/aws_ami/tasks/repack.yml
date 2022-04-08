@@ -28,7 +28,7 @@
   amazon.aws.ec2_ami:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
-    instance_id: "{{ aws_ami_running_instances[0].instance_id }}"
+    instance_id: "{{ aws_ami_running_instances.instances[0].instance_id }}"
     wait: true
     name: "{{ aws_ami.ami_name }}"
     tags: "{{ aws_ami.tags }}"
