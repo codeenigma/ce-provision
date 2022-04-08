@@ -20,6 +20,7 @@ aws_ami:
   repack_iam_role: "example" # On 'repack' the IAM role to be assumed by the temporary EC2 instance for repacking an AMI
   repack_controller_cidr: "0.0.0.0/0" # The CIDR IP block for controller access to the temporary EC2 instance on 'repack'
   vpc_id: vpc-XXXX # Required only for a 'repack'
+  vpc_subnet_id: subnet-01234567890abcdef # Required only for a 'repack'
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # Required only for a 'repack'
   force: false # Forces a builder to run when artifacts from a previous build prevent a build from running. May be necessary if on_error is 'abort'
   # on_error can be one of:

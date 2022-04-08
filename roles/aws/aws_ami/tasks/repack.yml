@@ -32,41 +32,41 @@
     wait: true
     name: "{{ aws_ami.ami_name }}"
     tags: "{{ aws_ami.tags }}"
+  register: _aws_ami_repack_ami
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Create a temporary EC2 instance to provision against.
-  ansible.builtin.import_role:
-    name: aws/aws_ec2_with_eip
-  vars:
-    aws_ec2_with_eip:
-      aws_profile: "{{ aws_ami.aws_profile }}"
-      region: "{{ aws_ami.region }}"
-      instance_type: t3.micro
-      key_name: "{{ aws_ami.key_name }}"
-      ami_name: "{{ aws_ami.ami_name }}"
-      ami_owner: self
-      vpc_name: "{{ _infra_name }}"
-      iam_role_name: "{{ aws_ami.repack_iam_role }}"
-      state: running
-      termination_protection: false
-      instance_name: "{{ aws_ami.ami_name }}-repacking"
-      root_volume_size: 80
-      root_volume_type: gp2
-      root_volume_encrypted: "{{ aws_ami.encrypt_boot }}"
-      root_volume_delete_on_termination: true
-      ebs_optimized: true
-      security_groups:
-        - "{{ aws_ami.cluster_name }}-repacker"
-      tags: "{{ aws_ami.tags }}"
-      route_53:
-        zone: ""
-      autorecover: false
-      backup: ""
+- name: Create EC2 instance.
+  community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
+    profile: "{{ aws_ami.aws_profile }}"
+    key_name: "{{ aws_ami.key_name }}"
+    instance_type: t3.micro
+    instance_role: "{{ aws_ami.repack_iam_role }}"
+    region: "{{ aws_ami.region }}"
+    image_id: "{{ _aws_ami_repack_ami.image_id }}"
+    state: running
+    wait: true
+    termination_protection: false
+    vpc_subnet_id: "{{ aws_ami.vpc_subnet_id }}"
+    name: "{{ aws_ami.ami_name }}-repacking"
+    tags: "{{ aws_ami.tags }}"
+    security_groups:
+      - "{{ aws_ami.cluster_name }}-repacker"
+    ebs_optimized: true
+    network:
+      assign_public_ip: true
+    volumes:
+      - device_name: /dev/xvda
+        ebs:
+          volume_size: 40
+          delete_on_termination: true
+          volume_type: gp2
+          encrypted: "{{ aws_ami.encrypt_boot }}"
+  register: _aws_ami_ec2_instances
   when: aws_ami_running_instances.instances | length > 0
 
 - name: Save the temporary EC2 instance DNS as the host to delegate tasks to.
   ansible.builtin.set_fact:
-    _delegate_host: "{{ aws_ec2_with_eip_instances.instances[0].public_dns_name }}" # Public DNS of new machine
+    _delegate_host: "{{ _aws_ami_ec2_instances.instances[0].public_dns_name }}" # Public DNS of new machine
   when: aws_ami_running_instances.instances | length > 0
 
 # Tasks must use `delegate_to: "{{ _delegate_host }}"` to run on the targeted instance
@@ -79,38 +79,17 @@
   amazon.aws.ec2_ami:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
-    instance_id: "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}"
+    instance_id: "{{ _aws_ami_ec2_instances.instances[0].instance_id }}"
     wait: true
     name: "{{ aws_ami.ami_name }}"
     tags: "{{ aws_ami.tags }}"
   when: aws_ami_running_instances.instances | length > 0
 
 - name: Terminate the temporary EC2 instance to provision against.
-  ansible.builtin.import_role:
-    name: aws/aws_ec2_with_eip
-  vars:
-    aws_ec2_with_eip:
-      aws_profile: "{{ aws_ami.aws_profile }}"
-      region: "{{ aws_ami.region }}"
-      instance_type: t3.micro
-      key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}"
-      ami_name: "{{ aws_ami.ami_name }}"
-      ami_owner: self
-      vpc_name: "{{ _infra_name }}"
-      iam_role_name: "{{ aws_ami.repack_iam_role }}"
-      state: terminated
-      termination_protection: false
-      instance_name: "{{ aws_ami.ami_name }}-repacking"
-      root_volume_size: 80
-      root_volume_type: gp2
-      root_volume_encrypted: "{{ aws_ami.encrypt_boot }}"
-      root_volume_delete_on_termination: true
-      ebs_optimized: true
-      security_groups:
-        - "{{ aws_ami.cluster_name }}-repacker"
-      tags: "{{ aws_ami.tags }}"
-      route_53:
-        zone: ""
-      autorecover: false
-      backup: ""
+  community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    state: absent
+    instance_ids:
+      - "{{ _aws_ami_ec2_instances.instances[0].instance_id }}"
   when: aws_ami_running_instances.instances | length > 0
