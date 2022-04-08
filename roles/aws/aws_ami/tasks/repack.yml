@@ -4,7 +4,7 @@
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
     filters:
-      image-id: "{{ aws_ami.ami_name }}"
+      "tag:Name": "{{ aws_ami.cluster_name }}"
       instance-state-name: ["running"]
   register: aws_ami_running_instances
 
