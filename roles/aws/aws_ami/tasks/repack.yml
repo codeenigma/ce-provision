@@ -33,7 +33,7 @@
   when: aws_ami_running_instances.instances | length > 0
 
 - name: Create a temporary EC2 instance to provision against.
-  ansible.buildin.import_role:
+  ansible.builtin.import_role:
     name: aws/aws_ec2_with_eip
   vars:
     aws_ec2_with_eip:
@@ -69,7 +69,7 @@
   when: aws_ami_running_instances.instances | length > 0
 
 - name: Terminate the temporary EC2 instance to provision against.
-  ansible.buildin.import_role:
+  ansible.builtin.import_role:
     name: aws/aws_ec2_with_eip
   vars:
     aws_ec2_with_eip:
