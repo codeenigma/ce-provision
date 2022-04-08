@@ -143,7 +143,7 @@
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
       force: "{{ aws_ec2_autoscale_cluster.packer_force }}"
-      operation: "{% if aws_ec2_autoscale_cluster.ami_force_new or aws_ec2_autoscale_cluster_running_instances.instances | length == 0 %}create{% else %}repack{% endif %}"
+      operation: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}{{ aws_ec2_autoscale_cluster.ami_operation }}{% else %}create{% endif %}"
   when:
     - aws_ec2_autoscale_cluster.ami_refresh
 
