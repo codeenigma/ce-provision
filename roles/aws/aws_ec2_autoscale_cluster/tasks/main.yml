@@ -142,6 +142,7 @@
       repack_iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name }}"
       key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
       vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      vpc_subnet_id: "{{ _aws_ec2_autoscale_cluster_subnets_ids[0] }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
