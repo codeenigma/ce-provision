@@ -33,12 +33,13 @@ aws_ec2_autoscale_cluster:
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
+  ami_repack_tasks: "{{ playbook_dir }}/ami_tasks.yml"
+  ami_operation: create # see aws_ami for details, use 'repack' to build AMIs from running instances, use 'create' to force a new Packer image each time
   packer_on_error: cleanup # see aws_ami for details
   packer_force: false # see aws_ami for details
   packer_vpc_filter: "" # see aws_ami for details
   packer_subnet_filter_az: "" # see aws_ami for details
   ami_refresh: true # Whether to build a new AMI or not.
-  ami_force_new: false # Force ce-provision to create a new AMI with Packer instead of using an existing EC2 instance.
   asg_refresh: true # Whether to build a new ASG or not.
   asg_cloudwatch_policy_scale_up_name: "{{ _env_type }}-scale-up-policy"
   asg_cloudwatch_policy_scale_down_name: "{{ _env_type }}-scale-down-policy"
