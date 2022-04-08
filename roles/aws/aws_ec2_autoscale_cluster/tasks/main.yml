@@ -139,6 +139,8 @@
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       repack_tasks: "{{ aws_ec2_autoscale_cluster.ami_repack_tasks }}"
+      repack_iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name }}"
+      vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
