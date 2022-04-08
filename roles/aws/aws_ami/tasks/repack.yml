@@ -8,16 +8,21 @@
       instance-state-name: ["running"]
   register: aws_ami_running_instances
 
-- name: Set the host to delegate tasks to.
-  ansible.builtin.set_fact:
-    _delegate_host: "{{ aws_ami_running_instances.instances[0].private_dns_name }}"
-  when: aws_ami_running_instances.instances | length > 0
-
-# Tasks must use `delegate_to: "{{ _delegate_host }}"` to run on the targeted instance
-- name: Run provisioning tasks over selected EC2 instance.
-  ansible.builtin.include_tasks:
-    file: "{{ aws_ami.repack_tasks }}"
-  when: aws_ami_running_instances.instances | length > 0
+- name: Create a Security Group to access the controller.
+  amazon.aws.ec2_group:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    name: "{{ aws_ami.cluster_name }}-repacker"
+    tags: "{{ aws_ami.tags }}"
+    state: present
+    vpc_id: "{{ aws_ami.vpc_id }}"
+    description: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
+    rules:
+      - proto: tcp
+        ports:
+          - 22
+        cidr_ip: "{{ aws_ami.repack_controller_cidr }}"
+        rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
 
 - name: Create an AMI with this EC2 instance.
   amazon.aws.ec2_ami:
@@ -25,4 +30,58 @@
     wait: true
     name: "{{ aws_ami.ami_name }}"
     tags: "{{ aws_ami.tags }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Create a temporary EC2 instance to provision against.
+  ansible.buildin.import_role:
+    name: aws/aws_ec2_with_eip
+  vars:
+    aws_ec2_with_eip:
+      ami_name: "{{ aws_ami.ami_name }}"
+      iam_role_name: "{{ aws_ami.repack_iam_role }}"
+      instance_name: "{{ aws_ami.ami_name }}-repacking"
+      security_groups:
+        - "{{ aws_ami.cluster_name }}-repacker"
+      tags: "{{ aws_ami.tags }}"
+      route_53:
+        zone: ""
+      autorecover: false
+      backup: ""
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Save the temporary EC2 instance DNS as the host to delegate tasks to.
+  ansible.builtin.set_fact:
+    _delegate_host: "{{ aws_ec2_with_eip_instances.instances[0].public_dns_name }}" # Public DNS of new machine
+  when: aws_ami_running_instances.instances | length > 0
+
+# Tasks must use `delegate_to: "{{ _delegate_host }}"` to run on the targeted instance
+- name: Run provisioning tasks over temporary EC2 instance.
+  ansible.builtin.include_tasks:
+    file: "{{ aws_ami.repack_tasks }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Update the AMI with the temporary EC2 instance image.
+  amazon.aws.ec2_ami:
+    instance_id: aws_ec2_with_eip_instances.instances[0].instance_id
+    wait: true
+    name: "{{ aws_ami.ami_name }}"
+    tags: "{{ aws_ami.tags }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Terminate the temporary EC2 instance to provision against.
+  ansible.buildin.import_role:
+    name: aws/aws_ec2_with_eip
+  vars:
+    aws_ec2_with_eip:
+      state: terminated
+      ami_name: "{{ aws_ami.ami_name }}"
+      iam_role_name: "{{ aws_ami.repack_iam_role }}"
+      instance_name: "{{ aws_ami.ami_name }}-repacking"
+      security_groups:
+        - "{{ aws_ami.cluster_name }}-repacker"
+      tags: "{{ aws_ami.tags }}"
+      route_53:
+        zone: ""
+      autorecover: false
+      backup: ""
   when: aws_ami_running_instances.instances | length > 0
