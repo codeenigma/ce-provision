@@ -16,6 +16,7 @@ aws_ami:
   #subnet_filter_az: "a" # If vpc_id and/or vpc_filter are defined, subnet_filter_az MUST be defined and must match an AZ that has public networking.
   subnet_filter_az: ""
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
+  repack_tasks: "{{ playbook_dir }}/base-playbook-tasks.yml" # When doing a 'repack' the tasks need to be in a separate file, your play needs to include_tasks
   force: false # Forces a builder to run when artifacts from a previous build prevent a build from running. May be necessary if on_error is 'abort'
   # on_error can be one of:
   # - cleanup (default): cleans up after the previous steps, deleting temporary files and virtual machines.
