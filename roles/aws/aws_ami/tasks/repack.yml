@@ -69,6 +69,10 @@
     _delegate_host: "{{ _aws_ami_ec2_instances.instances[0].public_dns_name }}" # Public DNS of new machine
   when: aws_ami_running_instances.instances | length > 0
 
+- name: Pause for 1 minute to allow systemd time to come up properly.
+  ansible.builtin.pause:
+    minutes: 1
+
 # Tasks must use `delegate_to: "{{ _delegate_host }}"` to run on the targeted instance
 - name: Run provisioning tasks over temporary EC2 instance.
   ansible.builtin.include_tasks:
