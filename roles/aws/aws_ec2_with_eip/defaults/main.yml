@@ -11,7 +11,7 @@ aws_ec2_with_eip:
   vpc_subnet_profile: core # if you are looking up subnets we need a Profile tag to search against
   # An IAM Role name to associate with the instance.
   iam_role_name: "example"
-  state: running
+  state: started # started = running + EC2 status checks report OK
   termination_protection: false # set to true to disable termination and avoid accidents
   instance_name: "{{ _domain_name }}"
   root_volume_size: 80
