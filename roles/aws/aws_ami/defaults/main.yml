@@ -16,7 +16,6 @@ aws_ami:
   #subnet_filter_az: "a" # If vpc_id and/or vpc_filter are defined, subnet_filter_az MUST be defined and must match an AZ that has public networking.
   subnet_filter_az: ""
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
-  repack_tasks: "{{ playbook_dir }}/base-playbook-tasks.yml" # When doing a 'repack' the tasks need to be in a separate file, your play needs to include_tasks
   repack_iam_role: "example" # On 'repack' the IAM role to be assumed by the temporary EC2 instance for repacking an AMI
   repack_controller_cidr: "0.0.0.0/0" # The CIDR IP block for controller access to the temporary EC2 instance on 'repack'
   vpc_id: vpc-XXXX # Required only for a 'repack'
