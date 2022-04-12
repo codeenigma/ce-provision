@@ -71,7 +71,7 @@
 
 - name: Run provisioning tasks over temporary EC2 instance.
   ansible.builtin.command:
-    cmd: "{{ ce_provision.local_dir }}/ce-provision/scripts/provision.sh --repo {{ _infra_name }} --workspace {{ _ce_provision_build_dir }} --branch {{ target_branch }} --playbook {{ aws_ami.playbook_file }} --own-branch {{ ce_provision.own_repository_branch }} --config-branch {{ ce_provision.config_repository_branch }} --boto-profile {{ _aws_profile }} --force --absolute-playbook-path --ansible-extra-vars '{_aws_region: {{ _aws_region }}, _env_type: {{ _env_type }}, _aws_resource_name: {{ _aws_resource_name }}, _aws_ami_host: {{ _aws_ami_host }}}'"
+    cmd: "{{ _ce_provision_base_dir }}/scripts/provision.sh --repo {{ _infra_name }} --workspace {{ _ce_provision_build_dir }} --branch {{ target_branch }} --playbook {{ aws_ami.playbook_file }} --own-branch {{ ce_provision.own_repository_branch }} --config-branch {{ ce_provision.config_repository_branch }} --boto-profile {{ _aws_profile }} --force --absolute-playbook-path --ansible-extra-vars '{_aws_region: {{ _aws_region }}, _env_type: {{ _env_type }}, _aws_resource_name: {{ _aws_resource_name }}, _aws_ami_host: {{ _aws_ami_host }}}'"
   become: true
   become_user: controller
   when: aws_ami_running_instances.instances | length > 0
