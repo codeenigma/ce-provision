@@ -35,6 +35,7 @@ aws_ec2_autoscale_cluster:
   encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_operation: create # see aws_ami for details, use 'repack' to build AMIs from running instances, use 'create' to force a new Packer image each time
+  ami_subnet_name: "{{ _infra_name }}-{{ _env_type }}-a" # Usually cluster subnets do not have Internet Gateways so cannot be used, so we use one that does have an IGW.
   packer_on_error: cleanup # see aws_ami for details
   packer_force: false # see aws_ami for details
   packer_vpc_filter: "" # see aws_ami for details
