@@ -124,6 +124,17 @@
   when:
     - aws_ec2_autoscale_cluster.asg_refresh or aws_ec2_autoscale_cluster.ami_refresh
 
+- name: Gather subnet information for temporary EC2 instance if using the 'repack' operation to generate a new AMI.
+  amazon.aws.ec2_vpc_subnet_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      tag:Name: "{{ aws_ec2_autoscale_cluster.ami_subnet_name }}"
+  register: _aws_ec2_autoscale_ami_subnet
+  when:
+    - aws_ec2_autoscale_cluster.ami_refresh and aws_ec2_autoscale_cluster.ami_operation == 'repack'
+
 # @todo We should be able to simply "register" here and
 # get rid of the lookup below?
 - name: Create new AMI.
@@ -138,10 +149,10 @@
       cluster_name: "{{ aws_ec2_autoscale_cluster.name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
-      repack_iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name }}"
+      repack_iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name | default(omit) }}"
       key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
       vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-      vpc_subnet_id: "{{ _aws_ec2_autoscale_cluster_subnets_ids[0] }}"
+      vpc_subnet_id: "{{ _aws_ec2_autoscale_ami_subnet.subnets[0].subnet_id | default(omit) }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"

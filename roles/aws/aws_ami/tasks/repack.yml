@@ -24,7 +24,7 @@
         cidr_ip: "{{ aws_ami.repack_controller_cidr }}"
         rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
 
-- name: Create an AMI with this EC2 instance.
+- name: Create an AMI with an existing EC2 instance.
   amazon.aws.ec2_ami:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
@@ -35,7 +35,7 @@
   register: _aws_ami_repack_ami
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Create EC2 instance.
+- name: Create temporary EC2 instance from the new AMI.
   community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ami.aws_profile }}"
     key_name: "{{ aws_ami.key_name }}"
@@ -64,7 +64,7 @@
   register: _aws_ami_ec2_instances
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Save the temporary EC2 instance DNS as the host to delegate tasks to.
+- name: Save the temporary EC2 instance DNS to use as the host to provision against.
   ansible.builtin.set_fact:
     _aws_ami_host: "{{ _aws_ami_ec2_instances.instances[0].public_dns_name }}" # Public DNS of new machine
   when: aws_ami_running_instances.instances | length > 0
@@ -76,7 +76,7 @@
   become_user: controller
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Update the AMI with the temporary EC2 instance image.
+- name: Update the AMI with an image of the temporary EC2 instance.
   amazon.aws.ec2_ami:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
@@ -86,7 +86,7 @@
     tags: "{{ aws_ami.tags }}"
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Terminate the temporary EC2 instance to provision against.
+- name: Terminate the temporary EC2 instance.
   community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
