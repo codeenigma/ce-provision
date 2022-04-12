@@ -19,6 +19,7 @@ DRY_RUN="no"
 LIST_TASKS="no"
 VERBOSE="no"
 LINT="no"
+ABSOLUTE_PLAYBOOK_PATH="no"
 PARALLEL_RUN="no"
 BOTO_PROFILE=""
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
@@ -44,6 +45,9 @@ parse_options(){
       "--playbook")
           shift
           TARGET_PROVISION_PLAYBOOK="$1"
+        ;;
+      "--absolute-playbook-path")
+          ABSOLUTE_PLAYBOOK_PATH="yes"
         ;;
       "--parallel")
           PARALLEL_RUN="yes"
@@ -135,7 +139,11 @@ ansible_play(){
   else
     ANSIBLE_BIN=$(command -v ansible-playbook)
   fi
-  ANSIBLE_CMD="$ANSIBLE_BIN $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  if [ "$ABSOLUTE_PLAYBOOK_PATH" = "yes" ]; then
+    ANSIBLE_CMD="$ANSIBLE_BIN $TARGET_PROVISION_PLAYBOOK"
+  else
+    ANSIBLE_CMD="$ANSIBLE_BIN $BUILD_WORKSPACE/$TARGET_PROVISION_PLAYBOOK"
+  fi
   if [ "$PARALLEL_RUN" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_BIN {}"
   fi
