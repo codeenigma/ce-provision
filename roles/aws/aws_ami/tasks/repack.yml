@@ -57,6 +57,7 @@
     volumes:
       - device_name: "{{ aws_ami.repack.device_name }}"
         ebs:
+          volume_size: "{{ aws_ami.repack.root_volume_size }}"
           delete_on_termination: true
           volume_type: "{{ aws_ami.repack.root_volume_type }}"
           encrypted: "{{ aws_ami.encrypt_boot }}"
