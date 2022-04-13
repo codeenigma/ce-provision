@@ -23,7 +23,7 @@
 
 - name: Build extra variables to pass to Ansible.
   ansible.builtin.set_fact:
-    _aws_ami_extra_vars: "{{ _aws_ami_extra_vars | default('') + item + (', ' if not ansible_loop.last else '') }}"
+    _aws_ami_extra_vars: "{{ ('' if not ansible_loop.first else '{ ') + _aws_ami_extra_vars | default('') + item + (', ' if not ansible_loop.last else ' }') }}"
   with_items: "{{ aws_ami.extra_vars }}"
   loop_control:
     extended: true
