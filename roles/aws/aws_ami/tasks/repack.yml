@@ -76,7 +76,17 @@
   become_user: controller
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Update the AMI with an image of the temporary EC2 instance.
+- name: Set AMI ID to delete it.
+  ansible.builtin.set_fact:
+    ami_base_image_latest:
+      image_id: "{{ _aws_ami_repack_ami.image_id }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Delete temporary image.
+  ansible.builtin.include_tasks: delete.yml
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Create a new AMI with an image of the temporary EC2 instance.
   amazon.aws.ec2_ami:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
