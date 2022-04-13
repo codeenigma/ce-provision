@@ -38,7 +38,7 @@
 - name: Create temporary EC2 instance from the new AMI.
   community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ami.aws_profile }}"
-    key_name: "{{ aws_ami.key_name }}"
+    key_name: "{{ aws_ami.repack.key_name }}"
     instance_type: "{{ aws_ami.instance_type }}"
     instance_role: "{{ aws_ami.repack.iam_role }}"
     region: "{{ aws_ami.region }}"
