@@ -144,15 +144,18 @@
     aws_ami:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-      cluster_name: "{{ aws_ec2_autoscale_cluster.name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
+      repack:
+        root_volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
+        cluster_name: "{{ aws_ec2_autoscale_cluster.name }}"
+        iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name | default(omit) }}"
+        vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+        vpc_subnet_id: "{{ _aws_ec2_autoscale_ami_subnet.subnets[0].subnet_id | default(omit) }}"
+        key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
+        ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
+        device_name: "{{ aws_ec2_autoscale_cluster.device_name }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
-      repack_iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name | default(omit) }}"
-      key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
-      vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-      vpc_subnet_id: "{{ _aws_ec2_autoscale_ami_subnet.subnets[0].subnet_id | default(omit) }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
@@ -199,7 +202,7 @@
     ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
     assign_public_ip: "{{ aws_ec2_autoscale_cluster.assign_public_ip }}"
     volumes:
-      - device_name: /dev/xvda
+      - device_name: "{{ aws_ec2_autoscale_cluster.device_name }}"
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
         volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
         encrypted: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
