@@ -31,6 +31,7 @@ aws_ec2_autoscale_cluster:
   root_volume_size: 30
   root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
   root_volume_delete_on_termination: true
+  device_name: /dev/xvda
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
