@@ -43,7 +43,7 @@
     instance_role: "{{ aws_ami.repack_iam_role }}"
     region: "{{ aws_ami.region }}"
     image_id: "{{ _aws_ami_repack_ami.image_id }}"
-    state: running
+    state: started
     wait: true
     termination_protection: false
     vpc_subnet_id: "{{ aws_ami.vpc_subnet_id }}"
