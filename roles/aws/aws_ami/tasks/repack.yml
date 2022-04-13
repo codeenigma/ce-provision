@@ -64,14 +64,33 @@
   register: _aws_ami_ec2_instances
   when: aws_ami_running_instances.instances | length > 0
 
-- name: Save the temporary EC2 instance DNS to use as the host to provision against.
+- name: Build list of extra variables needed to run Ansible against the temporary EC2 instance.
   ansible.builtin.set_fact:
-    _aws_ami_host: "{{ _aws_ami_ec2_instances.instances[0].public_dns_name }}" # Public DNS of new machine
+    _aws_ami_repack_extra_vars:
+      - "_aws_region: {{ _aws_region }}"
+      - "_env_type: {{ _env_type }}"
+      - "_aws_resource_name: {{ _aws_resource_name }}"
+      - "_aws_ami_host: {{ _aws_ami_ec2_instances.instances[0].public_dns_name }}" # public DNS entry for temp EC2 instance
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Add extra variables to already provided variables.
+  ansible.builtin.set_fact:
+    aws_ami:
+      extra_vars: "{{ aws_ami.extra_vars + [ item ] }}"
+  with_items: "{{ _aws_ami_repack_extra_vars }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Rebuild extra variables to pass to Ansible.
+  ansible.builtin.set_fact:
+    _aws_ami_extra_vars: "{{ ('' if not ansible_loop.first else '{ ') + _aws_ami_extra_vars | default('') + item + (', ' if not ansible_loop.last else ' }') }}"
+  with_items: "{{ aws_ami.extra_vars }}"
+  loop_control:
+    extended: true
   when: aws_ami_running_instances.instances | length > 0
 
 - name: Run provisioning tasks over temporary EC2 instance.
   ansible.builtin.command:
-    cmd: "{{ _ce_provision_base_dir }}/scripts/provision.sh --repo {{ _infra_name }} --workspace {{ _ce_provision_build_dir }} --branch {{ target_branch }} --playbook {{ aws_ami.playbook_file }} --own-branch {{ ce_provision.own_repository_branch }} --config-branch {{ ce_provision.config_repository_branch }} --boto-profile {{ _aws_profile }} --force --absolute-playbook-path --ansible-extra-vars '{_aws_region: {{ _aws_region }}, _env_type: {{ _env_type }}, _aws_resource_name: {{ _aws_resource_name }}, _aws_ami_host: {{ _aws_ami_host }}}'"
+    cmd: "{{ _ce_provision_base_dir }}/scripts/provision.sh --repo {{ _infra_name }} --workspace {{ _ce_provision_build_dir }} --branch {{ target_branch }} --playbook {{ aws_ami.playbook_file }} --own-branch {{ ce_provision.own_repository_branch }} --config-branch {{ ce_provision.config_repository_branch }} --boto-profile {{ _aws_profile }} --force --absolute-playbook-path --ansible-extra-vars '{{ _aws_ami_extra_vars }}'"
   become: true
   become_user: controller
   when: aws_ami_running_instances.instances | length > 0
