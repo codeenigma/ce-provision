@@ -40,6 +40,7 @@ aws_ami:
   # Only used by the 'repack' operation to define temporary EC2 instance
   repack:
     root_volume_type: gp2
+    root_volume_size: 20 # Important, for an ASG this must not be larger than the value set in the Launch Configuration
     cluster_name: "example" # To look up EC2 instances to use for an AMI
     iam_role: "example" # The IAM role to be assumed by the temporary EC2 instance for repacking an AMI
     controller_cidr: "0.0.0.0/0" # The CIDR IP block for controller access to the temporary EC2 instance
