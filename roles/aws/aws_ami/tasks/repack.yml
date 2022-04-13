@@ -80,9 +80,14 @@
   with_items: "{{ _aws_ami_repack_extra_vars }}"
   when: aws_ami_running_instances.instances | length > 0
 
+- name: Reset extra variables before repopulating.
+  ansible.builtin.set_fact:
+    _aws_ami_extra_vars: ""
+  when: aws_ami_running_instances.instances | length > 0
+
 - name: Rebuild extra variables to pass to Ansible.
   ansible.builtin.set_fact:
-    _aws_ami_extra_vars: "{{ ('' if not ansible_loop.first else '{ ') + _aws_ami_extra_vars | default('') + item + (', ' if not ansible_loop.last else ' }') }}"
+    _aws_ami_extra_vars: "{{ ('' if not ansible_loop.first else '{ ') + _aws_ami_extra_vars + item + (', ' if not ansible_loop.last else ' }') }}"
   with_items: "{{ aws_ami.extra_vars }}"
   loop_control:
     extended: true
