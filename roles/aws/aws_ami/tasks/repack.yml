@@ -4,7 +4,7 @@
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
     filters:
-      "tag:Name": "{{ aws_ami.cluster_name }}"
+      "tag:Name": "{{ aws_ami.repack.cluster_name }}"
       instance-state-name: ["running"]
   register: aws_ami_running_instances
 
@@ -12,16 +12,16 @@
   amazon.aws.ec2_group:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
-    name: "{{ aws_ami.cluster_name }}-repacker"
+    name: "{{ aws_ami.repack.cluster_name }}-repacker"
     tags: "{{ aws_ami.tags }}"
     state: present
-    vpc_id: "{{ aws_ami.vpc_id }}"
+    vpc_id: "{{ aws_ami.repack.vpc_id }}"
     description: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
     rules:
       - proto: tcp
         ports:
           - 22
-        cidr_ip: "{{ aws_ami.repack_controller_cidr }}"
+        cidr_ip: "{{ aws_ami.repack.controller_cidr }}"
         rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
 
 - name: Create an AMI with an existing EC2 instance.
@@ -39,27 +39,26 @@
   community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ami.aws_profile }}"
     key_name: "{{ aws_ami.key_name }}"
-    instance_type: t3.micro
-    instance_role: "{{ aws_ami.repack_iam_role }}"
+    instance_type: "{{ aws_ami.instance_type }}"
+    instance_role: "{{ aws_ami.repack.iam_role }}"
     region: "{{ aws_ami.region }}"
     image_id: "{{ _aws_ami_repack_ami.image_id }}"
     state: started
     wait: true
     termination_protection: false
-    vpc_subnet_id: "{{ aws_ami.vpc_subnet_id }}"
+    vpc_subnet_id: "{{ aws_ami.repack.vpc_subnet_id }}"
     name: "{{ aws_ami.ami_name }}-repacking"
     tags: "{{ aws_ami.tags }}"
     security_groups:
-      - "{{ aws_ami.cluster_name }}-repacker"
-    ebs_optimized: true
+      - "{{ aws_ami.repack.cluster_name }}-repacker"
+    ebs_optimized: "{{ aws_ami.repack.ebs_optimized }}"
     network:
       assign_public_ip: true
     volumes:
-      - device_name: /dev/xvda
+      - device_name: "{{ aws_ami.repack.device_name }}"
         ebs:
-          volume_size: 40
           delete_on_termination: true
-          volume_type: gp2
+          volume_type: "{{ aws_ami.repack.root_volume_type }}"
           encrypted: "{{ aws_ami.encrypt_boot }}"
   register: _aws_ami_ec2_instances
   when: aws_ami_running_instances.instances | length > 0
