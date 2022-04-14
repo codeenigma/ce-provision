@@ -2,6 +2,7 @@ aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   name: "example"
+  state: present
   acm:
     create_cert: false
     extra_domains: [] # list of Subject Alternative Name domains and zones
@@ -30,9 +31,19 @@ aws_ec2_autoscale_cluster:
   root_volume_size: 30
   root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
   root_volume_delete_on_termination: true
+  device_name: /dev/xvda
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
+  ami_operation: create # see aws_ami for details, use 'repack' to build AMIs from running instances, use 'create' to force a new Packer image each time
+  # Overrides extra_vars in the aws_ami role.
+  ami_extra_vars:
+    - "_aws_resource_name: {{ _aws_resource_name }}"
+    - "_infra_name: {{ _infra_name }}"
+    - "_env_type: {{ _env_type }}"
+    - "_aws_region: {{ _aws_region }}"
+    - "_aws_profile: {{ _aws_profile }}"
+  ami_subnet_name: "{{ _infra_name }}-{{ _env_type }}-a" # Usually cluster subnets do not have Internet Gateways so cannot be used, so we use one that does have an IGW.
   packer_on_error: cleanup # see aws_ami for details
   packer_force: false # see aws_ami for details
   packer_vpc_filter: "" # see aws_ami for details

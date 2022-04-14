@@ -94,6 +94,14 @@
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds
 
+- name: Add RDS endpoint address to extra vars for AMI building.
+  ansible.builtin.set_fact:
+    aws_ec2_autoscale_cluster:
+      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + [ '_rds_endpoint: ' + _rds_instance_info.endpoint.address ] }}"
+  when:
+    - aws_ec2_autoscale_cluster.rds.rds is defined
+    - aws_ec2_autoscale_cluster.rds.rds
+
 - name: Create EFS volume.
   ansible.builtin.include_role:
     name: aws/aws_efs
@@ -113,6 +121,28 @@
   when:
     - aws_ec2_autoscale_cluster.efs
 
+- name: Gather running instances information.
+  community.aws.ec2_instance_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
+      instance-state-name: ["running"]
+  register: aws_ec2_autoscale_cluster_running_instances
+  when:
+    - aws_ec2_autoscale_cluster.asg_refresh or aws_ec2_autoscale_cluster.ami_refresh
+
+- name: Gather subnet information for temporary EC2 instance if using the 'repack' operation to generate a new AMI.
+  amazon.aws.ec2_vpc_subnet_info:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    filters:
+      vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      tag:Name: "{{ aws_ec2_autoscale_cluster.ami_subnet_name }}"
+  register: _aws_ec2_autoscale_ami_subnet
+  when:
+    - aws_ec2_autoscale_cluster.ami_refresh and aws_ec2_autoscale_cluster.ami_operation == 'repack'
+
 # @todo We should be able to simply "register" here and
 # get rid of the lookup below?
 - name: Create new AMI.
@@ -122,15 +152,26 @@
     aws_ami:
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
-      instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
+      repack:
+        root_volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
+        root_volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
+        cluster_name: "{{ aws_ec2_autoscale_cluster.name }}"
+        iam_role: "{{ aws_ec2_autoscale_cluster.iam_role_name | default(omit) }}"
+        vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+        vpc_subnet_id: "{{ _aws_ec2_autoscale_ami_subnet.subnets[0].subnet_id | default(omit) }}"
+        key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
+        ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
+        device_name: "{{ aws_ec2_autoscale_cluster.device_name }}"
       playbook_file: "{{ aws_ec2_autoscale_cluster.ami_playbook_file }}"
       on_error: "{{ aws_ec2_autoscale_cluster.packer_on_error }}"
       vpc_filter: "{{ aws_ec2_autoscale_cluster.packer_vpc_filter }}"
       subnet_filter_az: "{{ aws_ec2_autoscale_cluster.packer_subnet_filter_az }}"
       force: "{{ aws_ec2_autoscale_cluster.packer_force }}"
-      operation: create
+      operation: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}{{ aws_ec2_autoscale_cluster.ami_operation }}{% else %}create{% endif %}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default(omit) }}"
   when:
     - aws_ec2_autoscale_cluster.ami_refresh
 
@@ -171,7 +212,7 @@
     ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
     assign_public_ip: "{{ aws_ec2_autoscale_cluster.assign_public_ip }}"
     volumes:
-      - device_name: /dev/xvda
+      - device_name: "{{ aws_ec2_autoscale_cluster.device_name }}"
         volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
         volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
         encrypted: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
@@ -200,17 +241,6 @@
     unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
     modify_targets: false
   register: _aws_ec2_target_group_created
-  when:
-    - aws_ec2_autoscale_cluster.asg_refresh
-
-- name: Gather running instances information.
-  community.aws.ec2_instance_info:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    filters:
-      "tag:Name": "{{ aws_ec2_autoscale_cluster.name }}"
-      instance-state-name: ["running"]
-  register: aws_ec2_autoscale_cluster_running_instances
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
 
