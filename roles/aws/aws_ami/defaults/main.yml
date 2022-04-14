@@ -27,11 +27,12 @@ aws_ami:
   #   - "example"
   # List of additional arguments to pass as ansible --extra-vars.
   # Values must me escaped already, they will be passed as-is.
-  extra_vars: []
-  # extra_vars: # some examples
-  #   - "_rds_endpoint: {{ _rds_instance_info.endpoint.address }}"
-  #   - "_aws_resource_name: {{ _aws_resource_name }}"
-  #   - "_infra_name: {{ _infra_name }}"
+  extra_vars:
+    - "_aws_resource_name: {{ _aws_resource_name }}"
+    - "_aws_region: {{ _aws_region }}"
+    - "_aws_profile: {{ _aws_profile }}"
+    - "_infra_name: {{ _infra_name }}"
+    - "_env_type: {{ _env_type }}"
   tags:
     Name: "example"
   # Operation can be one of:
