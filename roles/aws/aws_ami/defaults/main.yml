@@ -28,14 +28,10 @@ aws_ami:
   # List of additional arguments to pass as ansible --extra-vars.
   # Values must me escaped already, they will be passed as-is.
   extra_vars: []
-  # Default list is as follows:
-  # extra_vars:
-  #   - "_ce_provision_base_dir: {{ _ce_provision_base_dir }}"
-  #   - "_ce_provision_build_dir: {{ _ce_provision_build_dir }}"
-  #   - "_ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}"
-  #   - "_ce_provision_data_dir: {{ _ce_provision_data_dir }}"
-  #   - "_ce_provision_build_id: {{ _ce_provision_build_id }}"
-  #   - "_ce_provision_force_play: true
+  # extra_vars: # some examples
+  #   - "_rds_endpoint: {{ _rds_instance_info.endpoint.address }}"
+  #   - "_aws_resource_name: {{ _aws_resource_name }}"
+  #   - "_infra_name: {{ _infra_name }}"
   tags:
     Name: "example"
   # Operation can be one of:
