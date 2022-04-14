@@ -97,7 +97,7 @@
 - name: Add RDS endpoint address to extra vars for AMI building.
   ansible.builtin.set_fact:
     aws_ec2_autoscale_cluster:
-      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + [ '_rds_endpoint: ' + {{ _rds_instance_info.endpoint.address }} ] }}"
+      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + [ '_rds_endpoint: ' + _rds_instance_info.endpoint.address ] }}"
   when:
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds
