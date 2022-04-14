@@ -94,6 +94,14 @@
     - aws_ec2_autoscale_cluster.rds.rds is defined
     - aws_ec2_autoscale_cluster.rds.rds
 
+- name: Add RDS endpoint address to extra vars for AMI building.
+  ansible.builtin.set_fact:
+    aws_ec2_autoscale_cluster:
+      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + [ '_rds_endpoint: ' + {{ _rds_instance_info.endpoint.address }} ] }}"
+  when:
+    - aws_ec2_autoscale_cluster.rds.rds is defined
+    - aws_ec2_autoscale_cluster.rds.rds
+
 - name: Create EFS volume.
   ansible.builtin.include_role:
     name: aws/aws_efs
@@ -163,6 +171,7 @@
       force: "{{ aws_ec2_autoscale_cluster.packer_force }}"
       operation: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}{{ aws_ec2_autoscale_cluster.ami_operation }}{% else %}create{% endif %}"
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default(omit) }}"
   when:
     - aws_ec2_autoscale_cluster.ami_refresh
 
