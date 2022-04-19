@@ -205,7 +205,7 @@
     key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
-    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
     security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     instance_profile_name: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
@@ -230,7 +230,7 @@
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     protocol: http
     port: 80
-    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
+    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
     health_check_protocol: "{{ aws_ec2_autoscale_cluster.health_check_protocol }}"
     health_check_path: "{{ aws_ec2_autoscale_cluster.health_check_path }}"
     health_check_port: "{{ aws_ec2_autoscale_cluster.health_check_port }}"
