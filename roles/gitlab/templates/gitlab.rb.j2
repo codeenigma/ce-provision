@@ -986,7 +986,7 @@ nginx['redirect_http_to_https_port'] = {{ gitlab.nginx.redirect_http_to_https_po
 
 ##! if ssl_verify_client on, verification depth in the client certificates chain
 # nginx['ssl_verify_depth'] = "1"
-{% if gitlab.ssl %}
+{% if gitlab.ssl.enabled %}
 nginx['ssl_certificate'] = "{{ ssl_facts[gitlab.server_name].certificate }}"
 nginx['ssl_certificate_key'] = "{{ ssl_facts[gitlab.server_name].key }}"
 {% endif %}
@@ -1628,14 +1628,14 @@ node_exporter['enable'] = {{ gitlab.node_exporter }}
 ################################################################################
 # Let's Encrypt integration
 ################################################################################
-letsencrypt['enable'] = false
+letsencrypt['enable'] = {{ gitlab.letsencrypt }}
 # letsencrypt['contact_emails'] = [] # This should be an array of email addresses to add as contacts
 # letsencrypt['group'] = 'root'
 # letsencrypt['key_size'] = 2048
 # letsencrypt['owner'] = 'root'
 # letsencrypt['wwwroot'] = '/var/opt/gitlab/nginx/www'
 # See http://docs.gitlab.com/omnibus/settings/ssl.html#automatic-renewal for more on these sesttings
-# letsencrypt['auto_renew'] = true
+letsencrypt['auto_renew'] = {{ gitlab.letsencrypt }}
 # letsencrypt['auto_renew_hour'] = 0
 # letsencrypt['auto_renew_minute'] = nil # Should be a number or cron expression, if specified.
 # letsencrypt['auto_renew_day_of_month'] = "*/4"
