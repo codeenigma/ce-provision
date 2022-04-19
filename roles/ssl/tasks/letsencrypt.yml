@@ -4,6 +4,13 @@
     pkg: certbot
     state: present
 
+# @todo - add support for Route 53 DNS plugin
+- name: "Ensure certbot-{{ ssl.web_server }} plugin is installed.""
+  ansible.builtin.apt:
+    pkg: "python3-certbot-{{ ssl.web_server }}"
+    state: present
+  when: ssl.web_server != 'none'
+
 - name: define SSL base path.
   ansible.builtin.set_fact:
     _ssl_base_path: "/etc/letsencrypt/live/{{ ssl.domain }}"
@@ -33,9 +40,22 @@
     - ssl.services is defined
 
 - name: Register certificate if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ ssl.domain }} --standalone --preferred-challenges http -d {{ ssl.domain }} --agree-tos -m {{ ssl.email }}"
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http -d {{ domain }} --agree-tos -m {{ ssl.email }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
   when:
     - not letsencrypt_cert.stat.exists
+    - ssl.web_server == 'none'
+
+- name: Register certificate bypassing web server if needed.
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ ssl.web_server }} --cert-name {{ domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http -d {{ domain }} --agree-tos -m {{ ssl.email }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
+  when:
+    - not letsencrypt_cert.stat.exists
+    - ssl.web_server != 'none'
 
 - name: Restart services.
   ansible.builtin.service:
@@ -49,4 +69,27 @@
 
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
+
+- name: Create the certbot renewal script.
+  ansible.builtin.template:
+    src: le_cron.sh.j2
+    dest: /usr/local/bin/le_cron.sh
+    owner: root
+    group: root
+    mode: 0755
+  when: ssl.autorenew
+
+- name: Create cron job for certificate renewal.
+  ansible.builtin.cron:
+    name: "certbot renewal"
+    minute: "{{ ssl.renewal_minute | default('0') }}"
+    hour: "{{ ssl_renewal_hour | default('0') }}"
+    day: "{{ ssl_renewal_day | default('7') }}"
+    job: "/usr/local/bin/le_cron.sh"
+    cron_file: le-autorenewal
+    user: root
+  when: ssl.autorenew
