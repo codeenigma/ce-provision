@@ -1,13 +1,13 @@
 aws_rds:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   multi_az: true
   subnets:
     - subnet-aaaaaaaa
     - subnet-bbbbbbbb
   name: example
   tags: {}
-  db_instance_class: db.m5.large
+  db_instance_class: db.t3.medium
   state: present
   description: example
   engine: mariadb

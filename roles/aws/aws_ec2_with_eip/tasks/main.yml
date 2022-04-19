@@ -1,6 +1,6 @@
 ---
 - name: Gather AMI image from name.
-  ec2_ami_info:
+  amazon.aws.ec2_ami_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     owners: self
@@ -9,7 +9,7 @@
   register: aws_ec2_with_eip_image
 
 - name: Register latest AMI image.
-  set_fact:
+  ansible.builtin.set_fact:
     aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Gather IAM role info.
@@ -99,11 +99,13 @@
       - device_name: /dev/xvda
         ebs:
           volume_size: "{{ aws_ec2_with_eip.root_volume_size }}"
-          delete_on_termination: true
+          delete_on_termination: "{{ aws_ec2_with_eip.root_volume_delete_on_termination }}"
+          volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
+          encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: aws_ec2_with_eip_instances
 
 - name: Check if we have an existing EIP.
-  ec2_eip_info:
+  community.aws.ec2_eip_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
@@ -111,26 +113,26 @@
   register: aws_ec2_with_eip_instances_eip
 
 - name: Generate Terraform template.
-  template:
+  ansible.builtin.template:
     src: eip.tf.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/main.tf"
     mode: "0666"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Init Terraform.
-  command:
+  ansible.builtin.command:
     cmd: terraform init
     chdir: "{{ _ce_provision_build_tmp_dir }}"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Create EIP with Terraform if we don't have one.
-  command:
+  ansible.builtin.command:
     cmd: terraform apply -auto-approve
     chdir: "{{ _ce_provision_build_tmp_dir }}"
   when: not aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
-  ec2_eip_info:
+  community.aws.ec2_eip_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
@@ -138,7 +140,7 @@
   register: aws_ec2_with_eip_instances_eip
 
 - name: Associate Elastic IP.
-  ec2_eip:
+  community.aws.ec2_eip:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
@@ -177,7 +179,7 @@
     - aws_ec2_with_eip.route_53.wildcard
 
 - name: Create EC2 autorecovery alarm.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_ec2_metric_alarm
   vars:
     aws_ec2_metric_alarm:
@@ -198,7 +200,7 @@
   when: aws_ec2_with_eip.autorecover
 
 - name: Assign resource to backup plan.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_backup
     tasks_from: resource
   vars:

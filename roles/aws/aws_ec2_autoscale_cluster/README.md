@@ -8,7 +8,7 @@
 ```yaml
 aws_ec2_autoscale_cluster:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   name: "example"
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
   # vpc_name: example-vpc
@@ -95,12 +95,14 @@ aws_ec2_autoscale_cluster:
   # Hosts to peer with. This will gather vpc info from the Name tag and create a peering connection and route tables.
   peering:
     - name: utility-server.example.com
-      region: eu-west-3
+      region: "{{ _aws_region }}"
   # Associated RDS instance.
   rds:
     rds: false # wether to create an instance.
     db_instance_class: db.m5.large
+    #db_cluster_identifier: example-aurora-cluster
     engine: mariadb
+    aurora_reader: false
     #engine_version: 5.7.9
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.

@@ -4,6 +4,15 @@ Creates an image from a selected base with Packer, provisioned with an Ansible P
 ## Dependencies
 This requires boto and Packer on the "provisioning" server.
 
+If using the 'repack' operation, so your new AMI gets created from a temporary EC2 instance instead built by Packer, your playbook `hosts` line will need to look like this:
+
+```yaml
+- hosts: "{{ _aws_ami_host | default('default') }}"
+  become: true
+```
+
+Like that it will use `_aws_ami_host` if available and default to `default` if not, which is the value expected by Packer for the 'create' operation.
+
 <!--TOC-->
 <!--ENDTOC-->
 <!--ROLEVARS-->
@@ -12,9 +21,13 @@ This requires boto and Packer on the "provisioning" server.
 ---
 aws_ami:
   aws_profile: "{{ _aws_profile }}"
-  region: us-east-2
+  region: "{{ _aws_region }}"
   instance_type: t2.micro
+  virtualization_type: hvm
+  root_device_type: ebs
+  name_filter: "debian-10-amd64-*"
   ami_name: "example"
+  owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   encrypt_boot: false
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image.
   # Operation can be one of:

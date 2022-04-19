@@ -8,6 +8,8 @@ Creates AWS certificate requests. Allows for passing a validation domain. From t
 
 Additionally, this role attempts to be idempotent by running `aws acm list-certificates` and ensuring that the domain of the cert being requested is not included in the current list of certificates.
 
+Whenever this role runs it will set the `aws_acm_certificate_arn` variable so you have the ARN of the certificate, whether it exists already or it is newly created.
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -16,8 +18,16 @@ Additionally, this role attempts to be idempotent by running `aws acm list-certi
 ```yaml
 ---
 aws_acm:
-  acm_domain_name: subdomain.example.com
-  acm_validation_domain: example.com
+  region: "{{ _aws_region }}"
+  aws_profile: "{{ _aws_profile }}"
+  tags: "{{ _aws_tags }}"
+  domain_name: subdomain.example.com
+  validate: true # you need to set this to false if the validation zone is not in Route 53 or you do not have CLI access
+  export: true
+  route_53:
+    aws_profile: "{{ _aws_profile }}" # the zone might not be in the same account as the certificate
+    state: present
+    zone: example.com
 
 ```
 

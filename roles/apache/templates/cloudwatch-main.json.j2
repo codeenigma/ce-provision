@@ -1,0 +1,28 @@
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/apache2/access.log",
+{% if apache.log_group_prefix is defined and apache.log_group_prefix|length %}
+            "log_group_name": "{{ apache.log_group_prefix }}apache-access",
+{% else %}
+						"log_group_name": "apache-access",
+{% endif %}
+            "log_stream_name": "{{ apache.log_stream_name }}"
+          },
+          {
+            "file_path": "/var/log/apache2/error.log",
+{% if apache.log_group_prefix is defined and apache.log_group_prefix|length %}
+            "log_group_name": "{{ apache.log_group_prefix }}apache-error",
+{% else %}
+						"log_group_name": "apache-error",
+{% endif %}
+            "log_stream_name": "{{ apache.log_stream_name }}"
+          }
+        ]
+      }
+    }
+  }
+}

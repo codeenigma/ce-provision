@@ -1,0 +1,25 @@
+#
+# The following directives define some format nicknames for use with
+# a CustomLog directive (see below).
+# If you are behind a reverse proxy, you might want to change %h into %{X-Forwarded-For}i
+#
+LogFormat "%v:%p %h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %I %O" vhost_combined
+LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %I %O" ha_combined
+LogFormat "%h %l %u %t \"%r\" %>s %O \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combined
+LogFormat "%h %l %u %t \"%r\" %>s %O" common
+LogFormat "%{Referer}i -> %U" referer
+LogFormat "%{User-agent}i" agent
+
+<Files ~ "^web.config$">
+  Order deny,allow
+  deny from all
+</Files>
+
+<IfModule mod_headers.c>
+  RequestHeader unset Proxy
+</IfModule>
+
+<FilesMatch "\.(key|pem)$">
+	Order deny,allow
+	deny from all
+</FilesMatch>

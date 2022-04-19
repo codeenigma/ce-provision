@@ -1,0 +1,125 @@
+---
+- name: Gather running instances information.
+  amazon.aws.ec2_instance_info:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    filters:
+      "tag:Name": "{{ aws_ami.repack.cluster_name }}"
+      instance-state-name: ["running"]
+  register: aws_ami_running_instances
+
+- name: Create a Security Group to access the controller.
+  amazon.aws.ec2_group:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    name: "{{ aws_ami.repack.cluster_name }}-repacker"
+    tags: "{{ aws_ami.tags }}"
+    state: present
+    vpc_id: "{{ aws_ami.repack.vpc_id }}"
+    description: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
+    rules:
+      - proto: tcp
+        ports:
+          - 22
+        cidr_ip: "{{ aws_ami.repack.controller_cidr }}"
+        rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
+
+- name: Create an AMI with an existing EC2 instance.
+  amazon.aws.ec2_ami:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    instance_id: "{{ aws_ami_running_instances.instances[0].instance_id }}"
+    wait: true
+    name: "{{ aws_ami.ami_name }}"
+    tags: "{{ aws_ami.tags }}"
+  register: _aws_ami_repack_ami
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Create temporary EC2 instance from the new AMI.
+  community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
+    profile: "{{ aws_ami.aws_profile }}"
+    key_name: "{{ aws_ami.repack.key_name }}"
+    instance_type: "{{ aws_ami.instance_type }}"
+    instance_role: "{{ aws_ami.repack.iam_role }}"
+    region: "{{ aws_ami.region }}"
+    image_id: "{{ _aws_ami_repack_ami.image_id }}"
+    state: started
+    wait: true
+    termination_protection: false
+    vpc_subnet_id: "{{ aws_ami.repack.vpc_subnet_id }}"
+    name: "{{ aws_ami.ami_name }}-repacking"
+    tags: "{{ aws_ami.tags }}"
+    security_groups:
+      - "{{ aws_ami.repack.cluster_name }}-repacker"
+    ebs_optimized: "{{ aws_ami.repack.ebs_optimized }}"
+    network:
+      assign_public_ip: true
+    volumes:
+      - device_name: "{{ aws_ami.repack.device_name }}"
+        ebs:
+          volume_size: "{{ aws_ami.repack.root_volume_size }}"
+          delete_on_termination: true
+          volume_type: "{{ aws_ami.repack.root_volume_type }}"
+          encrypted: "{{ aws_ami.encrypt_boot }}"
+  register: _aws_ami_ec2_instances
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Build list of extra variables needed to run Ansible against the temporary EC2 instance.
+  ansible.builtin.set_fact:
+    _aws_ami_repack_extra_vars:
+      - "_aws_region: {{ _aws_region }}"
+      - "_env_type: {{ _env_type }}"
+      - "_aws_resource_name: {{ _aws_resource_name }}"
+      - "_aws_ami_host: {{ _aws_ami_ec2_instances.instances[0].public_dns_name }}" # public DNS entry for temp EC2 instance
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Merge repack extra variables with provided extra variables.
+  ansible.builtin.set_fact:
+    aws_ami:
+      extra_vars: "{{ aws_ami.extra_vars + [ item ] }}"
+  with_items: "{{ _aws_ami_repack_extra_vars }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Build extra variables string to pass to Ansible.
+  ansible.builtin.set_fact:
+    _aws_ami_extra_vars: "{{ ('' if not ansible_loop.first else '{ ') + _aws_ami_extra_vars | default('') + item + (', ' if not ansible_loop.last else ' }') }}"
+  with_items: "{{ aws_ami.extra_vars }}"
+  loop_control:
+    extended: true
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Run provisioning tasks over temporary EC2 instance.
+  ansible.builtin.command:
+    cmd: "{{ _ce_provision_base_dir }}/scripts/provision.sh --repo {{ _infra_name }} --workspace {{ _ce_provision_build_dir }} --branch {{ target_branch }} --playbook {{ aws_ami.playbook_file }} --own-branch {{ ce_provision.own_repository_branch }} --config-branch {{ ce_provision.config_repository_branch }} --boto-profile {{ _aws_profile }} --force --absolute-playbook-path --ansible-extra-vars '{{ _aws_ami_extra_vars }}'"
+  become: true
+  become_user: controller
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Set AMI ID to delete it.
+  ansible.builtin.set_fact:
+    ami_base_image_latest:
+      image_id: "{{ _aws_ami_repack_ami.image_id }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Delete temporary image.
+  ansible.builtin.include_tasks: delete.yml
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Create a new AMI with an image of the temporary EC2 instance.
+  amazon.aws.ec2_ami:
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    instance_id: "{{ _aws_ami_ec2_instances.instances[0].instance_id }}"
+    wait: true
+    name: "{{ aws_ami.ami_name }}"
+    tags: "{{ aws_ami.tags }}"
+  when: aws_ami_running_instances.instances | length > 0
+
+- name: Terminate the temporary EC2 instance.
+  community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
+    profile: "{{ aws_ami.aws_profile }}"
+    region: "{{ aws_ami.region }}"
+    state: absent
+    instance_ids:
+      - "{{ _aws_ami_ec2_instances.instances[0].instance_id }}"
+  when: aws_ami_running_instances.instances | length > 0
