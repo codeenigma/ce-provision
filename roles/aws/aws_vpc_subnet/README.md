@@ -10,7 +10,7 @@ aws_vpc_subnet:
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
   # vpc_name: example-vpc
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   subnets:
     - cidr_block: "10.0.0.0/24"
       az: b
