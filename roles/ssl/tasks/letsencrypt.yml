@@ -5,7 +5,7 @@
     state: present
 
 # @todo - add support for Route 53 DNS plugin
-- name: "Ensure certbot-{{ ssl.web_server }} plugin is installed.""
+- name: "Ensure certbot-{{ ssl.web_server }} plugin is installed."
   ansible.builtin.apt:
     pkg: "python3-certbot-{{ ssl.web_server }}"
     state: present
