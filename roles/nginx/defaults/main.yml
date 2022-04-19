@@ -23,8 +23,6 @@ nginx:
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
   fastcgi_read_timeout: 60
-  proxy_letsencrypt: false # enable proxying for LE
-  proxy_letsencrypt_port: "{{ ssl.http_01_port }}"
   overrides: [] # See the '_overrides' role.
   domains:
     - server_name: "{{ _domain_name }}"

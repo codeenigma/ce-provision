@@ -32,8 +32,3 @@ fastcgi_buffers         8 256k ;
 client_max_body_size    {{ nginx.client_max_body_size }} ;
 # Disable content sniffing, since it's an attack vector.
 add_header X-Content-Type-Options nosniff;
-{% if nginx.proxy_letsencrypt %}
-location /.well-known/acme-challenge/ {
-    proxy_pass http://localhost:{{ nginx.proxy_letsencrypt_port }};
-}
-{% endif %}
