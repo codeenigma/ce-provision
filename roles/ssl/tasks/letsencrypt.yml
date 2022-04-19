@@ -4,6 +4,13 @@
     pkg: certbot
     state: present
 
+# @todo - add support for Route 53 DNS plugin
+- name: "Ensure certbot-{{ ssl.web_server }} plugin is installed.""
+  ansible.builtin.apt:
+    pkg: "python3-certbot-{{ ssl.web_server }}"
+    state: present
+  when: ssl.web_server != 'none'
+
 - name: define SSL base path.
   ansible.builtin.set_fact:
     _ssl_base_path: "/etc/letsencrypt/live/{{ ssl.domain }}"
@@ -39,6 +46,16 @@
     loop_var: domain
   when:
     - not letsencrypt_cert.stat.exists
+    - ssl.web_server == 'none'
+
+- name: Register certificate bypassing web server if needed.
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ ssl.web_server }} --cert-name {{ domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http -d {{ domain }} --agree-tos -m {{ ssl.email }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
+  when:
+    - not letsencrypt_cert.stat.exists
+    - ssl.web_server != 'none'
 
 - name: Restart services.
   ansible.builtin.service:
