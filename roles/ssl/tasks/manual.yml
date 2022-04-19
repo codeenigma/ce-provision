@@ -10,15 +10,24 @@
 
 - name: Define key path.
   ansible.builtin.set_fact:
-    _ssl_current_key_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.key"
+    _ssl_current_key_path: "{{ _ssl_base_path }}/{{ domain }}.key"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
 
 - name: Define cert path.
   ansible.builtin.set_fact:
-    _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.cert"
+    _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ domain }}.cert"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
 
 - name: Define CA cert path.
   ansible.builtin.set_fact:
-    _ssl_current_ca_cert_path: "{{ _ssl_base_path }}/{{ ssl.domain }}.CA.cert"
+    _ssl_current_ca_cert_path: "{{ _ssl_base_path }}/{{ domain }}.CA.cert"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
 
 - name: Check if we have an existing SSL key.
   ansible.builtin.stat:
@@ -56,4 +65,7 @@
 
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ ssl.domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
