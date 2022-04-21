@@ -4,11 +4,12 @@
     pkg: certbot
     state: present
 
-# @todo - add support for Route 53 DNS plugin
-- name: Check for a supported web server.
+- name: Set LetsEncrypt variables.
   ansible.builtin.set_fact:
-    _ssl_web_server: "{{  ssl.web_server | default('none') }}"
+    _ssl_web_server: "{{ ssl.web_server | default('none') }}"
+    _ssl_services: "{{ ssl.services | default ([]) }}"
 
+# @todo - add support for Route 53 DNS plugin
 - name: "Ensure certbot-{{ _ssl_web_server }} plugin is installed."
   ansible.builtin.apt:
     pkg: "python3-certbot-{{ _ssl_web_server }}"
@@ -36,12 +37,12 @@
   ansible.builtin.service:
     name: "{{ ssl_service }}"
     state: stopped
-  with_items: "{{ ssl.services }}"
+  with_items: "{{ _ssl_services }}"
   loop_control:
     loop_var: ssl_service
   when:
     - not letsencrypt_cert.stat.exists
-    - ssl.services is defined
+    - _ssl_services | length > 0
 
 - name: Build certificate domains string.
   ansible.builtin.set_fact:
@@ -67,12 +68,12 @@
   ansible.builtin.service:
     name: "{{ ssl_service }}"
     state: started
-  with_items: "{{ ssl.services }}"
+  with_items: "{{ _ssl_services }}"
   loop_control:
     loop_var: ssl_service
   when:
     - not letsencrypt_cert.stat.exists
-    - ssl.services is defined
+    - _ssl_services | length > 0
 
 # Because of the scripted command each SSL implementation needs it's own uniquely named cron script.
 - name: Create the certbot renewal script.

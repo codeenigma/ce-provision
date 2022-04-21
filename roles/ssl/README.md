@@ -36,6 +36,7 @@ nginx:
         http_01_port: 54321
         autorenew: true
         email: administrator@example.com
+        services: []
 ```
 
 If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
