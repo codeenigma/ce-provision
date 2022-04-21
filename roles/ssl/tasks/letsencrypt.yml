@@ -5,11 +5,16 @@
     state: present
 
 # @todo - add support for Route 53 DNS plugin
-- name: "Ensure certbot-{{ ssl.web_server }} plugin is installed."
+- name: Check for a supported web server.
+  ansible.builtin.set_fact:
+    _ssl_web_server: "{{  ssl.web_server | default('none') }}"
+
+- name: "Ensure certbot-{{ _ssl_web_server }} plugin is installed."
   ansible.builtin.apt:
-    pkg: "python3-certbot-{{ ssl.web_server }}"
+    pkg: "python3-certbot-{{ _ssl_web_server }}"
     state: present
-  when: ssl.web_server != 'none'
+  when:
+    - _ssl_web_server != 'none'
 
 - name: Define SSL base path.
   ansible.builtin.set_fact:
@@ -38,7 +43,7 @@
     - not letsencrypt_cert.stat.exists
     - ssl.services is defined
 
-- name: Build cert domains string.
+- name: Build certificate domains string.
   ansible.builtin.set_fact:
     _letsencrypt_domain_string: "{{ _letsencrypt_domain_string | default('') + ' -d ' + domain }}"
   with_items: "{{ _ssl_domains }}"
@@ -50,13 +55,13 @@
   ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
   when:
     - not letsencrypt_cert.stat.exists
-    - ssl.web_server == 'none'
+    - _ssl_web_server == 'none'
 
 - name: Register certificate bypassing web server if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ ssl.web_server }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ _ssl_web_server }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
   when:
     - not letsencrypt_cert.stat.exists
-    - ssl.web_server != 'none'
+    - _ssl_web_server != 'none'
 
 - name: Restart services.
   ansible.builtin.service:
@@ -69,10 +74,11 @@
     - not letsencrypt_cert.stat.exists
     - ssl.services is defined
 
+# Because of the scripted command each SSL implementation needs it's own uniquely named cron script.
 - name: Create the certbot renewal script.
   ansible.builtin.template:
     src: le_cron.sh.j2
-    dest: /usr/local/bin/le_cron.sh
+    dest: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
     owner: root
     group: root
     mode: 0755
@@ -84,7 +90,7 @@
     minute: "{{ ssl.renewal_minute | default('0') }}"
     hour: "{{ ssl.renewal_hour | default('0') }}"
     day: "{{ ssl.renewal_day | default('7') }}"
-    job: "/usr/local/bin/le_cron.sh"
-    cron_file: le-autorenewal
+    job: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
+    cron_file: "le_autorenewal_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}"
     user: root
   when: ssl.autorenew

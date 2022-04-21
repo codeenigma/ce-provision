@@ -34,7 +34,8 @@ nginx:
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
-        domain: "{{ _domain_name }}"
+        domains:
+          - "{{ _domain_name }}"
         handling: selfsigned
       ratelimitingcrawlers: true
       is_default: true
