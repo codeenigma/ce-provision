@@ -23,9 +23,19 @@ location /.well-known/acme-challenge/ {
 {% endif %}
 ```
 
-So if you are using LetsEncrypt handling, you set `ssl.http_01_port` to something other than `80` and you are using our `nginx` role, it should take care of the proxying.
+So if you are using LetsEncrypt handling combined with our `nginx` role, you can set the SSL settings for one or more of your domains so `ssl.http_01_port` is something other than `80` and it should take care of the proxying, for example:
 
-If you are using Nginx or Apache you can set the `ssl.web_server` to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
+```yaml
+nginx:
+  domains:
+    - # other domain variables here
+      ssl:
+        domain: "{{ _domain_name }}"
+        handling: letsencrypt
+        http_01_port: 54321
+```
+
+If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
 <!--ROLEVARS-->
 ## Default variables
