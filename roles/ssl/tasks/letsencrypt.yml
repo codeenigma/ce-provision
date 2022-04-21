@@ -24,7 +24,7 @@
 
 - name: Check if we have a certificate.
   ansible.builtin.stat:
-    path: "{{ ssl_facts[0].certificate }}" # it's sufficient to check the first domain for a SAN cert
+    path: "{{ ssl_facts[ssl.domains[0]].certificate }}" # it's sufficient to check the first domain for a SAN cert
   register: letsencrypt_cert
 
 - name: Stop services listening on port 80.
@@ -47,13 +47,13 @@
   when: not letsencrypt_cert.stat.exists
 
 - name: Register certificate if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ ssl_facts[0].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ ssl_facts[ssl.domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
   when:
     - not letsencrypt_cert.stat.exists
     - ssl.web_server == 'none'
 
 - name: Register certificate bypassing web server if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ ssl.web_server }} --cert-name {{ ssl_facts[0].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
+  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ ssl.web_server }} --cert-name {{ ssl_facts[ssl.domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
   with_items: "{{ ssl.domains }}"
   loop_control:
     loop_var: domain
