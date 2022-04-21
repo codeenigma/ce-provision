@@ -1,8 +1,31 @@
 # SSL
 Manages SSL certificates.
+
 <!--TOC-->
 <!--ENDTOC-->
 
+If you are using LetsEncrypt for handling it assume `standalone` mode. If you want to do DNS validation, please do not use this role at this time. There are a few pre-requisites for `standalone` mode to work:
+
+* You must have firewalls open to allow traffic to ports 80 and/or 443, regardless of your configuration
+* LetsEncrypt's certbot application will try to use port 80, if this will not be possible you can either:
+  * change `ssl.http_01_port` to another available port for `certbot` to listen on; or
+  * provide a list of services to stop prior to creating/renewing LE certificates, so port 80 is available
+* If you change `ssl.http_01_port` *something* still needs to proxy traffic to the port you chose locally
+
+On the final point, our `nginx` role supports this automatically. In the `_common` config, which is included in all vhosts, you will find this block:
+
+```
+{% if ssl is defined and ssl.handling == 'letsencrypt' and ssl.http_01_port != 80 %}
+# Proxy for certbot (LetsEncrypt)
+location /.well-known/acme-challenge/ {
+    proxy_pass http://localhost:{{ ssl.http_01_port }}$request_uri;
+}
+{% endif %}
+```
+
+So if you are using LetsEncrypt handling, you set `ssl.http_01_port` to something other than `80` and you are using our `nginx` role, it should take care of the proxying.
+
+If you are using Nginx or Apache you can set the `ssl.web_server` to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
 <!--ROLEVARS-->
 ## Default variables
