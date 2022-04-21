@@ -8,64 +8,15 @@
     path: "{{ _ssl_base_path }}"
     state: directory
 
-- name: Define key path.
-  ansible.builtin.set_fact:
-    _ssl_current_key_path: "{{ _ssl_base_path }}/{{ domain }}.key"
-  with_items: "{{ ssl.domains }}"
-  loop_control:
-    loop_var: domain
-
-- name: Define cert path.
-  ansible.builtin.set_fact:
-    _ssl_current_cert_path: "{{ _ssl_base_path }}/{{ domain }}.cert"
-  with_items: "{{ ssl.domains }}"
-  loop_control:
-    loop_var: domain
-
-- name: Define CA cert path.
-  ansible.builtin.set_fact:
-    _ssl_current_ca_cert_path: "{{ _ssl_base_path }}/{{ domain }}.CA.cert"
-  with_items: "{{ ssl.domains }}"
-  loop_control:
-    loop_var: domain
-
-- name: Check if we have an existing SSL key.
-  ansible.builtin.stat:
-    path: "{{ _ssl_current_key_path }}"
-  register: ssl_key
-
-- name: Copy public cert file to destination
-  ansible.builtin.copy:
-    content: "{{ ssl.cert }}"
-    dest: "{{ _ssl_current_cert_path }}"
-    owner: root
-    group: root
-    mode: 0644
-  when: not ssl_key.stat.exists
-
-- name: Copy CA cert file to destination
-  ansible.builtin.copy:
-    content: "{{ ssl.ca_cert }}"
-    dest: "{{ _ssl_current_ca_cert_path }}"
-    owner: root
-    group: root
-    mode: 0644
-  when:
-    - not ssl_key.stat.exists
-    - ssl.ca_cert is defined
-
-- name: Copy private key file to destination
-  ansible.builtin.copy:
-    content: "{{ ssl.key }}"
-    dest: "{{ _ssl_current_key_path }}"
-    owner: root
-    group: root
-    mode: 0400
-  when: not ssl_key.stat.exists
-
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ domain:{ 'certificate': _ssl_current_cert_path, 'key': _ssl_current_key_path } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ domain: { 'domain': domain, 'certificate': _ssl_base_path + '/' + domain + '.cert', 'ca_certificate': _ssl_base_path + '/' + domain + '.CA.cert', 'key': _ssl_base_path + '/' + domain + '.key' } }) }}"
+  with_items: "{{ ssl.domains }}"
+  loop_control:
+    loop_var: domain
+
+- name: Copy keys and certificates if necessary.
+  ansible.builtin.include_tasks: copy.yml
   with_items: "{{ ssl.domains }}"
   loop_control:
     loop_var: domain

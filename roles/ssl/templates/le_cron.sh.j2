@@ -18,10 +18,10 @@ done
 
 {% if ssl.web_server == 'none' %}
 # run certbot
-/usr/bin/certbot certonly --standalone --agree-tos --renew-by-default --http-01-port {{ ssl.http_01_port }} --expand $SITESSTRING
+/usr/bin/certbot certonly --standalone --agree-tos --force-renew --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING
 {% else %}
 # run certbot
-/usr/bin/certbot certonly --{{ ssl.web_server }} --standalone --agree-tos --renew-by-default --http-01-port {{ ssl.http_01_port }} --expand $SITESSTRING
+/usr/bin/certbot certonly --{{ ssl.web_server }} --standalone --agree-tos --force-renew --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING
 {% endif %}
 
 # start services again
