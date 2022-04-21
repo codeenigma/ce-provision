@@ -1,10 +1,54 @@
 ---
+- name: Temporarily place a vhost for LetsEncrypt to work.
+  ansible.builtin.template:
+    src: vhost_letsencrypt.j2
+    dest: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - domain.ssl is defined
+    - domain.ssl.handling == 'letsencrypt'
+
+- name: Enable vhost.
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
+    state: link
+  when:
+    - domain.ssl is defined
+    - domain.ssl.handling == 'letsencrypt'
+
+- name: Reload the nginx service.
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  when:
+    - domain.ssl is defined
+    - domain.ssl.handling == 'letsencrypt'
+
 - name: Generates SSL keys.
   ansible.builtin.include_role:
     name: ssl
   when: domain.ssl is defined
   vars:
     ssl: "{{ domain.ssl }}"
+
+- name: Delete the link to the vhost for LetsEncrypt.
+  ansible.builtin.file:
+    path: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
+    state: absent
+  when:
+    - domain.ssl is defined
+    - domain.ssl.handling == 'letsencrypt'
+
+- name: Delete the temporarily vhost for LetsEncrypt.
+  ansible.builtin.file:
+    path: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+    state: absent
+  when:
+    - domain.ssl is defined
+    - domain.ssl.handling == 'letsencrypt'
 
 # If auth_enabled is defined and yes, and auth_pass is not defined or is defined but empty, generate a random password.
 - name: Generate random htauth password.
