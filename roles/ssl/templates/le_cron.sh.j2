@@ -6,7 +6,8 @@ service {{ service }} stop
 {% endfor %}
 
 # build bash array of domains
-SITES=(){% for domain in ssl.domains %}
+SITES=()
+{% for domain in ssl.domains %}
 SITES+=("{{ domain }}")
 {% endfor %}
 
