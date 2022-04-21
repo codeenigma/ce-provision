@@ -29,6 +29,12 @@ server {
     root "{{ domain.webroot }}";
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
     include "/etc/nginx/conf.d/_common";
+{% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' and domain.ssl.http_01_port != 80 %}
+    # Proxy for certbot (LetsEncrypt)
+    location /.well-known/acme-challenge/ {
+        proxy_pass http://localhost:{{ ssl.http_01_port }}$request_uri;
+    }
+{% endif %}
 {% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
     auth_basic "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
     auth_basic_user_file /etc/nginx/passwords/{{ domain.server_name }}.htpasswd;
