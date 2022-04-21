@@ -32,9 +32,3 @@ fastcgi_buffers         8 256k ;
 client_max_body_size    {{ nginx.client_max_body_size }} ;
 # Disable content sniffing, since it's an attack vector.
 add_header X-Content-Type-Options nosniff;
-{% if ssl is defined and ssl.handling == 'letsencrypt' and ssl.http_01_port != 80 %}
-# Proxy for certbot (LetsEncrypt)
-location /.well-known/acme-challenge/ {
-    proxy_pass http://localhost:{{ ssl.http_01_port }}$request_uri;
-}
-{% endif %}
