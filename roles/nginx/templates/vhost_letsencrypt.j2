@@ -1,6 +1,5 @@
 ### {{ ansible_managed }}
 
-{% for server in domain.servers %}
 server {
     listen 80;
     server_name {{ domain.server_name }};
@@ -8,7 +7,6 @@ server {
     access_log {{ domain.access_log }};
     # Proxy for certbot (LetsEncrypt)
     location /.well-known/acme-challenge/ {
-        proxy_pass http://localhost:{{ domain.ssl.http_01_port }}$request_uri;
+        proxy_pass http://127.0.0.1:{{ domain.ssl.http_01_port }}$request_uri;
     }
 }
-{% endfor %}
