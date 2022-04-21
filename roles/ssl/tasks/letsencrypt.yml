@@ -38,7 +38,7 @@
     - not letsencrypt_cert.stat.exists
     - ssl.services is defined
 
-- name: Build cert domains string.
+- name: Build certificate domains string.
   ansible.builtin.set_fact:
     _letsencrypt_domain_string: "{{ _letsencrypt_domain_string | default('') + ' -d ' + domain }}"
   with_items: "{{ _ssl_domains }}"
@@ -69,10 +69,11 @@
     - not letsencrypt_cert.stat.exists
     - ssl.services is defined
 
+# Because of the scripted command each SSL implementation needs it's own uniquely named cron script.
 - name: Create the certbot renewal script.
   ansible.builtin.template:
     src: le_cron.sh.j2
-    dest: /usr/local/bin/le_cron.sh
+    dest: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
     owner: root
     group: root
     mode: 0755
@@ -84,7 +85,7 @@
     minute: "{{ ssl.renewal_minute | default('0') }}"
     hour: "{{ ssl.renewal_hour | default('0') }}"
     day: "{{ ssl.renewal_day | default('7') }}"
-    job: "/usr/local/bin/le_cron.sh"
-    cron_file: le-autorenewal
+    job: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
+    cron_file: "le_autorenewal_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}"
     user: root
   when: ssl.autorenew
