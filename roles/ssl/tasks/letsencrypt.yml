@@ -53,13 +53,13 @@
   when: not letsencrypt_cert.stat.exists
 
 - name: Register certificate if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
+  ansible.builtin.command: "{{ ssl.certbot_register_command }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
   when:
     - not letsencrypt_cert.stat.exists
     - _ssl_web_server == 'none'
 
 - name: Register certificate bypassing web server if needed.
-  ansible.builtin.command: "/usr/bin/certbot certonly -n --{{ _ssl_web_server }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} --standalone --preferred-challenges http --agree-tos -m {{ ssl.email }}{{ _letsencrypt_domain_string }}"
+  ansible.builtin.command: "{{ ssl.certbot_register_command }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} -m {{ ssl.email }} --{{ _ssl_web_server }}{{ _letsencrypt_domain_string }}"
   when:
     - not letsencrypt_cert.stat.exists
     - _ssl_web_server != 'none'
