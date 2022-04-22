@@ -1,13 +1,13 @@
 ---
 - name: Check if we have an existing SSL key.
   ansible.builtin.stat:
-    path: "{{ ssl_facts[domain].key }}"
+    path: "{{ ssl_facts[certificate_domain].key }}"
   register: ssl_key
 
 - name: Copy public cert file to destination
   ansible.builtin.copy:
     content: "{{ ssl.cert }}"
-    dest: "{{ ssl_facts[domain].certificate }}"
+    dest: "{{ ssl_facts[certificate_domain].certificate }}"
     owner: root
     group: root
     mode: 0644
@@ -16,7 +16,7 @@
 - name: Copy CA cert file to destination
   ansible.builtin.copy:
     content: "{{ ssl.ca_cert }}"
-    dest: "{{ ssl_facts[domain].ca_certificate }}"
+    dest: "{{ ssl_facts[certificate_domain].ca_certificate }}"
     owner: root
     group: root
     mode: 0644
@@ -27,7 +27,7 @@
 - name: Copy private key file to destination
   ansible.builtin.copy:
     content: "{{ ssl.key }}"
-    dest: "{{ ssl_facts[domain].key }}"
+    dest: "{{ ssl_facts[certificate_domain].key }}"
     owner: root
     group: root
     mode: 0400

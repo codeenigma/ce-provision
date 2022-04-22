@@ -10,13 +10,13 @@
 
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ domain: { 'domain': domain, 'certificate': _ssl_base_path + '/' + domain + '.cert', 'key': _ssl_base_path + '/' + domain + '.key' } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ certificate_domain: { 'domain': certificate_domain, 'certificate': _ssl_base_path + '/' + certificate_domain + '.cert', 'key': _ssl_base_path + '/' + certificate_domain + '.key' } }) }}"
   with_items: "{{ _ssl_domains }}"
   loop_control:
-    loop_var: domain
+    loop_var: certificate_domain
 
 - name: Generate keys if necessary.
   ansible.builtin.include_tasks: generate.yml
   with_items: "{{ _ssl_domains }}"
   loop_control:
-    loop_var: domain
+    loop_var: certificate_domain
