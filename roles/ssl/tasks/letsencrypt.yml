@@ -23,10 +23,10 @@
 
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ domain: { 'domain': domain, 'certificate': _ssl_base_path + '/' + domain + '/fullchain.pem', 'key': _ssl_base_path + '/' + domain + '/privkey.pem' } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({ certificate_domain: { 'domain': certificate_domain, 'certificate': _ssl_base_path + '/' + certificate_domain + '/fullchain.pem', 'key': _ssl_base_path + '/' + certificate_domain + '/privkey.pem' } }) }}"
   with_items: "{{ _ssl_domains }}"
   loop_control:
-    loop_var: domain
+    loop_var: certificate_domain
 
 - name: Check if we have a certificate.
   ansible.builtin.stat:
@@ -46,10 +46,10 @@
 
 - name: Build certificate domains string.
   ansible.builtin.set_fact:
-    _letsencrypt_domain_string: "{{ _letsencrypt_domain_string | default('') + ' -d ' + domain }}"
+    _letsencrypt_domain_string: "{{ _letsencrypt_domain_string | default('') + ' -d ' + certificate_domain }}"
   with_items: "{{ _ssl_domains }}"
   loop_control:
-    loop_var: domain
+    loop_var: certificate_domain
   when: not letsencrypt_cert.stat.exists
 
 - name: Register certificate if needed.
