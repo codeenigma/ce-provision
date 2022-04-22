@@ -42,7 +42,7 @@
     - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
 
-- name: Delete the temporarily vhost for LetsEncrypt.
+- name: Delete the temporary vhost for LetsEncrypt.
   ansible.builtin.file:
     path: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
     state: absent
