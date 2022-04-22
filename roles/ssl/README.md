@@ -12,18 +12,16 @@ If you are using LetsEncrypt for handling it assume `standalone` mode. If you wa
   * provide a list of services to stop prior to creating/renewing LE certificates, so port 80 is available
 * If you change `ssl.http_01_port` *something* still needs to proxy traffic to the port you chose locally
 
-On the final point, our `nginx` role supports this automatically. In the `_common` config, which is included in all vhosts, you will find this block:
+On the final point, our `nginx` role supports this automatically. In the `vhost` config you will find this block:
 
 ```
-{% if ssl is defined and ssl.handling == 'letsencrypt' and ssl.http_01_port != 80 %}
 # Proxy for certbot (LetsEncrypt)
 location /.well-known/acme-challenge/ {
     proxy_pass http://localhost:{{ ssl.http_01_port }}$request_uri;
 }
-{% endif %}
 ```
 
-So if you are using LetsEncrypt handling combined with our `nginx` role, you can set the SSL settings for one or more of your domains so `ssl.http_01_port` is something other than `80` and it should take care of the proxying, for example:
+If you are using LetsEncrypt handling combined with our `nginx` role and you set `ssl.http_01_port` then it should take care of the proxying, for example:
 
 ```yaml
 nginx:
@@ -37,7 +35,11 @@ nginx:
         autorenew: true
         email: administrator@example.com
         services: []
+        certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
 ```
+
+You need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
 
 If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
