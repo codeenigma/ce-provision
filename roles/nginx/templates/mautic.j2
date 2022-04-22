@@ -70,11 +70,6 @@ location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf)$ {
     try_files $uri @rewrite;
 }
 
-# Allow Let's Encrypt RFC 5785 ACME protocol.
-location ~* ^/.well-known/ {
-    try_files $uri =404;
-}
-
 # Allow robots.txt.
 location = /robots.txt {
     try_files $uri @rewrite;

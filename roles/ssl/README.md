@@ -1,8 +1,47 @@
 # SSL
 Manages SSL certificates.
+
 <!--TOC-->
 <!--ENDTOC-->
 
+If you are using LetsEncrypt for handling it assume `standalone` mode. If you want to do DNS validation, please do not use this role at this time. There are a few pre-requisites for `standalone` mode to work:
+
+* You must have firewalls open to allow traffic to ports 80 and/or 443, regardless of your configuration
+* LetsEncrypt's certbot application will try to use port 80, if this will not be possible you can either:
+  * change `ssl.http_01_port` to another available port for `certbot` to listen on; or
+  * provide a list of services to stop prior to creating/renewing LE certificates, so port 80 is available
+* If you change `ssl.http_01_port` *something* still needs to proxy traffic to the port you chose locally
+
+On the final point, our `nginx` role supports this automatically. In the `vhost` config you will find this block:
+
+```
+# Proxy for certbot (LetsEncrypt)
+location /.well-known/acme-challenge/ {
+    proxy_pass http://localhost:{{ ssl.http_01_port }}$request_uri;
+}
+```
+
+If you are using LetsEncrypt handling combined with our `nginx` role and you set `ssl.http_01_port` then it should take care of the proxying, for example:
+
+```yaml
+nginx:
+  domains:
+    - # other domain variables here
+      ssl:
+        domains:
+          - "{{ _domain_name }}"
+        handling: letsencrypt
+        http_01_port: 54321
+        autorenew: true
+        email: administrator@example.com
+        services: []
+        certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
+```
+
+You need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
+
+If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
 <!--ROLEVARS-->
 ## Default variables

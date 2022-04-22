@@ -1,0 +1,9 @@
+---
+- name: Check if we have an existing SSL key.
+  ansible.builtin.stat:
+    path: "{{ ssl_facts[certificate_domain].key }}"
+  register: ssl_key
+
+- name: Generates a new key/cert.
+  ansible.builtin.command: "openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj '/C=GB/ST=Test/L=London/O=CodeEnigma/OU=Test/CN={{ certificate_domain }}' -keyout {{ ssl_facts[certificate_domain].key }} -out {{ ssl_facts[certificate_domain].certificate }}"
+  when: not ssl_key.stat.exists
