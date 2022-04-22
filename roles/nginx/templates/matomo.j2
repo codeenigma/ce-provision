@@ -47,11 +47,6 @@ location ~ \.(gif|ico|jpg|png|svg|js|css|htm|html|mp3|mp4|wav|ogg|avi|ttf|eot|wo
     add_header Cache-Control "public";
 }
 
-# Allow Let's Encrypt RFC 5785 ACME protocol.
-location ~* ^/.well-known/ {
-    try_files $uri =404;
-}
-
 # Allow robots.txt.
 location = /robots.txt {
     try_files $uri @rewrite;
