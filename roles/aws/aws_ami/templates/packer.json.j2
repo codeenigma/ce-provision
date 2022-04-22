@@ -59,12 +59,12 @@
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}
-        {% if aws_ami.extra_vars is defined and aws_ami.extra_vars | length %}
+        {% if _aws_ami_extra_vars is defined and _aws_ami_extra_vars | length %}
         "--extra-vars", 
-        "{{ aws_ami.extra_vars }}",
+        "{{ _aws_ami_extra_vars }}",
         {% endif %}        
 				"--extra-vars", 
-				"{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true}"        
+				"{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true }"
 			 ]
   }]
 }

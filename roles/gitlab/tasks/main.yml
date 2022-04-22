@@ -23,7 +23,7 @@
 - name: Generates SSL keys.
   ansible.builtin.include_role:
     name: ssl
-  when: gitlab.ssl is defined
+  when: gitlab.ssl.enabled
   vars:
     ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
 
