@@ -76,6 +76,10 @@ location ~ ^/(index|cron|modules\/statistics\/statistics|core\/modules\/statisti
 location ~ ^/(install|update)\.php$ {
     try_files @phpprocess @phpprocess;
 }
+# Allow install/update for local stack for Drupal8+.
+location ~ ^/core/(install|update).php$ {
+    try_files @phpprocess @phpprocess;
+}
 {% endif %}
 
 # Allow some known php files (like serve.php in the ad module).
