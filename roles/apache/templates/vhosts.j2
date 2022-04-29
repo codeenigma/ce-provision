@@ -1,0 +1,48 @@
+### {{ ansible_managed }}
+
+Include "/etc/apache2/conf-available/{{ domain.project_type }}.conf"
+
+{% for server in domain.servers %}
+<VirtualHost *:{{ server.port }}>
+  ServerName {{ domain.server_name }}
+{% if domain.serveralias is defined %}
+  ServerAlias {{ domain.serveralias }}
+{% endif %}
+{% if server.https_redirect is defined and server.https_redirect %}
+  RewriteEngine on
+  RewriteRule ^.*$ https://{{ domain.server_name }}%{REQUEST_URI} [R=301,L]
+{% endif %}
+{% if domain.webroot is defined %}
+  DocumentRoot "{{ domain.webroot }}"
+  <Directory "{{ domain.webroot }}">
+    Options FollowSymLinks
+
+    {% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
+    AuthType Basic
+    AuthName "{{ domain.basic_auth.auth_message | default('Restricted content') }}"
+    AuthUserFile /etc/apache2/passwords/{{ domain.server_name }}.htpasswd
+    Require valid-user
+    {% endif %}
+
+    AllowOverride All
+    Order allow,deny
+    Allow from all
+  </Directory>
+{% endif %}
+{% if server.custom_directives is defined %}
+    {% for directive in server.custom_directives %}
+    {{ directive }}
+    {% endfor %}
+{% endif %}
+{% if apache.limit_request_body is defined %}
+  LimitRequestBody {{ apache.limit_request_body }}
+{% endif %}
+{% if server.ssl %}
+  SSLEngine on
+  SSLCertificateFile {{ ssl_facts[domain.ssl.domain].certificate }}
+  SSLCertificateKeyFile {{ ssl_facts[domain.ssl.domain].key }}
+{% endif %}
+  ErrorLog {{ domain.error_log }}
+  CustomLog {{ domain.access_log }} combined
+</VirtualHost>
+{% endfor %}
