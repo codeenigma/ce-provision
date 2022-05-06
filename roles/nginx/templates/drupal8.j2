@@ -4,8 +4,5 @@
 location @rewrite {
     rewrite ^ /index.php?$query_string;
 }
-# Allow install/update for local stack for Drupal8+.
-location ~ ^/core/(install|update).php$ {
-    try_files @phpprocess @phpprocess;
-}
+
 include "/etc/nginx/conf.d/drupal_common";
