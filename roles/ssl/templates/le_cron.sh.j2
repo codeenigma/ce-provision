@@ -19,10 +19,10 @@ done
 
 {% if _ssl_web_server == 'none' %}
 # run certbot
-{{ ssl.certbot_renew_command }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING
+{{ ssl.certbot_renew_command }} --http-01-port {{ ssl.http_01_port }} --expand $SITESSTRING
 {% else %}
 # run certbot
-{{ ssl.certbot_renew_command }} --http-01-port {{ ssl.http_01_port }} --{{ _ssl_web_server }} --expand$SITESSTRING
+{{ ssl.certbot_renew_command }} --http-01-port {{ ssl.http_01_port }} --{{ _ssl_web_server }} --expand $SITESSTRING
 {% endif %}
 
 # start services again
