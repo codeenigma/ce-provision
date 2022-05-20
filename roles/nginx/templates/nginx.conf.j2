@@ -21,6 +21,14 @@ http {
 	types_hash_max_size 2048;
 	# server_tokens off;
 
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" $request_length $body_bytes_sent';
+
+        log_format  proxy '$http_x_forwarded_for - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" $request_length $body_bytes_sent';
+
 	server_names_hash_bucket_size {{ nginx.http.server_names_hash_bucket_size }};
 	# server_name_in_redirect off;
 
