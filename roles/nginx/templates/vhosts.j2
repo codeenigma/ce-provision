@@ -25,7 +25,7 @@ server {
     ssl_certificate_key {{ ssl_facts[_ssl_domains[0]].key }};
 {% endif %}
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
-    access_log {{ domain.access_log }};
+    access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
     root "{{ domain.webroot }}";
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
     include "/etc/nginx/conf.d/_common";
