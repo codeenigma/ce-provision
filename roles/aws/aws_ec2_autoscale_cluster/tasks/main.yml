@@ -71,7 +71,7 @@
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_name ] }}"
       rds_cloudwatch_alarms:
         - "{{ aws_ec2_autoscale_cluster.rds.rds_cloudwatch_alarms }}"
       sns:
@@ -123,7 +123,7 @@
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       encrypt: "{{ aws_ec2_autoscale_cluster.efs_encrypt }}"
       backup: "{{ aws_ec2_autoscale_cluster.efs_backup }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.efs_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.efs_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_name ] }}"
       purge_tags: true
       wait: false
   when:

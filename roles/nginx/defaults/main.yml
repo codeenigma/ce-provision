@@ -29,6 +29,7 @@ nginx:
       access_log: "/var/log/nginx/access.log"
       error_log: "/var/log/nginx/error.log"
       error_log_level: "notice"
+      access_log_format: "main"
       # Server specific log stream (Cloudwatch),
       log_stream_name: example
       webroot: "/var/www/html"
