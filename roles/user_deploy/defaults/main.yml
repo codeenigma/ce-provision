@@ -1,6 +1,7 @@
 ---
 user_deploy:
   # This sets both username and main group.
+  # If you are using ce-deploy to deploy code this must match the `deploy_user` variable
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
   # Local username of the deploy user.
   utility_host: "localhost"
