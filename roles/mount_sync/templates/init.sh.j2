@@ -6,11 +6,16 @@ if [ ! -f "{{ item }}" ]; then
   exit 0
 fi
 
+# Ensure deploy directory is writeable
+if [ -f "/home/{{ user_deploy.username }}/deploy" ]; then
+  chown "{{ user_deploy.username }}:{{ user_deploy.username }}" "/home/{{ user_deploy.username }}/deploy"
+fi
+
 # Create tmp dir and untar.
 mkdir -p $(dirname "/tmp{{ item }}")
 cp "{{ item }}" $(dirname "/tmp{{ item }}/")
 cd $(dirname "/tmp{{ item }}")
-tar -xvf *.tar --directory /
+sudo -u "{{ user_deploy.username }}" tar -xvf *.tar --directory /
 
 # Clean up tmp dir
 rm -rf $(dirname "/tmp{{ item }}")
