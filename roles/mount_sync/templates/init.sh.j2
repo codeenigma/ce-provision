@@ -1,14 +1,14 @@
 #!/bin/sh
 
+# Ensure deploy directory is writeable
+if [ -f "/home/{{ user_deploy.username }}/deploy" ]; then
+  chown "{{ user_deploy.username }}:{{ user_deploy.username }}" "/home/{{ user_deploy.username }}/deploy"
+fi
+
 {% for item in mount_sync.tarballs %}
 # Nothing to do without an initial tarball.
 if [ ! -f "{{ item }}" ]; then
   exit 0
-fi
-
-# Ensure deploy directory is writeable
-if [ -f "/home/{{ user_deploy.username }}/deploy" ]; then
-  chown "{{ user_deploy.username }}:{{ user_deploy.username }}" "/home/{{ user_deploy.username }}/deploy"
 fi
 
 # Create tmp dir and untar.
