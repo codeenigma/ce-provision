@@ -7,16 +7,15 @@ fi
 
 {% for item in mount_sync.tarballs %}
 # Nothing to do without an initial tarball.
-if [ ! -f "{{ item }}" ]; then
-  exit 0
+if [ -f "{{ item }}" ]; then
+  # Create tmp dir and untar.
+  mkdir -p $(dirname "/tmp{{ item }}")
+  cp "{{ item }}" $(dirname "/tmp{{ item }}/")
+  cd $(dirname "/tmp{{ item }}")
+  sudo -u "{{ user_deploy.username }}" tar -xvf *.tar --directory /
+
+  # Clean up tmp dir
+  rm -rf $(dirname "/tmp{{ item }}")
 fi
 
-# Create tmp dir and untar.
-mkdir -p $(dirname "/tmp{{ item }}")
-cp "{{ item }}" $(dirname "/tmp{{ item }}/")
-cd $(dirname "/tmp{{ item }}")
-sudo -u "{{ user_deploy.username }}" tar -xvf *.tar --directory /
-
-# Clean up tmp dir
-rm -rf $(dirname "/tmp{{ item }}")
 {% endfor %}
