@@ -2,6 +2,9 @@
 user_ansible:
   # This sets both username and main group.
   username: ""
+  # Optional Linux uid and gid for user
+  # uid: 999
+  # gid: 999
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: ""
