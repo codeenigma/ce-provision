@@ -7,5 +7,5 @@
     state: "{{ aws_vpc.state }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
     description: "{{ security_group.description }}"
-    rules: "{{ security_group.rules }}"
+    rules: "{{ security_group.rules | default(omit) }}"
     rules_egress: "{{ security_group.rules_egress | default(omit) }}"
