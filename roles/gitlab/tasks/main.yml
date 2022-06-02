@@ -85,4 +85,3 @@
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: "gitlab-rails runner /etc/gitlab/gitlab-config.rb"
   when: gitlab.disable_signup
-
