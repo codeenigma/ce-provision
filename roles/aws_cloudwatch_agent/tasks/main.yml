@@ -2,6 +2,7 @@
 - name: Install deb for AWS CloudWatch agent.
   ansible.builtin.apt:
     deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb"
+    force: true
     state: present
 
 - name: Adds cwagent user to adm group for log access.
