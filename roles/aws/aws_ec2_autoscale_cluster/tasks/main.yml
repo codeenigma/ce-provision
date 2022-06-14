@@ -239,7 +239,7 @@
     protocol: http
     port: 80
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-    deregistration_delay_timeout_seconds: "{{ aws_ec2_autoscale_cluster.deregistration_delay_timeout_seconds }}"
+    deregistration_delay_timeout: "{{ aws_ec2_autoscale_cluster.deregistration_delay_timeout }}"
     health_check_protocol: "{{ aws_ec2_autoscale_cluster.health_check_protocol }}"
     health_check_path: "{{ aws_ec2_autoscale_cluster.health_check_path }}"
     health_check_port: "{{ aws_ec2_autoscale_cluster.health_check_port }}"
