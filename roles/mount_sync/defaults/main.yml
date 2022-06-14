@@ -22,3 +22,6 @@ mount_sync:
   #  - project_name: myproject
   #    build_type: dev
   #    path: /path/to/initial/system.sqsh
+
+  # Only used by SquashFS, base location to copy the image file to.
+  build_dir: "/home/{{ user_deploy.username }}/builds"
