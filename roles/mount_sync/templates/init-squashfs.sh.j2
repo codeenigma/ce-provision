@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Ensure deploy directory is writeable
+if [ -f "{{ mount_sync.deploy_dir }}" ]; then
+  chown "{{ user_deploy.username }}:{{ user_deploy.username }}" "{{ mount_sync.deploy_dir }}"
+fi
+
+{% for item in mount_sync.squashed_fs %}
+# Nothing to do without an initial filesystem file.
+if [ -f "{{ item.path }}" ]; then
+  # Copy the file locally
+  cp "{{ item.path }}" "{{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}/deploy.sqsh"
+  # Mount the file
+  mount "{{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}/deploy.sqsh" "{{ mount_sync.deploy_dir }}/{{ item.project_name }}_{{ item.build_type }}" -t squashfs -o loop
+fi
+
+{% endfor %}
