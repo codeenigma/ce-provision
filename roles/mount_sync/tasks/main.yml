@@ -5,11 +5,24 @@
 #       - unison
 #     state: present
 
-- name: Create cloud-init script
+- name: Create cloud-init script for tar files.
   ansible.builtin.template:
-    src: init.sh.j2
+    src: init-tarballs.sh.j2
     dest: "/var/lib/cloud/scripts/per-instance/mount-sync-tarballs.sh"
     mode: "0755"
+  when:
+    - mount_sync.tarballs is defined
+    - mount_sync.tarballs | length > 0
+
+- name: Create cloud-init script for SquashFS files.
+  ansible.builtin.template:
+    src: init-squashfs.sh.j2
+    dest: "/var/lib/cloud/scripts/per-instance/mount-sync-squashfs.sh"
+    mode: "0755"
+  when:
+    - mount_sync.squashed_fs is defined
+    - mount_sync.squashed_fs | length > 0
+
 # - name: Create unison cron task
 #   cron:
 #     name: "Unison {{ item.name }}"
