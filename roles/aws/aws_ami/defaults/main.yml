@@ -16,6 +16,7 @@ aws_ami:
   subnet_filter_az: ""
   playbook_file: "{{ playbook_dir }}/base-playbook.yml" # Path to a playbook used to provision the image. If using 'repack' make sure the playbook host is _aws_ami_host.
   force: false # Forces a builder to run when artifacts from a previous build prevent a build from running. May be necessary if on_error is 'abort'
+  debug: false # Puts Packer into debug mode (does not terminate instance)
   # on_error can be one of:
   # - cleanup (default): cleans up after the previous steps, deleting temporary files and virtual machines.
   # - abort: exits without any cleanup, which might require the next build to use -force.

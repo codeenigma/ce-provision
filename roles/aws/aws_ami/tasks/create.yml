@@ -18,14 +18,21 @@
     cmd: "packer inspect {{ _ce_provision_build_tmp_dir }}/packer.json"
     chdir: "{{ _ce_provision_base_dir }}"
 
+- name: Build Packer command.
+  ansible.builtin.set_fact:
+    _aws_ami_packer_command: "-on-error={{ aws_ami.on_error }} {{ _ce_provision_build_tmp_dir }}/packer.json"
+
+- name: Add -force option to Packer command.
+  ansible.builtin.set_fact:
+    _aws_ami_packer_command: "-force {{ _aws_ami_packer_command }}"
+  when: aws_ami.force
+
+  - name: Add -debug option to Packer command.
+  ansible.builtin.set_fact:
+    _aws_ami_packer_command: "-debug {{ _aws_ami_packer_command }}"
+  when: aws_ami.debug
+
 - name: Build AMI.
   ansible.builtin.command:
-    cmd: "packer build -on-error={{ aws_ami.on_error }} {{ _ce_provision_build_tmp_dir }}/packer.json"
+    cmd: "packer build {{ _aws_ami_packer_command }}"
     chdir: "{{ _ce_provision_base_dir }}"
-  when: not aws_ami.force
-
-- name: Build AMI with force.
-  ansible.builtin.command:
-    cmd: "packer build -on-error={{ aws_ami.on_error }} -force {{ _ce_provision_build_tmp_dir }}/packer.json"
-    chdir: "{{ _ce_provision_base_dir }}"
-  when: aws_ami.force
