@@ -1,17 +1,33 @@
 #!/bin/sh
 
-# Ensure deploy directory is writeable
+# STEP 1 - Ensure deploy directory is writeable
+
 if [ -f "{{ mount_sync.deploy_dir }}" ]; then
   chown "{{ user_deploy.username }}:{{ user_deploy.username }}" "{{ mount_sync.deploy_dir }}"
 fi
 
+# STEP 2 - stand up the websites
+
 {% for item in mount_sync.squashed_fs %}
 # Nothing to do without an initial filesystem file.
 if [ -f "{{ item.path }}" ]; then
+  # Ensure the builds directory exists
+  sudo -u {{ user_deploy.username }} mkdir -p {{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}
   # Copy the file locally
-  cp "{{ item.path }}" "{{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}/deploy.sqsh"
+  sudo -u {{ user_deploy.username }} cp "{{ item.path }}" "{{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}/deploy.sqsh"
   # Mount the file
   mount "{{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}/deploy.sqsh" "{{ mount_sync.deploy_dir }}/{{ item.project_name }}_{{ item.build_type }}" -t squashfs -o loop
+fi
+
+{% endfor %}
+
+# STEP 3 - clean up builds directory
+
+{% for item in mount_sync.squashed_fs %}
+# Nothing to do without an initial filesystem file.
+if [ -f "{{ item.path }}" ]; then
+  # Copy the deployed files back to the builds directory
+  sudo -u {{ user_deploy.username }} cp -r "{{ mount_sync.deploy_dir }}/{{ item.project_name }}_{{ item.build_type }}/" "{{ mount_sync.build_dir }}/"
 fi
 
 {% endfor %}
