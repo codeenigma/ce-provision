@@ -13,6 +13,8 @@ fi
 if [ -f "{{ item.path }}" ]; then
   # Ensure the builds directory exists
   sudo -u {{ user_deploy.username }} mkdir -p {{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}
+  # Ensure the mountpoint exists
+  sudo -u {{ user_deploy.username }} mkdir -p {{ mount_sync.deploy_dir }}/{{ item.project_name }}_{{ item.build_type }}
   # Copy the file locally
   sudo -u {{ user_deploy.username }} cp "{{ item.path }}" "{{ mount_sync.build_dir }}/{{ item.project_name }}_{{ item.build_type }}/deploy.sqsh"
   # Mount the file
