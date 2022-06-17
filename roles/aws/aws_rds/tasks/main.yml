@@ -29,8 +29,8 @@
     params: "{{ aws_rds.db_parameters }}"
     tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
   when:
-    - aws_rds.db_parameter_group_name is defined
-    - aws_rds.db_parameter_group_name | length > 0
+    - aws_rds.db_parameters is defined
+    - aws_rds.db_parameters | length > 0
 
 - name: Create Aurora RDS instance.
   community.aws.rds_instance:
