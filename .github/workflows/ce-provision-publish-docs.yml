@@ -1,26 +1,45 @@
-name: Publish docs
+name: Build docs
 
-# Run this workflow on push to 1.x (e.g. on merge of PR to 1.x)
+# Run this workflow when a PR to 1.x gets merged
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - 1.x
 
 jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
-  run-tests:
+  build-docs:
     # Name the Job
-    name: Publish documentation
+    name: Build the documentation
     # Set the type of machine to run on
     runs-on: ubuntu-20.04
 
     steps:
+      # Checks out a copy of your repository on the ubuntu-latest machine
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       # Configures global Git variables for committing
       - name: Configure Git
         run: |
           git config --global user.email "sysadm@codeenigma.com"
           git config --global user.name "Code Enigma CI"
+          git config --global pull.rebase false
+
+      # Builds the docs
+      - name: Build documentation
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git fetch
+          /bin/sh ./contribute/toc.sh
+          find . -name "*.md" | xargs git add
+          git diff --quiet && git diff --staged --quiet || git commit -am 'GitHub Actions - Rebuilt documentation.'
+          git push origin 1.x
+        shell: bash
 
       # Installs the ce-dev stack
       - name: Install ce-dev
