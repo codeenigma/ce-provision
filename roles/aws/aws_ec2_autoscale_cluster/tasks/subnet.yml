@@ -62,6 +62,7 @@
     filters:
       vpc-id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
       tag:Name: "{{ subnet.public_subnet }}"
+      state: available
   register: _aws_ec2_autoscale_cluster_subnet_gateway
 
 - name: Generate route table for the private subnet.
