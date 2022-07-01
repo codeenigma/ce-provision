@@ -39,19 +39,30 @@ nginx:
       access_log: "/var/log/nginx/access.log"
       error_log: "/var/log/nginx/error.log"
       error_log_level: "notice"
+      access_log_format: "main"
       # Server specific log stream (Cloudwatch),
       log_stream_name: example
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
-        domain: "{{ _domain_name }}"
+        domains:
+          - "{{ _domain_name }}"
         handling: selfsigned
+        # Sample LetsEncrypt config, because include_role will not merge defaults these all need providing:
+        # handling: letsencrypt
+        # http_01_port: 5000
+        # autorenew: true
+        # email: sysadm@codeenigma.com
+        # services: []
+        # certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
+        # certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
       ratelimitingcrawlers: true
       is_default: true
       basic_auth:
         auth_enabled: false
         auth_user: "hello"
         auth_pass: "P3nguin!"
+        auth_message: Restricted content
       servers:
         - port: 80
           ssl: false
