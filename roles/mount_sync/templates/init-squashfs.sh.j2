@@ -29,7 +29,7 @@ fi
 # Nothing to do without an initial filesystem file.
 if [ -f "{{ item.path }}" ]; then
   # Copy the deployed files back to the builds directory
-  sudo -u {{ user_deploy.username }} cp -r "{{ mount_sync.deploy_dir }}/{{ item.project_name }}_{{ item.build_type }}/" "{{ mount_sync.build_dir }}/"
+  sudo -u {{ user_deploy.username }} rsync -az "{{ mount_sync.deploy_dir }}/{{ item.project_name }}_{{ item.build_type }}" "{{ mount_sync.build_dir }}/"
 fi
 
 {% endfor %}
