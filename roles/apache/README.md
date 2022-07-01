@@ -11,7 +11,7 @@ Install and configure the apache webserver.
 ---
 php:
   version:
-    - 7.2
+    - 7.3
 symfony_env: "{{ _env_type }}"
 apache:
   # Global default config for apache2.conf.
@@ -64,7 +64,6 @@ apache:
         - port: 443
           ssl: true
           https_redirect: false
-
 ```
 
 <!--ENDROLEVARS-->
