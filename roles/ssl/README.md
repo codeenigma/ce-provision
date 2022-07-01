@@ -48,7 +48,8 @@ If you are using Nginx or Apache you can set the `ssl.web_server` for each domai
 ```yaml
 ---
 ssl:
-  domain: www.example.com
+  domains: # you can provide multiple domains if you need
+    - www.example.com
   # Handling for certs, can be one of:
   # - letsencrypt: Generates individual LetsEncrypt certificate using the HTTP challenge
   # - selfsigned: Generates self-signed certificates
@@ -71,8 +72,19 @@ ssl:
     79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
     6XoQQlb5mYuLKCzAZws9uceeVH+z
     -----END PRIVATE KEY-----
+
   # For "letsencrypt" handling.
   email: admin@example.com
+  certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n" # root of the command to register a new cert
+  http_01_port: 80 # you can set a non-standard port to listen on, but certbot still needs port 80 - see https://letsencrypt.org/docs/challenge-types/#http-01-challenge
+  # For "letsencrypt" auto renewal
+  autorenew: false # set to true to create a cron job to renew LE certs
+  certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew" # root of the command used in the cron job
+  # renewal_minute: "0" # minute to run renewal cron job
+  # renewal_hour: "0" # hour to run renewal cron job
+  # renewal_day: "7" # day to run renewal cron job
+  web_server: none # values are none, nginx or apache - warning, will attempt to manipulate your vhosts!
+
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
   # eg;
