@@ -40,9 +40,9 @@ gitlab_runner:
     #  cleanup_args: '["--config", "/etc/gitlab-runner/fargate.toml", "custom", "cleanup"]'
   install_fargate: false
   restart: true # set to false if you're applying settings to a server responsible for its own runners
-  username: "{{ _ce_deploy.username }}"
+  username: "{{ ce_deploy.username }}"
   docker_group: "docker"
-  runner_workingdir: "/home/{{ _ce_deploy.username }}/build"
+  runner_workingdir: "/home/{{ ce_deploy.username }}/build"
   runner_config: "/etc/gitlab-runner/config.toml"
   # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
   fargate:
