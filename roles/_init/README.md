@@ -22,6 +22,8 @@ _ce_provision:
 
 ce_provision:
   username: "{{ _ce_provision.username }}"
+  new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
+  key_name: id_rsa.pub # existing users may have a key of a different name
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "master"
