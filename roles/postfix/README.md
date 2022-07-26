@@ -10,7 +10,7 @@ Installs and configures Postfix for sending mail. Mail sending is disabled by de
 ---
 
 postfix:
-  hostname: "{{ _domain_name }}"
+  hostname: "{{ ansible_fqdn }}" # if you set this to something else you may have to create PTR records to avoid bouncing
   dest_hosts: "mail.host1.com,mail.host2.com"
   disable_vrfy: false
   interfaces: all
