@@ -131,6 +131,11 @@
   loop_control:
     loop_var: lock_file
 
+- name: Create Postfix Aliases database
+  ansible.builtin.command:
+    cmd: /usr/bin/newaliases
+    warn: false
+
 - name: Restart Postfix
   ansible.builtin.command:
     cmd: /usr/sbin/service postfix start
