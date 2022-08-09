@@ -1,3 +1,4 @@
 ---
 aws_cli:
+  version: latest # Specify a particular version number in X.X.X format to override
   refresh: false # Set to true to upgrade the AWS client
