@@ -11,6 +11,13 @@
   when:
     - aws_cli.refresh
 
+- name: Delete AWS CLI install files when refreshing CLI version.
+  ansible.builtin.file:
+    path: /opt/aws-cli
+    state: absent
+  when:
+    - aws_cli.refresh
+
 - name: Check if we already have an AWS cli bin.
   ansible.builtin.stat:
     path: "/usr/local/bin/aws"
