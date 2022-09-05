@@ -1,15 +1,15 @@
 - name: Clone custom extra directory.
   ansible.builtin.git:
-    repo: "{{ ce_provision.extra_repository }}"
+    repo: "{{ _init.ce_provision_extra_repository }}"
     dest: "{{ _ce_provision_build_tmp_dir }}/extra"
-    version: "{{ ce_provision.extra_repository_branch }}"
+    version: "{{ _init.ce_provision_extra_repository_branch }}"
   delegate_to: localhost
   become: true
   become_user: "{{ ce_provision.username }}"
 
 - name: Check if file exists.
   ansible.builtin.stat:
-    path: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
+    path: "{{ _ce_provision_build_tmp_dir }}/extra/{{ _init.ce_provision_extra_repository_vars_file }}"
   delegate_to: localhost
   become: true
   become_user: "{{ ce_provision.username }}"
@@ -17,7 +17,7 @@
 
 - name: Include custom variables.
   ansible.builtin.include_vars:
-    file: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
+    file: "{{ _ce_provision_build_tmp_dir }}/extra/{{ _init.ce_provision_extra_repository_vars_file }}"
     name: _ce_provision_extra_vars
   delegate_to: localhost
   become: true
@@ -27,7 +27,7 @@
 
 - name: Filter allowed custom variables.
   ansible.builtin.set_fact:
-    ce_provision_extra_vars_filtered: "{{ _ce_provision_extra_vars | allowed_vars(ce_provision.extra_repository_allowed_vars) }}"
+    ce_provision_extra_vars_filtered: "{{ _ce_provision_extra_vars | allowed_vars(_init.ce_provision_extra_repository_allowed_vars) }}"
   when:
     - _extra_repository_vars_file.stat.exists
 
@@ -38,4 +38,4 @@
     - _extra_repository_vars_file.stat.exists
     - ce_provision_extra_vars_filtered is defined
     - ce_provision_extra_vars_filtered[item.name] is defined
-  loop: "{{ ce_provision.extra_repository_allowed_vars }}"
+  loop: "{{ _init.ce_provision_extra_repository_allowed_vars }}"
