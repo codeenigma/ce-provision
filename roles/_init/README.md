@@ -1,6 +1,6 @@
 # Init role
 
-This is meant to ALWAYS be included as the first task of a play.
+This is meant to ALWAYS be included as the first task of a play. If you include this role, as you will in the vast majority of cases, be sure to also include the `_exit` role as the last task of the play.
 
 <!--TOC-->
 <!--ENDTOC-->

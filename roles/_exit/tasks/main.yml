@@ -1,10 +1,11 @@
 ---
+# Do not include the _exit role at the end of a play without including the _init role at the start.
 - name: Generate/Update custom vars file.
   ansible.builtin.include_tasks: allowed_vars.yml
   when:
-    - ce_provision.extra_repository
-    - ce_provision.extra_repository_vars_file
-    - ce_provision.extra_repository_push
+    - _init.ce_provision_extra_repository
+    - _init.ce_provision_extra_repository_vars_file
+    - _init.ce_provision_extra_repository_push
 
 - name: Store current playbook md5.
   ansible.builtin.copy:
