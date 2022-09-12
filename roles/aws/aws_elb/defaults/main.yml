@@ -39,12 +39,11 @@ aws_elb:
   ssl_certificate_ARN: ""
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
   # Target group settings
-  targets: []
+  targets: [] # List of servers using their Name tags. This value is used to obtain the instance ID.
   # targets:
-  #   - Id: i-0123456789
-  #     Port: 80
-  #   - Id: i-0987654321
-  #     Port: 80
+  #   - example-server-one
+  #   - example-server-two
+  targets_port: 80
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
