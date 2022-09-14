@@ -11,17 +11,17 @@
     filters:
       "tag:Name": "{{ aws_ec2_autoscale_cluster.vpc_name }}"
   register: _aws_ec2_autoscale_cluster_vpc
-  when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
+  when: (aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0)
 
 - name: Set the VPC id from name.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-  when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
+  when: (aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0)
 
 - name: Use provided VPC id.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
-  when: ( aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0 )
+  when: (aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0)
 
 - name: Create matching Security Group.
   amazon.aws.ec2_group:

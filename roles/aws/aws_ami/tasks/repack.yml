@@ -76,7 +76,7 @@
 - name: Merge repack extra variables with provided extra variables.
   ansible.builtin.set_fact:
     aws_ami:
-      extra_vars: "{{ aws_ami.extra_vars + [ item ] }}"
+      extra_vars: "{{ aws_ami.extra_vars + [item] }}"
   with_items: "{{ _aws_ami_repack_extra_vars }}"
   when: aws_ami_running_instances.instances | length > 0
 
