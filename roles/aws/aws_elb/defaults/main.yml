@@ -1,0 +1,51 @@
+aws_elb:
+  aws_profile: "{{ _aws_profile }}"
+  region: "{{ _aws_region }}"
+  elb_type: "alb"
+  name: "example"
+  target_group_name: "example-target-group"
+  acm:
+    create_cert: false
+    extra_domains: [] # list of Subject Alternative Name domains and zones
+    #  - domain: www2.example.com
+    #    zone: example.com
+    #    aws_profile: us-east-1
+    route_53:
+      aws_profile: "{{ _aws_profile }}" # the zone might not be in the same account as the certificate
+      zone: example.com
+  vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
+  # vpc_name: example-vpc
+  # Add an CNAM record tied to the ALB.
+  # Set the zone to empty to skip.
+  route_53:
+    zone: "example.com"
+    record: "*.{{ _domain_name }}"
+    aws_profile: "{{ _aws_profile }}" # Not necessarily the same as the "target" one.
+  alb_security_groups: []
+  # ALB health checks - these are health check settings applied to the load balancer
+  alb_health_check_type: ELB # Uses ALB health checks, set to EC2 to use default AWS instance status checks
+  alb_health_check_period: 1200 # Length of time in seconds after a new EC2 instance comes into service that Auto Scaling starts checking its health
+  # Target Group health checks - these are distinct and separate checks carried out by the Target Group for the ASG
+  deregistration_delay_timeout: 60 # seconds to wait before removing instance from Target Group
+  health_check_protocol: "http"
+  health_check_path: "/"
+  health_check_port: "traffic-port" # Default is traffic-port, which matches the target port. Can be overridden with a port number.
+  health_check_success_codes: "200" # Can be single code, like "200", or a comma-separated value with ranges: "200,250-260".
+  health_check_interval: 30
+  health_check_timeout: 5
+  health_check_healthy_count: 5
+  health_check_unhealthy_count: 2
+  # ALB settings
+  alb_idle_timeout: 60
+  alb_ip_address_type: "ipv4" # Can be 'ipv4' or 'dualstack' (the latter includes IPv4 and IPv6 addresses).
+  ssl_certificate_ARN: ""
+  ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
+  # Target group settings
+  targets: [] # List of servers using their Name tags. This value is used to obtain the instance ID.
+  # targets:
+  #   - example-server-one
+  #   - example-server-two
+  targets_port: 80
+  # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
+  listeners: []
+  alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
