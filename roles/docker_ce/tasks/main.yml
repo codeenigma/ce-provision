@@ -8,7 +8,7 @@
   ansible.builtin.apt_key: url=https://download.docker.com/linux/debian/gpg state=present
 
 - name: Add repository for Docker.
-  ansible.builtin.apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/debian buster stable' state=present
+  ansible.builtin.apt_repository: "repo='deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable' state=present"
 
 - name: Ensure Docker is installed.
   ansible.builtin.apt:
