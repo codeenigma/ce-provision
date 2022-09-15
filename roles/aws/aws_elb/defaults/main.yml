@@ -48,6 +48,7 @@ aws_elb:
   #   - example-server-one
   #   - example-server-two
   targets_port: 80
+  modify_targets: false # Set to true if this is a standalone ELB, so the list of targets in the target group can be updated.
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   elb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ELB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
