@@ -1,4 +1,11 @@
 ---
+- block:
+    - name: "Abort if target is not a Debian server."
+      debug:
+        msg: "ce-provision currently only supports Debian based distributions of Linux."
+    - meta: end_host
+  when: ansible_os_family != "Debian"
+
 - name: Set "tracking" file for the playbook.
   ansible.builtin.set_fact:
     current_play_md5_file: "{{ _ce_provision_build_id }}-{{ playbook_dir | basename }}-{{ inventory_hostname }}"

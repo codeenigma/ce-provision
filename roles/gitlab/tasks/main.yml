@@ -6,12 +6,12 @@
 
 - name: Add repository for Gitlab.
   ansible.builtin.apt_repository:
-    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
     state: present
 
 - name: Add source repository for Gitlab.
   ansible.builtin.apt_repository:
-    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
     state: present
 
 - name: Ensure Gitlab is installed.
