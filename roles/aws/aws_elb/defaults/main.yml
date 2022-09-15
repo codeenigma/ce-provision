@@ -1,6 +1,7 @@
 aws_elb:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
+  state: present
   elb_type: "alb"
   name: "example"
   target_group_name: "example-target-group"
@@ -38,6 +39,8 @@ aws_elb:
   # ALB settings
   alb_idle_timeout: 60
   alb_ip_address_type: "ipv4" # Can be 'ipv4' or 'dualstack' (the latter includes IPv4 and IPv6 addresses).
+  tags:
+    Name: "example"
   ssl_certificate_ARN: ""
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
   # Target group settings
