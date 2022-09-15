@@ -29,7 +29,7 @@
     owner: root
     group: root
     mode: "0644"
-  notify: reload postfix configuration
+  notify: Reload Postfix configuration.
 
 - name: Configure transport
   ansible.builtin.template:
@@ -39,8 +39,8 @@
     group: root
     mode: "0644"
   notify:
-    - initialize transport
-    - reload postfix configuration
+    - Initialise transport.
+    - Reload Postfix configuration.
 
 - name: Install SASL
   ansible.builtin.package:
@@ -57,8 +57,8 @@
     mode: "0644"
   when: postfix.use_ses
   notify:
-    - initialize sasl_passwd
-    - reload postfix configuration
+    - Initialise sasl_passwd.
+    - Reload Postfix configuration.
 
 - name: Configure virtual
   ansible.builtin.template:
@@ -69,8 +69,8 @@
     mode: "0644"
   when: postfix.forward
   notify:
-    - initialize virtual
-    - reload postfix configuration
+    - Initialise virtual.
+    - Reload Postfix configuration.
 
 - name: Ensure host maildir exists.
   ansible.builtin.file:
