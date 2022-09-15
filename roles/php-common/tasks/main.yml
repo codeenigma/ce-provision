@@ -6,7 +6,7 @@
 
 - name: Add Sury repository.
   ansible.builtin.apt_repository:
-    repo: "deb https://packages.sury.org/php/ buster main"
+    repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
     state: present
 
 - name: Pin Sury packages.
