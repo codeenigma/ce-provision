@@ -19,6 +19,16 @@
     _aws_ec2_elb_vpc_id: "{{ aws_elb.vpc_id }}"
   when: ( aws_elb.vpc_name is not defined or aws_elb.vpc_name | length < 0 )
 
+- name: Reset subnets lists.
+  ansible.builtin.set_fact:
+    _aws_ec2_elb_public_subnets_ids: []
+
+- name: Construct list of public subnet IDs.
+  ansible.builtin.include_tasks: subnet.yml
+  with_items: "{{ aws_elb.subnets }}"
+  loop_control:
+    loop_var: subnet
+
 - name: Set a default target group list.
   ansible.builtin.set_fact:
     _targets: []
@@ -131,7 +141,7 @@
     region: "{{ aws_elb.region }}"
     state: "{{ aws_elb.state }}"
     tags: "{{ aws_elb.tags }}"
-    subnets: "{{ aws_elb.public_subnets_ids }}"
+    subnets: "{{ _aws_ec2_elb_public_subnets_ids }}"
     security_groups: "{{ aws_elb.security_groups }}"
     listeners: "{{ _aws_ec2_listeners }}"
     idle_timeout: "{{ aws_elb.idle_timeout }}"
