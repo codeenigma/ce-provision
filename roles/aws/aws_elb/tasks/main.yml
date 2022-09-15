@@ -61,7 +61,7 @@
     health_check_timeout: "{{ aws_elb.health_check_timeout }}"
     healthy_threshold_count: "{{ aws_elb.health_check_healthy_count }}"
     unhealthy_threshold_count: "{{ aws_elb.health_check_unhealthy_count }}"
-    modify_targets: false
+    modify_targets: "{{ aws_elb.modify_targets }}"
     targets: "{{ _targets }}"
   register: _aws_ec2_elb_target_group_created
 
