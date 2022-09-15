@@ -19,6 +19,16 @@
     _aws_ec2_elb_vpc_id: "{{ aws_elb.vpc_id }}"
   when: ( aws_elb.vpc_name is not defined or aws_elb.vpc_name | length < 0 )
 
+- name: Reset subnets lists.
+  ansible.builtin.set_fact:
+    _aws_ec2_elb_public_subnets_ids: []
+
+- name: Construct list of public subnet IDs.
+  ansible.builtin.include_tasks: subnet.yml
+  with_items: "{{ aws_elb.subnets }}"
+  loop_control:
+    loop_var: subnet
+
 - name: Set a default target group list.
   ansible.builtin.set_fact:
     _targets: []
@@ -35,7 +45,7 @@
 - name: Create a Target group for port 80.
   community.aws.elb_target_group:
     profile: "{{ aws_elb.aws_profile }}"
-    name: "{{ aws_elb.name }}"
+    name: "{{ aws_elb.target_group_name }}"
     state: "{{ aws_elb.state }}"
     region: "{{ aws_elb.region }}"
     tags: "{{ aws_elb.tags }}"
@@ -51,7 +61,7 @@
     health_check_timeout: "{{ aws_elb.health_check_timeout }}"
     healthy_threshold_count: "{{ aws_elb.health_check_healthy_count }}"
     unhealthy_threshold_count: "{{ aws_elb.health_check_unhealthy_count }}"
-    modify_targets: false
+    modify_targets: "{{ aws_elb.modify_targets }}"
     targets: "{{ _targets }}"
   register: _aws_ec2_elb_target_group_created
 
@@ -100,7 +110,7 @@
     _aws_ec2_listeners_https:
       Protocol: HTTPS
       Port: "443"
-      SslPolicy: "{{ aws_elb.alb_ssl_policy }}"
+      SslPolicy: "{{ aws_elb.elb_ssl_policy }}"
       Certificates:
         - CertificateArn: "{{ _ssl_certificate_ARN }}"
       DefaultActions:
@@ -131,10 +141,11 @@
     region: "{{ aws_elb.region }}"
     state: "{{ aws_elb.state }}"
     tags: "{{ aws_elb.tags }}"
-    subnets: "{{ aws_elb.public_subnets_ids }}"
-    security_groups: "{{ aws_elb.security_groups }}"
+    subnets: "{{ _aws_ec2_elb_public_subnets_ids }}"
+    security_groups: "{{ aws_elb.elb_security_groups }}"
     listeners: "{{ _aws_ec2_listeners }}"
     idle_timeout: "{{ aws_elb.idle_timeout }}"
+    ip_address_type: "{{ aws_elb.ip_address_type }}"
   register: _aws_ec2_elb
   when: aws_elb.elb_type == "alb"
 
