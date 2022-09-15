@@ -29,41 +29,14 @@
   loop_control:
     loop_var: subnet
 
-- name: Set a default target group list.
-  ansible.builtin.set_fact:
-    _targets: []
-
-- name: Construct list of instance IDs for ELB target group.
+- name: Create target groups.
   ansible.builtin.include_tasks: "target_group.yml"
-  with_items: "{{ aws_elb.targets }}"
+  with_items: "{{ aws_elb.target_groups }}"
   loop_control:
-    loop_var: tg_instance
+    loop_var: target_group
   when:
-    - aws_elb.targets is defined
-    - aws_elb.targets | length > 0
-
-- name: Create a Target group for port 80.
-  community.aws.elb_target_group:
-    profile: "{{ aws_elb.aws_profile }}"
-    name: "{{ aws_elb.target_group_name }}"
-    state: "{{ aws_elb.state }}"
-    region: "{{ aws_elb.region }}"
-    tags: "{{ aws_elb.tags }}"
-    protocol: http
-    port: 80
-    vpc_id: "{{ _aws_ec2_elb_vpc_id }}"
-    deregistration_delay_timeout: "{{ aws_elb.deregistration_delay_timeout }}"
-    health_check_protocol: "{{ aws_elb.health_check_protocol }}"
-    health_check_path: "{{ aws_elb.health_check_path }}"
-    health_check_port: "{{ aws_elb.health_check_port }}"
-    successful_response_codes: "{{ aws_elb.health_check_success_codes }}"
-    health_check_interval: "{{ aws_elb.health_check_interval }}"
-    health_check_timeout: "{{ aws_elb.health_check_timeout }}"
-    healthy_threshold_count: "{{ aws_elb.health_check_healthy_count }}"
-    unhealthy_threshold_count: "{{ aws_elb.health_check_unhealthy_count }}"
-    modify_targets: "{{ aws_elb.modify_targets }}"
-    targets: "{{ _targets }}"
-  register: _aws_ec2_elb_target_group_created
+    - aws_elb.target_groups is defined
+    - aws_elb.target_groups | length > 0
 
 - name: Create SSL certificate.
   ansible.builtin.include_role:
@@ -94,7 +67,8 @@
       Port: "80"
       DefaultActions:
         - Type: forward
-          TargetGroupName: "{{ aws_elb.target_group_name }}"
+          TargetGroupName: "{{ aws_elb.listeners_http.default_target_group }}"
+      Rules: "{{ aws_elb.listeners_http.rules }}"
     _aws_ec2_listeners_redirect:
       Protocol: HTTP
       Port: "80"
@@ -115,7 +89,8 @@
         - CertificateArn: "{{ _ssl_certificate_ARN }}"
       DefaultActions:
         - Type: forward
-          TargetGroupName: "{{ aws_elb.target_group_name }}"
+          TargetGroupName: "{{ aws_elb.listeners_https.default_target_group }}"
+      Rules: "{{ aws_elb.listeners_https.rules }}"
 
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
