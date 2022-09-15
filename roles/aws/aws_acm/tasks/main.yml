@@ -131,7 +131,7 @@
 
 - name: Add extra_domains so we can loop through DNS records.
   ansible.builtin.set_fact:
-    _acm_dns_all_domains: "{{ _acm_dns_all_domains + [{ 'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile }] }}"
+    _acm_dns_all_domains: "{{ _acm_dns_all_domains + [{'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile}] }}"
   loop: "{{ aws_acm.extra_domains }}"
   when:
     - aws_acm.extra_domains | length > 0
