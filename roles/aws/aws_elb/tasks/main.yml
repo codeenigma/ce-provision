@@ -45,7 +45,7 @@
 - name: Create a Target group for port 80.
   community.aws.elb_target_group:
     profile: "{{ aws_elb.aws_profile }}"
-    name: "{{ aws_elb.name }}"
+    name: "{{ aws_elb.target_group_name }}"
     state: "{{ aws_elb.state }}"
     region: "{{ aws_elb.region }}"
     tags: "{{ aws_elb.tags }}"
