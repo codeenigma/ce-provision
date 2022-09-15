@@ -31,7 +31,7 @@
     group: ossec
     mode: "0550"
   with_fileglob: "*_rules.xml"
-  notify: restart ossec
+  notify: Restart OSSEC.
 
 - name: Copy OSSEC authentication password.
   ansible.builtin.template:
@@ -41,8 +41,8 @@
     group: ossec
     mode: "0440"
   notify:
-    - stop ossec-authd
-    - start ossec-authd
+    - Stop ossec-authd.
+    - Start ossec-authd.
 
 - name: Generates SSL keys.
   ansible.builtin.include_role:

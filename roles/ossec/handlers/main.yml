@@ -1,14 +1,14 @@
 ---
 # handlers file for ossec
 
-- name: restart ossec
+- name: Restart OSSEC.
   service:
     name: "ossec"
     state: restarted
 
-- name: stop ossec-authd
+- name: Stop ossec-authd.
   ignore_errors: true
   command: "pkill ossec-authd"
 
-- name: start ossec-authd
+- name: Start ossec-authd.
   command: "/var/ossec/bin/ossec-authd -k {{ ssl_facts[ossec.ssl.domain].key }} -x {{ ssl_facts[ossec.ssl.domain].certificate }}"
