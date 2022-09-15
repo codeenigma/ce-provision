@@ -86,7 +86,7 @@
     group: "{{ jenkins.user }}"
     mode: 0775
 
-- name: restart jenkins
+- name: Restart Jenkins.
   ansible.builtin.service:
     name: jenkins
     state: restarted
@@ -96,25 +96,25 @@
     minutes: 2
   when: aptoutput.changed
 
-- name: Download Jenkins CLI
+- name: Download Jenkins CLI.
   ansible.builtin.get_url:
     url: "https://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
     validate_certs: false
     dest: /opt/jenkins-cli.jar
 
-- name: Add Jenkins cert renewal job
+- name: Add Jenkins cert renewal job.
   ansible.builtin.template:
     src: "jenkins-cert-renewal.sh.j2"
     dest: /etc/cron.daily/jenkins-cert-renewal
     mode: 0755
 
-- name: Install Jenkins Plugins
+- name: Install Jenkins Plugins.
   ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
   become: true
   become_user: "{{ jenkins.user }}"
   register: pluginoutput
 
-- name: Safe restart jenkins
+- name: Safe restart Jenkins.
   ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
   become: true
   become_user: "{{ jenkins.user }}"

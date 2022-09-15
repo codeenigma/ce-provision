@@ -1,4 +1,11 @@
 ---
+- block:
+    - name: "Abort if target is not a Debian server."
+      debug:
+        msg: "ce-provision currently only supports Debian based distributions of Linux."
+    - meta: end_host
+  when: ansible_os_family != "Debian"
+
 - name: Set "tracking" file for the playbook.
   ansible.builtin.set_fact:
     current_play_md5_file: "{{ _ce_provision_build_id }}-{{ playbook_dir | basename }}-{{ inventory_hostname }}"
@@ -17,7 +24,7 @@
 
 - name: Build the list of directories to scan for changes.
   ansible.builtin.set_fact:
-    _init_vars_dirs_list: "{{ _init.vars_dirs + [ playbook_dir ] }}"
+    _init_vars_dirs_list: "{{ _init.vars_dirs + [playbook_dir] }}"
 
 - name: Compute files md5 hash.
   ansible.builtin.shell: 'find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
@@ -38,7 +45,7 @@
 
 - name: Lookup current playbook md5
   ansible.builtin.set_fact:
-    previous_play_dir_md5: "{{ lookup('file', '{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}' ) }}"
+    previous_play_dir_md5: "{{ lookup('file', '{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}') }}"
 
 - name: Stop play if playbook md5 is unchanged.
   ansible.builtin.meta: end_play
