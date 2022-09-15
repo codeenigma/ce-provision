@@ -1,6 +1,7 @@
 aws_elb:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
+  state: present
   elb_type: "alb"
   name: "example"
   target_group_name: "example-target-group"
