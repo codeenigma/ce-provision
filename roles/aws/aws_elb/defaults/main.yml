@@ -4,7 +4,6 @@ aws_elb:
   state: present
   elb_type: "alb"
   name: "example"
-  target_group_name: "example-target-group"
   acm:
     create_cert: false
     extra_domains: [] # list of Subject Alternative Name domains and zones
@@ -25,16 +24,27 @@ aws_elb:
     record: "*.{{ _domain_name }}"
     aws_profile: "{{ _aws_profile }}" # Not necessarily the same as the "target" one.
   elb_security_groups: []
-  # Target Group health checks - these are distinct and separate checks carried out by the Target Group for the ASG
-  deregistration_delay_timeout: 60 # seconds to wait before removing instance from Target Group
-  health_check_protocol: "http"
-  health_check_path: "/"
-  health_check_port: "traffic-port" # Default is traffic-port, which matches the target port. Can be overridden with a port number.
-  health_check_success_codes: "200" # Can be single code, like "200", or a comma-separated value with ranges: "200,250-260".
-  health_check_interval: 30
-  health_check_timeout: 5
-  health_check_healthy_count: 5
-  health_check_unhealthy_count: 2
+  target_groups: # list of target groups
+    - name: example-target-group
+      protocol: http
+      port: 80 # Port on the ELB itself.
+      # Target Group health checks
+      deregistration_delay_timeout: 60 # seconds to wait before removing instance from Target Group
+      health_check_protocol: "http"
+      health_check_path: "/"
+      health_check_port: "traffic-port" # Default is traffic-port, which matches the target port. Can be overridden with a port number.
+      health_check_success_codes: "200" # Can be single code, like "200", or a comma-separated value with ranges: "200,250-260".
+      health_check_interval: 30
+      health_check_timeout: 5
+      health_check_healthy_count: 5
+      health_check_unhealthy_count: 2
+      # Target group settings
+      targets: [] # List of servers using their Name tags. This value is used to obtain the instance ID.
+      # targets:
+      #   - example-server-one
+      #   - example-server-two
+      targets_port: 80 # Port to forward to on target servers.
+      modify_targets: false # Set to true if this is a standalone ELB, so the list of targets in the target group can be updated.
   # ELB settings
   idle_timeout: 60
   ip_address_type: "ipv4" # Can be 'ipv4' or 'dualstack' (the latter includes IPv4 and IPv6 addresses).
@@ -42,13 +52,12 @@ aws_elb:
     Name: "example"
   ssl_certificate_ARN: ""
   ssl_extra_certificate_ARNs: [] # Optional list of extra certificate ARNs to add to the ALB.
-  # Target group settings
-  targets: [] # List of servers using their Name tags. This value is used to obtain the instance ID.
-  # targets:
-  #   - example-server-one
-  #   - example-server-two
-  targets_port: 80
-  modify_targets: false # Set to true if this is a standalone ELB, so the list of targets in the target group can be updated.
+  listeners_http:
+    default_target_group: "example-target-group" # must match a name provided in target_groups
+    rules: []
+  listeners_https:
+    default_target_group: "example-target-group" # must match a name provided in target_groups
+    rules: []
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   elb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ELB SSL policy to only accect TLSv1.2 and apply more secure ciphers.

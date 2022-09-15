@@ -1,0 +1,12 @@
+- name: "Gather EC2 instance info for {{ target_group.name }} target group instance."
+  community.aws.ec2_instance_info:
+    profile: "{{ aws_elb.aws_profile }}"
+    region: "{{ aws_elb.region }}"
+    filters:
+      "tag:Name": "{{ tg_instance }}"
+      instance-state-name: ["running"]
+  register: _aws_ec2_target_group_instance
+
+- name: Add instance to target group list.
+  ansible.builtin.set_fact:
+    _targets: "{{ _targets + [ {'Id': _aws_ec2_target_group_instance.instances[0].instance_id, 'Port': target_group.targets_port} ] }}"
