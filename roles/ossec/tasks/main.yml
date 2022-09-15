@@ -22,4 +22,4 @@
     owner: root
     group: ossec
     mode: "0440"
-  notify: restart ossec
+  notify: Restart OSSEC.

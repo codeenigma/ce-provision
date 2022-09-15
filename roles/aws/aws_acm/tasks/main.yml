@@ -35,7 +35,7 @@
 
 - name: Build list of tags as Key,Value strings.
   ansible.builtin.set_fact:
-    _aws_tags_list: "{{ _aws_tags_list + [ 'Key=' + item.key + ',' + 'Value=' + item.value ] }}"
+    _aws_tags_list: "{{ _aws_tags_list + ['Key=' + item.key + ',' + 'Value=' + item.value] }}"
   loop: "{{ aws_acm.tags | dict2items }}"
   when: aws_acm.tags | length > 0
 
@@ -63,7 +63,7 @@
 
 - name: Build a list of additional domains.
   ansible.builtin.set_fact:
-    _acm_san_domains: "{{ _acm_san_domains + [ item.domain ] }}"
+    _acm_san_domains: "{{ _acm_san_domains + [item.domain] }}"
   loop: "{{ aws_acm.extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
@@ -131,7 +131,7 @@
 
 - name: Add extra_domains so we can loop through DNS records.
   ansible.builtin.set_fact:
-    _acm_dns_all_domains: "{{ _acm_dns_all_domains + [ { 'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile } ] }}"
+    _acm_dns_all_domains: "{{ _acm_dns_all_domains + [{'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile}] }}"
   loop: "{{ aws_acm.extra_domains }}"
   when:
     - aws_acm.extra_domains | length > 0
@@ -143,9 +143,9 @@
     state: present
     profile: "{{ item.aws_profile }}"
     zone: "{{ item.zone }}"
-    record: "{{ ( _aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain) )[0].resource_record.name }}"
+    record: "{{ (_aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain))[0].resource_record.name }}"
     type: CNAME
-    value: "{{ ( _aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain) )[0].resource_record.value }}"
+    value: "{{ (_aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain))[0].resource_record.value }}"
     overwrite: true
   loop: "{{ _acm_dns_all_domains }}"
   when:

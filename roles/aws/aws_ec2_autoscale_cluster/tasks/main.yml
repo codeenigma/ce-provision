@@ -11,24 +11,24 @@
     filters:
       "tag:Name": "{{ aws_ec2_autoscale_cluster.vpc_name }}"
   register: _aws_ec2_autoscale_cluster_vpc
-  when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
+  when: (aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0)
 
 - name: Set the VPC id from name.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-  when: ( aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0 )
+  when: (aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0)
 
 - name: Use provided VPC id.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
-  when: ( aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0 )
+  when: (aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0)
 
 - name: Create matching Security Group.
   amazon.aws.ec2_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
-    tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
+    tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': aws_ec2_autoscale_cluster.name}) }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
     description: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
@@ -75,7 +75,7 @@
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_name ] }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
       rds_cloudwatch_alarms:
         - "{{ aws_ec2_autoscale_cluster.rds.rds_cloudwatch_alarms }}"
       sns:
@@ -100,7 +100,7 @@
 - name: Add RDS endpoint address to extra vars for AMI building.
   ansible.builtin.set_fact:
     aws_ec2_autoscale_cluster:
-      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + [ '_rds_endpoint: ' + _rds_instance_info.endpoint.address ] }}"
+      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + ['_rds_endpoint: ' + _rds_instance_info.endpoint.address] }}"
   when:
     - _rds_instance_info.db_instance_identifier is defined
     - aws_ec2_autoscale_cluster.rds.rds is defined
@@ -109,7 +109,7 @@
 - name: Add Aurora RDS endpoint address to extra vars for AMI building.
   ansible.builtin.set_fact:
     aws_ec2_autoscale_cluster:
-      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + [ '_rds_endpoint: ' + _rds_instance_info_aurora.endpoint.address ] }}"
+      ami_extra_vars: "{{ aws_ec2_autoscale_cluster.ami_extra_vars | default([]) + ['_rds_endpoint: ' + _rds_instance_info_aurora.endpoint.address] }}"
   when:
     - _rds_instance_info_aurora.db_instance_identifier is defined
     - aws_ec2_autoscale_cluster.rds.rds is defined
@@ -127,7 +127,7 @@
       tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       encrypt: "{{ aws_ec2_autoscale_cluster.efs_encrypt }}"
       backup: "{{ aws_ec2_autoscale_cluster.efs_backup }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.efs_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_name ] }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.efs_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
       purge_tags: true
       wait: false
   when:
@@ -218,7 +218,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
     instance_profile_name: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
@@ -267,11 +267,11 @@
     health_check_period: "{{ aws_ec2_autoscale_cluster.alb_health_check_period | default(omit) }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
-    replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0  else aws_ec2_autoscale_cluster.desired_capacity }}"
+    replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0 else aws_ec2_autoscale_cluster.desired_capacity }}"
     wait_for_instances: true
     lc_check: true
     wait_timeout: 3000
-    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0  else aws_ec2_autoscale_cluster.desired_capacity }}"
+    desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0 else aws_ec2_autoscale_cluster.desired_capacity }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
     max_size: "{{ aws_ec2_autoscale_cluster.max_size }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags | simpledict2list }}"
@@ -466,12 +466,12 @@
 
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_listeners: "{{ [ _aws_ec2_autoscale_cluster_listeners_http ] }}"
+    _aws_ec2_autoscale_cluster_listeners: "{{ [_aws_ec2_autoscale_cluster_listeners_http] }}"
   when: _ssl_certificate_ARN | length < 1
 
 - name: Add HTTPS Listener.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_listeners: "{{ [ _aws_ec2_autoscale_cluster_listeners_redirect, _aws_ec2_autoscale_cluster_listeners_https ] }}"
+    _aws_ec2_autoscale_cluster_listeners: "{{ [_aws_ec2_autoscale_cluster_listeners_redirect, _aws_ec2_autoscale_cluster_listeners_https] }}"
   when: _ssl_certificate_ARN | length > 1
 
 - name: Add custom Listeners.
@@ -489,7 +489,7 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [ _aws_ec2_autoscale_cluster_security_group.group_id ] }}"
+    security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
     idle_timeout: "{{ aws_ec2_autoscale_cluster.alb_idle_timeout }}"
   register: _aws_ec2_autoscale_cluster_alb
@@ -549,7 +549,7 @@
 
 - name: Add extra_domains so we can loop through DNS records.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_dns_all_domains: "{{ _aws_ec2_autoscale_cluster_dns_all_domains + [ { 'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile } ] }}"
+    _aws_ec2_autoscale_cluster_dns_all_domains: "{{ _aws_ec2_autoscale_cluster_dns_all_domains + [{'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile}] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
   when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
 
@@ -559,7 +559,7 @@
 
 - name: Add extra_domains so we can set up additional CloudFront aliases.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [ item.domain ] }}"
+    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [item.domain] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
   when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
 
@@ -568,7 +568,7 @@
     name: aws/aws_cloudfront_distribution
   vars:
     aws_cloudfront_distribution:
-      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': aws_ec2_autoscale_cluster.name } ) }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': aws_ec2_autoscale_cluster.name}) }}"
       aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases }}"
       viewer_certificate:
         acm_certificate_arn: "{{ _cf_certificate_ARN }}"
