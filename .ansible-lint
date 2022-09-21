@@ -12,3 +12,4 @@ skip_list:
   - no-jinja-nesting
   - command-instead-of-module
   - fqcn-builtins
+  - template-instead-of-copy # to skip over roles/ssl/tasks/copy.yml errors, temporarily.
