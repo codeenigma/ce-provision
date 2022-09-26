@@ -13,3 +13,4 @@ skip_list:
   - command-instead-of-module
   - fqcn-builtins
   - template-instead-of-copy # to skip over roles/ssl/tasks/copy.yml errors, temporarily.
+  - name[template] # it doesn't like Jinja templates being in the middle of a task name, which seems silly to me.

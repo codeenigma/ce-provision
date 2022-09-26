@@ -463,16 +463,21 @@
       DefaultActions:
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+  when: aws_ec2_autoscale_cluster.create_elb
 
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_listeners: "{{ [_aws_ec2_autoscale_cluster_listeners_http] }}"
-  when: _ssl_certificate_ARN | length < 1
+  when:
+    - aws_ec2_autoscale_cluster.create_elb
+    - _ssl_certificate_ARN | length < 1
 
 - name: Add HTTPS Listener.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_listeners: "{{ [_aws_ec2_autoscale_cluster_listeners_redirect, _aws_ec2_autoscale_cluster_listeners_https] }}"
-  when: _ssl_certificate_ARN | length > 1
+  when:
+    - aws_ec2_autoscale_cluster.create_elb
+    - _ssl_certificate_ARN | length > 1
 
 - name: Add custom Listeners.
   ansible.builtin.set_fact:
@@ -480,6 +485,7 @@
   when:
     - aws_ec2_autoscale_cluster is defined
     - aws_ec2_autoscale_cluster | length
+    - aws_ec2_autoscale_cluster.create_elb
 
 - name: Create the ALB.
   community.aws.elb_application_lb:
@@ -493,11 +499,13 @@
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
     idle_timeout: "{{ aws_ec2_autoscale_cluster.alb_idle_timeout }}"
   register: _aws_ec2_autoscale_cluster_alb
+  when: aws_ec2_autoscale_cluster.create_elb
 
 - name: Get ALB listener ARN for port 443.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_alb_listener_ARN: "{{ item.listener_arn }}"
   when:
+    - aws_ec2_autoscale_cluster.create_elb
     - "{{ item.port == 443 }}"
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - _ssl_certificate_ARN | length > 1
@@ -507,6 +515,7 @@
   ansible.builtin.command:
     cmd: "aws elbv2 add-listener-certificates --region {{ aws_ec2_autoscale_cluster.region }} --profile {{ aws_ec2_autoscale_cluster.aws_profile }} --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
   when:
+    - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - _ssl_certificate_ARN | length > 1
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
@@ -578,6 +587,7 @@
       default_cache_behavior:
         target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
   when:
+    - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
 
