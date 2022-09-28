@@ -1,3 +1,7 @@
+- name: Print out VPC info.
+  ansible.builtin.debug:
+    msg: "{{ _aws_vpc_subnet_vpc }}"
+
 - name: Create VPC subnet.
   ec2_vpc_subnet:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
