@@ -48,7 +48,7 @@
       routes:
         - dest: 0.0.0.0/0
           gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
-  when: _aws_vpc_vpc.ipv6_cidr_block_association_set is not defined
+  when: _aws_vpc_vpc.vpc.ipv6_cidr_block_association_set is not defined
 
 - name: Update Main route table, including IPv6.
   ansible.builtin.include_role:
@@ -64,4 +64,4 @@
           gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
         - dest: "::/0"
           gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
-  when: _aws_vpc_vpc.ipv6_cidr_block_association_set is defined
+  when: _aws_vpc_vpc.vpc.ipv6_cidr_block_association_set is defined
