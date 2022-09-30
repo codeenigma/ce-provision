@@ -3,6 +3,7 @@
     profile: "{{ aws_vpc.aws_profile }}"
     name: "{{ aws_vpc.name }}"
     cidr_block: "{{ aws_vpc.cidr_block }}"
+    ipv6_cidr: "{{ aws_vpc.ipv6_cidr }}"
     region: "{{ aws_vpc.region }}"
     tags: "{{ aws_vpc.tags }}"
     state: "{{ aws_vpc.state }}"
@@ -47,3 +48,20 @@
       routes:
         - dest: 0.0.0.0/0
           gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
+  when: _aws_vpc_vpc.vpc.ipv6_cidr_block_association_set is not defined
+
+- name: Update Main route table, including IPv6.
+  ansible.builtin.include_role:
+    name: aws/aws_vpc_route
+  vars:
+    aws_vpc_route:
+      aws_profile: "{{ aws_vpc.aws_profile }}"
+      region: "{{ aws_vpc.region }}"
+      vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
+      tags: "{{ aws_vpc.tags }}"
+      routes:
+        - dest: 0.0.0.0/0
+          gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
+        - dest: "::/0"
+          gateway_id: "{{ _aws_vpc_gateway.gateway_id }}"
+  when: _aws_vpc_vpc.vpc.ipv6_cidr_block_association_set is defined

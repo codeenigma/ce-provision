@@ -1,7 +1,26 @@
+- name: Print out VPC info.
+  ansible.builtin.debug:
+    msg: "{{ _aws_vpc_subnet_vpc }}"
+
+- name: Set IPv6 subnet CIDR.
+  set_fact:
+    _ipv6_subnet_cidr: "{{ _aws_vpc_subnet_vpc.vpcs[0].ipv6_cidr_block_association_set[0].ipv6_cidr_block | ipsubnet(64, subnet.ipv6_cidr_block) }}"
+  when:
+    - subnet.ipv6_cidr_block is defined
+    - subnet.ipv6_cidr_block | length > 0
+
+- name: Print out IPv6 subnet CIDR for debugging.
+  ansible.builtin.debug:
+    msg: "{{ _ipv6_subnet_cidr }}"
+  when:
+    - subnet.ipv6_cidr_block is defined
+    - subnet.ipv6_cidr_block | length > 0
+
 - name: Create VPC subnet.
   ec2_vpc_subnet:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     cidr: "{{ subnet.cidr_block }}"
+    ipv6_cidr: "{{ _ipv6_subnet_cidr if subnet.ipv6_cidr_block is defined and subnet.ipv6_cidr_block | length > 0 else '' }}"
     region: "{{ aws_vpc_subnet.region }}"
     tags: "{{ aws_vpc_subnet.tags | combine( { 'Name': subnet.name } ) }}"
     az: "{{ aws_vpc_subnet.region }}{{ subnet.az }}"
