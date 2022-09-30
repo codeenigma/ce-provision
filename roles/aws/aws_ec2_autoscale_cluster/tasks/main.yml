@@ -564,7 +564,7 @@
 
 - name: Initialise a list of CloudFront aliases with main domain name.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [ _domain_name ] }}"
+    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [_domain_name] }}"
 
 - name: Add extra_domains so we can set up additional CloudFront aliases.
   ansible.builtin.set_fact:
