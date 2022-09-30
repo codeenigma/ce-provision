@@ -4,7 +4,7 @@
 
 - name: Add subnet name to the list.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_subnets_names: "{{ _aws_ec2_autoscale_cluster_subnets_names + [ _aws_ec2_autoscale_cluster_private_subnet_name ] }}"
+    _aws_ec2_autoscale_cluster_subnets_names: "{{ _aws_ec2_autoscale_cluster_subnets_names + [_aws_ec2_autoscale_cluster_private_subnet_name] }}"
 
 - name: Construct private subnet definition.
   ansible.builtin.set_fact:
@@ -48,11 +48,11 @@
 
 - name: Add subnet id to the ids list.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids + [ _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id ] }}"
+    _aws_ec2_autoscale_cluster_subnets_ids: "{{ _aws_ec2_autoscale_cluster_subnets_ids + [_aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id] }}"
 
 - name: Add public subnet to the list.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [ _aws_ec2_autoscale_cluster_public_subnet.subnets[0].subnet_id ] }}"
+    _aws_ec2_autoscale_cluster_public_subnets_ids: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids + [_aws_ec2_autoscale_cluster_public_subnet.subnets[0].subnet_id] }}"
 
 # @todo Module has a bug and return result as a separate key.
 - name: Gather NAT gateway info.
@@ -75,7 +75,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
       subnet_id: "{{ _aws_ec2_autoscale_cluster_subnet.subnets[0].subnet_id }}"
-      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': _aws_ec2_autoscale_cluster_private_subnet_name } ) }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': _aws_ec2_autoscale_cluster_private_subnet_name}) }}"
       routes:
         - dest: 0.0.0.0/0
           gateway_id: "{{ _aws_ec2_autoscale_cluster_subnet_gateway.result[0].nat_gateway_id }}"
