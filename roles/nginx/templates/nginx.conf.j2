@@ -63,6 +63,16 @@ http {
 	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
 	##
+	# Additional Settings
+	##
+
+{% if nginx.http.custom_directives is defined %}
+	{% for directive in nginx.http.custom_directives %}
+	{{ directive }}
+	{% endfor %}
+{% endif %}
+
+	##
 	# Virtual Host Configs
 	##
 
