@@ -35,7 +35,7 @@
 
 - name: Add/replace subnets CIDR block routes.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes | default([]) + [ { 'dest': subnet.cidr, 'vpc_peering_connection_id': _aws_ec2_autoscale_cluster_peer_connection.peering_id } ] }}"
+    _aws_ec2_autoscale_cluster_peer_routes: "{{ _aws_ec2_autoscale_cluster_peer_routes | default([]) + [{'dest': subnet.cidr, 'vpc_peering_connection_id': _aws_ec2_autoscale_cluster_peer_connection.peering_id}] }}"
   with_items: "{{ aws_ec2_autoscale_cluster.subnets }}"
   loop_control:
     loop_var: subnet
@@ -59,7 +59,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
       subnet_id: "{{ subnet.subnet_id }}"
-      tags: "{{ aws_ec2_autoscale_cluster.tags | combine( { 'Name': subnet.tags.Name } ) }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': subnet.tags.Name}) }}"
       routes:
         - dest: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].private_ip_address }}/32"
           vpc_peering_connection_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"
