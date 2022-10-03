@@ -1,3 +1,7 @@
 ---
 nodejs:
   version: 12.x
+  npm_packages: []
+  #npm_packages:
+  #  - name: coffee-script
+  #    version: "1.6.1"
