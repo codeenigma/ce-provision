@@ -3,7 +3,7 @@
     profile: "{{ aws_vpc.aws_profile }}"
     name: "{{ aws_vpc.name }}"
     cidr_block: "{{ aws_vpc.cidr_block }}"
-    ipv6_cidr: "{{ aws_vpc.ipv6_cidr if aws_vpc.ipv6_cidr is defined and aws_vpc.ipv6_cidr else omit() }}"
+    ipv6_cidr: "{{ aws_vpc.ipv6_cidr | default(omit) }}"
     region: "{{ aws_vpc.region }}"
     tags: "{{ aws_vpc.tags }}"
     state: "{{ aws_vpc.state }}"
