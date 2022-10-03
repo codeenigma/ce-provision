@@ -50,6 +50,8 @@ aws_ec2_autoscale_cluster:
   packer_subnet_filter_az: "" # see aws_ami for details
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
+  # Define if you want to launch config to use a specific AMI, e.g. to pack a new AMI but not use it right away for QA reasons.
+  #image_id: ami-0123456789abcdefg
   asg_cloudwatch_policy_scale_up_name: "{{ _env_type }}-scale-up-policy"
   asg_cloudwatch_policy_scale_down_name: "{{ _env_type }}-scale-down-policy"
   asg_scaling_policies: # List of AutoScale policies. See ec2_scaling_policy module docs for options and details.

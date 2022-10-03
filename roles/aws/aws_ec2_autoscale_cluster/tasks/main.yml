@@ -213,7 +213,7 @@
   community.aws.ec2_lc:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
-    image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    image_id: "{{ aws_ec2_autoscale_cluster.image_id if aws_ec2_autoscale_cluster.image_id is defined else aws_ec2_autoscale_cluster_image_latest.image_id }}"
     key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
@@ -564,7 +564,7 @@
 
 - name: Initialise a list of CloudFront aliases with main domain name.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [ _domain_name ] }}"
+    _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [_domain_name] }}"
 
 - name: Add extra_domains so we can set up additional CloudFront aliases.
   ansible.builtin.set_fact:
