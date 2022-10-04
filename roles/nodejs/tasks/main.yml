@@ -32,9 +32,22 @@
     pkg: ["nodejs", "yarn"]
     state: present
 
-- name: Install npm packages.
+- name: Install global npm packages.
+  community.general.npm:
+    name: "{{ item.name }}"
+    global: true
+    version: "{{ item.version | default(omit) }}"
+  with_items: "{{ nodejs.npm_packages }}"
+  when:
+    - nodejs.npm_packages | length > 0
+    - item.path is not defined
+
+- name: Install application specific npm packages.
   community.general.npm:
     name: "{{ item.name }}"
     version: "{{ item.version | default(omit) }}"
+    path: "{{ item.path }}"
   with_items: "{{ nodejs.npm_packages }}"
-  when: nodejs.npm_packages | length > 0
+  when:
+    - nodejs.npm_packages | length > 0
+    - item.path is defined
