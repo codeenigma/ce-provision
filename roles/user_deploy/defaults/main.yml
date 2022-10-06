@@ -16,3 +16,4 @@ user_deploy:
   ssh_keys: []
   # If you add more than one key here, make sure the original private key of your deploy server is the first.
   ssh_private_keys: []
+  known_hosts: []
