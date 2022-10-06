@@ -53,6 +53,7 @@
     group: "{{ user_ansible.username }}"
     mode: '0600'
   with_items: "{{ user_ansible.ssh_private_keys }}"
+  no_log: true
   loop_control:
     loop_var: key
     index_var: key_id
@@ -68,6 +69,7 @@
 
 - name: Add public keys to known_hosts.
   ansible.builtin.known_hosts:
+    hash_host: "{{ user_ansible.known_hosts_hash }}"
     path: "/home/{{ user_ansible.username }}/.ssh/known_hosts"
     name: "{{ host }}"
     key: "{{ lookup('pipe', 'ssh-keyscan -t rsa ' + host) }}"
