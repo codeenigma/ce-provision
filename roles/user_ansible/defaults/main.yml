@@ -19,3 +19,5 @@ user_ansible:
   ssh_private_keys: []
   # List of hostnames to add to known_hosts.
   known_hosts: []
+  # Whether or not to hash any provided hosts for known_hosts.
+  known_hosts_hash: true

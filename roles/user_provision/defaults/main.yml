@@ -15,3 +15,4 @@ user_provision:
   # If you add more than one key here, make sure the original private key of your infra controller server is the first.
   ssh_private_keys: []
   known_hosts: []
+  known_hosts_hash: true
