@@ -14,8 +14,8 @@ user_ansible:
   groups: ""
   # List of SSH pub keys to authorize. These must be provided as strings (content of the pub key).
   ssh_keys: []
-  # List of SSH private keys to add to server.
-  # Should be the full private key contents and always be stored using SOPS or similar.
+  # List of SSH private keys to add to server. These must be provided as strings (content of the private key).
+  # Be sure to store securely using SOPS or similar.
   ssh_private_keys: []
   # List of hostnames to add to known_hosts.
   known_hosts: []
