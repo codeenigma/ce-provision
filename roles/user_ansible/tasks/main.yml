@@ -61,7 +61,7 @@
 # You cannot have too many new lines at the end of an SSH private key, but you MUST have one.
 - name: Ensure SSH private keys have a new line at end of file.
   ansible.builtin.command:
-    cmd: "sed -i -e '$a\' /home/{{ user_ansible.username }}/.ssh/{% if key_id == 0 %}id_rsa{% else %}id_rsa_{{ key_id }}{% endif %}"
+    cmd: "sed -i -e '$a\\' /home/{{ user_ansible.username }}/.ssh/{% if key_id == 0 %}id_rsa{% else %}id_rsa_{{ key_id }}{% endif %}"
   with_items: "{{ user_ansible.ssh_private_keys }}"
   loop_control:
     index_var: key_id
