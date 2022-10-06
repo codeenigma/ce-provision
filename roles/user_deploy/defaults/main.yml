@@ -13,4 +13,4 @@ user_deploy:
   sudoer: false
   # List of additional groups to add the user to.
   groups: []
-  keys: []
+  ssh_keys: []
