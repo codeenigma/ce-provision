@@ -8,4 +8,4 @@
 
 - name: Add security group id.
   ansible.builtin.set_fact:
-    _aws_efs_security_group_ids: "{{ _aws_efs_security_group_ids + [ _aws_efs_security_group_info.security_groups[0].group_id ] }}"
+    _aws_efs_security_group_ids: "{{ _aws_efs_security_group_ids + [_aws_efs_security_group_info.security_groups[0].group_id] }}"
