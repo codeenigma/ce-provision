@@ -1,5 +1,5 @@
 - name: Gather security group info.
-  ec2_group_info:
+  amazon.aws.ec2_group_info:
     profile: "{{ aws_efs.aws_profile }}"
     region: "{{ aws_efs.region }}"
     filters:
@@ -7,5 +7,5 @@
   register: _aws_efs_security_group_info
 
 - name: Add security group id.
-  set_fact:
-    _aws_efs_security_group_ids: "{{ _aws_efs_security_group_ids + [ _aws_efs_security_group_info.security_groups[0].group_id ] }}"
+  ansible.builtin.set_fact:
+    _aws_efs_security_group_ids: "{{ _aws_efs_security_group_ids + [_aws_efs_security_group_info.security_groups[0].group_id] }}"
