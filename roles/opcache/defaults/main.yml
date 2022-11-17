@@ -4,3 +4,4 @@ opcache:
   cachetool_version: latest # enter three-digit version number, e.g. "7.0.0", to install a specific version
   host: ""
   port: ""
+  socket: "" # default "/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock" - see php.fpm.unix_socket
