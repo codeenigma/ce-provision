@@ -24,7 +24,7 @@ php:
     max_file_uploads: 20
     date_timezone: "Europe/London"
     pool_user: "{{ user_deploy.username }}"
-    pool_group: "{{ user_deploy.username }}"
+    pool_group: "{{ user_deploy.username }}" # if using unix socket this should be the web server user
     default_socket_timeout: 60
     max_children: 5
     start_servers: 2
