@@ -1730,20 +1730,20 @@ ldap.max_links = -1
 
 [opcache]
 ; Determines if Zend OPCache is enabled
-opcache.enable=1
+opcache.enable={{ php.cli.opcache.enable }}
 
 ; Determines if Zend OPCache is enabled for the CLI version of PHP
-;opcache.enable_cli=0
+opcache.enable_cli={{ php.cli.opcache.enable_cli }}
 
 ; The OPcache shared memory storage size.
-opcache.memory_consumption=128
+opcache.memory_consumption={{ php.cli.opcache.memory_consumption }}
 
 ; The amount of memory for interned strings in Mbytes.
 ;opcache.interned_strings_buffer=4
 
 ; The maximum number of keys (scripts) in the OPcache hash table.
 ; Only numbers between 200 and 100000 are allowed.
-opcache.max_accelerated_files=2000
+opcache.max_accelerated_files={{ php.cli.opcache.max_accelerated_files }}
 
 ; The maximum percentage of "wasted" memory until a restart is scheduled.
 ;opcache.max_wasted_percentage=5
@@ -1756,7 +1756,7 @@ opcache.max_accelerated_files=2000
 
 ; When disabled, you must reset the OPcache manually or restart the
 ; webserver for changes to the filesystem to take effect.
-;opcache.validate_timestamps=1
+opcache.validate_timestamps={{ php.cli.opcache.validate_timestamps }}
 
 ; How often (in seconds) to check file timestamps for changes to the shared
 ; memory storage allocation. ("1" means validate once per second, but only

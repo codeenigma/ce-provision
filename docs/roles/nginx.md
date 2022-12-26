@@ -23,6 +23,7 @@ nginx:
     server_names_hash_bucket_size: 256
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
+    ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
   # Group prefix. Useful for grouping by environments.
   log_group_prefix: ""
   # Main log stream for nginx (Cloudwatch).
