@@ -3,7 +3,7 @@
     profile: "{{ aws_vpc.aws_profile }}"
     name: "{{ aws_vpc.name }}"
     cidr_block: "{{ aws_vpc.cidr_block }}"
-    ipv6_cidr: "{{ aws_vpc.ipv6_cidr }}"
+    ipv6_cidr: "{{ aws_vpc.ipv6_cidr | default(omit) }}"
     region: "{{ aws_vpc.region }}"
     tags: "{{ aws_vpc.tags }}"
     state: "{{ aws_vpc.state }}"
@@ -28,7 +28,7 @@
     label: "{{ security_group.name }}"
 
 - name: Create IGW
-  community.aws.ec2_vpc_igw:
+  amazon.aws.ec2_vpc_igw:
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"

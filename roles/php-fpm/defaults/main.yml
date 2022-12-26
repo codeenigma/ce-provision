@@ -31,3 +31,9 @@ php:
     max_spare_servers: 3
     process_idle_timeout: 10s
     max_requests: 500
+    opcache:
+      enable: 1
+      enable_cli: 0
+      memory_consumption: 128
+      max_accelerated_files: 2000
+      validate_timestamps: 1
