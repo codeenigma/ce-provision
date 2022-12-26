@@ -76,6 +76,10 @@ location ~ ^/(index|cron|modules\/statistics\/statistics|core\/modules\/statisti
 location ~ ^/(install|update)\.php$ {
     try_files @phpprocess @phpprocess;
 }
+# Allow install/update for local stack for Drupal8+.
+location ~ ^/core/(install|update).php$ {
+    try_files @phpprocess @phpprocess;
+}
 {% endif %}
 
 # Allow some known php files (like serve.php in the ad module).
@@ -99,11 +103,6 @@ location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does
 # Core and contrib assets can be pretty much anywhere.
 location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
     try_files $uri @rewrite =404;
-}
-
-# Allow Let's Encrypt RFC 5785 ACME protocol.
-location ~* ^/.well-known/ {
-    try_files $uri =404;
 }
 
 # Allow robots.txt.

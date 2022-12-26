@@ -17,18 +17,24 @@ You'll need to have created the subnet group first as well as the security group
 ```yaml
 aws_rds:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   multi_az: true
   subnets:
     - subnet-aaaaaaaa
     - subnet-bbbbbbbb
   name: example
   tags: {}
-  db_instance_class: db.m5.large
+  db_instance_class: db.t3.medium
   state: present
   description: example
   engine: mariadb
+  aurora_reader: false # If true, an Aurora reader instance will be created.
   # engine_version: '5.7.2' # Omit to use latest.
+  # See parameter group docs: https://docs.ansible.com/ansible/latest/collections/community/aws/rds_param_group_module.html
+  # db_parameter_group_name: "example" # Omit to use default
+  # db_parameter_group_description: "Custom parameter group" # Description of parameter group
+  # db_parameter_group_engine: "mariadb10.5" # accepts different values to RDS instance 'engine'
+  # db_parameters: {} # dictionary of available parameters
   allocated_storage: 100 # Initial size in GB. Minimum is 100.
   max_allocated_storage: 1000 # Max size in GB for autoscaling.
   storage_encrypted: false # Whether to encrypt the RDS instance or not.

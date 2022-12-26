@@ -1,1 +1,1 @@
-{{ ce_provision_extra_vars_computed | allowed_vars(ce_provision.extra_repository_allowed_vars) | to_nice_yaml(indent=2, width=1000) }}
+{{ ce_provision_extra_vars_computed | allowed_vars(_init.ce_provision_extra_repository_allowed_vars) | to_nice_yaml(indent=2, width=1000) }}

@@ -3,6 +3,7 @@
   ansible.builtin.group:
     name: "{{ ce_provision.username }}"
     system: true
+  when: ce_provision.new_user
 
 - name: Create additional groups.
   ansible.builtin.group:
@@ -29,11 +30,12 @@
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_provision.groups }}"
+  when: ce_provision.new_user
 
 - name: Fetch back the SSH pub key.
   ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
-    src: "/home/{{ ce_provision.username }}/.ssh/id_rsa.pub"
+    src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.key_name }}"
 
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.

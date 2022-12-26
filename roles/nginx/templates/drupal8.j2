@@ -1,7 +1,8 @@
 ######### Default block.
 
 # Generic rewrite rule.
-    location @rewrite {
+location @rewrite {
     rewrite ^ /index.php?$query_string;
 }
+
 include "/etc/nginx/conf.d/drupal_common";

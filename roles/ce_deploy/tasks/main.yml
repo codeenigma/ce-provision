@@ -3,6 +3,7 @@
   ansible.builtin.group:
     name: "{{ ce_deploy.username }}"
     system: true
+  when: ce_deploy.new_user
 
 - name: Create the deploy user for deployments.
   ansible.builtin.user:
@@ -19,6 +20,7 @@
     ssh_key_comment: "{{ ce_deploy.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_deploy.groups }}"
+  when: ce_deploy.new_user
 # @see https://github.com/ansible/ansible/issues/24862
 - name: Ensure home ownership.
   ansible.builtin.file:
@@ -27,11 +29,12 @@
     owner: "{{ ce_deploy.username }}"
     group: "{{ ce_deploy.username }}"
     recurse: true
+  when: ce_deploy.new_user
 
 - name: Fetch back the SSH pub key.
   ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
-    src: "/home/{{ ce_deploy.username }}/.ssh/id_rsa.pub"
+    src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.key_name }}"
 
 - name: Ensure Git is installed.
   ansible.builtin.apt:

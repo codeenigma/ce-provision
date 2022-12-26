@@ -5,7 +5,7 @@
   ansible.builtin.apt_key: url=https://www.atomicorp.com/RPM-GPG-KEY.atomicorp.txt state=present
 
 - name: Add repository for OSSEC.
-  ansible.builtin.apt_repository: repo='deb https://updates.atomicorp.com/channels/atomic/debian buster main' state=present
+  ansible.builtin.apt_repository: "repo='deb https://updates.atomicorp.com/channels/atomic/debian {{ ansible_distribution_release }} main' state=present"
 
 - name: Install OSSEC Server
   ansible.builtin.include_tasks: ossec-server.yml
@@ -22,4 +22,4 @@
     owner: root
     group: ossec
     mode: "0440"
-  notify: restart ossec
+  notify: Restart OSSEC.

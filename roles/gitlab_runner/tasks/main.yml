@@ -6,12 +6,12 @@
 
 - name: Add repository for Gitlab Runner.
   ansible.builtin.apt_repository:
-    repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main"
+    repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }}  main"
     state: present
 
 - name: Add source repository for Gitlab Runner.
   ansible.builtin.apt_repository:
-    repo: "deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ buster main"
+    repo: "deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }} main"
     state: present
 
 - name: Ensure Gitlab Runner is installed.
@@ -121,3 +121,5 @@
     groups: "{{ gitlab_runner.docker_group }}"
     append: true
   when: gitlab_runner.install_fargate
+
+# @todo: delete $HOME/.bash_logout for the runner user if it exists

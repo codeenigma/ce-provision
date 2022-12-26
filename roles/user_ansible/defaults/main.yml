@@ -2,6 +2,9 @@
 user_ansible:
   # This sets both username and main group.
   username: ""
+  # Optional Linux uid and gid for user
+  # uid: 999
+  # gid: 999
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: ""
@@ -11,3 +14,10 @@ user_ansible:
   groups: ""
   # List of SSH pub keys to authorize. These must be provided as strings (content of the pub key).
   ssh_keys: []
+  # List of SSH private keys to add to server. These must be provided as strings (content of the private key).
+  # Be sure to store securely using SOPS or similar.
+  ssh_private_keys: []
+  # List of hostnames to add to known_hosts.
+  known_hosts: []
+  # Whether or not to hash any provided hosts for known_hosts.
+  known_hosts_hash: true

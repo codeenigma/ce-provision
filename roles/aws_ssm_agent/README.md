@@ -10,7 +10,7 @@ Install and configure the SSM agent.
 ```yaml
 ---
 aws_ssm_agent:
-  region: "eu-west-2"
+  region: "{{ _aws_region }}"
 
 ```
 

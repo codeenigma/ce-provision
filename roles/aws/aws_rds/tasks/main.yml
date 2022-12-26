@@ -22,17 +22,22 @@
   community.aws.rds_param_group:
     state: present
     name: "{{ aws_rds.db_parameter_group_name }}"
+    profile: "{{ aws_rds.aws_profile }}"
+    region: "{{ aws_rds.region }}"
     description: "{{ aws_rds.db_parameter_group_description }}"
     engine: "{{ aws_rds.db_parameter_group_engine }}"
     params: "{{ aws_rds.db_parameters }}"
     tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
-  when: aws_rds.db_parameters is defined
+  when:
+    - aws_rds.db_parameters is defined
+    - aws_rds.db_parameters | length > 0
 
 - name: Create Aurora RDS instance.
   community.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
@@ -52,6 +57,7 @@
     db_instance_identifier: "{{ aws_rds.name }}-reader"
     db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
+    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true

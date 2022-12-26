@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Ensure deploy directory is writeable
+if [ -f "{{ mount_sync.deploy_dir }}" ]; then
+  chown "{{ user_deploy.username }}:{{ user_deploy.username }}" "{{ mount_sync.deploy_dir }}"
+fi
+
+{% for item in mount_sync.tarballs %}
+# Nothing to do without an initial tarball.
+if [ -f "{{ item }}" ]; then
+  # Create tmp dir and untar.
+  mkdir -p $(dirname "/tmp{{ item }}")
+  cp "{{ item }}" $(dirname "/tmp{{ item }}/")
+  cd $(dirname "/tmp{{ item }}")
+  sudo -u "{{ user_deploy.username }}" tar -xvf *.tar --directory /
+
+  # Clean up tmp dir
+  rm -rf $(dirname "/tmp{{ item }}")
+fi
+
+{% endfor %}

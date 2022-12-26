@@ -1,0 +1,27 @@
+# Disable DSA keys
+ApplicationSetting.last.update(dsa_key_restriction: -1)
+
+# Disable ECDSA keys
+ApplicationSetting.last.update(ecdsa_key_restriction: -1)
+
+# Enforce at least 2048 bits for RSA keys
+ApplicationSetting.last.update(rsa_key_restriction: 2048)
+
+# Disable password auth over HTTP/S
+ApplicationSetting.last.update(password_authentication_enabled_for_git: false)
+{% if gitlab.private_projects %}
+
+# Ensure user data and projects are private
+ApplicationSetting.last.update(restricted_visibility_levels: [10, 20])
+{% endif %}
+{% if gitlab.disable_signup %}
+
+# Disable self-service registration
+ApplicationSetting.last.update(signup_enabled: false)
+{% endif %}
+{% if gitlab.disable_signin %}
+
+# Disable standard sign-in dialogue
+Gitlab::CurrentSettings.update!(password_authentication_enabled_for_web: false)
+{% endif %}
+

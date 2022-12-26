@@ -6,12 +6,12 @@
 
 - name: Add repository for Gitlab.
   ansible.builtin.apt_repository:
-    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
     state: present
 
 - name: Add source repository for Gitlab.
   ansible.builtin.apt_repository:
-    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ buster main"
+    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
     state: present
 
 - name: Ensure Gitlab is installed.
@@ -23,7 +23,7 @@
 - name: Generates SSL keys.
   ansible.builtin.include_role:
     name: ssl
-  when: gitlab.ssl is defined
+  when: gitlab.ssl.enabled
   vars:
     ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
 
@@ -31,6 +31,11 @@
   ansible.builtin.template:
     src: gitlab.rb.j2
     dest: /etc/gitlab/gitlab.rb
+
+- name: Copy Gitlab configuration script.
+  ansible.builtin.template:
+    src: gitlab-config.rb.j2
+    dest: /etc/gitlab/gitlab-config.rb
 
 - name: Let Gitlab know it's on Docker.
   ansible.builtin.copy:
@@ -77,22 +82,6 @@
 - name: Restart Gitlab.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
 
-  # @TODO Can these settings go into gitlab.rb?
-  # Seems any ApplicationSetting can - see example: https://gitlab.com/gitlab-org/gitlab-foss/-/issues/17296
-- name: Disable self-register feature
-  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(signup_enabled: false)'"
-
-- name: Disable DSA keys
-  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(dsa_key_restriction: -1)'"
-
-- name: Disable ECDSA
-  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(ecdsa_key_restriction: -1)'"
-
-- name: Enforce at least 2048bits for RSA
-  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(rsa_key_restriction: 2048)'"
-
-- name: Disable password auth over HTTP/S
-  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(password_authentication_enabled_for_git: false)'"
-
-- name: Ensure user data and projects are private
-  ansible.builtin.command: "gitlab-rails runner 'ApplicationSetting.last.update(restricted_visibility_levels: [10, 20])'"
+- name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
+  ansible.builtin.command: "gitlab-rails runner /etc/gitlab/gitlab-config.rb"
+  when: gitlab.disable_signup

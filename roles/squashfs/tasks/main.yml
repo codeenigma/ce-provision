@@ -1,0 +1,19 @@
+- name: Ensure squashfs FUSE support is installed.
+  ansible.builtin.apt:
+    name: squashfuse
+    state: present
+    update_cache: true
+
+- name: Ensure squashfs tools are installed.
+  ansible.builtin.apt:
+    name: squashfs-tools
+    state: present
+    update_cache: true
+
+- name: Allow the deploy user to mount and unmount volumes.
+  ansible.builtin.template:
+    src: sudoers-mount.j2
+    dest: "/etc/sudoers.d/mount"
+    mode: "0600"
+    owner: root
+    group: root

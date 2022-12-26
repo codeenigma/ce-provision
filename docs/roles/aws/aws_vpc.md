@@ -8,9 +8,10 @@ Creates a VPC and associated subnets.
 ```yaml
 aws_vpc:
   aws_profile: "{{ _aws_profile }}"
-  region: eu-west-3
+  region: "{{ _aws_region }}"
   name: example-vpc-2
   cidr_block: "10.0.0.0/16"
+  # ipv6_cidr: true # uncomment to request an Amazon-provided IPv6 CIDR block with /56 prefix length.
   tags: {}
     #Type: "util"
   state: present

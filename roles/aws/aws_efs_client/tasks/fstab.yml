@@ -1,6 +1,6 @@
 ---
 - name: Gather EFS information.
-  efs_info:
+  community.aws.efs_info:
     profile: "{{ aws_efs_client.aws_profile }}"
     region: "{{ aws_efs_client.region }}"
     name: "{{ mount.src }}"
@@ -10,7 +10,7 @@
   register: aws_efs_client_efs_volume
 
 - name: Make sure mount point exists.
-  file:
+  ansible.builtin.file:
     path: "{{ mount.path }}"
     state: directory
     owner: "{{ mount.owner }}"
@@ -18,7 +18,7 @@
     recurse: true
 
 - name: Create fstab entry.
-  mount:
+  ansible.posix.mount:
     fstype: efs
     opts: "{{ mount.opts }}"
     src: "{{ aws_efs_client_efs_volume.efs[0].filesystem_address }}"

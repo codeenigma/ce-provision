@@ -21,16 +21,25 @@ server {
     {% endfor %}
 {% endif %}
 {% if server.ssl %}
-    ssl_certificate {{ ssl_facts[domain.ssl.domain].certificate }};
-    ssl_certificate_key {{ ssl_facts[domain.ssl.domain].key }};
+    ssl_certificate {{ ssl_facts[_ssl_domains[0]].certificate }};
+    ssl_certificate_key {{ ssl_facts[_ssl_domains[0]].key }};
 {% endif %}
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
-    access_log {{ domain.access_log }};
+    access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
     root "{{ domain.webroot }}";
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
     include "/etc/nginx/conf.d/_common";
+{% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' %}
+{% if domain.ssl.web_server | default('none') == 'none' %}
+    # Proxy for certbot (LetsEncrypt)
+    location /.well-known/acme-challenge/ {
+        auth_basic off;
+        proxy_pass http://127.0.0.1:{{ domain.ssl.http_01_port }}$request_uri;
+    }
+{% endif %}
+{% endif %}
 {% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
-    auth_basic "Restricted content";
+    auth_basic "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
     auth_basic_user_file /etc/nginx/passwords/{{ domain.server_name }}.htpasswd;
 {% endif %}
 }

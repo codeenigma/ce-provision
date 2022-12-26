@@ -1,5 +1,5 @@
 ---
-- name: restart hosts
+- name: Restart hosts.
   service:
     name: ncsd
     state: restarted

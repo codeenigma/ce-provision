@@ -11,18 +11,35 @@
   when:
     - aws_cli.refresh
 
+- name: Delete AWS CLI install files when refreshing CLI version.
+  ansible.builtin.file:
+    path: /opt/aws-cli
+    state: absent
+  when:
+    - aws_cli.refresh
+
 - name: Check if we already have an AWS cli bin.
   ansible.builtin.stat:
     path: "/usr/local/bin/aws"
   register: aws_cli_bin
 
-- name: Fetch and extract AWS cli.
+- name: Fetch and extract latest AWS cli.
   ansible.builtin.unarchive:
     src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
     dest: /tmp
     remote_src: true
   when:
     - not aws_cli_bin.stat.exists
+    - aws_cli.version == 'latest'
+
+- name: "Fetch and extract AWS cli version {{ aws_cli.version }}."
+  ansible.builtin.unarchive:
+    src: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ aws_cli.version }}.zip"
+    dest: /tmp
+    remote_src: true
+  when:
+    - not aws_cli_bin.stat.exists
+    - aws_cli.version != 'latest'
 
 - name: Install AWS cli.
   ansible.builtin.command:

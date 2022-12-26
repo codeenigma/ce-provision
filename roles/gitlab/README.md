@@ -22,22 +22,30 @@ ldap_client:
 
 gitlab:
   server_name: "gitlab.{{ _domain_name }}"
+  letsencrypt: "true" # use built-in GitLab LetsEncrypt support by default
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
+    enabled: false
     handling: selfsigned
+  disable_signup: true
+  disable_signin: false
+  private_projects: true
   unicorn_worker_processes: 2
   puma_worker_processes: 2
   initial_root_password: ""
-  ldap: false
+  ldap: false # enable/disable LDAP integration
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
   ldap_lookup_base: "{{ ldap_client.lookup_base }}"
   ldap_binddn: "{{ ldap_client.binddn }}"
   ldap_bindpw: "{{ ldap_client.bindpw }}"
+  prometheus: "true" # enable/disable built-in Prometheus
+  node_exporter: "true" # enable/disable built-in Prometheus Node Exporter
+  alertmanager: "true" # enable/disable built-in Prometheus Alertmanager
   nginx:
-    listen_port: 8881
-    listen_https: nil
+    listen_port: 443
+    listen_https: 443
     client_max_body_size: "250m"
-    redirect_http_to_https: "false"
-    redirect_http_to_https_port: 8881
+    redirect_http_to_https: "true" # must be enabled if you're using LetsEncrypt above
+    redirect_http_to_https_port: 80 # must be 80 if you're using LetsEncrypt above
 
 ```
 

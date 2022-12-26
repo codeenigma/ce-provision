@@ -1,0 +1,23 @@
+# PHP-FPM FCGI settings
+AddHandler  fcgid-script .fcgi .php .fpl
+FcgidConnectTimeout 20
+FcgidMaxRequestLen 268435456
+FcgidMaxProcessesPerClass 10
+FcgidIOTimeout 300
+
+# We want to deny all access to install.php and update.php
+<Directory />
+  RedirectMatch 403 "/(install|update).php"
+  RedirectMatch 403 "/xmlrpc.php"
+</Directory>
+
+# Don't allow hitting .php files in the 'files' directory.
+<Directory />
+  RedirectMatch 403 "/sites/(.*)/files/(.*).php"
+  RedirectMatch 403 "/sites/(.*)/files/(.*)/(.*).php"
+</Directory>
+
+<FilesMatch "(CHANGELOG|COPYRIGHT|INSTALL|LICENSE|MAINTAINERS|README|UPGRADE)\.txt">
+  Order deny,allow
+  deny from all
+</FilesMatch>
