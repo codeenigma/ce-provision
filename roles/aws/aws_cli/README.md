@@ -9,7 +9,8 @@ Installs the AWS client for Linux.
 ```yaml
 ---
 aws_cli:
-  refresh: false # Set to true to upgrade the AWS client
+  version: latest # Specify a particular version number in X.X.X format to override
+  refresh: false # Set to true to upgrade or downgrade the AWS client, which also clears out install files in /opt/aws-cli
 ```
 
 <!--ENDROLEVARS-->
