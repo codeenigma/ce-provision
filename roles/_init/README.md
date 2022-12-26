@@ -15,38 +15,16 @@ _init:
   vars_dirs: []
   force_play: false
 
-# ce_provision vars are sometimes needed even when the role isn't used so we define them here.
-# If you are using ce_provision and *not* using _init you can copy these vars to your playbook.
-_ce_provision:
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
-
-ce_provision:
-  username: "{{ _ce_provision.username }}"
-  new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
-  key_name: id_rsa.pub # existing users may have a key of a different name
-  # Main repo.
-  own_repository: "https://github.com/codeenigma/ce-provision.git"
-  own_repository_branch: "master"
-  own_repository_skip_checkout: false
-  # Destination.
-  local_dir: "/home/{{ _ce_provision.username }}/ce-provision"
-  # Private config repo.
-  config_repository: ""
-  config_repository_branch: "master"
-  config_repository_skip_checkout: false
+  # Although these variables logically belong with ce_provision, the _init role needs to
+  # gather the extra variables if there are any, so there are _init variables.
   # Extra config repo.
-  extra_repository: ""
-  extra_repository_branch: "master"
-  extra_repository_skip_checkout: false
-  extra_repository_vars_file: "custom.yml"
-  # Wether to commit back changes to extra repo.
-  extra_repository_push: false
-  extra_repository_allowed_vars: []
-  # List of additional groups to add the user to.
-  groups: []
-  # File containing default roles and collections to install via Ansible Galaxy.
-  # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
-  galaxy_custom_requirements_file: "/home/{{ _ce_provision.username }}/ce-provision/config/files/galaxy-requirements.yml"
+  ce_provision_extra_repository: ""
+  ce_provision_extra_repository_branch: "master"
+  ce_provision_extra_repository_skip_checkout: false
+  ce_provision_extra_repository_vars_file: "custom.yml"
+  # Whether to commit back changes to extra repo.
+  ce_provision_extra_repository_push: false
+  ce_provision_extra_repository_allowed_vars: []
 
 ```
 

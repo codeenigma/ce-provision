@@ -6,11 +6,11 @@
     owners: self
     filters:
       name: "{{ aws_ec2_with_eip.ami_name }}"
-  register: aws_ec2_with_eip_image
+  register: _aws_ec2_with_eip_image
 
 - name: Register latest AMI image.
   ansible.builtin.set_fact:
-    aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
+    _aws_ec2_with_eip_image_latest: "{{ _aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Gather IAM role info.
   community.aws.iam_role_info:
@@ -18,6 +18,17 @@
     region: "{{ aws_ec2_with_eip.region }}"
     name: "{{ aws_ec2_with_eip.iam_role_name }}"
   register: _aws_ec2_with_eip_iam_role_info
+
+# Find out if a server already exists.
+- name: Blank the _aws_hostname variable.
+  ansible.builtin.set_fact:
+    _aws_hostname: ""
+
+- name: Check to see if an Ansible host exists.
+  ansible.builtin.set_fact:
+    _aws_hostname: "{{ item }}"
+  with_inventory_hostnames:
+    - "{{ aws_ec2_with_eip.hostname }}"
 
 # Subnet ID is stored in ce-provision's data directory
 - name: Ensure server data directory exists.
@@ -86,7 +97,7 @@
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
     instance_role: "{{ _aws_ec2_with_eip_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     region: "{{ aws_ec2_with_eip.region }}"
-    image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
+    image_id: "{{ _aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
     wait: true
     termination_protection: "{{ aws_ec2_with_eip.termination_protection }}"
@@ -103,6 +114,7 @@
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: aws_ec2_with_eip_instances
+  when: (_aws_hostname | length == 0) or aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
   community.aws.ec2_eip_info:
