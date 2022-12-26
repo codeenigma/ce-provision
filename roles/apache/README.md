@@ -33,7 +33,7 @@ apache:
   log_stream_name: example
   # We can only have one backend, due to the way we use "common" templates.
   # Moving this per domain means instead having templates per project type.
-  php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.','') }}"
+  php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.', '') }}"
   limit_request_body: "734003200" #700M
   timeout: 120
   max_clients: 256

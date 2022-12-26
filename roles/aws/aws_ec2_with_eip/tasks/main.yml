@@ -6,11 +6,11 @@
     owners: self
     filters:
       name: "{{ aws_ec2_with_eip.ami_name }}"
-  register: aws_ec2_with_eip_image
+  register: _aws_ec2_with_eip_image
 
 - name: Register latest AMI image.
   ansible.builtin.set_fact:
-    aws_ec2_with_eip_image_latest: "{{ aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
+    _aws_ec2_with_eip_image_latest: "{{ _aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Gather IAM role info.
   community.aws.iam_role_info:
@@ -18,6 +18,17 @@
     region: "{{ aws_ec2_with_eip.region }}"
     name: "{{ aws_ec2_with_eip.iam_role_name }}"
   register: _aws_ec2_with_eip_iam_role_info
+
+# Find out if a server already exists.
+- name: Blank the _aws_hostname variable.
+  ansible.builtin.set_fact:
+    _aws_hostname: ""
+
+- name: Check to see if an Ansible host exists.
+  ansible.builtin.set_fact:
+    _aws_hostname: "{{ item }}"
+  with_inventory_hostnames:
+    - "{{ aws_ec2_with_eip.hostname }}"
 
 # Subnet ID is stored in ce-provision's data directory
 - name: Ensure server data directory exists.
@@ -79,6 +90,7 @@
     dest: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
     force: true
 
+# Do not create an instance if _aws_hostname is not an EC2 generated address unless `force: true`
 - name: Create EC2 instance.
   amazon.aws.ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -86,7 +98,7 @@
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
     instance_role: "{{ _aws_ec2_with_eip_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     region: "{{ aws_ec2_with_eip.region }}"
-    image_id: "{{ aws_ec2_with_eip_image_latest.image_id }}"
+    image_id: "{{ _aws_ec2_with_eip_image_latest.image_id }}"
     state: "{{ aws_ec2_with_eip.state }}"
     wait: true
     termination_protection: "{{ aws_ec2_with_eip.termination_protection }}"
@@ -102,7 +114,8 @@
           delete_on_termination: "{{ aws_ec2_with_eip.root_volume_delete_on_termination }}"
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
-  register: aws_ec2_with_eip_instances
+  register: _aws_ec2_with_eip_instances
+  when: (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
   community.aws.ec2_eip_info:
@@ -110,26 +123,26 @@
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
-  register: aws_ec2_with_eip_instances_eip
+  register: _aws_ec2_with_eip_instances_eip
 
 - name: Generate Terraform template.
   ansible.builtin.template:
     src: eip.tf.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/main.tf"
     mode: "0666"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+  when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Init Terraform.
   ansible.builtin.command:
     cmd: terraform init
     chdir: "{{ _ce_provision_build_tmp_dir }}"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+  when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Create EIP with Terraform if we don't have one.
   ansible.builtin.command:
     cmd: terraform apply -auto-approve
     chdir: "{{ _ce_provision_build_tmp_dir }}"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+  when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
   community.aws.ec2_eip_info:
@@ -137,18 +150,19 @@
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
-  register: aws_ec2_with_eip_instances_eip
+  register: _aws_ec2_with_eip_instances_eip
 
 - name: Associate Elastic IP.
   community.aws.ec2_eip:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
-    device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
-    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
-    private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
+    device_id: "{{ _aws_ec2_with_eip_instances.instance_ids[0] }}"
+    public_ip: "{{ _aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    private_ip_address: "{{ _aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
     in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
+  when: (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Add a DNS record in route 53
   community.aws.route53:
@@ -157,11 +171,12 @@
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
     record: "{{ aws_ec2_with_eip.route_53.record }}"
     type: A
-    value: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    value: "{{ _aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
     overwrite: true
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Add a matching wildcard DNS record
   community.aws.route53:
@@ -177,6 +192,7 @@
     - aws_ec2_with_eip.route_53.zone | length > 0
     - aws_ec2_with_eip.route_53.wildcard is defined
     - aws_ec2_with_eip.route_53.wildcard
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Create EC2 autorecovery alarm.
   ansible.builtin.include_role:
@@ -196,8 +212,10 @@
       period: 60
       evaluation_periods: 2
       alarm_actions: ["arn:aws:automate:{{ aws_ec2_with_eip.region }}:ec2:recover"]
-      dimensions: { "InstanceId": "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}" }
-  when: aws_ec2_with_eip.autorecover
+      dimensions: { "InstanceId": "{{ _aws_ec2_with_eip_instances.instances[0].instance_id }}" }
+  when:
+    - aws_ec2_with_eip.autorecover
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Assign resource to backup plan.
   ansible.builtin.include_role:
@@ -207,8 +225,9 @@
     backup:
       backup_plan_name: "{{ aws_ec2_with_eip.backup }}"
       selection_name: "EC2-{{ aws_ec2_with_eip.instance_name }}-{{ _env_type }}"
-      resource_id: "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}"
+      resource_id: "{{ _aws_ec2_with_eip_instances.instances[0].instance_id }}"
       resource_type: "instance"
   when:
     - aws_ec2_with_eip.backup is defined
     - aws_ec2_with_eip.backup | length > 0
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
