@@ -134,7 +134,7 @@
     - aws_ec2_autoscale_cluster.efs
 
 - name: Gather running instances information.
-  community.aws.ec2_instance_info:
+  amazon.aws.ec2_instance_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     filters:

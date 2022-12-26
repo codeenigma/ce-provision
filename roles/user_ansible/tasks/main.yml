@@ -37,7 +37,7 @@
   when: user_ansible.sudoer
 
 - name: Copy SSH public key to target.
-  ansible.builtin.authorized_key:
+  ansible.posix.authorized_key:
     key: "{{ key }}"
     user: "{{ user_ansible.username }}"
     state: present
