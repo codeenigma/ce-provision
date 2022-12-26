@@ -68,13 +68,13 @@
     state: present
 
 - name: Install "lhci/cli" node.js package.
-  ansible.builtin.npm:
+  community.general.packaging.language.npm:
     name: "@lhci/cli"
     production: true
     global: true
 
 - name: Install "lighthouse" node.js package.
-  ansible.builtin.npm:
+  community.general.packaging.language.npm:
     name: "lighthouse"
     production: true
     global: true

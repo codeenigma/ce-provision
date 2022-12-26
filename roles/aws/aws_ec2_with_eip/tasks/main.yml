@@ -80,7 +80,7 @@
     force: true
 
 - name: Create EC2 instance.
-  community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
+  amazon.aws.ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     key_name: "{{ aws_ec2_with_eip.key_name }}"
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
