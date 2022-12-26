@@ -90,6 +90,7 @@
     dest: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
     force: true
 
+# Do not create an instance if _aws_hostname is not an EC2 generated address unless `force: true`
 - name: Create EC2 instance.
   community.aws.ec2_instance: # @TODO: soon to move to amazon.aws collection
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -114,7 +115,7 @@
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: _aws_ec2_with_eip_instances
-  when: (_aws_hostname | length == 0) or aws_ec2_with_eip.force
+  when: (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
   community.aws.ec2_eip_info:
@@ -161,7 +162,7 @@
     in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
-  when: (_aws_hostname | length == 0) or aws_ec2_with_eip.force
+  when: (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Add a DNS record in route 53
   community.aws.route53:
@@ -175,7 +176,7 @@
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
-    - (_aws_hostname | length == 0) or aws_ec2_with_eip.force
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Add a matching wildcard DNS record
   community.aws.route53:
@@ -191,7 +192,7 @@
     - aws_ec2_with_eip.route_53.zone | length > 0
     - aws_ec2_with_eip.route_53.wildcard is defined
     - aws_ec2_with_eip.route_53.wildcard
-    - (_aws_hostname | length == 0) or aws_ec2_with_eip.force
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Create EC2 autorecovery alarm.
   ansible.builtin.include_role:
@@ -214,7 +215,7 @@
       dimensions: { "InstanceId": "{{ _aws_ec2_with_eip_instances.instances[0].instance_id }}" }
   when:
     - aws_ec2_with_eip.autorecover
-    - (_aws_hostname | length == 0) or aws_ec2_with_eip.force
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Assign resource to backup plan.
   ansible.builtin.include_role:
@@ -229,4 +230,4 @@
   when:
     - aws_ec2_with_eip.backup is defined
     - aws_ec2_with_eip.backup | length > 0
-    - (_aws_hostname | length == 0) or aws_ec2_with_eip.force
+    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
