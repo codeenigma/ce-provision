@@ -11,7 +11,7 @@
     state: absent
 
 - name: Add authorized keys.
-  ansible.builtin.authorized_key:
+  ansible.posix.authorized_key:
     user: root
     state: present
     key: "{{ key }}"
