@@ -113,7 +113,7 @@
           delete_on_termination: "{{ aws_ec2_with_eip.root_volume_delete_on_termination }}"
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
-  register: aws_ec2_with_eip_instances
+  register: _aws_ec2_with_eip_instances
   when: (_aws_hostname | length == 0) or aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
@@ -122,26 +122,26 @@
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
-  register: aws_ec2_with_eip_instances_eip
+  register: _aws_ec2_with_eip_instances_eip
 
 - name: Generate Terraform template.
   ansible.builtin.template:
     src: eip.tf.j2
     dest: "{{ _ce_provision_build_tmp_dir }}/main.tf"
     mode: "0666"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+  when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Init Terraform.
   ansible.builtin.command:
     cmd: terraform init
     chdir: "{{ _ce_provision_build_tmp_dir }}"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+  when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Create EIP with Terraform if we don't have one.
   ansible.builtin.command:
     cmd: terraform apply -auto-approve
     chdir: "{{ _ce_provision_build_tmp_dir }}"
-  when: not aws_ec2_with_eip_instances_eip.addresses
+  when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
   community.aws.ec2_eip_info:
@@ -149,18 +149,19 @@
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
-  register: aws_ec2_with_eip_instances_eip
+  register: _aws_ec2_with_eip_instances_eip
 
 - name: Associate Elastic IP.
   community.aws.ec2_eip:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
-    device_id: "{{ aws_ec2_with_eip_instances.instance_ids[0] }}"
-    public_ip: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
-    private_ip_address: "{{ aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
+    device_id: "{{ _aws_ec2_with_eip_instances.instance_ids[0] }}"
+    public_ip: "{{ _aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    private_ip_address: "{{ _aws_ec2_with_eip_instances.instances[0].private_ip_address }}"
     in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
+  when: (_aws_hostname | length == 0) or aws_ec2_with_eip.force
 
 - name: Add a DNS record in route 53
   community.aws.route53:
@@ -169,7 +170,7 @@
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
     record: "{{ aws_ec2_with_eip.route_53.record }}"
     type: A
-    value: "{{ aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
+    value: "{{ _aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
     overwrite: true
   when:
     - aws_ec2_with_eip.route_53.zone is defined
@@ -208,7 +209,7 @@
       period: 60
       evaluation_periods: 2
       alarm_actions: ["arn:aws:automate:{{ aws_ec2_with_eip.region }}:ec2:recover"]
-      dimensions: { "InstanceId": "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}" }
+      dimensions: { "InstanceId": "{{ _aws_ec2_with_eip_instances.instances[0].instance_id }}" }
   when: aws_ec2_with_eip.autorecover
 
 - name: Assign resource to backup plan.
@@ -219,7 +220,7 @@
     backup:
       backup_plan_name: "{{ aws_ec2_with_eip.backup }}"
       selection_name: "EC2-{{ aws_ec2_with_eip.instance_name }}-{{ _env_type }}"
-      resource_id: "{{ aws_ec2_with_eip_instances.instances[0].instance_id }}"
+      resource_id: "{{ _aws_ec2_with_eip_instances.instances[0].instance_id }}"
       resource_type: "instance"
   when:
     - aws_ec2_with_eip.backup is defined
