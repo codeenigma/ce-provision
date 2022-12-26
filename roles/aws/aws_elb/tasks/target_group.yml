@@ -1,0 +1,34 @@
+- name: Set a default target group list.
+  ansible.builtin.set_fact:
+    _targets: []
+
+- name: Construct list of instance IDs for ELB target group.
+  ansible.builtin.include_tasks: "target_group_instances.yml"
+  with_items: "{{ target_group.targets }}"
+  loop_control:
+    loop_var: tg_instance
+  when:
+    - target_group.targets is defined
+    - target_group.targets | length > 0
+
+- name: "Create a Target group {{ target_group.name }} for port {{ target_group.port }}."
+  community.aws.elb_target_group:
+    profile: "{{ aws_elb.aws_profile }}"
+    name: "{{ target_group.name }}"
+    state: "{{ aws_elb.state }}"
+    region: "{{ aws_elb.region }}"
+    tags: "{{ aws_elb.tags }}"
+    protocol: "{{ target_group.protocol }}"
+    port: "{{ target_group.port }}"
+    vpc_id: "{{ _aws_ec2_elb_vpc_id }}"
+    deregistration_delay_timeout: "{{ target_group.deregistration_delay_timeout }}"
+    health_check_protocol: "{{ target_group.health_check_protocol }}"
+    health_check_path: "{{ target_group.health_check_path }}"
+    health_check_port: "{{ target_group.health_check_port }}"
+    successful_response_codes: "{{ target_group.health_check_success_codes }}"
+    health_check_interval: "{{ target_group.health_check_interval }}"
+    health_check_timeout: "{{ target_group.health_check_timeout }}"
+    healthy_threshold_count: "{{ target_group.health_check_healthy_count }}"
+    unhealthy_threshold_count: "{{ target_group.health_check_unhealthy_count }}"
+    modify_targets: "{{ target_group.modify_targets }}"
+    targets: "{{ _targets }}"

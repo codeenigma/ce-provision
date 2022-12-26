@@ -2,14 +2,14 @@
   ansible.builtin.set_fact:
     ce_provision_extra_vars_computed: "{{ ce_provision_extra_vars_computed | default({}) | combine({item.name: lookup('vars', item.name)}, recursive=True) }}"
   when:
-    - ce_provision.extra_repository_allowed_vars is defined
+    - _init.ce_provision_extra_repository_allowed_vars is defined
     - lookup('vars', item.name, default="")
-  loop: "{{ ce_provision.extra_repository_allowed_vars }}"
+  loop: "{{ _init.ce_provision_extra_repository_allowed_vars }}"
 
 - name: Generate/Update custom vars file.
   ansible.builtin.template:
     src: vars.j2
-    dest: "{{ _ce_provision_build_tmp_dir }}/extra/{{ ce_provision.extra_repository_vars_file }}"
+    dest: "{{ _ce_provision_build_tmp_dir }}/extra/{{ _init.ce_provision_extra_repository_vars_file }}"
     mode: "0755"
   delegate_to: localhost
   become: true
@@ -48,7 +48,7 @@
     - _ce_provision_extra_vars_git_changed.stdout
 
 - name: Push newly generated configuration.
-  ansible.builtin.command: "git push origin {{ ce_provision.extra_repository_branch }}"
+  ansible.builtin.command: "git push origin {{ _init.ce_provision_extra_repository_branch }}"
   args:
     chdir: "{{ _ce_provision_build_tmp_dir }}/extra"
   become: true

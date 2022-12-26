@@ -8,7 +8,7 @@
     mode: "0644"
     force: true
 
-- name: restart service.
+- name: Restart service.
   ansible.builtin.service:
     name: rsyslog
     state: restarted

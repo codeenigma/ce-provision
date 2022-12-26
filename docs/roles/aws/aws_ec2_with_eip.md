@@ -12,6 +12,8 @@ Creates a new EC2 instance at AWS with a static IP address.
 aws_ec2_with_eip:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
+  hostname: "{{ _domain_name }}" # The hostname is used to check if the machine exists already.
+  force: false # Force a new EC2 machine to be created if a new AMI is packed.
   instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_name: "{{ _domain_name }}" # The name of an AMI image to use. Image must exists in the same region.

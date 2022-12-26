@@ -20,23 +20,23 @@
   ansible.builtin.set_fact:
     _selenium_major_version: "{{ selenium.version | regex_replace('\\.[0-9]+$', '') }}"
 
-- name: create Selenium folder.
+- name: Create Selenium folder.
   ansible.builtin.file:
     path: /opt/selenium
     state: directory
 
-- name: Download Selenium
+- name: Download Selenium.
   ansible.builtin.get_url:
     url: "http://selenium-release.storage.googleapis.com/{{ _selenium_major_version }}/selenium-server-standalone-{{ selenium.version }}.jar"
     dest: "/opt/selenium/selenium-server-standalone.jar"
 
-- name: Download GeckoDriver
+- name: Download GeckoDriver.
   ansible.builtin.unarchive:
     src: "https://github.com/mozilla/geckodriver/releases/download/v{{ selenium.gecko_version }}/geckodriver-v{{ selenium.gecko_version }}-linux64.tar.gz"
     dest: /opt/selenium
     remote_src: true
 
-- name: Download ChromeDriver
+- name: Download ChromeDriver.
   ansible.builtin.unarchive:
     src: "https://chromedriver.storage.googleapis.com/{{ selenium.chrome_version }}/chromedriver_linux64.zip"
     dest: /opt/selenium
