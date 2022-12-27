@@ -3,7 +3,6 @@ collections:
   - name: community.aws
   - name: community.general
   - name: amazon.aws
-    version: 4.0.0
 
 roles:
   - name: geerlingguy.varnish
