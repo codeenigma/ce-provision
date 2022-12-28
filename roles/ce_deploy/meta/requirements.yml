@@ -1,0 +1,6 @@
+---
+collections:
+  - community.mysql
+  - community.sops
+  - ansible.posix
+  - amazon.aws
