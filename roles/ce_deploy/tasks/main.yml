@@ -125,3 +125,21 @@
     state: directory
     owner: "{{ ce_deploy.username }}"
     recurse: true
+
+- name: Check if ansible-galaxy custom requirements file exists.
+  ansible.builtin.stat:
+    path: "{{ ce_deploy.galaxy_custom_requirements_file }}"
+  register: _ce_deploy_custom_galaxy_requirements
+
+- name: Install mandatory ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "ansible-galaxy install -r {{ ce_deploy.local_dir }}/roles/ce_deploy/meta/requirements.yml"
+  become: true
+  become_user: "{{ ce_deploy.username }}"
+
+- name: Install custom ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "ansible-galaxy install -r {{ ce_deploy.galaxy_custom_requirements_file }}"
+  become: true
+  become_user: "{{ ce_deploy.username }}"
+  when: _ce_deploy_custom_galaxy_requirements.stat.exists
