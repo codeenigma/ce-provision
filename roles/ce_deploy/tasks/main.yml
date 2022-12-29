@@ -148,11 +148,24 @@
     path: "{{ ce_deploy.galaxy_custom_requirements_file }}"
   register: _ce_deploy_custom_galaxy_requirements
 
+- name: Copy mandatory ansible-galaxy requirements file to deploy server.
+  ansible.builtin.copy:
+    src: "{{ ce_deploy.ce_provision_dir }}/roles/ce_deploy/meta/requirements.yml"
+    dest: "{{ ce_deploy.local_dir }}/requirements.yml"
+    owner: "{{ ce_deploy.username }}"
+    group: "{{ ce_deploy.username }}"
+    mode: '0644'
+
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "ansible-galaxy install -r {{ ce_deploy.ce_provision_dir }}/roles/ce_deploy/meta/requirements.yml"
+    cmd: "ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements.yml"
   become: true
   become_user: "{{ ce_deploy.username }}"
+
+- name: Clean up mandatory ansible-galaxy requirements file.
+  ansible.builtin.file:
+    path: "{{ ce_deploy.local_dir }}/requirements.yml"
+    state: absent
 
 - name: Install custom ansible-galaxy roles and collections.
   ansible.builtin.command:
