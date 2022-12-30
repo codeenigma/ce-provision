@@ -1,9 +1,8 @@
 ---
-# @todo do we want to support percona client ?
 mysql_client:
-  client: "mysql-client"
-  host: "rds.example.com"
-  user: "user"
+  client: "mariadb-client" # package name of the MySQL client to install
+  host: "localhost"
+  user: "root"
   password: "password"
   creds_file_dest: "/home/{{ user_deploy.username }}/.mysql.creds"
   creds_file_owner: "{{ user_deploy.username }}"
