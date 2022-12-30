@@ -1,7 +1,7 @@
 ---
 - name: Ensure mariadb-client is installed.
   ansible.builtin.apt:
-    pkg: ["mariadb-client"]
+    pkg: "{{ mysql_client.client }}"
     state: present
     update_cache: true
     cache_valid_time: 240
