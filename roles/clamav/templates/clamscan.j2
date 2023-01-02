@@ -11,7 +11,7 @@ av_report() {
     if [ `cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l` != 0 ]
     then
 	SUBJECT="[WARNING] `hostname` FAILED SCAN"
-{$ if clamav.send_on_fail %}
+{% if clamav.send_on_fail %}
     # Only send an email if infected files are found
 	EMAILMESSAGE=`mktemp /tmp/virus-alert.XXXXX`
     echo "To: ${EMAIL}" >>  ${EMAILMESSAGE}
