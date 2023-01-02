@@ -1272,7 +1272,7 @@ mattermost['enable'] = "true"
 # mattermost['database_name'] = 'mattermost_production'
 {% if (gitlab.mattermost_env_vars | length > 0) %}
 mattermost['env'] = {
-{% for var in gitlab.mattermost_env_vars %}  {{ var }}{% if not var.last %},{% endif %}
+{% for var in gitlab.mattermost_env_vars %}  {{ var }}{% if not loop.last %},{% endif %}
 {% endfor %}
 }
 {% else %}
