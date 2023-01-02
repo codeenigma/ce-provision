@@ -44,8 +44,7 @@
       - yamllint
     executable: pip3
 
-# This package gets removed with python3-yaml above. We want the latest PyPI version.
+# This package gets removed with python3-yaml above but we need it for auto-scale.
 - name: Install cloud-init.
-  ansible.builtin.pip:
+  ansible.builtin.apt:
     name: cloud-init
-    executable: pip3
