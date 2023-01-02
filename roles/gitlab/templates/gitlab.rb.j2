@@ -298,15 +298,16 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 
 ### OmniAuth Settings
 ###! Docs: https://docs.gitlab.com/ce/integration/omniauth.html
-# gitlab_rails['omniauth_enabled'] = nil
-# gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
+{% if gitlab.omniauth %}
+gitlab_rails['omniauth_enabled'] = true
+gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
 # gitlab_rails['omniauth_sync_email_from_provider'] = 'saml'
 # gitlab_rails['omniauth_sync_profile_from_provider'] = ['saml']
 # gitlab_rails['omniauth_sync_profile_attributes'] = ['email']
-# gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'saml'
-# gitlab_rails['omniauth_block_auto_created_users'] = true
+gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'saml'
+gitlab_rails['omniauth_block_auto_created_users'] = {{ gitlab.omniauth_block_auto_created_users }}
 # gitlab_rails['omniauth_auto_link_ldap_user'] = false
-# gitlab_rails['omniauth_auto_link_saml_user'] = false
+gitlab_rails['omniauth_auto_link_saml_user'] = {{ gitlab.omniauth_auto_link_saml_user }}
 # gitlab_rails['omniauth_external_providers'] = ['twitter', 'google_oauth2']
 # gitlab_rails['omniauth_providers'] = [
 #   {
@@ -316,6 +317,19 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 #     "args" => { "access_type" => "offline", "approval_prompt" => "" }
 #   }
 # ]
+gitlab_rails['omniauth_providers'] = [
+    name: 'saml',
+    args: {
+             assertion_consumer_service_url: '{{ gitlab.omniauth_consumer_service_url }}',
+             idp_cert_fingerprint: '{{ gitlab.omniauth_saml_cert_fingerprint }}',
+             idp_sso_target_url: '{{ gitlab.omniauth_saml_endpoint_url }}',
+             issuer: '{{ gitlab.omniauth_saml_entity_id }}', # this is the Entity ID in SAML
+             name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+             attribute_statements: { {{ gitlab.omniauth_saml_attribute_statements }} }
+           },
+    label: '{{ gitlab.omniauth_login_button_label }}'
+]
+{% endif %}
 
 ### Backup Settings
 ###! Docs: https://docs.gitlab.com/omnibus/settings/backups.html
@@ -1274,6 +1288,7 @@ mattermost['enable'] = "true"
 mattermost['env'] = {
 {% for var in gitlab.mattermost_env_vars %}  {{ var }}{% if not loop.last %},{% endif %}
 {% endfor %}
+
 }
 {% else %}
 # mattermost['env'] = {
