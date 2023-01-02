@@ -1,5 +1,5 @@
 #!/bin/bash
-SUBJECT="`hostname` PASSED SCAN"
+SUBJECT="{{ clamav.server_name }} PASSED SCAN"
 EMAIL="{{ clamav.report_recipient_email }}"
 LOG={{ clamav.log_location }}/clamav.log
 TMP_LOG=/tmp/clam.daily
@@ -10,7 +10,7 @@ av_report() {
 
     if [ `cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l` != 0 ]
     then
-	SUBJECT="[WARNING] `hostname` FAILED SCAN"
+	SUBJECT="[WARNING] {{ clamav.server_name }} FAILED SCAN"
 {% if clamav.send_on_fail %}
     # Only send an email if infected files are found
 	EMAILMESSAGE=`mktemp /tmp/virus-alert.XXXXX`
