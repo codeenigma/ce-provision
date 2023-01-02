@@ -1,21 +1,21 @@
 ---
 - name: Ensure the ClamAV scripts directory exists.
   ansible.builtin.file:
-    path: "{{ clamscan.scripts_location }}"
+    path: "{{ clamav.scripts_location }}"
     state: directory
     mode: '0755'
 
 - name: Copy clamscan script to server.
   ansible.builtin.template:
     src: "clamscan.j2"
-    dest: "{{ clamscan.scripts_location }}/clamscan"
+    dest: "{{ clamav.scripts_location }}/clamscan"
     owner: root
     group: root
     mode: "0755"
 
 - name: Ensure the ClamAV log directory exists.
   ansible.builtin.file:
-    path: "{{ clamscan.log_location }}"
+    path: "{{ clamav.log_location }}"
     state: directory
     mode: '0755'
   when: clamav.provide_cron
@@ -26,5 +26,5 @@
     minute: "{{ clamav.cron_minute }}"
     hour: "{{ clamav.cron_hour | default(omit) }}"
     day: "{{ clamav.cron_day | default(omit) }}"
-    job: "{{ clamscan.scripts_location }}/clamscan"
+    job: "{{ clamav.scripts_location }}/clamscan"
   when: clamav.provide_cron
