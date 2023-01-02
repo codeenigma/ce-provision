@@ -1,5 +1,5 @@
 ---
-- name: Ensure mariadb-client is installed.
+- name: Ensure MySQL client is installed.
   ansible.builtin.apt:
     pkg: "{{ mysql_client.client }}"
     state: present
