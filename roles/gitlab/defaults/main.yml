@@ -24,6 +24,10 @@ gitlab:
   ldap_lookup_base: "{{ ldap_client.lookup_base }}"
   ldap_binddn: "{{ ldap_client.binddn }}"
   ldap_bindpw: "{{ ldap_client.bindpw }}"
+  mattermost: false # enable/disable Mattermost chat
+  mattermost_url: "chat.{{ _domain_name }}"
+  mattermost_env_vars: [] # list of environment variables to pass to Mattermost
+  #  - "'MM_ALLOW_UNTRUSTED_INTERNAL_CONNECTIONS_TO' => 'git.example.com'"
   prometheus: "true" # enable/disable built-in Prometheus
   node_exporter: "true" # enable/disable built-in Prometheus Node Exporter
   alertmanager: "true" # enable/disable built-in Prometheus Alertmanager
