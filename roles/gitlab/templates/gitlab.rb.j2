@@ -1260,19 +1260,26 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 ## GitLab Mattermost
 ##! Docs: https://docs.gitlab.com/omnibus/gitlab-mattermost
 ################################################################################
+{% if gitlab.mattermost %}
+mattermost_external_url 'https://{{ gitlab.mattermost_url }}'
 
-# mattermost_external_url 'http://mattermost.example.com'
-
-# mattermost['enable'] = false
+mattermost['enable'] = "true"
 # mattermost['username'] = 'mattermost'
 # mattermost['group'] = 'mattermost'
 # mattermost['uid'] = nil
 # mattermost['gid'] = nil
 # mattermost['home'] = '/var/opt/gitlab/mattermost'
 # mattermost['database_name'] = 'mattermost_production'
+{% if (gitlab.mattermost_env_vars | length > 0) %}
+mattermost['env'] = {
+{% for var in gitlab.mattermost_env_vars %}  {{ var }}{% if not var.last %},{% endif %}
+{% endfor %}
+}
+{% else %}
 # mattermost['env'] = {
 #   'SSL_CERT_DIR' => "/opt/gitlab/embedded/ssl/certs/"
 # }
+{% endif %}
 # mattermost['service_address'] = "127.0.0.1"
 # mattermost['service_port'] = "8065"
 # mattermost['service_site_url'] = nil
@@ -1303,6 +1310,10 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 # `nginx['some_setting']` WILL NOT be automatically replicated as
 # `mattermost_nginx['some_setting']` and should be set separately.
 
+# It is not in the docs, but LetsEncrypt should handle this - https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5135#note_298654185
+# mattermost_nginx['ssl_certificate'] = "/etc/gitlab/ssl/my.crt"
+# mattermost_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/my.key"
+
 # Below you can find settings that are exclusive to "Mattermost NGINX"
 # mattermost_nginx['enable'] = false
 
@@ -1317,7 +1328,7 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 #   "Upgrade" => "$http_upgrade",
 #   "Connection" => "$connection_upgrade"
 # }
-
+{% endif %}
 
 ################################################################################
 ## Registry NGINX
