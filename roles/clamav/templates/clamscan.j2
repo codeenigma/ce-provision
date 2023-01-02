@@ -1,0 +1,60 @@
+#!/bin/bash
+SUBJECT="{{ clamav.server_name }} PASSED SCAN"
+EMAIL="{{ clamav.report_recipient_email }}"
+LOG={{ clamav.log_location }}/clamav.log
+TMP_LOG=/tmp/clam.daily
+
+rm -rf ${TMP_LOG}
+
+av_report() {
+
+    if [ `cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l` != 0 ]
+    then
+	SUBJECT="[WARNING] {{ clamav.server_name }} FAILED SCAN"
+{% if clamav.send_on_fail %}
+    # Only send an email if infected files are found
+	EMAILMESSAGE=`mktemp /tmp/virus-alert.XXXXX`
+    echo "To: ${EMAIL}" >>  ${EMAILMESSAGE}
+    echo "From: {{ clamav.report_sender_email }}" >>  ${EMAILMESSAGE}
+    echo "Subject: ${SUBJECT}" >>  ${EMAILMESSAGE}
+    echo "Importance: High" >> ${EMAILMESSAGE}
+    echo "X-Priority: 1" >> ${EMAILMESSAGE}
+    echo "`tail -n 50 ${TMP_LOG}`" >> ${EMAILMESSAGE}
+    sendmail -t < ${EMAILMESSAGE}
+{% endif %}
+    fi
+
+{% if not clamav.send_on_fail %}
+    # Always send an email
+	EMAILMESSAGE=`mktemp /tmp/virus-alert.XXXXX`
+    echo "To: ${EMAIL}" >>  ${EMAILMESSAGE}
+    echo "From: {{ clamav.report_sender_email }}" >>  ${EMAILMESSAGE}
+    echo "Subject: ${SUBJECT}" >>  ${EMAILMESSAGE}
+    echo "Importance: High" >> ${EMAILMESSAGE}
+    echo "X-Priority: 1" >> ${EMAILMESSAGE}
+    echo "`tail -n 50 ${TMP_LOG}`" >> ${EMAILMESSAGE}
+    sendmail -t < ${EMAILMESSAGE}
+{% endif %}
+}
+
+av_scan() {
+    # build bash array of directories to exclude
+    EXCLUSIONS=()
+    {% for directory in clamav.exclude_directories %}
+    EXCLUSIONS+=("{{ directory }}")
+    {% endfor %}
+
+    # turn array into certbot compatible sites string
+    EXCLUSIONS_STRING=""
+    for directory in ${EXCLUSIONS[@]}; do
+      EXCLUSIONS_STRING+=" --exclude-dir=$directory"
+    done
+
+	touch ${TMP_LOG}
+	clamscan -r {{ clamav.scan_location }} --quiet --infected --log=${TMP_LOG}$EXCLUSIONS_STRING
+
+	cat ${TMP_LOG} >> ${LOG}
+}
+ 
+av_scan
+{% if clamav.send_mail %}av_report{% endif %}
