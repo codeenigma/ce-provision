@@ -31,21 +31,21 @@
   ansible.builtin.include_role:
     name: python-pip
 
-# This package gets removed with python3-yaml above. We want the latest PyPI version.
-- name: Install cloud-init.
-  ansible.builtin.pip:
-    name: cloud-init
-    executable: pip3
-
-- name: Install linters.
-  ansible.builtin.pip:
-    name:
-      - yamllint
-      - ansible-lint
-    executable: pip3
-
 # Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
 - name: Remove and re-install Ansible.
   ansible.builtin.shell:
     cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
   become: false
+
+- name: Install linters.
+  ansible.builtin.pip:
+    name:
+      - ansible-lint
+      - yamllint
+    executable: pip3
+
+# This package gets removed with python3-yaml above. We want the latest PyPI version.
+- name: Install cloud-init.
+  ansible.builtin.pip:
+    name: cloud-init
+    executable: pip3
