@@ -1,9 +1,7 @@
-_ce_deploy:
-  username: ce-dev
-
 ce_deploy:
   own_repository: https://github.com/codeenigma/ce-deploy.git
   own_repository_branch: 1.x
   username: deploy
   utility_username: deploy
   local_dir: /home/deploy/ce-deploy
+  ce_provision_dir: /home/ce-dev/ce-provision
