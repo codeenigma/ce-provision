@@ -55,6 +55,7 @@ gitlab:
   omniauth_block_auto_created_users: "true"
   omniauth_login_button_label: "Login with SAML"
   omniauth_consumer_service_url: "https://{{ _domain_name }}/users/auth/saml/callback"
+  omniauth_saml_cert_fingerprint: "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00" # fingerprint of the SAML server's certificate
   omniauth_saml_endpoint_url: https://login.example.com/simplesaml/saml2/idp/SSOService.php # typical endpoint if you followed the SimpleSAMLphp QuickStart - https://simplesamlphp.org/docs/stable/simplesamlphp-idp.html
   omniauth_saml_entity_id: "{{ _domain_name }}" # can be any string, typically just the domain name
   omniauth_saml_attribute_statements: "uid: ['uid']" # typical basic set-up if your SAML authsource is OpenLDAP
