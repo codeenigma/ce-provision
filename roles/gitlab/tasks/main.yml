@@ -8,6 +8,7 @@
     type: "{{ gitlab.gitlab_route_53.type }}"
     value: "{{ gitlab.gitlab_route_53.value }}"
     overwrite: true
+  delegate_to: localhost
   when:
     - gitlab.gitlab_route_53.zone is defined
     - gitlab.gitlab_route_53.zone | length > 0
@@ -21,6 +22,7 @@
     type: CNAME
     value: "{{ gitlab.server_name }}"
     overwrite: true
+  delegate_to: localhost
   when:
     - gitlab.mattermost_route_53.zone is defined
     - gitlab.mattermost_route_53.zone | length > 0
