@@ -1,4 +1,30 @@
 ---
+- name: Add a DNS record for GitLab
+  community.aws.route53:
+    state: "{{ gitlab.gitlab_route_53.state }}"
+    profile: "{{ gitlab.gitlab_route_53.aws_profile }}"
+    zone: "{{ gitlab.gitlab_route_53.zone }}"
+    record: "{{ gitlab.server_name }}"
+    type: "{{ gitlab.gitlab_route_53.type }}"
+    value: "{{ gitlab.gitlab_route_53.value }}"
+    overwrite: true
+  when:
+    - gitlab.gitlab_route_53.zone is defined
+    - gitlab.gitlab_route_53.zone | length > 0
+
+- name: Add a DNS record for Mattermost
+  community.aws.route53:
+    state: "{{ gitlab.mattermost_route_53.state }}"
+    profile: "{{ gitlab.mattermost_route_53.aws_profile }}"
+    zone: "{{ gitlab.mattermost_route_53.zone }}"
+    record: "{{ gitlab.mattermost_url }}"
+    type: CNAME
+    value: "{{ gitlab.server_name }}"
+    overwrite: true
+  when:
+    - gitlab.mattermost_route_53.zone is defined
+    - gitlab.mattermost_route_53.zone | length > 0
+
 - name: Add repository key for Gitlab.
   ansible.builtin.apt_key:
     url: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey

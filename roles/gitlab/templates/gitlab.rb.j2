@@ -1304,13 +1304,13 @@ mattermost['env'] = {
 # mattermost['sql_driver_name'] = 'mysql'
 # mattermost['sql_data_source'] = "mmuser:mostest@tcp(dockerhost:3306)/mattermost_test?charset=utf8mb4,utf8"
 # mattermost['log_file_directory'] = '/var/log/gitlab/mattermost/'
-# mattermost['gitlab_enable'] = false
+# mattermost['gitlab_enable'] = true
 # mattermost['gitlab_id'] = "12345656"
 # mattermost['gitlab_secret'] = "123456789"
 # mattermost['gitlab_scope'] = ""
-# mattermost['gitlab_auth_endpoint'] = "http://gitlab.example.com/oauth/authorize"
-# mattermost['gitlab_token_endpoint'] = "http://gitlab.example.com/oauth/token"
-# mattermost['gitlab_user_api_endpoint'] = "http://gitlab.example.com/api/v4/user"
+# mattermost['gitlab_auth_endpoint'] = "https://{{ gitlab.server_name }}/oauth/authorize"
+# mattermost['gitlab_token_endpoint'] = "https://{{ gitlab.server_name }}/oauth/token"
+# mattermost['gitlab_user_api_endpoint'] = "https://{{ gitlab.server_name }}/api/v4/user"
 # mattermost['file_directory'] = "/var/opt/gitlab/mattermost/data"
 # mattermost['plugin_directory'] = "/var/opt/gitlab/mattermost/plugins"
 # mattermost['plugin_client_directory'] = "/var/opt/gitlab/mattermost/client-plugins"

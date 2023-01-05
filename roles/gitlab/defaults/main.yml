@@ -9,7 +9,16 @@ ldap_client:
 
 gitlab:
   server_name: "gitlab.{{ _domain_name }}"
-  letsencrypt: "true" # use built-in GitLab LetsEncrypt support by default
+  # Add a record for GitLab in AWS Route 53
+  # If you use the aws_ec2_with_eip role to create your server this will not be necessary
+  gitlab_route_53:
+    state: present
+    zone: "" # empty zone skips DNS creation
+    record: "{{ _domain_name }}"
+    type: A # change to CNAME if required
+    value: 1.2.3.4 # set IP if type: A and target hostname if type: CNAME
+    aws_profile: another # Not necessarily the same as the "target" one for the server
+    wildcard: true # Creates a matching wildcard CNAME  letsencrypt: "true" # use built-in GitLab LetsEncrypt support by default
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
     enabled: false
     handling: selfsigned
@@ -27,9 +36,18 @@ gitlab:
   ldap_bindpw: "{{ ldap_client.bindpw }}"
   # Mattermost chat settings
   mattermost: false # enable/disable Mattermost chat
-  mattermost_url: "chat.{{ _domain_name }}" # @todo - create a DNS record
-  mattermost_env_vars: [] # list of environment variables to pass to Mattermost
+  mattermost_url: "chat.{{ _domain_name }}" # unless you use Route 53 integration you must create a DNS record first for LetsEncrypt to work
+  # See the Mattermost docs for possibilities, most Mattermost config options have an environment variable version:
+  # https://docs.mattermost.com/guides/administration.html#get-started
+  mattermost_env_vars: [] # list of environment variables to pass to Mattermost, for example:
+  #  - "'MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL' => 'false'"
   #  - "'MM_ALLOW_UNTRUSTED_INTERNAL_CONNECTIONS_TO' => 'git.example.com'"
+  # Add a CNAME record for Mattermost in AWS Route 53
+  mattermost_route_53:
+    state: present
+    zone: "" # empty zone skips DNS creation
+    aws_profile: another # Not necessarily the same as the "target" one for the server
+    wildcard: false # Creates a matching wildcard CNAME
   # Single sign-on settings
   omniauth: false # enable/disable SAML logins via Omniauth
   omniauth_auto_link_saml_user: "false"
