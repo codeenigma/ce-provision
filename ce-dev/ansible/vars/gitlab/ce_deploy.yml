@@ -1,3 +1,6 @@
+_ce_deploy:
+  username: ce-dev
+
 ce_deploy:
   own_repository: https://github.com/codeenigma/ce-deploy.git
   own_repository_branch: 1.x
