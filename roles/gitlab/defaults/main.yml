@@ -19,8 +19,9 @@ gitlab:
     value: 1.2.3.4 # set IP if type: A and target hostname if type: CNAME
     aws_profile: another # Not necessarily the same as the "target" one for the server
     wildcard: true # Creates a matching wildcard CNAME  letsencrypt: "true" # use built-in GitLab LetsEncrypt support by default
+  letsencrypt: "true" # GitLab's built in SSL handling enabled by default
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
-    enabled: false
+    enabled: false # manual SSL handling disabled by default
     handling: selfsigned
   disable_signup: true
   disable_signin: false
