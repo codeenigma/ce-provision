@@ -1288,7 +1288,6 @@ mattermost['enable'] = "true"
 mattermost['env'] = {
 {% for var in gitlab.mattermost_env_vars %}  {{ var }}{% if not loop.last %},{% endif %}
 {% endfor %}
-
 }
 {% else %}
 # mattermost['env'] = {
