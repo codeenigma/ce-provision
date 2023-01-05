@@ -9,6 +9,7 @@
     value: "{{ gitlab.gitlab_route_53.value }}"
     overwrite: true
   delegate_to: localhost
+  become: false
   when:
     - gitlab.gitlab_route_53.zone is defined
     - gitlab.gitlab_route_53.zone | length > 0
@@ -23,6 +24,7 @@
     value: "{{ gitlab.server_name }}"
     overwrite: true
   delegate_to: localhost
+  become: false
   when:
     - gitlab.mattermost_route_53.zone is defined
     - gitlab.mattermost_route_53.zone | length > 0
