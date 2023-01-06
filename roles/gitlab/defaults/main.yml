@@ -23,6 +23,17 @@ gitlab:
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
     enabled: false # manual SSL handling disabled by default
     handling: selfsigned
+  # Linux setup
+  linux_user: git
+  linux_group: git
+  linux_uid: nil
+  linux_gid: nil
+  linux_shell: /bin/sh
+  linux_user_home: /var/opt/gitlab
+  username: GitLab
+  email: "gitlab@#{node['fqdn']}"
+  # GitLab settings
+  default_theme: 1 # see 'Color theme' under https://gitlab.example.com/-/profile/preferences for options
   disable_signup: true
   disable_signin: false
   private_projects: true
@@ -64,8 +75,10 @@ gitlab:
   node_exporter: "true" # enable/disable built-in Prometheus Node Exporter
   alertmanager: "true" # enable/disable built-in Prometheus Alertmanager
   nginx:
+    enable: true
     listen_port: 443
     listen_https: 443
     client_max_body_size: "250m"
     redirect_http_to_https: "true" # must be enabled if you're using LetsEncrypt above
     redirect_http_to_https_port: 80 # must be 80 if you're using LetsEncrypt above
+    custom_nginx_config: "" # include extra config, for example "include /etc/nginx/conf.d/example.conf;"
