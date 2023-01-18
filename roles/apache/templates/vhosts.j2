@@ -26,8 +26,8 @@ Include "/etc/apache2/conf-available/{{ domain.project_type }}.conf"
 
     {% if server.files_directives is defined %}
     {% for directive in server.files_directives %}
-    {{ directive }}
-    {% endfor %}
+      {{ directive }}
+      {% endfor %}
     {% endif %}
 
     AllowOverride All
