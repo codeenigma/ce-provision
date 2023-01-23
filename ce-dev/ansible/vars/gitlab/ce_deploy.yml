@@ -4,3 +4,4 @@ ce_deploy:
   username: deploy
   utility_username: deploy
   local_dir: /home/deploy/ce-deploy
+  ce_provision_dir: /home/ce-dev/ce-provision
