@@ -17,13 +17,8 @@ for site in ${SITES[@]}; do
   SITESSTRING+=" -d $site"
 done
 
-{% if _ssl_web_server == 'none' %}
 # run certbot
-{{ ssl.certbot_renew_command }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING
-{% else %}
-# run certbot
-{{ ssl.certbot_renew_command }} --http-01-port {{ ssl.http_01_port }} --{{ _ssl_web_server }} --expand$SITESSTRING
-{% endif %}
+{{ ssl.certbot_renew_command }} --{{ _ssl_web_server }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING
 
 # start services again
 {% for service in _ssl_services %}
