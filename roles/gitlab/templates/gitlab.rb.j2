@@ -60,7 +60,7 @@ external_url 'https://{{ gitlab.server_name }}'
 # gitlab_rails['gitlab_username_changing_enabled'] = true
 
 ### Default Theme
-# gitlab_rails['gitlab_default_theme'] = 2
+gitlab_rails['gitlab_default_theme'] = {{ gitlab.default_theme }}
 
 ### Default project feature settings
 # gitlab_rails['gitlab_default_projects_features_issues'] = true
@@ -288,6 +288,8 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 #     admin_group: ''
 #     sync_ssh_keys: false
  EOS
+{% else %}
+gitlab_rails['ldap_enabled'] = false
 {% endif %}
 
 ### Smartcard authentication settings
@@ -298,15 +300,16 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 
 ### OmniAuth Settings
 ###! Docs: https://docs.gitlab.com/ce/integration/omniauth.html
-# gitlab_rails['omniauth_enabled'] = nil
-# gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
+{% if gitlab.omniauth %}
+gitlab_rails['omniauth_enabled'] = true
+gitlab_rails['omniauth_allow_single_sign_on'] = ['saml']
 # gitlab_rails['omniauth_sync_email_from_provider'] = 'saml'
 # gitlab_rails['omniauth_sync_profile_from_provider'] = ['saml']
 # gitlab_rails['omniauth_sync_profile_attributes'] = ['email']
-# gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'saml'
-# gitlab_rails['omniauth_block_auto_created_users'] = true
+gitlab_rails['omniauth_auto_sign_in_with_provider'] = 'saml'
+gitlab_rails['omniauth_block_auto_created_users'] = {{ gitlab.omniauth_block_auto_created_users }}
 # gitlab_rails['omniauth_auto_link_ldap_user'] = false
-# gitlab_rails['omniauth_auto_link_saml_user'] = false
+gitlab_rails['omniauth_auto_link_saml_user'] = {{ gitlab.omniauth_auto_link_saml_user }}
 # gitlab_rails['omniauth_external_providers'] = ['twitter', 'google_oauth2']
 # gitlab_rails['omniauth_providers'] = [
 #   {
@@ -316,6 +319,21 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 #     "args" => { "access_type" => "offline", "approval_prompt" => "" }
 #   }
 # ]
+gitlab_rails['omniauth_providers'] = [
+    name: 'saml',
+    args: {
+             assertion_consumer_service_url: '{{ gitlab.omniauth_consumer_service_url }}',
+             idp_cert_fingerprint: '{{ gitlab.omniauth_saml_cert_fingerprint }}',
+             idp_sso_target_url: '{{ gitlab.omniauth_saml_endpoint_url }}',
+             issuer: '{{ gitlab.omniauth_saml_entity_id }}', # this is the Entity ID in SAML
+             name_identifier_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+             attribute_statements: { {{ gitlab.omniauth_saml_attribute_statements }} }
+           },
+    label: '{{ gitlab.omniauth_login_button_label }}'
+]
+{% else %}
+gitlab_rails['omniauth_enabled'] = false
+{% endif %}
 
 ### Backup Settings
 ###! Docs: https://docs.gitlab.com/omnibus/settings/backups.html
@@ -643,19 +661,19 @@ gitlab_rails['initial_root_password'] = "{{ gitlab.initial_root_password }}"
 ##! Docs: https://docs.gitlab.com/omnibus/settings/configuration.html#changing-the-name-of-the-git-user-group
 ################################################################################
 
-# user['username'] = "git"
-# user['group'] = "git"
-# user['uid'] = nil
-# user['gid'] = nil
+user['username'] = "{{ gitlab.linux_user }}"
+user['group'] = "{{ gitlab.linux_group }}"
+user['uid'] = {{ gitlab.linux_uid }}
+user['gid'] = {{ gitlab.linux_gid }}
 
 ##! The shell for the git user
-# user['shell'] = "/bin/sh"
+user['shell'] = "{{ gitlab.linux_shell }}"
 
 ##! The home directory for the git user
-# user['home'] = "/var/opt/gitlab"
+user['home'] = "{{ gitlab.linux_user_home }}"
 
-# user['git_user_name'] = "GitLab"
-# user['git_user_email'] = "gitlab@#{node['fqdn']}"
+user['git_user_name'] = "{{ gitlab.username }}"
+user['git_user_email'] = "{{ gitlab.email }}"
 
 ################################################################################
 ## GitLab Unicorn
@@ -973,8 +991,9 @@ puma['worker_processes'] = {{ gitlab.puma_worker_processes }}
 ##! Docs: https://docs.gitlab.com/omnibus/settings/nginx.html
 ################################################################################
 
-# nginx['enable'] = true
-# nginx['client_max_body_size'] = '250m'
+{% if gitlab.nginx.enable %}
+nginx['enable'] = true
+nginx['client_max_body_size'] = '{{ gitlab.nginx.client_max_body_size }}'
 nginx['redirect_http_to_https'] = {{ gitlab.nginx.redirect_http_to_https }}
 nginx['redirect_http_to_https_port'] = {{ gitlab.nginx.redirect_http_to_https_port }}
 
@@ -1023,7 +1042,9 @@ nginx['listen_port'] = {{ gitlab.nginx.listen_port }}
 nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 
 # nginx['custom_gitlab_server_config'] = "location ^~ /foo-namespace/bar-project/raw/ {\n deny all;\n}\n"
-# nginx['custom_nginx_config'] = "include /etc/nginx/conf.d/example.conf;"
+{% if (gitlab.nginx.custom_nginx_config | length > 0) %}
+nginx['custom_nginx_config'] = "{{ gitlab.nginx.custom_nginx_config }}"
+{% endif %}
 # nginx['proxy_read_timeout'] = 3600
 # nginx['proxy_connect_timeout'] = 300
 # nginx['proxy_set_headers'] = {
@@ -1084,6 +1105,9 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 #    "deny" => "all" # Deny access to anyone else
 #  }
 # }
+{% else %}
+nginx['enable'] = false
+{% endif %}
 
 ################################################################################
 ## GitLab Logging
@@ -1260,19 +1284,26 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 ## GitLab Mattermost
 ##! Docs: https://docs.gitlab.com/omnibus/gitlab-mattermost
 ################################################################################
+{% if gitlab.mattermost %}
+mattermost_external_url 'https://{{ gitlab.mattermost_url }}'
 
-# mattermost_external_url 'http://mattermost.example.com'
-
-# mattermost['enable'] = false
+mattermost['enable'] = "true"
 # mattermost['username'] = 'mattermost'
 # mattermost['group'] = 'mattermost'
 # mattermost['uid'] = nil
 # mattermost['gid'] = nil
 # mattermost['home'] = '/var/opt/gitlab/mattermost'
 # mattermost['database_name'] = 'mattermost_production'
+{% if (gitlab.mattermost_env_vars | length > 0) %}
+mattermost['env'] = {
+{% for var in gitlab.mattermost_env_vars %}  {{ var }}{% if not loop.last %},{% endif %}
+{% endfor %}
+}
+{% else %}
 # mattermost['env'] = {
 #   'SSL_CERT_DIR' => "/opt/gitlab/embedded/ssl/certs/"
 # }
+{% endif %}
 # mattermost['service_address'] = "127.0.0.1"
 # mattermost['service_port'] = "8065"
 # mattermost['service_site_url'] = nil
@@ -1282,13 +1313,13 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 # mattermost['sql_driver_name'] = 'mysql'
 # mattermost['sql_data_source'] = "mmuser:mostest@tcp(dockerhost:3306)/mattermost_test?charset=utf8mb4,utf8"
 # mattermost['log_file_directory'] = '/var/log/gitlab/mattermost/'
-# mattermost['gitlab_enable'] = false
+# mattermost['gitlab_enable'] = true
 # mattermost['gitlab_id'] = "12345656"
 # mattermost['gitlab_secret'] = "123456789"
 # mattermost['gitlab_scope'] = ""
-# mattermost['gitlab_auth_endpoint'] = "http://gitlab.example.com/oauth/authorize"
-# mattermost['gitlab_token_endpoint'] = "http://gitlab.example.com/oauth/token"
-# mattermost['gitlab_user_api_endpoint'] = "http://gitlab.example.com/api/v4/user"
+# mattermost['gitlab_auth_endpoint'] = "https://{{ gitlab.server_name }}/oauth/authorize"
+# mattermost['gitlab_token_endpoint'] = "https://{{ gitlab.server_name }}/oauth/token"
+# mattermost['gitlab_user_api_endpoint'] = "https://{{ gitlab.server_name }}/api/v4/user"
 # mattermost['file_directory'] = "/var/opt/gitlab/mattermost/data"
 # mattermost['plugin_directory'] = "/var/opt/gitlab/mattermost/plugins"
 # mattermost['plugin_client_directory'] = "/var/opt/gitlab/mattermost/client-plugins"
@@ -1302,6 +1333,10 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 # those settings should be explicitly set. That is, settings given as
 # `nginx['some_setting']` WILL NOT be automatically replicated as
 # `mattermost_nginx['some_setting']` and should be set separately.
+
+# It is not in the docs, but LetsEncrypt should handle this - https://gitlab.com/gitlab-org/omnibus-gitlab/-/issues/5135#note_298654185
+# mattermost_nginx['ssl_certificate'] = "/etc/gitlab/ssl/my.crt"
+# mattermost_nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/my.key"
 
 # Below you can find settings that are exclusive to "Mattermost NGINX"
 # mattermost_nginx['enable'] = false
@@ -1317,7 +1352,7 @@ nginx['listen_https'] = {{ gitlab.nginx.listen_https }}
 #   "Upgrade" => "$http_upgrade",
 #   "Connection" => "$connection_upgrade"
 # }
-
+{% endif %}
 
 ################################################################################
 ## Registry NGINX
