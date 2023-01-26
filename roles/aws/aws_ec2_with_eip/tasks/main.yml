@@ -188,7 +188,6 @@
     in_vpc: true
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
-  when: (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Add a DNS record in route 53
   community.aws.route53:
@@ -202,7 +201,6 @@
   when:
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
-    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Add a matching wildcard DNS record
   community.aws.route53:
@@ -218,7 +216,6 @@
     - aws_ec2_with_eip.route_53.zone | length > 0
     - aws_ec2_with_eip.route_53.wildcard is defined
     - aws_ec2_with_eip.route_53.wildcard
-    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Create EC2 autorecovery alarm.
   ansible.builtin.include_role:
@@ -241,7 +238,6 @@
       dimensions: { "InstanceId": "{{ _aws_ec2_with_eip_instances.instances[0].instance_id }}" }
   when:
     - aws_ec2_with_eip.autorecover
-    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
 
 - name: Assign resource to backup plan.
   ansible.builtin.include_role:
@@ -256,4 +252,3 @@
   when:
     - aws_ec2_with_eip.backup is defined
     - aws_ec2_with_eip.backup | length > 0
-    - (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
