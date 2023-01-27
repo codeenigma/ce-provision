@@ -133,6 +133,7 @@
 - name: Create Postfix Aliases database
   ansible.builtin.command:
     cmd: /usr/bin/newaliases
+    warn: false
 
 - name: Restart Postfix
   ansible.builtin.command:
