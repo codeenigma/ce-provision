@@ -9,5 +9,4 @@ dependencies:
   - role: nodejs
   - role: php-cli
   - role: php-fpm
-  - role: opcache
   - role: nginx
