@@ -1,0 +1,53 @@
+---
+- name: Fetch the Wazuh playbooks and roles.
+  ansible.builtin.git:
+    repo: https://github.com/wazuh/wazuh-ansible.git
+    dest: "{{ wazuh.roles_directory }}"
+    version: "{{ wazuh.version }}"
+    update: true
+  delegate_to: localhost
+
+- name: Generate certificates.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+  delegate_to: localhost
+  vars:
+    indexer_node_master: true
+    instances: "{{ wazuh.indexer_primary }}"
+    perform_installation: false
+  tags:
+    - generate-certs
+
+- name: Install Wazuh indexer.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+  vars:
+    instances: "{{ wazuh.indexer_instances }}"
+  become: true
+
+- name: Delete certs directory to force regeneration.
+  ansible.builtin.file:
+    path: "{{ local_certs_path }}"
+    state: absent
+  delegate_to: localhost
+
+- name: Generate certificates.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+  delegate_to: localhost
+  vars:
+    indexer_node_master: true
+    instances: "{{ wazuh.indexer_primary }}"
+    perform_installation: false
+    #indexer_conf_path: /etc/wazuh-dashboard
+  tags:
+    - generate-certs
+
+- name: Install Wazuh dashboard.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-dashboard
+  vars:
+    single_node: true
+    indexer_network_host: "{{ wazuh.dashboard_host }}"
+    ansible_shell_allow_world_readable_temp: true
+  become: true

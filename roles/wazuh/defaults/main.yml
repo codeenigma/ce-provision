@@ -1,0 +1,15 @@
+---
+wazuh:
+  version: "4.3"
+  roles_directory: "/home/{{ user_provision.username }}/.ansible/roles/wazuh-ansible"
+  indexer_primary:
+    node-1:
+      name: node-1
+      ip: "{{ ansible_default_ipv4.address }}"
+      role: indexer
+  indexer_instances:
+    node-1:
+      name: node-1
+      ip: "{{ ansible_default_ipv4.address }}"
+      role: indexer
+  dashboard_host: "{{ ansible_default_ipv4.address }}"
