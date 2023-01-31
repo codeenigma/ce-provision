@@ -1,7 +1,7 @@
 ---
 - name: Ensure old pip versions are not installed.
   ansible.builtin.apt:
-    pkg: ["python-pip", "python3-pip"]
+    pkg: "{{ python_pip.pip_packages }}"
     state: absent
 
 - name: Ensure python3-distutils is installed.
@@ -30,7 +30,7 @@
   when:
     - pip3_package.rc != 0
 
-- name: Ensure python3 is the default binary.
+- name: "Ensure {{ python_pip.python_binary_path }} is the default binary."
   ansible.builtin.command:
-    cmd: update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+    cmd: update-alternatives --install /usr/bin/python python "{{ python_pip.python_binary_path }}" 1
   become: true
