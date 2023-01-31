@@ -23,7 +23,7 @@
 
 - name: Set up pip3.
   ansible.builtin.include_role:
-    name: python-pip
+    name: python_pip
 
 - name: Ensure Ansible dependencies are installed.
   ansible.builtin.apt:
