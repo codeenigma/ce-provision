@@ -23,7 +23,10 @@
       - xfonts-scalable
     default_release: buster-backports
     state: present
-  when: is_local
+  when:
+    - is_local
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version == "10"
 
 - name: Install Google Chrome "headful" mode dependencies.
   ansible.builtin.apt:
@@ -49,6 +52,8 @@
   when:
     - lhci.enable_vnc
     - is_local
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version == "10"
 
 - name: Install VNC support.
   ansible.builtin.apt:
