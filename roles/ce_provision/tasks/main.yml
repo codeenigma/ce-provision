@@ -154,3 +154,13 @@
   become: true
   become_user: "{{ ce_provision.username }}"
   when: _ce_provision_custom_galaxy_requirements.stat.exists
+
+# These roles are not currently available via Ansible Galaxy.
+- name: Fetch the Wazuh playbooks and roles.
+  ansible.builtin.git:
+    repo: https://github.com/wazuh/wazuh-ansible.git
+    dest: "{{ ce_provision.galaxy_roles_directory }}/wazuh-ansible"
+    update: true
+    version: master
+  become: true
+  become_user: "{{ ce_provision.username }}"
