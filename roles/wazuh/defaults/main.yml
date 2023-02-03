@@ -1,15 +1,22 @@
 ---
 wazuh:
+  #roles_directory: "/path/to/roles" # defaults to /home/controller/.ansible/roles/wazuh-ansible
   version: "4.3"
-  roles_directory: "/home/{{ user_provision.username }}/.ansible/roles/wazuh-ansible"
+  single_node: true
+  minimum_master_nodes: 1
+  indexer_node_master: true
+  indexer_network_host: 127.0.0.1
+  filebeat_node_name: node-1
+  filebeat_output_indexer_hosts:
+    - 127.0.0.1
+  ansible_shell_allow_world_readable_temp: true
   indexer_primary:
     node-1:
       name: node-1
-      ip: "{{ ansible_default_ipv4.address }}"
+      ip: 127.0.0.1
       role: indexer
   indexer_instances:
     node-1:
       name: node-1
-      ip: "{{ ansible_default_ipv4.address }}"
+      ip: 127.0.0.1
       role: indexer
-  dashboard_host: "{{ ansible_default_ipv4.address }}"
