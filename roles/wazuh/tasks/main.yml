@@ -1,0 +1,77 @@
+---
+# Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles.
+- name: Set the Wazuh version branch for the playbooks and roles.
+  ansible.builtin.git:
+    repo: https://github.com/wazuh/wazuh-ansible.git
+    dest: "{{ wazuh.roles_directory | default('/home/' + user_provision.username + '/.ansible/roles/wazuh-ansible') }}"
+    version: "{{ wazuh.version }}"
+    update: true
+  become: true
+  become_user: "{{ user_provision.username }}"
+  delegate_to: localhost
+
+- name: Generate certificates.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+  delegate_to: localhost
+  vars:
+    indexer_node_master: "{{ wazuh.indexer_node_master }}"
+    instances: "{{ wazuh.indexer_primary }}"
+    perform_installation: false
+  tags:
+    - generate-certs
+
+- name: Install Wazuh indexer.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+  vars:
+    single_node: "{{ wazuh.single_node }}"
+    minimum_master_nodes: "{{ wazuh.minimum_master_nodes }}"
+    indexer_node_master: "{{ wazuh.indexer_node_master }}"
+    indexer_network_host: "{{ wazuh.indexer_network_host }}"
+    filebeat_node_name: "{{ wazuh.filebeat_node_name }}"
+    filebeat_output_indexer_hosts: "{{ wazuh.filebeat_output_indexer_hosts }}"
+    instances: "{{ wazuh.indexer_instances }}"
+    ansible_shell_allow_world_readable_temp: true
+    perform_installation: true
+  tags:
+    - install
+
+- name: Install Wazuh Manager.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/ansible-wazuh-manager
+  vars:
+    single_node: "{{ wazuh.single_node }}"
+    minimum_master_nodes: "{{ wazuh.minimum_master_nodes }}"
+    indexer_node_master: "{{ wazuh.indexer_node_master }}"
+    indexer_network_host: "{{ wazuh.indexer_network_host }}"
+    filebeat_node_name: "{{ wazuh.filebeat_node_name }}"
+    filebeat_output_indexer_hosts: "{{ wazuh.filebeat_output_indexer_hosts }}"
+    instances: "{{ wazuh.indexer_instances }}"
+    ansible_shell_allow_world_readable_temp: true
+
+- name: Install Filebeat.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/ansible-filebeat-oss
+  vars:
+    single_node: "{{ wazuh.single_node }}"
+    minimum_master_nodes: "{{ wazuh.minimum_master_nodes }}"
+    indexer_node_master: "{{ wazuh.indexer_node_master }}"
+    indexer_network_host: "{{ wazuh.indexer_network_host }}"
+    filebeat_node_name: "{{ wazuh.filebeat_node_name }}"
+    filebeat_output_indexer_hosts: "{{ wazuh.filebeat_output_indexer_hosts }}"
+    instances: "{{ wazuh.indexer_instances }}"
+    ansible_shell_allow_world_readable_temp: true
+
+- name: Install Wazuh dashboard.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/wazuh/wazuh-dashboard
+  vars:
+    single_node: "{{ wazuh.single_node }}"
+    minimum_master_nodes: "{{ wazuh.minimum_master_nodes }}"
+    indexer_node_master: "{{ wazuh.indexer_node_master }}"
+    indexer_network_host: "{{ wazuh.indexer_network_host }}"
+    filebeat_node_name: "{{ wazuh.filebeat_node_name }}"
+    filebeat_output_indexer_hosts: "{{ wazuh.filebeat_output_indexer_hosts }}"
+    instances: "{{ wazuh.indexer_instances }}"
+    ansible_shell_allow_world_readable_temp: true
