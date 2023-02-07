@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     pkg: [libpam-ldapd, libnss-ldapd]
     state: present
+    update_cache: true
 
 - name: Create certificate directory.
   ansible.builtin.file:
