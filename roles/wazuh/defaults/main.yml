@@ -132,7 +132,7 @@ wazuh:
     install: false # install the dashboard packages
     dashboard_node_name: node-1
     dashboard_server_host: "0.0.0.0"
-    dashboard_server_port: "443"
+    dashboard_server_port: "443" # if you want to use provided SSL certificates install a web server and proxy to Wazuh
     dashboard_server_name: "{{ _domain_name }}"
     dashboard_conf_path: "/etc/wazuh-dashboard/"
     wazuh_api_credentials:
@@ -144,16 +144,3 @@ wazuh:
     dashboard_security: true
     dashboard_user: kibanaserver
     dashboard_password: changeme
-    # Optionally replace the dashboard's self-signed SSL certs, see the `ssl` role for details.
-    # Sample LetsEncrypt config:
-    #ssl:
-    #  domains:
-    #    - "{{ _domain_name }}"
-    #  handling: letsencrypt
-    #  http_01_port: 80
-    #  autorenew: true
-    #  email: sysadm@codeenigma.com
-    #  services:
-    #    - wazuh-dashboard
-    #  certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
-    #  certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
