@@ -15,6 +15,14 @@ wazuh:
     #    api_user: ansible
     #    max_retries: 5
     #    retry_interval: 5
+    # Automated enrolment variables
+    # See docs - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html
+    wazuh_agent_enrollment:
+      enabled: 'yes'
+      agent_name: ''
+      groups: '' # comma-separated list of group names corresponding to `agent_groups` under manager config below
+      agent_address: ''
+      ssl_ciphers: HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH
   # Indexer variables, default to single node mode
   # Role defaults - https://github.com/wazuh/wazuh-ansible/blob/master/roles/wazuh/wazuh-indexer/defaults/main.yml
   indexer:
@@ -74,6 +82,7 @@ wazuh:
     wazuh_manager_email_log_source: alerts.log
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
+    agent_groups: [] # maps to `groups` string in agent config above
     wazuh_manager_extra_emails: [] # list of additional emails to send, e.g.
       #- enable: true
       #  mail_to: 'recipient@example.wazuh.com'

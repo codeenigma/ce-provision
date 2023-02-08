@@ -101,5 +101,11 @@
     name: wazuh-ansible/roles/wazuh/ansible-wazuh-agent
   vars:
     wazuh_managers: "{{ wazuh.agent.managers }}"
+    wazuh_agent_enrollment:
+      enabled: "{{ wazuh.agent.wazuh_agent_enrollment.enabled }}"
+      agent_name: "{{ wazuh.agent.wazuh_agent_enrollment.agent_name }}"
+      groups: "{{ wazuh.agent.wazuh_agent_enrollment.groups }}"
+      agent_address: "{{ wazuh.agent.wazuh_agent_enrollment.agent_address }}"
+      ssl_ciphers: "{{ wazuh.agent.wazuh_agent_enrollment.ssl_ciphers }}"
     ansible_shell_allow_world_readable_temp: true
   when: wazuh.agent.install
