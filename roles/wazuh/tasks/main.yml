@@ -79,16 +79,6 @@
     indexer_security_password: "{{ wazuh.indexer.indexer_admin_password }}"
   when: wazuh.filebeat.install
 
-- name: Generates dashboard SSL keys.
-  ansible.builtin.include_role:
-    name: ssl
-    public: true
-  when:
-    - wazuh.dashboard.install
-    - wazuh.dashboard.ssl is defined
-  vars:
-    ssl: "{{ wazuh.dashboard.ssl }}"
-
 - name: Install Wazuh dashboard.
   ansible.builtin.import_role:
     name: wazuh-ansible/roles/wazuh/wazuh-dashboard
@@ -105,19 +95,6 @@
     indexer_api_protocol: "{{ wazuh.indexer.indexer_api_protocol }}"
     ansible_shell_allow_world_readable_temp: true
   when: wazuh.dashboard.install
-
-- name: Replace self-signed dashboard SSL keys.
-  ansible.builtin.template:
-    src: opensearch_dashboards.yml.j2
-    dest: "{{ wazuh.dashboard.dashboard_conf_path }}/opensearch_dashboards.yml"
-    group: wazuh-dashboard
-    owner: wazuh-dashboard
-    mode: 0640
-    force: yes
-  notify: restart wazuh-dashboard
-  when:
-    - wazuh.dashboard.install
-    - wazuh.dashboard.ssl is defined
 
 - name: Install Wazuh agent.
   ansible.builtin.import_role:
