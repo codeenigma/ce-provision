@@ -1,7 +1,6 @@
 ---
 dependencies:
   - role: _meta/common_base
-  - role: firewall_config
   - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: user_provision
   - role: user_deploy
