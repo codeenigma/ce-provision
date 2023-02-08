@@ -1,0 +1,14 @@
+server.host: {{ wazuh.dashboard.dashboard_server_host }}
+server.port: {{ wazuh.dashboard.dashboard_server_port }}
+opensearch.hosts:
+{% for item in wazuh.indexer.indexer_cluster_nodes %}
+  - https://{{ item }}:{{ wazuh.indexer.indexer_http_port }}
+{% endfor %}
+opensearch.ssl.verificationMode: certificate
+opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+opensearch_security.multitenancy.enabled: false
+opensearch_security.readonly_mode.roles: ["kibana_read_only"]
+server.ssl.enabled: true
+server.ssl.key: "{{ ssl_facts[_ssl_domains[0]].key }}"
+server.ssl.certificate: "{{ ssl_facts[_ssl_domains[0]].certificate }}"
+uiSettings.overrides.defaultRoute: /app/wazuh
