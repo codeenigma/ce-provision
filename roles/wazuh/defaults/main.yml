@@ -18,10 +18,10 @@ wazuh:
     # Automated enrolment variables
     # See docs - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html
     wazuh_agent_enrollment:
-      enabled: 'yes'
-      agent_name: ''
-      groups: '' # comma-separated list of group names corresponding to `agent_groups` under manager config below
-      agent_address: ''
+      enabled: "yes"
+      agent_name: ""
+      groups: "" # comma-separated list of group names corresponding to `agent_groups` under manager config below
+      agent_address: ""
       ssl_ciphers: HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH
   # Indexer variables, default to single node mode
   # Role defaults - https://github.com/wazuh/wazuh-ansible/blob/master/roles/wazuh/wazuh-indexer/defaults/main.yml
