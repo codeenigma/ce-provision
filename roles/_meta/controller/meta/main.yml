@@ -11,4 +11,3 @@ dependencies:
   - role: gpg_key
   - role: pam_ldap
   - role: pam_linotp
-  - role: firewall_config

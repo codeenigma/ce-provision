@@ -119,7 +119,6 @@
 - name: Stop Postfix
   ansible.builtin.command:
     cmd: /usr/sbin/service postfix stop
-    warn: false
 
 - name: Remove trailing lock files.
   ansible.builtin.file:
@@ -139,4 +138,3 @@
 - name: Restart Postfix
   ansible.builtin.command:
     cmd: /usr/sbin/service postfix start
-    warn: false
