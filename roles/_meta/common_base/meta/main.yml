@@ -8,3 +8,4 @@ dependencies:
   - role: rkhunter
   - role: postfix
   - role: clamav
+  - role: firewall_config
