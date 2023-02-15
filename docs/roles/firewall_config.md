@@ -60,6 +60,7 @@ firewall_config:
   firewall_allowed_tcp_ports: [ "22" ] # initially open port 22 so we don't lose connection
   rulesets:
     - ssh_open
+    - web_open
 
   # Ruleset definitions
   # Permitted rule lists
