@@ -5,6 +5,9 @@
 service {{ service }} stop
 {% endfor %}
 
+# Give Nginx more time to stop before certbot
+sleep 5
+
 # build bash array of domains
 SITES=()
 {% for domain in _ssl_domains %}
