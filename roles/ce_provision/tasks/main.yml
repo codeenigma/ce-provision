@@ -164,3 +164,4 @@
     version: master
   become: true
   become_user: "{{ ce_provision.username }}"
+  when: ce_provision.galaxy_roles_directory | length > 0
