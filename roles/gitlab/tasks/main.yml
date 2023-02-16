@@ -67,6 +67,12 @@
     src: gitlab-config.rb.j2
     dest: /etc/gitlab/gitlab-config.rb
 
+- name: Stop Gitlab.
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
+
+- name: Reconfigure Gitlab.
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
+
 - name: Let Gitlab know it's on Docker.
   ansible.builtin.copy:
     content: "gitlab-docker"
@@ -103,15 +109,8 @@
     - is_local is defined
     - is_local
 
-- name: Stop Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
-
-- name: Reconfigure Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
-
-- name: Restart Gitlab.
+- name: Ensure GitLab is started.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
 
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: "gitlab-rails runner /etc/gitlab/gitlab-config.rb"
-  when: gitlab.disable_signup
