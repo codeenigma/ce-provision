@@ -4,6 +4,11 @@
     pkg: postfix
     state: present
 
+- name: Install procmail
+  ansible.builtin.apt:
+    pkg: procmail
+    state: present
+
 - name: Copy master config
   ansible.builtin.copy:
     src: "files/{{ item }}"
