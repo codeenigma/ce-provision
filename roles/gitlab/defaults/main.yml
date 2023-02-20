@@ -39,7 +39,7 @@ gitlab:
   private_projects: true
   unicorn_worker_processes: 2
   puma_worker_processes: 2
-  initial_root_password: ""
+  initial_root_password: "Ch@ng3m3"
   # LDAP settings
   ldap: false # enable/disable LDAP integration
   ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
