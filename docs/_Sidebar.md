@@ -67,5 +67,6 @@
      - [solr](/roles/solr)
      - [SSHD](/roles/ssh_server)
      - [SSL](/roles/ssl)
+     - [sudo config](/roles/sudo_config)
      - [varnish-config](/roles/varnish_config)
      - [wazuh](/roles/wazuh)
