@@ -1,0 +1,5 @@
+---
+sudo_config:
+  entity_name: "" # user or group name, not forgetting to prefix groups with a '%' symbol
+  commands: "ALL" # can also be a comma separated list, see the `squashfs` role for an example
+  filename: "sudoer" # name of config file in /etc/sudoers.d
