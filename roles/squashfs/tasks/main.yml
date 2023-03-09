@@ -11,10 +11,9 @@
     update_cache: true
 
 - name: Allow the deploy user to mount and unmount volumes.
-  ansible.builtin.include_role:
-    name: sudo_config
-  vars:
-    sudo_config:
-      entity_name: "{{ user_deploy.username }}"
-      commands: "/usr/bin/mount, /usr/bin/umount, /usr/sbin/service, /bin/sh"
-      filename: mount
+  ansible.builtin.template:
+    src: sudoers-mount.j2
+    dest: "/etc/sudoers.d/mount"
+    mode: "0600"
+    owner: root
+    group: root
