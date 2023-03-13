@@ -28,7 +28,7 @@ Unattended-Upgrade::Origins-Pattern {
         // archives (e.g. from testing to stable and later oldstable).
         // Software will be the latest available for the named release,
         // but the Debian release itself will not be automatically upgraded.
-{% for origin in apt_extras.apt_unattended_upgrade_origins %}        {{ origin }}
+{% for origin in apt_extras.apt_unattended_upgrade_origins %}        "{{ origin }}";
 {% endfor %}
 };
 
@@ -52,7 +52,7 @@ Unattended-Upgrade::Package-Blacklist {
 
     // For more information about Python regular expressions, see
     // https://docs.python.org/3/howto/regex.html
-{% for package in apt_extras.apt_unattended_blocked_packages %}    {{ package }}
+{% for package in apt_extras.apt_unattended_blocked_packages %}    "{{ package }}";
 {% endfor %}
 };
 
