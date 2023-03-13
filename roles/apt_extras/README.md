@@ -1,4 +1,4 @@
-# Extra packages
+# APT extras
 Provides a wrapper for managing packages through apt. Will replace apt_extra_packages soon.
 <!--TOC-->
 <!--ENDTOC-->
