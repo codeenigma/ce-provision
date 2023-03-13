@@ -1,0 +1,31 @@
+---
+- name: Install additional extra packages.
+  ansible.builtin.apt:
+    pkg: "{{ apt_extras.apt_extra_packages | list }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 240
+  when: apt_extras.apt_extra_packages | length
+
+- name: Install unattended-upgrades package.
+  ansible.builtin.apt:
+    pkg: unattended-upgrades
+    state: present
+  when: apt_extras.apt_unattended_upgrades
+
+- name: Copy unattended-upgrades configuration file.
+  ansible.builtin.template:
+    src: 50unattended-upgrades.j2
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when: apt_extras.apt_unattended_upgrades
+
+- name: Enable and start service unattended-upgrades.
+  ansible.builtin.service:
+    name: unattended-upgrades
+    state: restarted
+    enabled: true
+  when: apt_extras.apt_unattended_upgrades
