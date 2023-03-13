@@ -6,6 +6,7 @@
      - [Ansible](/roles/ansible)
      - [APACHE](/roles/apache)
      - [Extra packages](/roles/apt_extra_packages)
+     - [APT extras](/roles/apt_extras)
      - [AWS Cloudwatch agent](/roles/aws_cloudwatch_agent)
      - [AWS Infrastructure](/roles/aws)
        - [AWS Certificate Manager](/roles/aws/aws_acm)
