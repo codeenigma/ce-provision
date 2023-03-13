@@ -13,9 +13,9 @@ apt_extras:
   # unattended-upgrades template vars.
   # booleans must be strings to avoid Jinja2 interpretting.
   apt_unattended_upgrade_origins:
-    - '"origin=Debian,codename=${distro_codename},label=Debian";'
-    - '"origin=Debian,codename=${distro_codename},label=Debian-Security";'
-  apt_unattended_blocked_packages: [] # list of packages to not upgrade
+    - "origin=Debian,codename=${distro_codename},label=Debian"
+    - "origin=Debian,codename=${distro_codename},label=Debian-Security"
+  apt_unattended_blocked_packages: [] # list of package patterns to not upgrade
   apt_unattended_upgrade_mail: "sysadmins@example.com" # email to send upgrade notifications to
   apt_unattended_upgrade_mail_on_error: "true" # send mail on error only
   apt_remove_unused_dependencies: "false"
