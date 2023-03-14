@@ -8,8 +8,9 @@ ldap_client:
   bindpw: ""
 
 # Adding apt repo to unattended-upgrades config.
+_apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ 'origin=packages.gitlab.com/gitlab/gitlab-ce,codename=${distro_codename},label=gitlab-ce' ] }}"
 apt_unattended_upgrades:
-  origins: "{{ _apt_unattended_upgrades_default_origins + [ 'origin=packages.gitlab.com/gitlab/gitlab-ce,codename=${distro_codename},label=gitlab-ce' ] }}"
+  origins: "{{ _apt_unattended_upgrades_default_origins }}"
 
 gitlab:
   server_name: "gitlab.{{ _domain_name }}"
