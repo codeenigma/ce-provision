@@ -1,0 +1,3 @@
+---
+dependencies:
+  - role: apt_unattended_upgrades
