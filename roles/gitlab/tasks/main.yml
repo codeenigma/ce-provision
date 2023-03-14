@@ -44,6 +44,11 @@
     repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
     state: present
 
+- name: Add GitLab repository to unattended-upgrades.
+  ansible.builtin.include_role:
+    name: apt_unattended_upgrades
+  when: apt_unattended_upgrades.enable
+
 - name: Ensure Gitlab is installed.
   ansible.builtin.apt:
     pkg: "gitlab-ce"
