@@ -20,6 +20,10 @@ ldap_client:
   binddn: ""
   bindpw: ""
 
+# Adding apt repo to unattended-upgrades config.
+apt_unattended_upgrades:
+  origins: "{{ _apt_unattended_upgrades_default_origins + [ 'origin=packages.gitlab.com/gitlab/gitlab-ce,codename=${distro_codename},label=gitlab-ce' ] }}"
+
 gitlab:
   server_name: "gitlab.{{ _domain_name }}"
   # Add a record for GitLab in AWS Route 53
