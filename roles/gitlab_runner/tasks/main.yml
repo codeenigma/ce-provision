@@ -14,6 +14,16 @@
     repo: "deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }} main"
     state: present
 
+- name: Add GitLab Runner repository to unattended-upgrades origins list.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab_runner.apt_origin ] }}"
+  when: apt_unattended_upgrades.enable
+
+- name: Install the unattended-upgrades config.
+  ansible.builtin.include_role:
+    name: apt_unattended_upgrades
+  when: apt_unattended_upgrades.enable
+
 - name: Ensure Gitlab Runner is installed.
   ansible.builtin.apt:
     name: "gitlab-runner"
