@@ -12,6 +12,7 @@ If you want to use AWS ECS with Fargate for orchestrating CI containers then set
 ```yaml
 ---
 gitlab_runner:
+  apt_origin: "origin=packages.gitlab.com/runner/gitlab-runner,codename=${distro_codename},label=gitlab-runner" # used by apt_unattended_upgrades
   concurrent_jobs: 10
   check_interval: 0
   session_timeout: 1800
