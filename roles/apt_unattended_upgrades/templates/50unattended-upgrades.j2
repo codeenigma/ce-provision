@@ -28,7 +28,7 @@ Unattended-Upgrade::Origins-Pattern {
         // archives (e.g. from testing to stable and later oldstable).
         // Software will be the latest available for the named release,
         // but the Debian release itself will not be automatically upgraded.
-{% for origin in apt_extras.apt_unattended_upgrade_origins %}        "{{ origin }}";
+{% for origin in apt_unattended_upgrades.origins %}        "{{ origin }}";
 {% endfor %}
 };
 
@@ -52,7 +52,7 @@ Unattended-Upgrade::Package-Blacklist {
 
     // For more information about Python regular expressions, see
     // https://docs.python.org/3/howto/regex.html
-{% for package in apt_extras.apt_unattended_blocked_packages %}    "{{ package }}";
+{% for package in apt_unattended_upgrades.blocked_packages %}    "{{ package }}";
 {% endfor %}
 };
 
@@ -83,11 +83,11 @@ Unattended-Upgrade::Package-Blacklist {
 // If empty or unset then no email is sent, make sure that you
 // have a working mail setup on your system. A package that provides
 // 'mailx' must be installed. E.g. "user@example.com"
-Unattended-Upgrade::Mail "{{ apt_extras.apt_unattended_upgrade_mail }}";
+Unattended-Upgrade::Mail "{{ apt_unattended_upgrades.mail }}";
 
 // Set this value to "true" to get emails only on errors. Default
 // is to always send a mail if Unattended-Upgrade::Mail is set
-Unattended-Upgrade::MailOnlyOnError "{{ apt_extras.apt_unattended_upgrade_mail_on_error }}";
+Unattended-Upgrade::MailOnlyOnError "{{ apt_unattended_upgrades.mail_on_error }}";
 
 // Remove unused automatically installed kernel-related packages
 // (kernel images, kernel headers and kernel version locked tools).
@@ -98,27 +98,27 @@ Unattended-Upgrade::MailOnlyOnError "{{ apt_extras.apt_unattended_upgrade_mail_o
 
 // Do automatic removal of unused packages after the upgrade
 // (equivalent to apt-get autoremove)
-Unattended-Upgrade::Remove-Unused-Dependencies "{{ apt_extras.apt_remove_unused_dependencies }}";
+Unattended-Upgrade::Remove-Unused-Dependencies "{{ apt_unattended_upgrades.remove_unused_dependencies }}";
 
 // Automatically reboot *WITHOUT CONFIRMATION* if
 //  the file /var/run/reboot-required is found after the upgrade
-Unattended-Upgrade::Automatic-Reboot "{{ apt_extras.apt_automatic_reboot }}";
+Unattended-Upgrade::Automatic-Reboot "{{ apt_unattended_upgrades.automatic_reboot }}";
 
 // Automatically reboot even if there are users currently logged in
 // when Unattended-Upgrade::Automatic-Reboot is set to true
-Unattended-Upgrade::Automatic-Reboot-WithUsers "{{ apt_extras.apt_automatic_reboot_with_users }}";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "{{ apt_unattended_upgrades.automatic_reboot_with_users }}";
 
 // If automatic reboot is enabled and needed, reboot at the specific
 // time instead of immediately
 //  Default: "now"
-Unattended-Upgrade::Automatic-Reboot-Time "{{ apt_extras.apt_automatic_reboot_time }}";
+Unattended-Upgrade::Automatic-Reboot-Time "{{ apt_unattended_upgrades.automatic_reboot_time }}";
 
 // Use apt bandwidth limit feature, this example limits the download
 // speed to 70kb/sec
 //Acquire::http::Dl-Limit "70";
 
 // Enable logging to syslog. Default is False
-Unattended-Upgrade::SyslogEnable "{{ apt_extras.apt_enable_syslog }}";
+Unattended-Upgrade::SyslogEnable "{{ apt_unattended_upgrades.enable_syslog }}";
 
 // Specify syslog facility. Default is daemon
 // Unattended-Upgrade::SyslogFacility "daemon";
