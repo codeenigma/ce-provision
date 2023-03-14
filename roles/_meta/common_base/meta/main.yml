@@ -1,9 +1,9 @@
 ---
 dependencies:
-  - { role: apt_extras_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential"] }
   - role: locales
   - role: user_root
-  - role: apt_extras_packages
+  - role: apt_extra_packages
   - role: apt_unattended_upgrades
   - { role: hosts, when: ( is_local is not defined or not is_local ) }
   - role: rkhunter
