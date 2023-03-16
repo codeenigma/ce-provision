@@ -33,6 +33,8 @@ apt_unattended_upgrades:
     - "origin=MyOtherRepo,codename=bullseye,label=stable"
 ```
 
+To find out what the origin string should look like, you can read the top of the InRelease files to see the components. These files are typically found in `/var/lib/apt/lists/`.
+
 There are no `blocked_packages` by default, but you can define a list of names or patterns to skip unattended upgrades.
 
 ```yaml
