@@ -1,1 +1,1 @@
-{{ sudo_config.entity_name }} ALL=(ALL) NOPASSWD: {{ sudo_config.commands }}
+{{ sudo_config.entity_name }} {{ sudo_config.hosts }}={{ sudo_config.operators }} {{ sudo_config.tags }} {{ sudo_config.commands }}
