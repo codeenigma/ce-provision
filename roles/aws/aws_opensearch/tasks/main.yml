@@ -1,0 +1,40 @@
+- name: Get the current AWS account caller identity information
+  amazon.aws.aws_caller_info:
+    profile: "{{ aws_iam_saml.aws_profile }}"
+  delegate_to: localhost
+  register: _aws_account_info
+
+- name: Create OpenSearch domain.
+  community.aws.opensearch:
+    region: "{{ aws_opensearch.aws_region }}"
+    profile: "{{ aws_opensearch.aws_profile }}"
+    domain_name: "{{ aws_opensearch.domain_name }}"
+    engine_version: "{{ aws_opensearch.engine_version }}"
+    cluster_config:
+      instance_type: "{{ aws_opensearch.instance_type }}"
+      instance_count: "{{ aws_opensearch.instance_count }}"
+      zone_awareness: "{{ aws_opensearch.zone_awareness }}"
+      dedicated_master: "{{ aws_opensearch.dedicated_master }}"
+      availability_zone_count: "{{ aws_opensearch.availability_zone_count }}"
+      dedicated_master_instance_type: "{{ aws_opensearch.dedicated_master_instance_type | default(omit) }}"
+      dedicated_master_instance_count: "{{ aws_opensearch.dedicated_master_instance_count | default(omit) }}"
+      warm_enabled: "{{ aws_opensearch.warm_enabled }}"
+      warm_type: "{{ aws_opensearch.warm_type | default(omit) }}"
+      warm_count: "{{ aws_opensearch.warm_count | default(omit) }}"
+      cold_storage_options:
+        enabled: "{{ aws_opensearch.cold_storage }}"
+    ebs_options:
+      ebs_enabled: true
+      volume_type: "{{ aws_opensearch.volume_type }}"
+      volume_size: "{{ aws_opensearch.volume_size }}"
+    access_policies: "{{ lookup('template', 'policy.json.j2') | from_json }}"
+    vpc_options:
+      subnets: "{{ aws_opensearch.subnets }}"
+      security_groups: "{{ aws_opensearch.security_groups }}"
+    snapshot_options:
+      automated_snapshot_start_hour: "{{ aws_opensearch.automated_snapshot_start_hour }}"
+    auto_tune_options:
+      enabled: "{{ aws_opensearch.auto_tune }}"
+      maintenance_schedules: "{{ aws_opensearch.auto_tune_maintenance_schedules | default(omit) }}"
+    tags: "{{ aws_opensearch.tags }}"
+    wait: true
