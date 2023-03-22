@@ -2,6 +2,8 @@
 
 Install and configure the nginx webserver.
 
+Note, the directives are mostly DENY FIRST so if you're expecting to find config that blocks a certain file extension or pattern you should consider it the other way and ensure that pattern is not *allowed* anywhere.
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -24,6 +26,8 @@ nginx:
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
     ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
+    # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
+    #custom_directives: []
   # Group prefix. Useful for grouping by environments.
   log_group_prefix: ""
   # Main log stream for nginx (Cloudwatch).
@@ -68,9 +72,12 @@ nginx:
         - port: 80
           ssl: false
           https_redirect: true
+          # You can inject custom directives into any server block in any vhost here by providing them as a list of strings.
+          #custom_directives: []
         - port: 443
           ssl: true
           https_redirect: false
+          #custom_directives: []
       upstreams: []
       # upstreams:
       #   - name: 'backend_example'

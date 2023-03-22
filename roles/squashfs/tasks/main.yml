@@ -16,5 +16,8 @@
   vars:
     sudo_config:
       entity_name: "{{ user_deploy.username }}"
+      hosts: "ALL"
+      operators: "(ALL)"
+      tags: "NOPASSWD:"
       commands: "/usr/bin/mount, /usr/bin/umount, /usr/sbin/service, /bin/sh"
       filename: mount
