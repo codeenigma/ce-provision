@@ -15,8 +15,17 @@ If your EFS volume was not created by Ansible or via the console but was created
       group: root
 ```
 
-It uses the "Name" tag for a given volume to retrieve the volume path.
+You cannot retrieve the `creation_token` from the console, you need to use the API, for example:
 
+```
+aws efs describe-file-systems --profile myaccount --region eu-west-1
+```
+
+In the output of listed file systems, for each one you will find an entry like this:
+
+```
+    "CreationToken": "destination-fba829fc-3680-4b7d-be6a-147d02c357b3"
+```
 
 <!--TOC-->
 <!--ENDTOC-->
