@@ -1,6 +1,23 @@
 # EFS client
 Mounts EFS volume(s) to specific mount point(s).
+
+The [`efs_info` role for Ansible](https://docs.ansible.com/ansible/latest/collections/community/aws/efs_info_module.html) searches based on the `creation_token` attribute of a file system. This is usually the same as `name` **but not always!**
+
+If your EFS volume was not created by Ansible or via the console but was created automatically, for example by setting up replication to another region, no matter what you set the human-readable `name` to the `creation_token` will remain a dynamically generated value, such as `destination-5e6b763c-0f8b-4e90-9392-8c83b2453553`. It is the `creation_token` value that matters, **not** `name`, so in this case your mount will need to look like this:
+
+```yaml
+  mounts:
+    - path: /mnt/shared
+      src: destination-5e6b763c-0f8b-4e90-9392-8c83b2453553
+      opts: _netdev
+      state: present
+      owner: root
+      group: root
+```
+
 It uses the "Name" tag for a given volume to retrieve the volume path.
+
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -15,7 +32,7 @@ aws_efs_client:
   # See https://docs.ansible.com/ansible/latest/modules/mount_module.html
   mounts:
     - path: /mnt/shared
-      src: example-efs # Can be the mount "name" or the "id" - if you use "id" set `search_by_id: true`
+      src: example-efs # This is the EFS "creation_token" which is not always "name" - read the role docs carefully!
       opts: _netdev # _netdev tells OS to wait for network before attempting to mount
       state: present
       owner: root
