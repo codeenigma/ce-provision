@@ -9,6 +9,17 @@
   delegate_to: "localhost"
   register: aws_efs_client_efs_volume
 
+- name: Gather EFS information by file system ID.
+  community.aws.efs_info:
+    profile: "{{ aws_efs_client.aws_profile }}"
+    region: "{{ aws_efs_client.region }}"
+    id: "{{ mount.src }}"
+  become: true
+  become_user: "{{ user_provision.username }}"
+  delegate_to: "localhost"
+  register: aws_efs_client_efs_volume
+  when: mount.search_by_id
+
 - name: Make sure mount point exists.
   ansible.builtin.file:
     path: "{{ mount.path }}"
