@@ -9,6 +9,8 @@ Forked from https://github.com/bertvv/ansible-role-hosts
 ## Default variables
 ```yaml
 ---
+hosts_hostname: "" # provide a hostname to manage the system hostname value.
+
 hosts_playbook_version: "1.0.1"
 
 # If set to true, an entry for `ansible_hostname`, bound to the host's default IPv4 address is added added.
