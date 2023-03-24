@@ -15,12 +15,11 @@ aws_efs_client:
   # See https://docs.ansible.com/ansible/latest/modules/mount_module.html
   mounts:
     - path: /mnt/shared
-      src: example-efs # Can be the mount "name" or the "id" - if you use "id" set `search_by_id: true`
+      src: example-efs # This will be translated from the "name"
       opts: _netdev # _netdev tells OS to wait for network before attempting to mount
       state: present
       owner: root
       group: root
-      search_by_id: false # in some circumstances name-based lookup will not work
 
 ```
 
