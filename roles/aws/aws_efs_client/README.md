@@ -20,6 +20,7 @@ aws_efs_client:
       state: present
       owner: root
       group: root
+      search_by_id: false # in some circumstances name-based lookup will not work
 
 ```
 
