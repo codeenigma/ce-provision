@@ -27,6 +27,7 @@ jobs:
           pip3 install ansible ansible-lint
       - name: Run linters.
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        run: |
           find ./roles -name "*.yml"  | xargs ansible-lint
           yamllint ./roles
           cd scripts && shellcheck *.sh
