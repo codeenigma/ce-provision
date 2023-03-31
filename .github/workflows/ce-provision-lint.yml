@@ -9,8 +9,8 @@ jobs:
   run-tests:
     # Name the Job
     name: Lint the codebase
-    # Set the type of machine to run on
-    runs-on: ubuntu-20.04
+    # Set the type of machine to run on (ansible-lint now needs newer Ubuntu)
+    runs-on: ubuntu-22.04
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
@@ -19,12 +19,14 @@ jobs:
         uses: actions/checkout@v2
 
       # Linter checks.
-      - name: Run linters.
+      - name: Prepare linters.
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip yamllint shellcheck
           pip3 install ansible ansible-lint
+      - name: Run linters.
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
           find ./roles -name "*.yml"  | xargs ansible-lint
           yamllint ./roles
           cd scripts && shellcheck *.sh
