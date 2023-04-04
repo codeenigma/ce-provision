@@ -9,6 +9,7 @@ Installs and configures the rkhunter malware scanner.
 ```yaml
 ---
 rkhunter:
+  apt_autogen: "yes" # automatically update the rkhunter database when apt has run - set to "false" to suppress
   report_email_recipient: system@example.com
   warning_email_recipient: ""
   mail_command: 'mail -s "[rkhunter] Warnings found for ${HOST_NAME}"'
