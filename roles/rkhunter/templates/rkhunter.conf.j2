@@ -141,7 +141,7 @@ MAIL-ON-WARNING="{{ rkhunter.warning_email_recipient }}"
 # The default is to use the 'mail' command, with a subject line
 # of '[rkhunter] Warnings found for ${HOST_NAME}'.
 #
-MAIL_CMD="{{ rkhunter.mail_command }}"
+MAIL_CMD={{ rkhunter.mail_command }}
 
 #
 # This option specifies the directory to use for temporary files.
@@ -190,7 +190,7 @@ SCRIPTDIR=/usr/share/rkhunter/scripts
 #
 #BINDIR=/bin /usr/bin /sbin /usr/sbin
 #BINDIR=+/usr/local/bin +/usr/local/sbin
-BINDIR="{{ rkhunter.bin_directory }}"
+BINDIR={{ rkhunter.bin_directory }}
 
 #
 # This option specifies the default language to use. This should be similar to
@@ -229,7 +229,7 @@ UPDATE_LANG="en"
 #
 # The default value is '/var/log/rkhunter.log'.
 #
-LOGFILE="{{ rkhunter.log_file }}"
+LOGFILE={{ rkhunter.log_file }}
 
 #
 # Set this option to '1' if the log file is to be appended to whenever rkhunter
