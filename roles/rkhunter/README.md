@@ -1,3 +1,12 @@
+# rkhunter
+Installs and configures the rkhunter malware scanner.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 rkhunter:
   report_email_recipient: system@example.com
@@ -32,3 +41,6 @@ rkhunter:
   use_locking: "0"
   lock_timeout: "300"
   show_lock_messages: "1"
+```
+
+<!--ENDROLEVARS-->

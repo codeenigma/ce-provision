@@ -65,6 +65,7 @@
      - [Postfix](/roles/postfix)
      - [Process Manager](/roles/process_manager)
      - [Python Pip](/roles/python_pip)
+     - [rkhunter](/roles/rkhunter)
      - [Rsyslog](/roles/rsyslog)
      - [solr](/roles/solr)
      - [SSHD](/roles/ssh_server)
