@@ -4,6 +4,7 @@ rkhunter:
   report_email_recipient: system@example.com
   warning_email_recipient: ""
   mail_command: 'mail -s "[rkhunter] Warnings found for ${HOST_NAME}"'
+  web_command: "curl"
   bin_directory: "/bin /usr/bin /sbin /usr/sbin /usr/local/bin /usr/local/sbin /usr/libexec /usr/local/libexec"
   log_file: /var/log/rkhunter.log
   append_log: "0"
