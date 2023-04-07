@@ -1,10 +1,18 @@
+# rkhunter
+Installs and configures the rkhunter malware scanner.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 rkhunter:
   apt_autogen: "yes" # automatically update the rkhunter database when apt has run - set to "false" to suppress
   report_email_recipient: system@example.com
   warning_email_recipient: ""
   mail_command: 'mail -s "[rkhunter] Warnings found for ${HOST_NAME}"'
-  web_command: "curl"
   bin_directory: "/bin /usr/bin /sbin /usr/sbin /usr/local/bin /usr/local/sbin /usr/libexec /usr/local/libexec"
   log_file: /var/log/rkhunter.log
   append_log: "0"
@@ -34,3 +42,6 @@ rkhunter:
   use_locking: "0"
   lock_timeout: "300"
   show_lock_messages: "1"
+```
+
+<!--ENDROLEVARS-->
