@@ -3,7 +3,7 @@
 
 - name: Add repository key for MySQL repository.
   ansible.builtin.apt_key:
-    keyserver: keyserver.ubuntu.com
+    keyserver: "{{ mysql_server_oracle_ce_key_server }}"
     id: "{{ mysql_server_oracle_ce_key }}"
     state: present
 
