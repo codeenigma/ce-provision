@@ -2,7 +2,10 @@
 #@todo Configuration is for dev.
 
 - name: Add repository key for MySQL repository.
-  ansible.builtin.apt_key: keyserver=keyserver.ubuntu.com id=A4A9406876FCBD3C456770C88C718D3B5072E1F5 state=present
+  ansible.builtin.apt_key:
+    keyserver: "{{ mysql_server_oracle_ce_key_server }}"
+    id: "{{ mysql_server_oracle_ce_key }}"
+    state: present
 
 - name: Add repository for MySQL.
   ansible.builtin.apt_repository: "repo='deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-5.7' state=present"
