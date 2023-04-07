@@ -121,11 +121,13 @@
   ansible.builtin.service:
     name: nslcd
     state: restarted
+  when: ansible_facts.services['nslcd.service'] is defined
 
 - name: Restart nscd service.
   ansible.builtin.service:
     name: nscd
     state: restarted
+  when: ansible_facts.services['nscd.service'] is defined
 
 - name: Restart SSH service.
   ansible.builtin.service:

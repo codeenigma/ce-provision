@@ -55,6 +55,7 @@
        - [AWS region](/roles/_meta/aws_region)
      - [Mount sync](/roles/mount_sync)
      - [MariaDB Client](/roles/mysql_client)
+     - [MySQL Server - Oracle Community Edition](/roles/mysql_server_oracle_ce)
      - [NGINX](/roles/nginx)
      - [NodeJS](/roles/nodejs)
      - [OpenVPN Config](/roles/openvpn_config)
