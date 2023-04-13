@@ -1,5 +1,5 @@
 - name: Create Security Group.
-  amazon.aws.ec2_group:
+  amazon.aws.ec2_security_group:
     name: "{{ security_group.name }}"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
