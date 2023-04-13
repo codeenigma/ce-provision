@@ -30,7 +30,7 @@ server {
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
     include "/etc/nginx/conf.d/_common";
 {% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' %}
-{% if domain.ssl.web_server | default('none') == 'none' %}
+{% if domain.ssl.web_server | default('standalone') == 'standalone' %}
     # Proxy for certbot (LetsEncrypt)
     location /.well-known/acme-challenge/ {
         auth_basic off;
