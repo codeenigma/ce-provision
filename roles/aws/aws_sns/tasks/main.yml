@@ -1,6 +1,6 @@
 ---
 - name: Create an SNS topic and subscription.
-  sns_topic:
+  community.aws.sns_topic:
     name: "{{ aws_sns.name }}"
     region: "{{ aws_sns.region }}"
     state: "present"
@@ -24,7 +24,7 @@
     - aws_sns.policy is not defined or aws_sns.policy | length == 0
 
 - name: Create an SNS topic and subscription with custom policy.
-  sns_topic:
+  community.aws.sns_topic:
     name: "{{ aws_sns.name }}"
     region: "{{ aws_sns.region }}"
     state: "present"

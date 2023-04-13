@@ -63,7 +63,7 @@
   when: ce_deploy.config_repository is defined and ce_deploy.config_repository
 
 - name: Synchronize config directory.
-  synchronize:
+  ansible.posix.synchronize:
     src: "{{ _ce_provision_build_tmp_dir }}/config"
     dest: "{{ ce_deploy.local_dir }}/"
     delete: true

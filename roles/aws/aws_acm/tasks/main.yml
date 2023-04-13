@@ -108,7 +108,7 @@
     - aws_acm.validate
 
 - name: Obtain all information for a the new ACM certificate.
-  community.aws.aws_acm_info:
+  community.aws.acm_certificate_info:
     region: "{{ aws_acm.region }}"
     profile: "{{ aws_acm.aws_profile }}"
     domain_name: "{{ aws_acm.domain_name }}"
@@ -139,7 +139,7 @@
     - aws_acm.validate
 
 - name: Add a DNS records in Route 53 for validation.
-  community.aws.route53:
+  amazon.aws.route53:
     state: present
     profile: "{{ item.aws_profile }}"
     zone: "{{ item.zone }}"
