@@ -7,7 +7,7 @@ aws_vpc_route:
   #   Name: "example"
   vpc_id: vpc-XXX
   # subnet_id: subnet-XXX # Optional. If omitted, the role will target the "main" route for the VPC. Else a route will be created for the subnets.
-  # See https://docs.ansible.com/ansible/latest/modules/ec2_vpc_route_table_module.html#parameter-routes
+  # See https://docs.ansible.com/ansible/latest/collections/amazon/aws/ec2_vpc_route_table_module.html#parameter-routes
   routes:
     - dest: "10.0.0.0/16" # CIDR block for the route.
       gateway_id: igw-XXX

@@ -1,5 +1,5 @@
 - name: Create DB subnet
-  community.aws.rds_subnet_group:
+  amazon.aws.rds_subnet_group:
     name: "{{ aws_rds.name }}"
     state: "{{ aws_rds.state }}"
     subnets: "{{ aws_rds.subnets }}"
@@ -19,7 +19,7 @@
     loop_var: security_group
 
 - name: Create RDS parameter group
-  community.aws.rds_param_group:
+  amazon.aws.rds_param_group:
     state: present
     name: "{{ aws_rds.db_parameter_group_name }}"
     profile: "{{ aws_rds.aws_profile }}"
@@ -33,7 +33,7 @@
     - aws_rds.db_parameters | length > 0
 
 - name: Create Aurora RDS instance.
-  community.aws.rds_instance:
+  amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
@@ -53,7 +53,7 @@
   when: "'aurora' in aws_rds.engine"
 
 - name: Create Aurora RDS reader instance.
-  community.aws.rds_instance:
+  amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}-reader"
     db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
@@ -74,7 +74,7 @@
     - aws_rds.aurora_reader
 
 - name: Create RDS instance
-  community.aws.rds_instance:
+  amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
