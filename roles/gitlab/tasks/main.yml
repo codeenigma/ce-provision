@@ -1,6 +1,6 @@
 ---
 - name: Add a DNS record for GitLab
-  community.aws.route53:
+  amazon.aws.route53:
     state: "{{ gitlab.gitlab_route_53.state }}"
     profile: "{{ gitlab.gitlab_route_53.aws_profile }}"
     zone: "{{ gitlab.gitlab_route_53.zone }}"
@@ -15,7 +15,7 @@
     - gitlab.gitlab_route_53.zone | length > 0
 
 - name: Add a DNS record for Mattermost
-  community.aws.route53:
+  amazon.aws.route53:
     state: "{{ gitlab.mattermost_route_53.state }}"
     profile: "{{ gitlab.mattermost_route_53.aws_profile }}"
     zone: "{{ gitlab.mattermost_route_53.zone }}"

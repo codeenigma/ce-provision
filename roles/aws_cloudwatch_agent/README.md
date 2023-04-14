@@ -2,7 +2,7 @@
 
 Install and configure the cloudwatch agent.
 Note that retention policies can not be set here,
-you will have to use the `community.aws.cloudwatchlogs_log_group`
+you will have to use the `amazon.aws.cloudwatchlogs_log_group`
 module in your playbooks.
 
 <!--TOC-->

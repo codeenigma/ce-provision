@@ -25,6 +25,6 @@
     - _subscription_exists.stdout == "null"
 
 - name: Tidy up and remove the yaml input file.
-  file:
+  ansible.builtin.file:
     path: "/tmp/aws_backup/{{ _infra_name }}/subscribe-yaml-input.yml"
     state: absent
