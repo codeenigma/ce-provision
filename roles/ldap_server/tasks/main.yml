@@ -130,6 +130,12 @@
     ssl: "{{ ldap_server.ssl }}"
 
 # LetsEncrypt handling - see https://serverfault.com/a/864655
+- name: Ensure letsencrypt group exists.
+  ansible.builtin.group:
+    name: letsencrypt
+    state: present
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
 - name: Create user for LetsEncrypt.
   ansible.builtin.user:
     name: letsencrypt

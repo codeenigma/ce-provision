@@ -27,3 +27,8 @@ done
 {% for service in _ssl_services %}
 service {{ service }} start
 {% endfor %}
+
+# reload dependent services
+{% for service in ssl.reload %}
+service {{ service }} {{ ssl.reload_command }}
+{% endfor %}

@@ -72,7 +72,7 @@
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
     acm request-certificate \
     --domain-name "{{ aws_acm.domain_name }}" \
-    --subject-alternative-names "{{ _acm_san_domains | join(' ') }}" \
+    --subject-alternative-names {{ _acm_san_domains | join(' ') }} \
     --validation-method DNS \
     --tags {{ _aws_tags_string }}
   register: _aws_acm_new_san_certificate

@@ -132,4 +132,9 @@
     append: true
   when: gitlab_runner.install_fargate
 
-# @todo: delete $HOME/.bash_logout for the runner user if it exists
+# See https://docs.gitlab.com/runner/shells/index.html#shell-profile-loading
+- name: Delete $HOME/.bash_logout for the runner user if it exists.
+  ansible.builtin.file:
+    path: "/home/{{ gitlab_runner.username }}/.bash_logout"
+    state: absent
+  become: true

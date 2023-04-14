@@ -59,8 +59,12 @@ nginx:
         # autorenew: true
         # email: sysadm@codeenigma.com
         # services: []
-        # certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
-        # certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
+        # web_server: standalone
+        # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
+        # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+        # reload_command: reload
+        # reload:
+        #   - nginx
       ratelimitingcrawlers: true
       is_default: true
       basic_auth:
