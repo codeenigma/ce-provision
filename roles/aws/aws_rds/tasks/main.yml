@@ -161,7 +161,7 @@
         "DBInstanceIdentifier": "{{ _rds_instance_info.db_instance_identifier }}"
   with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
   when:
-    - aws_rds.rds_cloudwatch_alarms
+    - aws_rds.rds_cloudwatch_alarms | length > 0
     - _rds_instance_info.db_instance_identifier is defined
 
 - name: Create Aurora RDS CloudWatch alarms.
@@ -187,7 +187,7 @@
         "DBInstanceIdentifier": "{{ _rds_instance_info_aurora.db_instance_identifier }}"
   with_items: "{{ aws_rds.rds_cloudwatch_alarms }}"
   when:
-    - aws_rds.rds_cloudwatch_alarms
+    - aws_rds.rds_cloudwatch_alarms | length > 0
     - _rds_instance_info_aurora.db_instance_identifier is defined
 
 - name: (Re) set facts for instance.

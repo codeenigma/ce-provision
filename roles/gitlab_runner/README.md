@@ -48,7 +48,7 @@ gitlab_runner:
   # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
   fargate:
     cluster: "my-cluster" # ECS cluster name
-    region: "{{ _aws_region }}"
+    region: "eu-west-1" # AWS region name
     subnet: "subnet-abcdef123456" # subnet ID
     security_group: "sg-abcdef123456" # SG ID
     task_definition: "my-task:1" # task definition in format name:revision, if revision is not provided ECS will use latest

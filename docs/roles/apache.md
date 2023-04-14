@@ -52,6 +52,18 @@ apache:
       ssl: # @see the 'ssl' role.
         domain: "{{ _domain_name }}"
         handling: selfsigned
+        # Sample LetsEncrypt config, because include_role will not merge defaults these all need providing:
+        # handling: letsencrypt
+        # http_01_port: 5000
+        # autorenew: true
+        # email: sysadm@codeenigma.com
+        # services: []
+        # web_server: standalone
+        # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
+        # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+        # reload_command: reload
+        # reload:
+        #   - apache
       is_default: true
       basic_auth:
         auth_enabled: false

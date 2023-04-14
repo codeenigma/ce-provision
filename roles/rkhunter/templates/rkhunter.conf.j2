@@ -141,7 +141,7 @@ MAIL-ON-WARNING="{{ rkhunter.warning_email_recipient }}"
 # The default is to use the 'mail' command, with a subject line
 # of '[rkhunter] Warnings found for ${HOST_NAME}'.
 #
-#MAIL_CMD=mail -s "[rkhunter] Warnings found for ${HOST_NAME}"
+MAIL_CMD={{ rkhunter.mail_command }}
 
 #
 # This option specifies the directory to use for temporary files.
@@ -190,6 +190,7 @@ SCRIPTDIR=/usr/share/rkhunter/scripts
 #
 #BINDIR=/bin /usr/bin /sbin /usr/sbin
 #BINDIR=+/usr/local/bin +/usr/local/sbin
+BINDIR={{ rkhunter.bin_directory }}
 
 #
 # This option specifies the default language to use. This should be similar to
@@ -228,7 +229,7 @@ UPDATE_LANG="en"
 #
 # The default value is '/var/log/rkhunter.log'.
 #
-LOGFILE=/var/log/rkhunter.log
+LOGFILE={{ rkhunter.log_file }}
 
 #
 # Set this option to '1' if the log file is to be appended to whenever rkhunter
@@ -237,7 +238,7 @@ LOGFILE=/var/log/rkhunter.log
 #
 # The default value is '0'.
 #
-#APPEND_LOG=0
+APPEND_LOG={{ rkhunter.append_log }}
 
 #
 # Set the following option to '1' if the log file is to be copied when rkhunter
@@ -249,7 +250,7 @@ LOGFILE=/var/log/rkhunter.log
 #
 # The default value is '0'.
 #
-#COPY_LOG_ON_ERROR=0
+COPY_LOG_ON_ERROR={{ rkhunter.copy_log_on_error }}
 
 #
 # Set the following option to enable the rkhunter check start and finish times
@@ -264,7 +265,7 @@ LOGFILE=/var/log/rkhunter.log
 #
 # The default value is not to use syslog.
 #
-USE_SYSLOG=authpriv.warning
+USE_SYSLOG={{ rkhunter.use_syslog }}
 
 #
 # Set the following option to '1' if the second colour set is to be used. This
@@ -303,7 +304,7 @@ AUTO_X_DETECT=1
 #
 # The default value is 'no'.
 #
-#ALLOW_SSH_ROOT_USER=no
+ALLOW_SSH_ROOT_USER={{ rkhunter.allow_ssh_root_user }}
 
 #
 # Set this option to '1' to allow the use of the SSH-1 protocol, but note
@@ -830,7 +831,7 @@ ALLOWDEVFILE={{ item }}
 #
 # The default value is '0'.
 #
-#ALLOW_SYSLOG_REMOTE_LOGGING=0
+ALLOW_SYSLOG_REMOTE_LOGGING={{ rkhunter.allow_system_remote_logging }}
 
 #
 # This option allows the specified applications, or a specific version of an
@@ -865,7 +866,7 @@ ALLOWDEVFILE={{ item }}
 #
 # The default value is the '/tmp' and '/var/tmp' directories.
 #
-#SUSPSCAN_DIRS=/tmp /var/tmp
+SUSPSCAN_DIRS={{ rkhunter.supscan_directories }}
 
 #
 # This option specifies the directory for temporary files used by the
@@ -884,7 +885,7 @@ ALLOWDEVFILE={{ item }}
 #
 # The default value is '1024000'.
 #
-#SUSPSCAN_MAXSIZE=10240000
+SUSPSCAN_MAXSIZE={{ rkhunter.supscan_maxsize }}
 
 #
 # This option specifies the 'suspscan' test score threshold. Below this value
@@ -892,7 +893,7 @@ ALLOWDEVFILE={{ item }}
 #
 # The default value is '200'.
 #
-#SUSPSCAN_THRESH=200
+SUSPSCAN_THRESH={{ rkhunter.supscan_threshold }}
 
 #
 # The following options can be used to whitelist network ports which are known
@@ -1095,7 +1096,7 @@ ALLOWDEVFILE={{ item }}
 #
 # This option has no default value.
 #
-WEB_CMD="/bin/false"
+WEB_CMD="{{ rkhunter.web_command }}"
 
 #
 # Set the following option to '1' if locking is to be used when rkhunter runs.
@@ -1111,7 +1112,7 @@ WEB_CMD="/bin/false"
 #
 # Also see the LOCK_TIMEOUT and SHOW_LOCK_MSGS options.
 #
-#USE_LOCKING=0
+USE_LOCKING={{ rkhunter.use_locking }}
 
 #
 # If locking is used, then rkhunter may have to wait to get the lock file.
@@ -1121,7 +1122,7 @@ WEB_CMD="/bin/false"
 #
 # The default value is 300 seconds (5 minutes).
 #
-#LOCK_TIMEOUT=300
+LOCK_TIMEOUT={{ rkhunter.lock_timeout }}
 
 #
 # If locking is used, then rkhunter may be doing nothing for some time if it
@@ -1132,7 +1133,7 @@ WEB_CMD="/bin/false"
 #
 # The default value is '1'.
 #
-#SHOW_LOCK_MSGS=1
+SHOW_LOCK_MSGS={{ rkhunter.show_lock_messages }}
 
 #
 # If this option is set to 'THOROUGH' then rkhunter will search (on a per
