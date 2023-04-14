@@ -1,6 +1,6 @@
 ---
 - name: Add Jitsi key.
-  ansible.builtin.shell: wget -q -O - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add -
+  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add -"
 
 - name: Install Jitsi repo.
   ansible.builtin.apt_repository:

@@ -1,15 +1,15 @@
 skip_list:
-  - '204'
-  - '301'
-  - '701'
-  - '306'
-  - '303'
+  - '204' # Lines should be no longer than 160 chars
+  - '301' # Commands should not changei things if nothing needs doing
+  - '303' # Using command rather than module
+  - '701' # 701 No 'galaxy_info' found
   - unnamed-task
   - risky-file-permissions
   - role-name
   - no-handler
   - var-naming
   - no-jinja-nesting
-  - command-instead-of-module
+  - command-instead-of-module # dupe of '303'?
+  - fqcn-builtins
   - template-instead-of-copy # to skip over roles/ssl/tasks/copy.yml errors, temporarily.
   - name[template] # it doesn't like Jinja templates being in the middle of a task name, which seems silly to me.
