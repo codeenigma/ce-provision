@@ -19,7 +19,7 @@
   when: _process_manager_running_processes.stdout_lines | length > 0
 
 - name: "Check {{ process_manager.process_name }} processes."
-  wait_for:
+  ansible.builtin.wait_for:
     path: "/proc/{{ item }}/status"
     state: absent
   with_items: "{{ _process_manager_running_processes.stdout_lines }}"
