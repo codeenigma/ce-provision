@@ -39,10 +39,15 @@ ssl:
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
-  # eg;
+  # List of services to be stopped during renewal, e.g.
   # services:
   #   - nginx
   services: []
+  # When certificates get renewed on a schedule you also need to reload any dependent services, such as your web server.
+  # List of services to reload:
+  reload: []
+  reload_command: reload # if 'reload' is not strong enough you could change this to 'restart'
+
 ############ Facts
 # ssl_facts
 # A dict of domain names with key/cert destination paths.

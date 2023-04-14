@@ -44,6 +44,16 @@
     repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
     state: present
 
+- name: Add GitLab repository to unattended-upgrades origins list.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab.apt_origin ] }}"
+  when: apt_unattended_upgrades.enable
+
+- name: Install the unattended-upgrades config.
+  ansible.builtin.include_role:
+    name: apt_unattended_upgrades
+  when: apt_unattended_upgrades.enable
+
 - name: Ensure Gitlab is installed.
   ansible.builtin.apt:
     pkg: "gitlab-ce"
@@ -66,6 +76,12 @@
   ansible.builtin.template:
     src: gitlab-config.rb.j2
     dest: /etc/gitlab/gitlab-config.rb
+
+- name: Stop Gitlab.
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
+
+- name: Reconfigure Gitlab.
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
 
 - name: Let Gitlab know it's on Docker.
   ansible.builtin.copy:
@@ -103,15 +119,8 @@
     - is_local is defined
     - is_local
 
-- name: Stop Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
-
-- name: Reconfigure Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
-
-- name: Restart Gitlab.
+- name: Ensure GitLab is started.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
 
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: "gitlab-rails runner /etc/gitlab/gitlab-config.rb"
-  when: gitlab.disable_signup
