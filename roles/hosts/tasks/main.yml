@@ -25,3 +25,12 @@
     line: "manage_etc_hosts: false"
   when:
     - cloud_init_file.stat.exists
+
+- name: Set system hostname.
+  ansible.builtin.template:
+    src: hostname.j2
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: 0644
+  when: hosts_hostname | length > 0
