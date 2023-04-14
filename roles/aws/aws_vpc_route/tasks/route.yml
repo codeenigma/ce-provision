@@ -1,7 +1,7 @@
 # @todo there are more properties than that.
 # AWS API supports: gatewayId, natGatewayId, networkInterfaceId, vpcPeeringConnectionId, egressOnlyInternetGatewayId, transitGatewayId, localGatewayId, instanceId.
 - name: Normalize route.
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_vpc_route_route:
       dest: "{{ route.destination_ipv6_cidr_block if route.destination_ipv6_cidr_block is defined else route.destination_cidr_block }}"
       gateway_id: "{{ route.gateway_id | default(omit) }}"
@@ -11,6 +11,6 @@
       instance_id: "{{ route.instance_id | default(omit) }}"
 
 - name: Add route to the list.
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_vpc_route_routes: "{{ _aws_vpc_route_routes | combine( { _aws_vpc_route_route.dest:  _aws_vpc_route_route } ) }}"
   when: ( route.gateway_id is undefined or route.gateway_id != 'local' )

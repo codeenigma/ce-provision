@@ -1,8 +1,8 @@
 ---
-- set_fact:
+- ansible.builtin.set_fact:
     _ldap_server_bind_pwd: "{{ ldap_server.replication.bind_pwd | default(lookup('password', '/dev/null'), true) }}"
 
-- set_fact:
+- ansible.builtin.set_fact:
     _ldap_server_bind_pwd_hash: "{{ '{{ _ldap_server_bind_pwd }}' | password_hash('sha512') }}"
 
 - name: Check for existence of bind user on host.

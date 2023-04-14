@@ -1,7 +1,7 @@
 # @todo Once the ec2_eip module is fixed, we can get rid of most of the logic below.
 # For now, we register and manually tag the EIP with ec2_tag.
 - name: Check if we have an EIP already.
-  ec2_eip_info:
+  amazon.aws.ec2_eip_info:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"
     filters:
@@ -9,7 +9,7 @@
   register: _aws_vpc_subnet_eip
 
 - name: Create the NAT gateway.
-  ec2_vpc_nat_gateway:
+  amazon.aws.ec2_vpc_nat_gateway:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"
     tags: "{{ aws_vpc_subnet.tags | combine({ 'Name': subnet.name }) }}"
@@ -20,7 +20,7 @@
   register: _aws_vpc_subnet_gateway
 
 - name: Ensure EIP is tagged properly.
-  ec2_tag:
+  amazon.aws.ec2_tag:
     resource: "{{ _aws_vpc_subnet_gateway.nat_gateway_addresses[0].allocation_id }}"
     tags: "{{ aws_vpc_subnet.tags | combine({ 'Name': subnet.name }) }}"
     profile: "{{ aws_vpc_subnet.aws_profile }}"

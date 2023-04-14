@@ -58,6 +58,6 @@ aws_elb:
   listeners_https:
     default_target_group: "example-target-group" # must match a name provided in target_groups
     rules: []
-  # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
+  # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/amazon/aws/elb_application_lb_module.html
   listeners: []
   elb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ELB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
