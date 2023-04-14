@@ -296,7 +296,7 @@
     step_adjustments: "{{ item.step_adjustments }}"
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies
-    - "{{ item.policy_type == 'StepScaling' }}"
+    - item.policy_type == 'StepScaling'
   register: _aws_ec2_autoscale_cluster_step_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
@@ -313,7 +313,7 @@
     cooldown: "{{ item.cooldown }}"
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies
-    - "{{ item.policy_type == 'SimpleScaling' }}"
+    - item.policy_type == 'SimpleScaling'
   register: _aws_ec2_autoscale_cluster_simple_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
@@ -506,7 +506,7 @@
     _aws_ec2_autoscale_cluster_alb_listener_ARN: "{{ item.listener_arn }}"
   when:
     - aws_ec2_autoscale_cluster.create_elb
-    - "{{ item.port == 443 }}"
+    - item.port == 443
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - _ssl_certificate_ARN | length > 1
   with_items: "{{ _aws_ec2_autoscale_cluster_alb.listeners }}"
