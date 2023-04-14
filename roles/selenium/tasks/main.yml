@@ -85,7 +85,7 @@
   when: selenium.display_manager == "VNC"
 
 - name: Generate VNC password.
-  ansible.builtin.shell: "echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
+  ansible.builtin.shell: "set -o pipefail && echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
   become: true
   become_user: "{{ user_deploy.username }}"
   when: selenium.display_manager == "VNC"
