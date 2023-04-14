@@ -14,7 +14,7 @@
   ansible.builtin.command:
     cmd: which pip3
   register: pip3_package
-  ignore_errors: true
+  failed_when: false
 
 - name: Fetch Pip installer.
   ansible.builtin.get_url:

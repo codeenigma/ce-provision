@@ -111,7 +111,7 @@
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
-  ignore_errors: true
+  failed_when: false
   register: _include_commit
   when:
     - _saml_include_template is not skipped
@@ -148,7 +148,7 @@
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
-  ignore_errors: true
+  failed_when: false
   register: _sp_commit
   when:
     - _saml_sp_template is succeeded
