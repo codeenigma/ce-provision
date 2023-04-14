@@ -14,5 +14,5 @@ apt_unattended_upgrades:
   remove_unused_dependencies: "false"
   automatic_reboot: "false"
   automatic_reboot_with_users: "false" # reboot even if users are logged in
-  automatic_reboot_time: "02:00"  
+  automatic_reboot_time: "02:00"
   enable_syslog: "false" # make apt log upgrades to syslog as well as apt history

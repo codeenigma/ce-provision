@@ -1,5 +1,5 @@
 ---
-- name: Ensure "locales" is installed.
+- name: Ensure locales package is installed.
   ansible.builtin.apt:
     pkg: "locales"
     state: present
@@ -17,7 +17,7 @@
     src: "locale.j2"
     dest: "/etc/default/locale"
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:
@@ -30,7 +30,7 @@
   ansible.builtin.command: "/usr/sbin/locale-gen"
   when: locales_gen_changed.changed
 
-- name: Set timezone
-  timezone:
+- name: Set timezone.
+  community.general.timezone:
     name: "{{ locales.timezone }}"
   when: not is_local is defined or not is_local

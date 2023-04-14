@@ -10,7 +10,7 @@
   register: _aws_vpc_vpc
 
 - name: Ensure default Security group is tagged.
-  amazon.aws.ec2_group:
+  amazon.aws.ec2_security_group:
     name: "default"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"

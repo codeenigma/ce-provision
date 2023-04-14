@@ -9,7 +9,7 @@
   register: aws_ami_running_instances
 
 - name: Create a Security Group to access the controller.
-  amazon.aws.ec2_group:
+  amazon.aws.ec2_security_group:
     profile: "{{ aws_ami.aws_profile }}"
     region: "{{ aws_ami.region }}"
     name: "{{ aws_ami.repack.cluster_name }}-repacker"

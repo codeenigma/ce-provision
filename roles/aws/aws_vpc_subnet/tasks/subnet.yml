@@ -3,7 +3,7 @@
     msg: "{{ _aws_vpc_subnet_vpc }}"
 
 - name: Set IPv6 subnet CIDR.
-  set_fact:
+  ansible.builtin.set_fact:
     _ipv6_subnet_cidr: "{{ _aws_vpc_subnet_vpc.vpcs[0].ipv6_cidr_block_association_set[0].ipv6_cidr_block | ipsubnet(64, subnet.ipv6_cidr_block) }}"
   when:
     - subnet.ipv6_cidr_block is defined
@@ -17,7 +17,7 @@
     - subnet.ipv6_cidr_block | length > 0
 
 - name: Create VPC subnet.
-  ec2_vpc_subnet:
+  amazon.aws.ec2_vpc_subnet:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     cidr: "{{ subnet.cidr_block }}"
     ipv6_cidr: "{{ _ipv6_subnet_cidr if subnet.ipv6_cidr_block is defined and subnet.ipv6_cidr_block | length > 0 else '' }}"
@@ -30,11 +30,11 @@
   register: _aws_vpc_subnet_subnet
 
 - name: Create VPC ipv4 gateway.
-  include_tasks: "gateway.ipv4.nat.yml"
+  ansible.builtin.include_tasks: "gateway.ipv4.nat.yml"
   when: subnet.nat_ipv4 is defined and subnet.nat_ipv4
 
 - name: Create matching Security Group.
-  ec2_group:
+  amazon.aws.ec2_security_group:
     name: "{{ subnet.name }}"
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"

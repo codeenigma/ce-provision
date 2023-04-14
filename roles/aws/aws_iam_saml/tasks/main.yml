@@ -79,7 +79,7 @@
     - _billing_policy.policy is succeeded
 
 - name: Clone SimpleSAMLphp repo
-  git:
+  ansible.builtin.git:
     repo: "{{ aws_iam_saml.saml_repository }}"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
     version: "{{ aws_iam_saml.saml_repository_branch }}"
@@ -89,7 +89,7 @@
     - aws_iam_saml.saml_repository | length > 20
 
 - name: Create AWS account include for centralised admin
-  template:
+  ansible.builtin.template:
     src: "simplesamlphp_admin_include.j2"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_include_path }}/admin_{{ _aws_account_info.account }}.php"
   delegate_to: localhost
@@ -99,7 +99,7 @@
     - aws_iam_saml.saml_include_path | length > 0
 
 - name: Stage the AWS account include
-  command: git add .
+  ansible.builtin.command: git add .
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
@@ -107,17 +107,17 @@
     - _saml_include_template is not skipped
 
 - name: Try a git commit of the AWS account include
-  command: git commit -m "Automated commit - admin access for AWS account {{ _aws_account_info.account }}."
+  ansible.builtin.command: git commit -m "Automated commit - admin access for AWS account {{ _aws_account_info.account }}."
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
-  ignore_errors: true
+  failed_when: false
   register: _include_commit
   when:
     - _saml_include_template is not skipped
 
 - name: Push the AWS account include
-  command: git push origin {{ aws_iam_saml.saml_repository_branch }}
+  ansible.builtin.command: git push origin {{ aws_iam_saml.saml_repository_branch }}
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
@@ -126,7 +126,7 @@
     - _saml_include_template is not skipped
 
 - name: Create a SAML service provider for the AWS account
-  template:
+  ansible.builtin.template:
     src: "simplesamlphp_sp.j2"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}/{{ aws_iam_saml.saml_sp_path }}/aws_{{ _aws_account_info.account }}.php"
   delegate_to: localhost
@@ -136,7 +136,7 @@
     - aws_iam_saml.saml_sp_path | length > 0
 
 - name: Stage the AWS account service provider
-  command: git add .
+  ansible.builtin.command: git add .
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
@@ -144,17 +144,17 @@
     - _saml_sp_template is succeeded
 
 - name: Try a git commit of the AWS account service provider
-  command: git commit -m "Automated commit - dedicated SP for AWS account {{ _aws_account_info.account }}."
+  ansible.builtin.command: git commit -m "Automated commit - dedicated SP for AWS account {{ _aws_account_info.account }}."
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost
-  ignore_errors: true
+  failed_when: false
   register: _sp_commit
   when:
     - _saml_sp_template is succeeded
 
 - name: Push the AWS account service provider
-  command: git push origin {{ aws_iam_saml.saml_repository_branch }}
+  ansible.builtin.command: git push origin {{ aws_iam_saml.saml_repository_branch }}
   args:
     chdir: "{{ _ce_provision_build_dir }}/{{ aws_iam_saml.saml_repository_directory }}"
   delegate_to: localhost

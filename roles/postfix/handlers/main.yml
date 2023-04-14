@@ -1,12 +1,12 @@
 ---
 - name: Initialise transport.
-  command: /usr/sbin/postmap /etc/postfix/transport
+  ansible.builtin.command: /usr/sbin/postmap /etc/postfix/transport
 
 - name: Initialise sasl_passwd.
-  command: /usr/sbin/postmap /etc/postfix/sasl_passwd
+  ansible.builtin.command: /usr/sbin/postmap /etc/postfix/sasl_passwd
 
 - name: Initialise virtual.
-  command: /usr/sbin/postmap /etc/postfix/virtual
+  ansible.builtin.command: /usr/sbin/postmap /etc/postfix/virtual
 
 - name: Reload Postfix configuration.
-  command: /usr/sbin/postfix reload
+  ansible.builtin.command: /usr/sbin/postfix reload
