@@ -30,7 +30,7 @@ Because this is sensitive data, you probably do not want to store it anywhere, r
 - name: Ensure running slapd processes are killed.
   ansible.builtin.command:
     cmd: pkill slapd
-  ignore_errors: true
+  failed_when: false
 
 - name: Copy LDAP data from config repo. # we've temporarily placed the directory data on our controller, this copies it to the LDAP server
   ansible.builtin.copy:
@@ -96,6 +96,18 @@ ldap_server:
     key: ""
     cert: ""
     ca_cert: ""
+    # Sample LetsEncrypt config, because include_role will not merge defaults these all need providing:
+    # handling: letsencrypt
+    # http_01_port: 5000
+    # autorenew: true
+    # email: sysadm@codeenigma.com
+    # services: []
+    # web_server: standalone
+    # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
+    # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+    # reload_command: reload
+    # reload:
+    #   - slapd
   replication:
     host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
     port: "636"

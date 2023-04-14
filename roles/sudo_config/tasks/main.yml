@@ -1,0 +1,15 @@
+---
+- name: Ensure sudoers directory exists.
+  ansible.builtin.file:
+    path: /etc/sudoers.d
+    state: directory
+    mode: "0750"
+
+- name: "Add {{ sudo_config.entity_name }} to sudoers."
+  ansible.builtin.template:
+    src: "sudoer.j2"
+    dest: "/etc/sudoers.d/{{ sudo_config.filename }}"
+    owner: root
+    group: root
+    mode: "0440"
+  when: sudo_config.entity_name | length > 0

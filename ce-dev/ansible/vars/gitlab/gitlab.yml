@@ -1,5 +1,7 @@
 gitlab:
   server_name: provision-privileged.local
+  letsencrypt: "false"
   ssl:
+    enabled: true
     handling: selfsigned
-  ldap: no
+  ldap: false

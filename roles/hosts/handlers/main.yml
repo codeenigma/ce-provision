@@ -1,5 +1,5 @@
 ---
 - name: Restart hosts.
-  service:
+  ansible.builtin.service:
     name: ncsd
     state: restarted

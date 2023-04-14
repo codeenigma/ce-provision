@@ -1,10 +1,15 @@
 ---
-- block:
-    - name: "Abort if target is not a Debian server."
-      debug:
-        msg: "ce-provision currently only supports Debian based distributions of Linux."
-    - meta: end_host
+- name: Check OS family.
   when: ansible_os_family != "Debian"
+  block:
+    - name: Abort if target is not a Debian server.
+      ansible.builtin.debug:
+        msg: "ce-provision currently only supports Debian based distributions of Linux."
+    - ansible.builtin.meta: end_host
+
+# Load Linux services into ansible_facts.services.
+- name: Populate service facts
+  ansible.builtin.service_facts:
 
 - name: Set "tracking" file for the playbook.
   ansible.builtin.set_fact:

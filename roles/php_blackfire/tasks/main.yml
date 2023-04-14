@@ -20,11 +20,15 @@
   when: not blackfire.enable
 
 - name: Add key for Blackfire repository.
-  ansible.builtin.apt_key: url=https://packages.blackfire.io/gpg.key state=present
+  ansible.builtin.apt_key:
+    url: https://packages.blackfire.io/gpg.key
+    state: present
   when: blackfire.enable
 
 - name: Add repository for Blackfire.
-  ansible.builtin.apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
+  ansible.builtin.apt_repository:
+    repo: "deb http://packages.blackfire.io/debian any main"
+    state: present
   when: blackfire.enable
 
 - name: Ensure Blackfire agent is installed.

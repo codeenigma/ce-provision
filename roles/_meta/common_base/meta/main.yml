@@ -4,8 +4,10 @@ dependencies:
   - role: locales
   - role: user_root
   - role: apt_extra_packages
+  - role: apt_unattended_upgrades
   - { role: hosts, when: ( is_local is not defined or not is_local ) }
   - role: rkhunter
   - role: postfix
   - role: clamav
-  - role: firewall_config
+  - { role: firewall_config, when: ( is_local is not defined or not is_local ) }
+  - role: sudo_config

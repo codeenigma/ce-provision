@@ -28,12 +28,16 @@
     groups: "{{ user_ansible.groups }}"
 
 - name: Add user to sudoers.
-  ansible.builtin.template:
-    src: "sudoer.j2"
-    dest: "/etc/sudoers.d/{{ user_ansible.username }}"
-    owner: root
-    group: root
-    mode: "0600"
+  ansible.builtin.include_role:
+    name: sudo_config
+  vars:
+    sudo_config:
+      entity_name: "{{ user_ansible.username }}"
+      hosts: "ALL"
+      operators: "(ALL)"
+      tags: "NOPASSWD:"
+      commands: "ALL"
+      filename: "{{ user_ansible.username }}"
   when: user_ansible.sudoer
 
 - name: Copy SSH public key to target.
