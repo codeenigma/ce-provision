@@ -1,5 +1,5 @@
 - name: Gather security group info.
-  amazon.aws.ec2_group_info:
+  amazon.aws.ec2_security_group_info:
     profile: "{{ aws_efs.aws_profile }}"
     region: "{{ aws_efs.region }}"
     filters:

@@ -1,29 +1,29 @@
 - name: Reset security groups info
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_efs_security_group_ids: []
 
 - name: Reset subnet ids info
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_efs_subnets_ids: []
 
 - name: Reset targets info
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_efs_targets: {}
 
 - name: Gather security groups info.
-  include_tasks: security_group.yml
+  ansible.builtin.include_tasks: security_group.yml
   with_items: "{{ aws_efs.security_groups }}"
   loop_control:
     loop_var: security_group
 
 - name: Gather subnets info.
-  include_tasks: subnet.yml
+  ansible.builtin.include_tasks: subnet.yml
   with_items: "{{ aws_efs.subnets }}"
   loop_control:
     loop_var: subnet
 
 - name: Construct target list.
-  include_tasks: target.yml
+  ansible.builtin.include_tasks: target.yml
   with_items: "{{ _aws_efs_subnets_ids }}"
   loop_control:
     loop_var: target
@@ -41,7 +41,7 @@
   register: aws_efs_created
 
 - name: Assign resource to backup plan.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_backup
     tasks_from: resource
   vars:

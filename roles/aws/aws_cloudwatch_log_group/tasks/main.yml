@@ -1,6 +1,6 @@
 ---
 - name: Ensure Cloudwatch group settings.
-  community.aws.cloudwatchlogs_log_group:
+  amazon.aws.cloudwatchlogs_log_group:
     profile: "{{ aws_cloudwatch_log_group.aws_profile }}"
     region: "{{ aws_cloudwatch_log_group.region }}"
     tags: "{{ aws_cloudwatch_log_group.tags }}"
