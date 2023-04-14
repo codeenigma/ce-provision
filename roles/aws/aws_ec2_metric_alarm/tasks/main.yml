@@ -1,6 +1,6 @@
 ---
 - name: Create a CloudWatch alarm.
-  community.aws.ec2_metric_alarm:
+  amazon.aws.cloudwatch_metric_alarm:
     profile: "{{ aws_ec2_metric_alarm.aws_profile }}"
     region: "{{ aws_ec2_metric_alarm.region }}"
     state: "{{ aws_ec2_metric_alarm.state }}"

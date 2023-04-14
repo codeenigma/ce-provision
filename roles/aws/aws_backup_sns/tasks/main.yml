@@ -5,7 +5,7 @@
   register: _aws_account_info_backup
 
 - name: Create SNS topic for Backup notifications.
-  include_role:
+  ansible.builtin.include_role:
     name: aws/aws_sns
   vars:
     aws_sns:
@@ -67,7 +67,7 @@
     - aws_backup.sns.sns
 
 - name: Create SNS subscriptions for failed Backup jobs.
-  include_tasks:
+  ansible.builtin.include_tasks:
     file: subscribe.yml
   with_items: "{{ aws_backup.sns.subscriptions }}"
   loop_control:

@@ -48,3 +48,17 @@
 - name: Install cloud-init.
   ansible.builtin.apt:
     name: cloud-init
+
+- name: Create cron entry to upgrade Ansible.
+  ansible.builtin.cron:
+    name: upgrade_ansible
+    minute: "{{ ce_ansible.upgrade.minute | default(omit) }}"
+    hour: "{{ ce_ansible.upgrade.hour | default(omit) }}"
+    day: "{{ ce_ansible.upgrade.day | default(omit) }}"
+    weekday: "{{ ce_ansible.upgrade.weekday | default(omit) }}"
+    month: "{{ ce_ansible.upgrade.month | default(omit) }}"
+    job: "{{ ce_ansible.upgrade.command }}"
+    state: present
+    disabled: "{{ ce_ansible.upgrade.disabled | default(omit) }}"
+  become: true
+  when: ce_ansible.upgrade.enabled

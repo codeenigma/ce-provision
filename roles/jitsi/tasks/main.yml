@@ -1,6 +1,6 @@
 ---
 - name: Add Jitsi key.
-  ansible.builtin.shell: wget -q -O - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add -
+  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add -"
 
 - name: Install Jitsi repo.
   ansible.builtin.apt_repository:
@@ -9,7 +9,7 @@
     filename: jitsi-stable
 
 - name: Update system settings for Jitsi.
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /etc/systemd/system.conf
     block: |
       DefaultLimitNOFILE=65000
