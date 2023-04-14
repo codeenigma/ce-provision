@@ -35,6 +35,7 @@
   ansible.builtin.shell: 'set -o pipefail && find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
   args:
     warn: false
+    executable: /bin/bash
   delegate_to: "localhost"
   register: _init_vars_dirs_md5
   with_items: "{{ _init_vars_dirs_list }}"
