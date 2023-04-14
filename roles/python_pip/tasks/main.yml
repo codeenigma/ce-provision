@@ -34,3 +34,17 @@
   ansible.builtin.command:
     cmd: "update-alternatives --install /usr/bin/python python {{ python_pip.python_binary_path }} 1"
   become: true
+
+- name: Create cron entry to upgrade pip.
+  ansible.builtin.cron:
+    name: upgrade_python_pip
+    minute: "{{ python_pip.upgrade.minute | default(omit) }}"
+    hour: "{{ python_pip.upgrade.hour | default(omit) }}"
+    day: "{{ python_pip.upgrade.day | default(omit) }}"
+    weekday: "{{ python_pip.upgrade.weekday | default(omit) }}"
+    month: "{{ python_pip.upgrade.month | default(omit) }}"
+    job: "{{ python_pip.upgrade.command }}"
+    state: present
+    disabled: "{{ python_pip.upgrade.disabled | default(omit) }}"
+  become: true
+  when: python_pip.upgrade.enabled

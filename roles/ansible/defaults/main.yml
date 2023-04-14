@@ -1,12 +1,3 @@
-# Ansible
-(Re-)install Ansible from the official repository.
-
-<!--TOC-->
-<!--ENDTOC-->
-
-<!--ROLEVARS-->
-## Default variables
-```yaml
 ---
 ce_ansible:
   upgrade:
@@ -19,7 +10,3 @@ ce_ansible:
     # weekday: 7
     # month: 12
     # disabled: true
-
-```
-
-<!--ENDROLEVARS-->
