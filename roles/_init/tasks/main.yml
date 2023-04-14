@@ -33,6 +33,7 @@
 
 - name: Compute files md5 hash.
   ansible.builtin.shell: 'set -o pipefail && find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
+    executable: /bin/bash
   args:
     warn: false
   delegate_to: "localhost"

@@ -1,6 +1,7 @@
 ---
 - name: Add Google Chrome key.
   ansible.builtin.shell: "set -o pipefail && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
+    executable: /bin/bash
 
 - name: Install Google Chrome repo.
   ansible.builtin.apt_repository:
