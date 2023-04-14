@@ -1,9 +1,9 @@
 ---
 - block:
     - name: "Abort if target is not a Debian server."
-      debug:
+      ansible.builtin.debug:
         msg: "ce-provision currently only supports Debian based distributions of Linux."
-    - meta: end_host
+    - ansible.builtin.meta: end_host
   when: ansible_os_family != "Debian"
 
 # Load Linux services into ansible_facts.services.

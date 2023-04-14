@@ -3,9 +3,11 @@
   ansible.builtin.command: "aws --profile {{ aws_acm.aws_profile }} --region {{ aws_acm.region }} acm list-certificates"
   register: _aws_acm_cert_list
 
-- fail: msg="Domain name is undefined"
+- ansible.builtin.fail:
+    msg: "Domain name is undefined"
   when: aws_acm.domain_name is undefined
-- fail: msg="Route 53 zone is undefined"
+- ansible.builtin.fail:
+    msg: "Route 53 zone is undefined"
   when: aws_acm.route_53.zone is undefined
 
 - name: Replace JSON output with parsed results.
