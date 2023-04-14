@@ -1,9 +1,13 @@
 ---
 - name: Add repository key for Jenkins.
-  ansible.builtin.apt_key: url=https://pkg.jenkins.io/debian/jenkins.io.key state=present
+  ansible.builtin.apt_key:
+    url: https://pkg.jenkins.io/debian/jenkins.io.key
+    state: present
 
 - name: Add repository for Jenkins.
-  ansible.builtin.apt_repository: repo='deb http://pkg.jenkins.io/debian binary/' state=present
+  ansible.builtin.apt_repository:
+    repo: "deb http://pkg.jenkins.io/debian binary/"
+    state: present
 
 - name: Ensure Jenkins is installed.
   ansible.builtin.apt:
@@ -92,7 +96,7 @@
     state: restarted
   when: aptoutput.changed
 
-- pause:
+- ansible.builtin.pause:
     minutes: 2
   when: aptoutput.changed
 

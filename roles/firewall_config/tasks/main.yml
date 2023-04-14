@@ -92,7 +92,7 @@
 
 # Set the variables the firewall manager role is expecting with our newly created settings
 - name: Set variables for firewall role.
-  set_fact:
+  ansible.builtin.set_fact:
     firewall_allowed_tcp_ports: "{{ _firewall_config_allowed_tcp_ports | flatten }}"
     firewall_allowed_udp_ports: "{{ _firewall_config_allowed_udp_ports | flatten }}"
     firewall_forwarded_tcp_ports: "{{ _firewall_config_forwarded_tcp_ports | flatten }}"

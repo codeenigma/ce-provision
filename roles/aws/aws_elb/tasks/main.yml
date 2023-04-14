@@ -110,7 +110,7 @@
     - aws_elb | length
 
 - name: Create the ALB.
-  community.aws.elb_application_lb:
+  amazon.aws.elb_application_lb:
     name: "{{ aws_elb.name }}"
     profile: "{{ aws_elb.aws_profile }}"
     region: "{{ aws_elb.region }}"
@@ -128,7 +128,7 @@
   ansible.builtin.set_fact:
     _aws_ec2_elb_listener_ARN: "{{ item.listener_arn }}"
   when:
-    - "{{ item.port == 443 }}"
+    - item.port == 443
     - aws_elb.ssl_extra_certificate_ARNs
     - _ssl_certificate_ARN | length > 1
   with_items: "{{ _aws_ec2_elb.listeners }}"
