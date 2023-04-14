@@ -11,6 +11,10 @@
 - name: Populate service facts
   ansible.builtin.service_facts:
 
+# Load Linux services into ansible_facts.services.
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
 - name: Set "tracking" file for the playbook.
   ansible.builtin.set_fact:
     current_play_md5_file: "{{ _ce_provision_build_id }}-{{ playbook_dir | basename }}-{{ inventory_hostname }}"
