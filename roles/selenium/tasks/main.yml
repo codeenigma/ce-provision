@@ -86,6 +86,7 @@
 
 - name: Generate VNC password.
   ansible.builtin.shell: "set -o pipefail && echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
+    executable: /bin/bash
   become: true
   become_user: "{{ user_deploy.username }}"
   when: selenium.display_manager == "VNC"
