@@ -144,7 +144,7 @@
   when: (_aws_hostname | length > 0) or (_aws_hostname != aws_ec2_with_eip.hostname) or not aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
-  community.aws.ec2_eip_info:
+  amazon.aws.ec2_eip_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
@@ -171,7 +171,7 @@
   when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
-  community.aws.ec2_eip_info:
+  amazon.aws.ec2_eip_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     filters:
@@ -179,7 +179,7 @@
   register: _aws_ec2_with_eip_instances_eip
 
 - name: Associate Elastic IP.
-  community.aws.ec2_eip:
+  amazon.aws.ec2_eip:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     device_id: "{{ _aws_ec2_with_eip_instances.instance_ids[0] }}"
@@ -190,7 +190,7 @@
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
 
 - name: Add a DNS record in route 53
-  community.aws.route53:
+  amazon.aws.route53:
     state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"
@@ -203,7 +203,7 @@
     - aws_ec2_with_eip.route_53.zone | length > 0
 
 - name: Add a matching wildcard DNS record
-  community.aws.route53:
+  amazon.aws.route53:
     state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
     zone: "{{ aws_ec2_with_eip.route_53.zone }}"

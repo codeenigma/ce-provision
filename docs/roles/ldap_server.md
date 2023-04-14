@@ -30,7 +30,7 @@ Because this is sensitive data, you probably do not want to store it anywhere, r
 - name: Ensure running slapd processes are killed.
   ansible.builtin.command:
     cmd: pkill slapd
-  ignore_errors: true
+  failed_when: false
 
 - name: Copy LDAP data from config repo. # we've temporarily placed the directory data on our controller, this copies it to the LDAP server
   ansible.builtin.copy:

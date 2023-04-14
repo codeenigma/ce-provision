@@ -1,5 +1,5 @@
 - name: Gather VPC information
-  ec2_vpc_net_info:
+  amazon.aws.ec2_vpc_net_info:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"
     filters:
@@ -8,17 +8,17 @@
   when: ( aws_vpc_subnet.vpc_name is defined and aws_vpc_subnet.vpc_name | length > 0 )
 
 - name: Set the VPC id from name.
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_vpc_subnet_vpc_id: "{{ _aws_vpc_subnet_vpc.vpcs[0].vpc_id }}"
   when: ( aws_vpc_subnet.vpc_name is defined and aws_vpc_subnet.vpc_name | length > 0 )
 
 - name: Use provided VPC id.
-  set_fact:
+  ansible.builtin.set_fact:
     _aws_vpc_subnet_vpc_id: "{{ aws_vpc_subnet.vpc_id }}"
   when: ( aws_vpc_subnet.vpc_name is not defined or aws_vpc_subnet.vpc_name | length < 0 )
 
 - name: Create VPC subnets.
-  include_tasks: "subnet.yml"
+  ansible.builtin.include_tasks: "subnet.yml"
   with_items: "{{ aws_vpc_subnet.subnets }}"
   loop_control:
     loop_var: subnet
