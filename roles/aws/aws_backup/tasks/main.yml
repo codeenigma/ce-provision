@@ -55,7 +55,7 @@
   when: _copy_vault_created is defined
 
 - name: Create backup plans.
-  include_tasks: backup_plan.yml
+  ansible.builtin.include_tasks: backup_plan.yml
   with_items: "{{ aws_backup.plans }}"
   loop_control:
     loop_var: plan

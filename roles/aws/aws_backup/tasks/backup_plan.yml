@@ -10,7 +10,7 @@
   when: aws_backup.copy_vault.region | length > 0
 
 - name: Create temp directory.
-  file:
+  ansible.builtin.file:
     path: "/tmp/aws_backup/{{ _infra_name }}"
     state: directory
 
@@ -42,6 +42,6 @@
   when: _backup_plan_created is defined
 
 - name: Tidy up and remove the yaml input file.
-  file:
+  ansible.builtin.file:
     path: "/tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml"
     state: absent
