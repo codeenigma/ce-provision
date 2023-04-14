@@ -7,7 +7,7 @@
     state: restarted
 
 - name: Stop ossec-authd.
-  ignore_errors: true
+  failed_when: false
   ansible.builtin.command: "pkill ossec-authd"
 
 - name: Start ossec-authd.
