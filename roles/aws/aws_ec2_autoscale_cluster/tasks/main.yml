@@ -24,7 +24,7 @@
   when: (aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0)
 
 - name: Create matching Security Group.
-  amazon.aws.ec2_group:
+  amazon.aws.ec2_security_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -210,7 +210,7 @@
     - aws_ec2_autoscale_cluster.asg_refresh
 
 - name: Create Launch Configuration.
-  community.aws.ec2_lc:
+  community.aws.autoscaling_launch_config:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
     image_id: "{{ aws_ec2_autoscale_cluster.image_id if aws_ec2_autoscale_cluster.image_id is defined else aws_ec2_autoscale_cluster_image_latest.image_id }}"
@@ -258,7 +258,7 @@
     - aws_ec2_autoscale_cluster.asg_refresh
 
 - name: Create AutoScale group and spin up new instances.
-  community.aws.ec2_asg:
+  amazon.aws.autoscaling_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
@@ -283,7 +283,7 @@
     - aws_ec2_autoscale_cluster.asg_refresh
 
 - name: Create step scaling AutoScale policies.
-  community.aws.ec2_scaling_policy:
+  community.aws.autoscaling_policy:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "present"
@@ -296,12 +296,12 @@
     step_adjustments: "{{ item.step_adjustments }}"
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies
-    - "{{ item.policy_type == 'StepScaling' }}"
+    - item.policy_type == 'StepScaling'
   register: _aws_ec2_autoscale_cluster_step_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
 - name: Create simple scaling AutoScale policies.
-  community.aws.ec2_scaling_policy:
+  community.aws.autoscaling_policy:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "present"
@@ -313,7 +313,7 @@
     cooldown: "{{ item.cooldown }}"
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies
-    - "{{ item.policy_type == 'SimpleScaling' }}"
+    - item.policy_type == 'SimpleScaling'
   register: _aws_ec2_autoscale_cluster_simple_scaling_policies
   with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
@@ -488,7 +488,7 @@
     - aws_ec2_autoscale_cluster.create_elb
 
 - name: Create the ALB.
-  community.aws.elb_application_lb:
+  amazon.aws.elb_application_lb:
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
@@ -506,7 +506,7 @@
     _aws_ec2_autoscale_cluster_alb_listener_ARN: "{{ item.listener_arn }}"
   when:
     - aws_ec2_autoscale_cluster.create_elb
-    - "{{ item.port == 443 }}"
+    - item.port == 443
     - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
     - _ssl_certificate_ARN | length > 1
   with_items: "{{ _aws_ec2_autoscale_cluster_alb.listeners }}"
@@ -592,7 +592,7 @@
     - _cf_certificate_ARN | length > 1
 
 - name: Add DNS records in route 53.
-  community.aws.route53:
+  amazon.aws.route53:
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     profile: "{{ item.aws_profile }}"
     zone: "{{ item.zone }}"

@@ -1,7 +1,25 @@
 # Ansible
-(Re-)install Ansible from the official repository
+(Re-)install Ansible from the official repository.
+
 <!--TOC-->
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
+## Default variables
+```yaml
+---
+ce_ansible:
+  upgrade:
+    enabled: true # create cron job to auto-upgrade Ansible
+    command: "/usr/bin/python -m pip install --upgrade ansible"
+    # cron variables - see https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html
+    minute: 10
+    hour: 1
+    # day: 1
+    # weekday: 7
+    # month: 12
+    # disabled: true
+
+```
+
 <!--ENDROLEVARS-->

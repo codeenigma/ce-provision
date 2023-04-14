@@ -1,5 +1,5 @@
 ---
 - name: Restart Jenkins.
-  service:
+  ansible.builtin.service:
     name: jenkins
     state: restarted
