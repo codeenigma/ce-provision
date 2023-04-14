@@ -1,7 +1,7 @@
 ---
 - name: Check OS family.
-  block:
   when: ansible_os_family != "Debian"
+  block:
     - name: Abort if target is not a Debian server.
       ansible.builtin.debug:
         msg: "ce-provision currently only supports Debian based distributions of Linux."
