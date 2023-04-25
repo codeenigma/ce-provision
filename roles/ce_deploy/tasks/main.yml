@@ -126,23 +126,6 @@
     owner: "{{ ce_deploy.username }}"
     recurse: true
 
-# - name: Gather AWS account ID if it isn't already set.
-#   amazon.aws.aws_caller_info:
-#     profile: "{{ _aws_profile }}"
-#   delegate_to: localhost
-#   become: true
-#   become_user: "{{ _ce_provision.username }}"
-#   register: _deploy_caller_info
-
-# - name: Create IAM policy for deploy user
-#   community.aws.iam_policy:
-#     iam_type: user
-#     iam_name: "{{ ce_deploy.username }}"
-#     policy_name: "{{ ce_deploy.asg_processes_policy_name }}"
-#     policy_json: "{{ lookup('template', 'asg_processes.json.j2') }}"
-#     state: present
-#   delegate_to: localhost
-
 - name: Check if ansible-galaxy custom requirements file exists.
   ansible.builtin.stat:
     path: "{{ ce_deploy.galaxy_custom_requirements_file }}"

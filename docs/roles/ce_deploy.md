@@ -20,7 +20,6 @@ ce_deploy:
   config_repository_branch: "master"
   local_dir: "/home/{{ _ce_deploy.username }}/ce-deploy"
   ce_provision_dir: "/home/controller/ce-provision"
-  asg_processes_policy_name: "DeployManageASGProcesses"
   # List of additional groups to add the user to.
   groups: []
   # File containing default roles and collections to install via Ansible Galaxy.
