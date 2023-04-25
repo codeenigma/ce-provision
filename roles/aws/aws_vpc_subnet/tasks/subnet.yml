@@ -4,7 +4,7 @@
 
 - name: Set IPv6 subnet CIDR.
   ansible.builtin.set_fact:
-    _ipv6_subnet_cidr: "{{ _aws_vpc_subnet_vpc.vpcs[0].ipv6_cidr_block_association_set[0].ipv6_cidr_block | ipsubnet(64, subnet.ipv6_cidr_block) }}"
+    _ipv6_subnet_cidr: "{{ _aws_vpc_subnet_vpc.vpcs[0].ipv6_cidr_block_association_set[0].ipv6_cidr_block | ansible.utils.ipsubnet(64, subnet.ipv6_cidr_block) }}"
   when:
     - subnet.ipv6_cidr_block is defined
     - subnet.ipv6_cidr_block | length > 0

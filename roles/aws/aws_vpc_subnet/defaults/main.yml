@@ -5,7 +5,7 @@ aws_vpc_subnet:
   region: "{{ _aws_region }}"
   subnets:
     - cidr_block: "10.0.0.0/24"
-      # ipv6_cidr_block: "1" # This will create something like xxxx:xxxx:xxxx:xxyy::/64 where yy is created using the ipsubnet filter automatically - DO NOT DEFINE IF IPV6 IS NOT REQUIRED
+      # ipv6_cidr_block: "1" # This will create something like xxxx:xxxx:xxxx:xxyy::/64 where yy is created using the ansible.utils.ipsubnet filter automatically - DO NOT DEFINE IF IPV6 IS NOT REQUIRED
       az: b
       assign_instances_ipv6: false # if true, need to specify an ipv6_cidr_block value.
       # A NAT gateway to associate with the subnets.
