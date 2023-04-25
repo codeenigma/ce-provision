@@ -10,6 +10,12 @@
     repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
     state: absent
 
+# Linters need a newer version of PyYAML than the one that ships with Debian.
+- name: Remove older PyYAML package.
+  ansible.builtin.apt:
+    pkg: ["python3-yaml"]
+    state: absent
+
 - name: Check pip is still installed.
   ansible.builtin.stat:
     path: /usr/bin/pip
@@ -25,22 +31,23 @@
   ansible.builtin.include_role:
     name: python_pip
 
-- name: Ensure Ansible dependencies are installed.
-  ansible.builtin.apt:
-    pkg: ["yamllint"]
-    state: present
-    update_cache: true
-
 # Not using 'apt' - this needs to be one task or we break controller servers acting on themselves.
 - name: Remove and re-install Ansible.
   ansible.builtin.shell:
     cmd: sudo apt-get -y remove ansible && sudo pip3 install ansible
   become: false
 
-- name: Install ansible-lint.
+- name: Install linters.
   ansible.builtin.pip:
-    name: ansible-lint
+    name:
+      - ansible-lint
+      - yamllint
     executable: pip3
+
+# This package gets removed with python3-yaml above but we need it for auto-scale.
+- name: Install cloud-init.
+  ansible.builtin.apt:
+    name: cloud-init
 
 - name: Create cron entry to upgrade Ansible.
   ansible.builtin.cron:
