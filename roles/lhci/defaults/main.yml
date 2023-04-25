@@ -1,3 +1,9 @@
 ---
 lhci:
   enable_vnc: false
+  chrome_package: google-chrome-stable # optionally set specific version, e.g. google-chrome-stable=112.0.5615.165-1
+  # Optional npm version handling.
+  # cli_version: '0.12.0'
+  # cli_state: latest # uncomment to update to latest package each time ce-provision runs
+  # lighthouse_version: '10.1.1'
+  # lighthouse_state: latest # uncomment to update to latest package each time ce-provision runs
