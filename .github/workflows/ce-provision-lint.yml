@@ -10,7 +10,7 @@ jobs:
     # Name the Job
     name: Lint the codebase
     # Set the type of machine to run on (ansible-lint now needs newer Ubuntu)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
