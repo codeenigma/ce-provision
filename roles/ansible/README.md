@@ -19,6 +19,8 @@ ce_ansible:
     # weekday: 7
     # month: 12
     # disabled: true
+  linters:
+    enabled: true # will not install linters if false, installing linters breaks cloud-init
 
 ```
 

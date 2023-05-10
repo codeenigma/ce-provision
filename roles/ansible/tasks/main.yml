@@ -15,6 +15,7 @@
   ansible.builtin.apt:
     pkg: ["python3-yaml"]
     state: absent
+  when: ce_ansible.linters.enabled
 
 - name: Check pip is still installed.
   ansible.builtin.stat:
@@ -43,11 +44,13 @@
       - ansible-lint
       - yamllint
     executable: pip3
+  when: ce_ansible.linters.enabled
 
 # This package gets removed with python3-yaml above but we need it for auto-scale.
 - name: Install cloud-init.
   ansible.builtin.apt:
     name: cloud-init
+  when: ce_ansible.linters.enabled
 
 - name: Create cron entry to upgrade Ansible.
   ansible.builtin.cron:
