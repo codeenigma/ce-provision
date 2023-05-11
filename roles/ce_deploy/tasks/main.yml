@@ -154,7 +154,7 @@
 
 - name: Create cron entries to upgrade mandatory ansible-galaxy collections.
   ansible.builtin.cron:
-    name: "upgrade_ansible_galaxy_{{ item.name | regex_replace('\\.', '_') }}"
+    name: "upgrade_ansible_galaxy_mandatory"
     minute: "{{ ce_deploy.upgrade_galaxy.minute | default(omit) }}"
     hour: "{{ ce_deploy.upgrade_galaxy.hour | default(omit) }}"
     day: "{{ ce_deploy.upgrade_galaxy.day | default(omit) }}"
@@ -169,7 +169,7 @@
 
 - name: Create cron entries to upgrade custom ansible-galaxy roles and collections.
   ansible.builtin.cron:
-    name: "upgrade_ansible_galaxy_{{ item.name | regex_replace('\\.', '_') }}"
+    name: "upgrade_ansible_galaxy_custom"
     minute: "{{ ce_deploy.upgrade_galaxy.minute | default(omit) }}"
     hour: "{{ ce_deploy.upgrade_galaxy.hour | default(omit) }}"
     day: "{{ ce_deploy.upgrade_galaxy.day | default(omit) }}"
@@ -180,4 +180,6 @@
     disabled: "{{ ce_deploy.upgrade_galaxy.disabled | default(omit) }}"
   become: true
   become_user: "{{ ce_deploy.username }}"
-  when: _ce_deploy_custom_galaxy_requirements.stat.exists
+  when:
+    - _ce_deploy_custom_galaxy_requirements.stat.exists
+    - ce_deploy.upgrade_galaxy.enabled
