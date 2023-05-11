@@ -71,17 +71,21 @@
 
 - name: Install Google Chrome.
   ansible.builtin.apt:
-    name: google-chrome-stable
+    name: "{{ lhci.chrome_package }}"
     state: present
 
 - name: Install "lhci/cli" node.js package.
   community.general.packaging.language.npm:
     name: "@lhci/cli"
+    version: "{{ lhci.cli_version | default(omit) }}"
+    state: "{{ lhci.cli_state | default(omit) }}"
     production: true
     global: true
 
 - name: Install "lighthouse" node.js package.
   community.general.packaging.language.npm:
     name: "lighthouse"
+    version: "{{ lhci.lighthouse_version | default(omit) }}"
+    state: "{{ lhci.lighthouse_state | default(omit) }}"
     production: true
     global: true
