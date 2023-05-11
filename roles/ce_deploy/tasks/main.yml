@@ -180,4 +180,6 @@
     disabled: "{{ ce_deploy.upgrade_galaxy.disabled | default(omit) }}"
   become: true
   become_user: "{{ ce_deploy.username }}"
-  when: _ce_deploy_custom_galaxy_requirements.stat.exists
+  when:
+    - _ce_deploy_custom_galaxy_requirements.stat.exists
+    - ce_deploy.upgrade_galaxy.enabled
