@@ -4,4 +4,4 @@ collections:
   - name: community.sops
   - name: ansible.posix
   - name: amazon.aws
-    version: 4.5.0 # pinning at version 4.5.0 for Python 3.7
+    version: 5.5.0 # pinning at version 5.5.0 for Python 3.7
