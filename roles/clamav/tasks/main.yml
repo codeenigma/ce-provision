@@ -26,5 +26,6 @@
     minute: "{{ clamav.cron_minute }}"
     hour: "{{ clamav.cron_hour | default(omit) }}"
     day: "{{ clamav.cron_day | default(omit) }}"
+    weekday: "{{ clamav.cron_weekday | default(omit) }}"
     job: "{{ clamav.scripts_location }}/clamscan"
   when: clamav.provide_cron
