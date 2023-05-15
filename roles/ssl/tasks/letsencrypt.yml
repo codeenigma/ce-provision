@@ -83,7 +83,8 @@
     name: "certbot renewal"
     minute: "{{ ssl.renewal_minute | default('0') }}"
     hour: "{{ ssl.renewal_hour | default('0') }}"
-    day: "{{ ssl.renewal_day | default('7') }}"
+    day: "{{ ssl.renewal_day | default(omit) }}"
+    weekday: "{{ ssl.renewal_weekday | default('0') }}" # default is weekly at midnight on Sunday
     job: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
     cron_file: "le_autorenewal_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}"
     user: root

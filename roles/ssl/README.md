@@ -82,7 +82,8 @@ ssl:
   certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew" # root of the command used in the cron job
   # renewal_minute: "0" # minute to run renewal cron job
   # renewal_hour: "0" # hour to run renewal cron job
-  # renewal_day: "7" # day to run renewal cron job
+  # renewal_day: "7" # day of month to run renewal cron job
+  # renewal_weekday: "0" # day of week to run renewal cron job
   web_server: standalone # values are standalone, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
