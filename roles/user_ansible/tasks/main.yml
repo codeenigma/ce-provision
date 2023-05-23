@@ -69,6 +69,7 @@
   with_items: "{{ user_ansible.ssh_private_keys }}"
   loop_control:
     index_var: key_id
+  no_log: true
 
 - name: Ensure known_hosts file exists.
   ansible.builtin.file:
