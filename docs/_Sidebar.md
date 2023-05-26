@@ -23,6 +23,7 @@
        - [AWS EFS](/roles/aws/aws_efs)
        - [AWS IAM EC2](/roles/aws/aws_iam_role)
        - [AWS IAM SAML](/roles/aws/aws_iam_saml)
+       - [AWS OpenSearch](/roles/aws/aws_opensearch)
        - [AWS key pair.](/roles/aws/aws_provision_ec2_keypair)
        - [AWS RDS](/roles/aws/aws_rds)
        - [AWS S3 Bucket](/roles/aws/aws_s3_bucket)
