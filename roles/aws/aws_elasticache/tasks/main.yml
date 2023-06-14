@@ -1,0 +1,15 @@
+---
+- name: Create ElastiCache cluster
+  community.aws.elasticache:
+    name: "{{ aws_elasticache.name }}"
+    state: "{{ aws_elasticache.state }}"
+    engine: "{{ aws_elasticache.elasticache_engine }}"
+    cache_engine_version: "{{ aws_elasticache.cache_engine_version | default(omit) }}"
+    cache_parameter_group: "{{ aws_elasticache.cache_parameter_group | default(omit) }}"
+    node_type: "{{ aws_elasticache.elasticache_node_type }}"
+    num_nodes: "{{ aws_elasticache.elasticache_nodes }}"
+    cache_port: "{{ aws_elasticache.elasticache_port }}"
+    cache_security_groups: "{{ aws_elasticache.elasticache_security_groups }}"
+    zone: "{{ aws_elasticache.zone | default(omit) }}"
+
+# @TODO parameter group handling
