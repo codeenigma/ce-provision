@@ -21,6 +21,7 @@
        - [EC2 instance with EIP](/roles/aws/aws_ec2_with_eip)
        - [EFS client](/roles/aws/aws_efs_client)
        - [AWS EFS](/roles/aws/aws_efs)
+       - [AWS ElastiCache](/roles/aws/aws_elasticache)
        - [AWS IAM EC2](/roles/aws/aws_iam_role)
        - [AWS IAM SAML](/roles/aws/aws_iam_saml)
        - [AWS OpenSearch](/roles/aws/aws_opensearch)
