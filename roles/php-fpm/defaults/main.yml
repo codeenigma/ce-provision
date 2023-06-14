@@ -1,7 +1,5 @@
 ---
 php:
-  version:
-    - 7.2
   fpm:
     expose_php: "{% if _env_type == 'prod' %}Off{% else %}On{% endif %}"
     error_reporting: "{% if _env_type == 'prod' %}E_ALL & ~E_DEPRECATED & ~E_STRICT{% else %}E_ALL{% endif %}"
