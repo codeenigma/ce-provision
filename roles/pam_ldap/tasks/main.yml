@@ -45,9 +45,11 @@
   ansible.builtin.debconf:
     name: libpam-ldapd
 
-- name: Regenerate configuration from pam_ldap.
-  ansible.builtin.debconf:
-    name: sudo-ldap
+- name: Copy ldap config.
+  ansible.builtin.template:
+    src: sudo-ldap.conf.j2
+    dest: /etc/sudo-ldap.conf
+    mode: "0644"
 
 - name: Copy PAM configuration.
   ansible.builtin.copy:
