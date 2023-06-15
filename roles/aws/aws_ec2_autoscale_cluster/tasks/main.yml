@@ -100,8 +100,7 @@
 
 # ELASTICACHE
 # @TODO parameter group support
-- name: Create ElastiCache cluster
-- name: Create RDS instance.
+- name: Create ElastiCache cluster.
   ansible.builtin.include_role:
     name: aws/aws_elasticache
   vars:
