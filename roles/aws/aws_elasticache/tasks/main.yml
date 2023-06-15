@@ -9,7 +9,7 @@
     node_type: "{{ aws_elasticache.elasticache_node_type }}"
     num_nodes: "{{ aws_elasticache.elasticache_nodes }}"
     cache_port: "{{ aws_elasticache.elasticache_port }}"
-    cache_security_groups: "{{ aws_elasticache.elasticache_security_groups }}"
+    security_group_ids: "{{ aws_elasticache.elasticache_security_groups }}"
     zone: "{{ aws_elasticache.zone | default(omit) }}"
 
 # @TODO parameter group handling

@@ -34,7 +34,12 @@ aws_ec2_autoscale_cluster:
     - az: c
       cidr_block: "10.0.3.128/26"
       public_subnet: public-c
+  instance_nic_delete_on_termination: true
   instance_type: t3.micro
+  instance_disable_api_termination: true
+  # Only valid for t2/3 instances, omit for other types.
+  #instance_credit_specification:
+  #  cpu_credits: unlimited # unlimited or standard
   assign_public_ip: false
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
@@ -124,11 +129,11 @@ aws_ec2_autoscale_cluster:
   max_size: 8
   # Security groups for the instances cluster.
   # An internal one will be created automatically, use these vars to provide additional groups
-  cluster_security_groups: []
-  alb_security_groups: []
-  efs_security_groups: []
-  rds_security_groups: []
-  elasticache_security_groups: []
+  cluster_security_groups: [] # used in launch template, must be SG IDs
+  alb_security_groups: [] # edge case, the module supports SG names or IDs
+  efs_security_groups: [] # must be SG names because the role uses the name to find the ID
+  rds_security_groups: [] # must be SG names because the role uses the name to find the ID
+  elasticache_security_groups: [] # must be SG IDs
   # ALB health checks - these are health check settings applied to the load balancer
   alb_health_check_type: ELB # Uses ALB health checks, set to EC2 to use default AWS instance status checks
   alb_health_check_period: 1200 # Length of time in seconds after a new EC2 instance comes into service that Auto Scaling starts checking its health
