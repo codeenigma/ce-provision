@@ -114,6 +114,7 @@
       elasticache_node_type: "{{ aws_ec2_autoscale_cluster.elasticache_node_type }}"
       elasticache_nodes: "{{ aws_ec2_autoscale_cluster.elasticache_nodes }}"
       elasticache_port: "{{ aws_ec2_autoscale_cluster.elasticache_port }}"
+      elasticache_security_groups: "{{ aws_ec2_autoscale_cluster.elasticache_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
   when:
     - aws_ec2_autoscale_cluster.elasticache
 
@@ -402,27 +403,35 @@
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
 
 # EC2 - BUILD ASG
-- name: Create Launch Configuration.
-  community.aws.autoscaling_launch_config:
+- name: Create launch template.
+  community.aws.ec2_launch_template:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
+    name: "{{ aws_ec2_autoscale_cluster.name }}"
     image_id: "{{ aws_ec2_autoscale_cluster.image_id if aws_ec2_autoscale_cluster.image_id is defined else aws_ec2_autoscale_cluster_image_latest.image_id }}"
     key_name: "{{ aws_ec2_autoscale_cluster.key_name }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
-    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
     instance_type: "{{ aws_ec2_autoscale_cluster.instance_type }}"
-    instance_profile_name: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
+    iam_instance_profile: "{{ _aws_ec2_autoscale_cluster_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
+    disable_api_termination: "{{ aws_ec2_autoscale_cluster.instance_disable_api_termination }}"
     ebs_optimized: "{{ aws_ec2_autoscale_cluster.ebs_optimized }}"
-    assign_public_ip: "{{ aws_ec2_autoscale_cluster.assign_public_ip }}"
-    volumes:
-      - device_name: "{{ aws_ec2_autoscale_cluster.device_name }}"
-        volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
-        volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
-        encrypted: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
-        delete_on_termination: "{{ aws_ec2_autoscale_cluster.root_volume_delete_on_termination }}"
-  register: _aws_ec2_lc_created
+    network_interfaces:
+      - associate_public_ip_address: "{{ aws_ec2_autoscale_cluster.assign_public_ip }}"
+        delete_on_termination: "{{ aws_ec2_autoscale_cluster.instance_nic_delete_on_termination }}"
+        subnet_id: "{{ subnet_id }}" # picked randomly from _aws_ec2_autoscale_cluster_subnets_ids, see with_random_choice
+        device_index: 0 # must be 0 - see https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html#change-network-interface
+        groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
+    block_device_mappings:
+      - ebs:
+          delete_on_termination: "{{ aws_ec2_autoscale_cluster.root_volume_delete_on_termination }}"
+          encrypted: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
+          volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
+          volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
+        device_name: "{{ aws_ec2_autoscale_cluster.device_name }}"
+    credit_specification: "{{ aws_ec2_autoscale_cluster.instance_credit_specification | default(omit) }}"
+  with_random_choice: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
+  loop_control:
+    loop_var: subnet_id
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
     - aws_ec2_autoscale_cluster.type == "ec2"
@@ -433,14 +442,15 @@
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     state: "{{ aws_ec2_autoscale_cluster.state }}"
-    launch_config_name: "{{ _aws_ec2_lc_created.name }}"
+    launch_template:
+      launch_template_name: "{{ aws_ec2_autoscale_cluster.name }}"
     health_check_type: "{% if aws_ec2_autoscale_cluster_running_instances.instances | length > 0 %}{{ aws_ec2_autoscale_cluster.alb_health_check_type }}{% else %}EC2{% endif %}"
     health_check_period: "{{ aws_ec2_autoscale_cluster.alb_health_check_period | default(omit) }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     replace_all_instances: true
     replace_batch_size: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0 else aws_ec2_autoscale_cluster.desired_capacity }}"
     wait_for_instances: true
-    lc_check: true
+    lt_check: true
     wait_timeout: 3000
     desired_capacity: "{{ aws_ec2_autoscale_cluster.min_size if aws_ec2_autoscale_cluster.desired_capacity == 0 else aws_ec2_autoscale_cluster.desired_capacity }}"
     min_size: "{{ aws_ec2_autoscale_cluster.min_size }}"
