@@ -1,5 +1,5 @@
 uri     {{ pam_ldap.endpoints[0] }}/
-port	636
+port    636
 sudoers_base   ou=SUDOers,{{ pam_ldap.lookup_base }}
 #sudoers_debug 2
 ssl start_tls
