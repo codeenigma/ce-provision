@@ -2,9 +2,12 @@
 aws_elasticache:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  name: "example"
+  name: example
+  description: example
   state: present
-  tags: {}
+  subnets:
+    - subnet-aaaaaaaa
+    - subnet-bbbbbbbb
   elasticache_engine: memcached
   #cache_engine_version: 1.4.14
   #cache_parameter_group: my_custom_parameters
