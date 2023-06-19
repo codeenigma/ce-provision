@@ -108,7 +108,9 @@
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       name: "{{ aws_ec2_autoscale_cluster.name }}"
+      description: "{{ aws_ec2_autoscale_cluster.name }}"
       state: present
+      subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
       elasticache_engine: "{{ aws_ec2_autoscale_cluster.elasticache_engine }}"
       cache_engine_version: "{{ aws_ec2_autoscale_cluster.cache_engine_version | default(omit) }}"
       elasticache_node_type: "{{ aws_ec2_autoscale_cluster.elasticache_node_type }}"

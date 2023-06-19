@@ -1,11 +1,24 @@
 ---
-- name: Create ElastiCache cluster
+- name: Create ElastiCache subnet group.
+  community.aws.elasticache_subnet_group:
+    name: "{{ aws_elasticache.name }}"
+    state: "{{ aws_elasticache.state }}"
+    subnets: "{{ aws_elasticache.subnets }}"
+    region: "{{ aws_elasticache.region }}"
+    profile: "{{ aws_elasticache.aws_profile }}"
+    description: "{{ aws_elasticache.description }}"
+  register: _aws_elasticache_subnet_group
+
+# @TODO parameter group handling
+
+- name: Create ElastiCache cluster.
   community.aws.elasticache:
     profile: "{{ aws_elasticache.aws_profile }}"
     name: "{{ aws_elasticache.name }}"
     region: "{{ aws_elasticache.region }}"
     state: "{{ aws_elasticache.state }}"
     engine: "{{ aws_elasticache.elasticache_engine }}"
+    cache_subnet_group: "{{ _aws_elasticache_subnet_group.cache_subnet_group.name }}"
     cache_engine_version: "{{ aws_elasticache.cache_engine_version | default(omit) }}"
     cache_parameter_group: "{{ aws_elasticache.cache_parameter_group | default(omit) }}"
     node_type: "{{ aws_elasticache.elasticache_node_type }}"
@@ -13,5 +26,3 @@
     cache_port: "{{ aws_elasticache.elasticache_port }}"
     security_group_ids: "{{ aws_elasticache.elasticache_security_groups }}"
     zone: "{{ aws_elasticache.zone | default(omit) }}"
-
-# @TODO parameter group handling
