@@ -5,7 +5,6 @@
     name: "{{ aws_elasticache.name }}"
     region: "{{ aws_elasticache.region }}"
     state: "{{ aws_elasticache.state }}"
-    tags: "{{ aws_elasticache.tags }}"
     engine: "{{ aws_elasticache.elasticache_engine }}"
     cache_engine_version: "{{ aws_elasticache.cache_engine_version | default(omit) }}"
     cache_parameter_group: "{{ aws_elasticache.cache_parameter_group | default(omit) }}"

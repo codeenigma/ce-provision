@@ -4,7 +4,6 @@ aws_elasticache:
   region: "{{ _aws_region }}"
   name: "example"
   state: present
-  tags: {}
   elasticache_engine: memcached
   #cache_engine_version: 1.4.14
   #cache_parameter_group: my_custom_parameters
