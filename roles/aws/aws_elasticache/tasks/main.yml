@@ -26,3 +26,5 @@
     cache_port: "{{ aws_elasticache.elasticache_port }}"
     security_group_ids: "{{ aws_elasticache.elasticache_security_groups }}"
     zone: "{{ aws_elasticache.zone | default(omit) }}"
+
+# @TODO grab the endpoint data for the memcached client role
