@@ -19,7 +19,7 @@ rkhunter:
   append_log: "0"
   copy_log_on_error: "0"
   use_syslog: authpriv.warning
-  allow_ssh_root_user: "no"
+  allow_ssh_root_user: "{{ sshd.PermitRootLogin }}"
   disable_tests: "suspscan hidden_procs deleted_files packet_cap_apps apps os_specific"
   scriptwhitelist:
     - /bin/egrep
@@ -43,6 +43,7 @@ rkhunter:
   use_locking: "0"
   lock_timeout: "300"
   show_lock_messages: "1"
+
 ```
 
 <!--ENDROLEVARS-->

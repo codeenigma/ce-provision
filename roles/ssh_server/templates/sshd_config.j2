@@ -10,6 +10,8 @@
 # possible, but leave them comm ented.  Uncommented options override the
 # default value.
 
+Protocol {{ sshd.Protocol }}
+
 #Port 22
 {% for port in sshd.Port %}
 Port {{ port }}

@@ -38,6 +38,7 @@ sshd:
   PermitUserEnvironment: "no"
   PrintLastLog: "yes"
   PrintMotd: "no"
+  Protocol: "2"
   PubkeyAuthentication: "yes"
   RekeyLimit: "default none"
   StrictModes: "yes"
