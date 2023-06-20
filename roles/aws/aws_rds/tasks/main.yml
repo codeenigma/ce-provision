@@ -1,4 +1,4 @@
-- name: Create DB subnet
+- name: Create DB subnet group.
   amazon.aws.rds_subnet_group:
     name: "{{ aws_rds.name }}"
     state: "{{ aws_rds.state }}"
@@ -8,7 +8,7 @@
     description: "{{ aws_rds.description }}"
   register: _aws_rds_rds_subnet_group
 
-- name: Reset security groups info
+- name: Reset security groups info.
   ansible.builtin.set_fact:
     _aws_rds_security_group_ids: []
 
