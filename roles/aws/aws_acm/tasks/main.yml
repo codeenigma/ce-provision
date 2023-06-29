@@ -33,7 +33,6 @@
 - ansible.builtin.set_fact:
     _aws_tags_list: []
     _aws_tags_string: ""
-  when: aws_acm.tags | length > 0
 
 - name: Build list of tags as Key,Value strings.
   ansible.builtin.set_fact:

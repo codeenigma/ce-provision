@@ -2,6 +2,9 @@
 collections:
   - name: community.mysql
   - name: community.sops
+  - name: community.docker
+  - name: community.aws
+    version: 5.5.0 # pinning at version 5.5.0 for Python 3.7
   - name: ansible.posix
   - name: amazon.aws
     version: 5.5.0 # pinning at version 5.5.0 for Python 3.7
