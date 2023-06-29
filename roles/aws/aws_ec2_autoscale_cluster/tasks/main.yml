@@ -662,12 +662,18 @@
 - name: Initialise a list of CloudFront aliases with main domain name.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [_domain_name] }}"
+  when:
+    - aws_ec2_autoscale_cluster.create_elb
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
 - name: Add extra_domains so we can set up additional CloudFront aliases.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [item.domain] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
   when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
+  when:
+    - aws_ec2_autoscale_cluster.create_elb
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
 - name: Create a CloudFront distribution.
   ansible.builtin.include_role:
