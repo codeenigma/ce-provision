@@ -297,7 +297,7 @@
 - name: "Create a Target group for port {{ aws_ec2_autoscale_cluster.target_group_http_port }}."
   community.aws.elb_target_group:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    name: "{{ aws_ec2_autoscale_cluster.name }}"
+    name: "{{ aws_ec2_autoscale_cluster.name | truncate(32, true, '', 0) }}" # 32 char limit
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
@@ -317,6 +317,7 @@
   register: _aws_ec2_target_group_created
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
+    - aws_ec2_autoscale_cluster.create_elb
 
 - name: Define default ALB listeners.
   ansible.builtin.set_fact:
@@ -687,7 +688,7 @@
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
 
-- name: Add DNS records in route 53.
+- name: Add DNS records in Route 53.
   amazon.aws.route53:
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     profile: "{{ item.aws_profile }}"
