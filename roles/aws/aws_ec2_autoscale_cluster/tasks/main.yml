@@ -526,17 +526,12 @@
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
 
-- ansible.builtin.set_fact:
+- name: Create placeholder ARN variables for scaling policies.
+  ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: ""
-  when:
-    - _aws_ec2_autoscale_cluster_scaling_policies
-    - aws_ec2_autoscale_cluster.type == "ec2"
-    - aws_ec2_autoscale_cluster.deploy_cluster
-
-- ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: ""
   when:
-    - _aws_ec2_autoscale_cluster_scaling_policies
+    - _aws_ec2_autoscale_cluster_scaling_policies is defined
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
 
@@ -547,7 +542,7 @@
     _aws_ec2_autoscale_cluster_scaling_up_policy_ARN: "{{ item.arn }}"
   loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
   when:
-    - _aws_ec2_autoscale_cluster_scaling_policies
+    - _aws_ec2_autoscale_cluster_scaling_policies is defined
     - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_up_name
     - item.arn is defined
     - aws_ec2_autoscale_cluster.type == "ec2"
@@ -559,7 +554,7 @@
     _aws_ec2_autoscale_cluster_scaling_down_policy_ARN: "{{ item.arn }}"
   loop: "{{ _aws_ec2_autoscale_cluster_scaling_policies }}"
   when:
-    - _aws_ec2_autoscale_cluster_scaling_policies
+    - _aws_ec2_autoscale_cluster_scaling_policies is defined
     - item.item.name == aws_ec2_autoscale_cluster.asg_cloudwatch_policy_scale_down_name
     - item.arn is defined
     - aws_ec2_autoscale_cluster.type == "ec2"
