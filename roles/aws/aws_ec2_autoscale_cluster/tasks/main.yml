@@ -173,6 +173,9 @@
 - name: Create an AWS ECR repository for cluster containers.
   community.aws.ecs_ecr:
     name: "{{ aws_ec2_autoscale_cluster.container_repo_name }}"
+    state: "{{ aws_ec2_autoscale_cluster.state }}"
+    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
   when:
     - aws_ec2_autoscale_cluster.type == "ecs"
 
@@ -670,8 +673,8 @@
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [item.domain] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
-  when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
   when:
+    - aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
