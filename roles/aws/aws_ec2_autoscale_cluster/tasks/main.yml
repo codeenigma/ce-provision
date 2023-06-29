@@ -670,8 +670,8 @@
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [item.domain] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
-  when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
   when:
+    - aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
