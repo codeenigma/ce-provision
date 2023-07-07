@@ -8,3 +8,7 @@ TIMEOUT 5
 TIMELIMIT 5
 
 pam_lookup_policy yes
+
+{% if pam_ldap.ssl_certificate_check is defined and not pam_ldap.ssl_certificate_check %}
+TLS_REQCERT never
+{% endif %}
