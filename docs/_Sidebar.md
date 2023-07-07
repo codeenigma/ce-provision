@@ -24,6 +24,7 @@
        - [AWS ElastiCache](/roles/aws/aws_elasticache)
        - [AWS IAM EC2](/roles/aws/aws_iam_role)
        - [AWS IAM SAML](/roles/aws/aws_iam_saml)
+       - [AWS Network Info](/roles/aws/_aws_network_info)
        - [AWS key pair.](/roles/aws/aws_provision_ec2_keypair)
        - [AWS RDS](/roles/aws/aws_rds)
        - [AWS S3 Bucket](/roles/aws/aws_s3_bucket)
