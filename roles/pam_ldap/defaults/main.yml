@@ -7,6 +7,9 @@ ldap_client:
   # @todo this need a bit more work to be more robust/flexible.
   ssl_certificate: ""
   # ssl_certificate: ldap.example.pem
+  # Debian cannot support multiple LDAP SSL connections.
+  # See https://serverfault.com/questions/520597/how-to-securely-connect-to-multiple-different-ldaps-servers-debian
+  ssl_certificate_check: true # set to false if you need to connect to multiple LDAP servers with different CA certs from the same machine
   # List of ldap servers to
   endpoints:
     []

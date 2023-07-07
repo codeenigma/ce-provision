@@ -14,7 +14,7 @@ php_composer:
   # https://github.com/geerlingguy/ansible-role-composer/blob/master/defaults/main.yml
   version: ''
   keep_updated: true
-  version_branch: '--2' # install latest version 2.x by default
+  version_branch: '' # empty installs latest version by default
   github_oauth_token: ''
 
 ```
