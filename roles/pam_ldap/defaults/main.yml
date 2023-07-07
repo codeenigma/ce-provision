@@ -23,6 +23,7 @@ ldap_client:
 
 pam_ldap:
   ssl_certificate: "{{ ldap_client.ssl_certificate }}"
+  ssl_certificate_check: "{{ ldap_client.ssl_certificate_check }}"
   endpoints: "{{ ldap_client.endpoints }}"
   lookup_base: "{{ ldap_client.lookup_base }}"
   binddn: "{{ ldap_client.binddn }}"
