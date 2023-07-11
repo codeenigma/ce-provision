@@ -1,0 +1,19 @@
+---
+- name: Ensure old boto versions are not installed.
+  ansible.builtin.apt:
+    pkg: ["python-botocore", "python-urllib3"]
+    state: absent
+
+- name: Set initial boto3 package name.
+  ansible.builtin.set_fact:
+    _boto3_install_package: boto3
+
+- name: Set specific boto3 version to install.
+  ansible.builtin.set_fact:
+    _boto3_install_package: "boto3=={{ python_boto.boto3_version}}"
+  when: python_boto.boto3_version | length > 0
+
+- name: Ensure boto3 is installed.
+  ansible.builtin.pip:
+    name: "{{ _boto3_install_package }}"
+    executable: pip3
