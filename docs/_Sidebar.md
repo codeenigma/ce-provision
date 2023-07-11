@@ -62,6 +62,7 @@
      - [OpenVPN Config](/roles/openvpn_config)
      - [OSSEC](/roles/ossec)
      - [\_overrides.](/roles/_overrides)
+     - [Packer](/roles/packer)
      - [PHP Composer](/roles/php_composer)
      - [PHP XDebug](/roles/php_xdebug)
      - [Postfix](/roles/postfix)
