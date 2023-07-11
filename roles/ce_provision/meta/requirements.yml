@@ -4,10 +4,10 @@ collections:
   - name: ansible.utils
   - name: community.sops
   - name: community.aws
-    version: 5.5.0 # pinning at version 5.5.0 for Python 3.7
+    version: ">=5.5.0,<6.0.0" # pinning at version 5.5.x for Python 3.7
   - name: community.general
   - name: amazon.aws
-    version: 5.5.0 # pinning at version 5.5.0 for Python 3.7
+    version: ">=5.5.0,<6.0.0" # pinning at version 5.5.x for Python 3.7
 
 roles:
   - name: geerlingguy.varnish
