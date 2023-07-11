@@ -1,0 +1,11 @@
+---
+- name: Ensure python3-distutils is installed.
+  ansible.builtin.apt:
+    name: python3-distutils
+    state: present
+    update_cache: true
+
+- name: Ensure python3-pip is installed.
+  ansible.builtin.apt:
+    pkg: python3-pip
+    state: present

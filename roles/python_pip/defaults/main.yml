@@ -1,4 +1,5 @@
 ---
+# Variables only valid for Debian versions below 12 (bookworm).
 python_pip:
   python_binary_path: "/usr/bin/python3"
   pip_packages:
