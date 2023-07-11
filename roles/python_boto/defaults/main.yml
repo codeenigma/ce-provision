@@ -1,0 +1,2 @@
+python_boto:
+  boto3_version: "1.22.13" # first version that works with 'stable-6' AWS collections - empty string means latest
