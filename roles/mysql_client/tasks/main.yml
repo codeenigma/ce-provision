@@ -6,10 +6,17 @@
     update_cache: true
     cache_valid_time: 240
 
-- name: Ensure pip dependencies are installed.
+- name: Ensure pip dependencies are installed with pip3.
   ansible.builtin.pip:
     name: pymysql
     executable: pip3
+  when: ansible_distribution_major_version < 12
+
+- name: Ensure pip dependencies are installed with apt.
+  ansible.builtin.apt:
+    pkg: python3-pymysql
+    state: present
+  when: ansible_distribution_major_version >= 12
 
 - name: Copy debian.cnf credentials file.
   ansible.builtin.template:

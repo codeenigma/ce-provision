@@ -1,42 +1,11 @@
 ---
-- name: Ensure old pip versions are not installed.
-  ansible.builtin.apt:
-    pkg: "{{ python_pip.pip_packages }}"
-    state: absent
-
 - name: Ensure python3-distutils is installed.
   ansible.builtin.apt:
     name: python3-distutils
     state: present
     update_cache: true
 
-- name: Check to see if pip3 is already there.
-  ansible.builtin.command:
-    cmd: which pip3
-  register: pip3_package
-  failed_when: false
-
-- name: Fetch Pip installer.
-  ansible.builtin.get_url:
-    url: https://bootstrap.pypa.io/get-pip.py
-    dest: /tmp/get-pip.py
-  when:
-    - pip3_package.rc != 0
-
-- name: Ensure pip3 is installed.
-  ansible.builtin.command:
-    cmd: python3 /tmp/get-pip.py
-  become: false
-  when:
-    - pip3_package.rc != 0
-
-#- name: Ensure python3-distutils is installed.
-#  ansible.builtin.apt:
-#    name: python3-distutils
-#    state: present
-#    update_cache: true
-
-#- name: Ensure python3-pip is installed.
-#  ansible.builtin.apt:
-#    pkg: python3-pip
-#    state: present
+- name: Ensure python3-pip is installed.
+  ansible.builtin.apt:
+    pkg: python3-pip
+    state: present
