@@ -72,16 +72,6 @@
     state: present
   when: ansible_distribution_major_version | int >= 12
 
-- name: Ensure certifi pip package is installed.
-  ansible.builtin.pip:
-    name: certifi
-    executable: pip3
-
-- name: Ensure pyopenssl pip package is installed.
-  ansible.builtin.pip:
-    name: pyopenssl
-    executable: pip3
-
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
   ansible.builtin.command:
