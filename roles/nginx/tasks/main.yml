@@ -6,7 +6,7 @@
     update_cache: true
     cache_valid_time: 240
 
-- name: Ensure passlib is installed with pip.
+- name: Ensure passlib is installed with pip3.
   ansible.builtin.pip:
     name: passlib
     executable: pip3
@@ -17,7 +17,6 @@
     pkg: python3-passlib
     state: present
   when: ansible_distribution_major_version | int >= 12
-
 
 - name: Copy main nginx config.
   ansible.builtin.template:
