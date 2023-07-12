@@ -1,24 +1,3 @@
 ---
-- name: Load version specific tasks.
+- name: Load Debian version specific tasks.
   ansible.builtin.include_tasks: "{{ ansible_distribution_major_version }}.yml"
-
-# cron is not necessarily installed by default.
-- name: Ensure cron is installed.
-  ansible.builtin.apt:
-    name: cron
-    state: present
-    update_cache: true
-
-- name: Create cron entry to upgrade pip.
-  ansible.builtin.cron:
-    name: upgrade_python_pip
-    minute: "{{ python_pip.upgrade.minute | default(omit) }}"
-    hour: "{{ python_pip.upgrade.hour | default(omit) }}"
-    day: "{{ python_pip.upgrade.day | default(omit) }}"
-    weekday: "{{ python_pip.upgrade.weekday | default(omit) }}"
-    month: "{{ python_pip.upgrade.month | default(omit) }}"
-    job: "{{ python_pip.upgrade.command }}"
-    state: present
-    disabled: "{{ python_pip.upgrade.disabled | default(omit) }}"
-  become: true
-  when: python_pip.upgrade.enabled

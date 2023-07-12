@@ -68,6 +68,7 @@
      - [PHP XDebug](/roles/php_xdebug)
      - [Postfix](/roles/postfix)
      - [Process Manager](/roles/process_manager)
+     - [Python Boto](/roles/python_boto)
      - [Python Pip](/roles/python_pip)
      - [rkhunter](/roles/rkhunter)
      - [Rsyslog](/roles/rsyslog)
