@@ -11,7 +11,7 @@ Install and configure the apache webserver.
 ---
 php:
   version:
-    - 7.2
+    - 8.1 # see https://www.php.net/supported-versions.php
 symfony_env: "{{ _env_type }}"
 apache:
   # Global default config for apache2.conf.

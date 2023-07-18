@@ -12,9 +12,9 @@ This role is used to install the Composer package manager for PHP. It wraps the 
 php_composer:
   # Abstractions of default variables which can be found here:
   # https://github.com/geerlingguy/ansible-role-composer/blob/master/defaults/main.yml
-  version: '1.8.4' # Buster apt package is 'Composer 1.8.4 2019-02-11 10:52:10'
-  keep_updated: false
-  version_branch: ''
+  version: ''
+  keep_updated: true
+  version_branch: '' # empty installs latest version by default
   github_oauth_token: ''
 
 ```

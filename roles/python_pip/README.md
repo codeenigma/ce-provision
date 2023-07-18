@@ -1,5 +1,7 @@
 # Python Pip
-Role to install pip3.
+Role to install `pip3`.
+
+Note, the variables do not do anything for Debian 12 (bookworm) onwards, as `pip3` is handled by `apt` from then on.
 
 <!--TOC-->
 <!--ENDTOC-->
@@ -8,6 +10,7 @@ Role to install pip3.
 ## Default variables
 ```yaml
 ---
+# Variables only valid for Debian versions below 12 (bookworm).
 python_pip:
   python_binary_path: "/usr/bin/python3"
   pip_packages:

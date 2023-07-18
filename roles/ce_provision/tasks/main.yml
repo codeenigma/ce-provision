@@ -1,4 +1,11 @@
 ---
+# cron is not necessarily installed by default.
+- name: Ensure cron is installed.
+  ansible.builtin.apt:
+    name: cron
+    state: present
+    update_cache: true
+
 - name: Create the provision group for provisioning.
   ansible.builtin.group:
     name: "{{ ce_provision.username }}"
@@ -47,20 +54,23 @@
     pkg: ["git", "parallel"]
     state: present
 
-- name: Ensure dnspython pip package is installed.
+- name: Ensure dnspython, certifi and pyopenssl are installed with pip3.
   ansible.builtin.pip:
-    name: dnspython
+    name:
+      - dnspython
+      - certifi
+      - pyopenssl
     executable: pip3
+  when: ansible_distribution_major_version | int < 12
 
-- name: Ensure certifi pip package is installed.
-  ansible.builtin.pip:
-    name: certifi
-    executable: pip3
-
-- name: Ensure pyopenssl pip package is installed.
-  ansible.builtin.pip:
-    name: pyopenssl
-    executable: pip3
+- name: Ensure dnspython, certifi and openssl are installed with apt.
+  ansible.builtin.apt:
+    name:
+      - python3-dnspython
+      - python3-certifi
+      - python3-openssl
+    state: present
+  when: ansible_distribution_major_version | int >= 12
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
@@ -166,22 +176,34 @@
   become_user: "{{ ce_provision.username }}"
   when: ce_provision.galaxy_roles_directory | length > 0
 
-- name: Include meta requirements file as variables.
-  ansible.builtin.include_vars:
-    file: ../meta/requirements.yml
-
-- name: Create cron entries to upgrade Ansible Galaxy collections.
+- name: Create cron entries to upgrade mandatory ansible-galaxy collections.
   ansible.builtin.cron:
-    name: "upgrade_ansible_galaxy_{{ item.name | regex_replace('\\.', '_') }}"
+    name: "upgrade_ansible_galaxy_mandatory"
     minute: "{{ ce_provision.upgrade_galaxy.minute | default(omit) }}"
     hour: "{{ ce_provision.upgrade_galaxy.hour | default(omit) }}"
     day: "{{ ce_provision.upgrade_galaxy.day | default(omit) }}"
     weekday: "{{ ce_provision.upgrade_galaxy.weekday | default(omit) }}"
     month: "{{ ce_provision.upgrade_galaxy.month | default(omit) }}"
-    job: "{{ ce_provision.upgrade_galaxy.command }} {{ item.name }}"
+    job: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.local_dir }}/roles/ce_provision/meta/requirements.yml"
     state: present
     disabled: "{{ ce_provision.upgrade_galaxy.disabled | default(omit) }}"
   become: true
   become_user: "{{ ce_provision.username }}"
-  with_items: "{{ collections }}"
   when: ce_provision.upgrade_galaxy.enabled
+
+- name: Create cron entries to upgrade custom ansible-galaxy collections.
+  ansible.builtin.cron:
+    name: "upgrade_ansible_galaxy_custom"
+    minute: "{{ ce_provision.upgrade_galaxy.minute | default(omit) }}"
+    hour: "{{ ce_provision.upgrade_galaxy.hour | default(omit) }}"
+    day: "{{ ce_provision.upgrade_galaxy.day | default(omit) }}"
+    weekday: "{{ ce_provision.upgrade_galaxy.weekday | default(omit) }}"
+    month: "{{ ce_provision.upgrade_galaxy.month | default(omit) }}"
+    job: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.galaxy_custom_requirements_file }}"
+    state: present
+    disabled: "{{ ce_provision.upgrade_galaxy.disabled | default(omit) }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  when:
+    - _ce_provision_custom_galaxy_requirements.stat.exists
+    - ce_provision.upgrade_galaxy.enabled
