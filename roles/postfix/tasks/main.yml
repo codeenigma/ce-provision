@@ -44,8 +44,11 @@
     group: root
     mode: "0644"
   notify:
-    - Initialise transport.
     - Reload Postfix configuration.
+
+- name: Initialise transport db
+  ansible.builtin.command:
+    cmd: /usr/sbin/postmap /etc/postfix/transport
 
 - name: Install SASL
   ansible.builtin.package:
@@ -62,8 +65,12 @@
     mode: "0644"
   when: postfix.use_ses
   notify:
-    - Initialise sasl_passwd.
     - Reload Postfix configuration.
+
+- name: Initialise sasl_passwd
+  ansible.builtin.command:
+    cmd: /usr/sbin/postmap /etc/postfix/sasl_passwd
+  when: postfix.use_ses
 
 - name: Configure virtual
   ansible.builtin.template:
