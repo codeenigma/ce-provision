@@ -35,7 +35,6 @@ aws_opensearch:
   #      value: 2
   #      unit: "HOURS"
   #    cron_expression_for_recurrence: "cron(0 2 * * *)"
-
 ```
 
 <!--ENDROLEVARS-->
