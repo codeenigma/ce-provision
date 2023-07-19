@@ -1,6 +1,6 @@
 ---
 dependencies:
-  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron", "bsd-mailx"] }
   - role: locales
   - role: user_root
   - role: apt_extra_packages
