@@ -11,7 +11,7 @@
         "Action": [
             "es:ESHttp*"
         ],
-        "Resource": "arn:aws:es:eu-west-2:{{ _aws_account_info.account }}:domain/*"
+        "Resource": "arn:aws:es:{{ aws_opensearch.region }}:{{ _aws_account_info.account }}:domain/{{ aws_opensearch.domain_name }}/*"
         }
     ]
 }
