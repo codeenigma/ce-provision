@@ -1,6 +1,6 @@
 - name: Get the current AWS account caller identity information
   amazon.aws.aws_caller_info:
-    profile: "{{ aws_iam_saml.aws_profile }}"
+    profile: "{{ aws_opensearch.aws_profile }}"
   delegate_to: localhost
   register: _aws_account_info
 
