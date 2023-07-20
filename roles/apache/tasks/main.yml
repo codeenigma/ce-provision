@@ -90,11 +90,13 @@
   ansible.builtin.file:
     path: "/etc/apache2/sites-enabled"
     state: absent
+  when: apache.recreate_vhosts
 
 - name: Recreate vhosts folder.
   ansible.builtin.file:
     path: "/etc/apache2/sites-enabled"
     state: directory
+  when: apache.recreate_vhosts
 
 - name: Check if we have an AWS Cloudwatch folder.
   ansible.builtin.stat:
@@ -113,6 +115,21 @@
   with_items: "{{ apache.domains }}"
   loop_control:
     loop_var: domain
+  when: apache.recreate_vhosts
+
+- name: Test Apache configuration.
+  ansible.builtin.command: apachectl configtest
+  register: apache_test_result
+  failed_when: false
+
+- name: Display Apache test result.
+  ansible.builtin.debug:
+    msg: "{{ apache_test_result.stdout }}"
+
+- name: Fail the playbook if Apache test fails.
+  ansible.builtin.fail:
+    msg: "Apache configuration test failed."
+  when: apache_test_result.rc != 0
 
 - name: Ensure apache2 is restarted.
   ansible.builtin.service:
