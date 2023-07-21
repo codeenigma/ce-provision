@@ -18,8 +18,8 @@ aws_opensearch:
     - "subnet-bbbbbbbb"
   security_groups: []
   automated_snapshot_start_hour: 3
-  auto_tune: false  # boolean; true or false - not supported when t3's are used
-  # List of maintenance schedules to use if auto_tune is set to true:
+  auto_tune: "DISABLED" # not supported when t3's are used
+  # List of maintenance schedules to use if auto_tune is set to "ENABLED":
   #auto_tune_maintenance_schedules:
   #  - start_at: "2022-08-10"
   #    duration:
