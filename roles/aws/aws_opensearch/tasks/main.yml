@@ -34,7 +34,7 @@
     snapshot_options:
       automated_snapshot_start_hour: "{{ aws_opensearch.automated_snapshot_start_hour }}"
     auto_tune_options:
-      enabled: "{{ aws_opensearch.auto_tune }}"
+      desired_state: "{{ aws_opensearch.auto_tune }}"
       maintenance_schedules: "{{ aws_opensearch.auto_tune_maintenance_schedules | default(omit) }}"
     tags: "{{ aws_opensearch.tags }}"
     wait: true
