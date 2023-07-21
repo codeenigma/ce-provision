@@ -27,7 +27,7 @@
       ebs_enabled: true
       volume_type: "{{ aws_opensearch.volume_type }}"
       volume_size: "{{ aws_opensearch.volume_size }}"
-    access_policies: "{{ lookup('template', 'policy.json.j2') | from_json }}"
+    access_policies: "{{ lookup('template', 'policy.json.j2') }}"
     vpc_options:
       subnets: "{{ aws_opensearch.subnets }}"
       security_groups: "{{ aws_opensearch.security_groups }}"
