@@ -55,11 +55,20 @@ gitlab:
   puma_worker_processes: 2
   initial_root_password: "Ch@ng3m3"
   # LDAP settings
-  ldap: false # enable/disable LDAP integration
-  ldap_endpoint: "{{ ldap_client.endpoints[0] }}"
-  ldap_lookup_base: "{{ ldap_client.lookup_base }}"
-  ldap_binddn: "{{ ldap_client.binddn }}"
-  ldap_bindpw: "{{ ldap_client.bindpw }}"
+  ldap:
+    enable: false # enable/disable LDAP integration
+    servers: # setting more than one server is a Premium feature, in most cases you can have only one
+      - name: main # key name in GitLab config YAML
+        label: LDAP # label of server in GitLab
+        endpoint: "{{ ldap_client.endpoints[0] }}"
+        port: 636
+        lookup_base: "{{ ldap_client.lookup_base }}"
+        binddn: "{{ ldap_client.binddn }}"
+        bindpw: "{{ ldap_client.bindpw }}"
+        active_directory: false
+        uid: uid
+        method: ssl # "tls" or "ssl" or "plain"
+        user_filter: "" # optionally filter users based on a user attribute, e.g. gidNumber
   # Mattermost chat settings
   mattermost: false # enable/disable Mattermost chat
   mattermost_url: "chat.{{ _domain_name }}" # unless you use Route 53 integration you must create a DNS record first for LetsEncrypt to work
