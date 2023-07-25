@@ -36,9 +36,13 @@
   loop_control:
     loop_var: _init_vars_dir
 
+- name: Set an empty _init_vars_dirs_list variable in case none are provided.
+  ansible.builtin.set_fact:
+    _init_vars_dirs_list: []
+
 - name: Build the list of directories to scan for changes.
   ansible.builtin.set_fact:
-    _init_vars_dirs_list: "{{ _init_vars_dirs_list | default([]) + [_init_vars_dir._init_vars_dir] }}"
+    _init_vars_dirs_list: "{{ _init_vars_dirs_list + [_init_vars_dir._init_vars_dir] }}"
   when: _init_vars_dir.stat.exists
   with_items: "{{ _init_vars_dir_exists.results }}"
   loop_control:
