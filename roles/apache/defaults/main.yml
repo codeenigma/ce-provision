@@ -29,6 +29,7 @@ apache:
   max_clients: 256
   max_requests_per_child: 10000
   keepalive: "Off"
+  recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml
   overrides: [] # See the '_overrides' role.
   domains:
     - server_name: "{{ _domain_name }}"

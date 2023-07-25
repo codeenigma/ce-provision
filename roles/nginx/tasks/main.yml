@@ -65,11 +65,13 @@
   ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: absent
+  when: nginx.recreate_vhosts
 
 - name: Recreate vhosts folder
   ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: directory
+  when: nginx.recreate_vhosts
 
 - name: Check if we have an AWS Cloudwatch folder.
   ansible.builtin.stat:
@@ -91,6 +93,7 @@
   when:
     - nginx.domains is defined
     - nginx.domains | length > 0
+    - nginx.recreate_vhosts
 
 - name: Trigger overrides
   ansible.builtin.include_role:
@@ -100,6 +103,20 @@
   when:
     - nginx.overrides is defined
     - nginx.overrides | length > 0
+
+- name: Test Nginx configuration.
+  ansible.builtin.command: nginx -t
+  register: nginx_test_result
+  failed_when: false
+
+- name: Display Nginx test result.
+  ansible.builtin.debug:
+    msg: "{{ nginx_test_result.stdout }}"
+
+- name: Fail the playbook if Nginx test fails.
+  ansible.builtin.fail:
+    msg: "Nginx configuration test failed."
+  when: nginx_test_result.rc != 0
 
 - name: Ensure Nginx is restarted.
   ansible.builtin.service:
