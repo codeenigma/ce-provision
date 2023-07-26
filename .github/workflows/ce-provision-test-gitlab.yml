@@ -33,14 +33,14 @@ jobs:
           rm -Rf mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
           sudo apt-get install -y dnsmasq
-          sudo /bin/systemctl stop systemd-resolved
-          sudo /bin/systemctl start dnsmasq
 
       # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
+          sudo /bin/systemctl stop systemd-resolved
+          sudo /bin/systemctl start dnsmasq
           sudo /bin/systemctl restart docker.service
           /bin/bash ce-dev/ansible/test.sh --verbose --examples gitlab --own-branch ${{ github.event.pull_request.base.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
         shell: bash
