@@ -148,7 +148,7 @@
 
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements.yml --force"
+    cmd: "ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
   become: true
   become_user: "{{ ce_deploy.username }}"
 
@@ -161,13 +161,13 @@
 
 - name: Create cron entries to upgrade mandatory ansible-galaxy collections.
   ansible.builtin.cron:
-    name: "upgrade_ansible_galaxy_mandatory"
+    name: "upgrade_ce_deploy_ansible_galaxy_mandatory"
     minute: "{{ ce_deploy.upgrade_galaxy.minute | default(omit) }}"
     hour: "{{ ce_deploy.upgrade_galaxy.hour | default(omit) }}"
     day: "{{ ce_deploy.upgrade_galaxy.day | default(omit) }}"
     weekday: "{{ ce_deploy.upgrade_galaxy.weekday | default(omit) }}"
     month: "{{ ce_deploy.upgrade_galaxy.month | default(omit) }}"
-    job: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements.yml"
+    job: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
     state: present
     disabled: "{{ ce_deploy.upgrade_galaxy.disabled | default(omit) }}"
   become: true
@@ -176,7 +176,7 @@
 
 - name: Create cron entries to upgrade custom ansible-galaxy roles and collections.
   ansible.builtin.cron:
-    name: "upgrade_ansible_galaxy_custom"
+    name: "upgrade_ce_deploy_ansible_galaxy_custom"
     minute: "{{ ce_deploy.upgrade_galaxy.minute | default(omit) }}"
     hour: "{{ ce_deploy.upgrade_galaxy.hour | default(omit) }}"
     day: "{{ ce_deploy.upgrade_galaxy.day | default(omit) }}"
