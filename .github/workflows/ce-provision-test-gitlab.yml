@@ -32,8 +32,9 @@ jobs:
           sudo chmod +x /usr/local/bin/mkcert
           rm -Rf mkcert
           curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
-          sudo /bin/systemctl stop systemd-resolved
           sudo apt-get install -y dnsmasq
+          sudo /bin/systemctl stop systemd-resolved
+          sudo /bin/systemctl start dnsmasq
 
       # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
