@@ -140,8 +140,8 @@
 
 - name: Copy mandatory ansible-galaxy requirements file to deploy server.
   ansible.builtin.copy:
-    src: "{{ ce_deploy.ce_provision_dir }}/roles/ce_deploy/meta/requirements.yml"
-    dest: "{{ ce_deploy.local_dir }}/requirements.yml"
+    src: "{{ ce_deploy.ce_provision_dir }}/roles/ce_deploy/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+    dest: "{{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
     owner: "{{ ce_deploy.username }}"
     group: "{{ ce_deploy.username }}"
     mode: '0644'

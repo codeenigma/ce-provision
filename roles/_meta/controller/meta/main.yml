@@ -1,9 +1,9 @@
 ---
 dependencies:
   - role: user_provision
+  - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: _meta/common_base
   - role: aws/aws_credentials
-  - role: ssh_server
   - role: ce_provision
   - role: gitlab
   - role: gitlab_runner

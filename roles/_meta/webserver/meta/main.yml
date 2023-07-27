@@ -1,7 +1,7 @@
 ---
 dependencies:
-  - role: _meta/common_base
   - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
+  - role: _meta/common_base
   - role: user_provision
   - role: user_deploy
   - role: mysql_client
