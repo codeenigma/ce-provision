@@ -2,7 +2,8 @@
 roles:
   - name: geerlingguy.solr
   - name: geerlingguy.java
-  - name: cloudalchemy.prometheus
-  - name: cloudalchemy.node_exporter
-  - name: cloudalchemy.alertmanager
   - name: cloudalchemy.process_exporter
+  - name: cloudalchemy.grafana
+collections:
+  - name: community.grafana
+  - name: prometheus.prometheus
