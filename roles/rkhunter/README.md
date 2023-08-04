@@ -19,7 +19,7 @@ rkhunter:
   append_log: "0"
   copy_log_on_error: "0"
   use_syslog: authpriv.warning
-  allow_ssh_root_user: "{{ sshd.PermitRootLogin }}"
+  allow_ssh_root_user: "{{ sshd.PermitRootLogin | default('prohibit-password') }}"
   disable_tests: "suspscan hidden_procs deleted_files packet_cap_apps apps os_specific"
   scriptwhitelist:
     - /bin/egrep

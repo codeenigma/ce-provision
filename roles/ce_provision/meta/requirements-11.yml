@@ -2,6 +2,7 @@
 collections:
   - name: ansible.posix
   - name: ansible.utils
+  - name: ansible.windows # required by Wazuh roles
   - name: community.sops
   - name: community.aws
   - name: community.general
