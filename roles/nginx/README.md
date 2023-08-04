@@ -41,6 +41,7 @@ nginx:
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
   fastcgi_read_timeout: 60
+  recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml.
   overrides: [] # See the '_overrides' role.
   domains:
     - server_name: "{{ _domain_name }}"
