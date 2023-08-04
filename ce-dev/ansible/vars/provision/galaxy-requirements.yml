@@ -2,5 +2,8 @@
 roles:
   - name: geerlingguy.solr
   - name: geerlingguy.java
-  - name: prometheus.prometheus
   - name: cloudalchemy.process_exporter
+  - name: cloudalchemy.grafana
+collections:
+  - name: community.grafana
+  - name: prometheus.prometheus
