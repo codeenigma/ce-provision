@@ -1,4 +1,15 @@
 # Autoscale cluster
+Supports either AWS EC2 Autoscaling Groups (ASGs) or AWS ECS clusters. Note, this role only deals with setting up the config and surrounding services, it does not handle any deployment of code or containers. If you want to use Code Enigma complementary tools, see these two roles in our `ce-deploy` project:
+* https://github.com/codeenigma/ce-deploy/tree/1.x/roles/deploy_container (ECS)
+* https://github.com/codeenigma/ce-deploy/tree/1.x/roles/deploy_code (EC2)
+
+Note also that the `deploy_code` role needs to be used in tandem with this `ce-provision` role, which ensures there is a `cloud-init` script in place to install the code in the event of an instance replacement:
+* https://github.com/codeenigma/ce-provision/tree/1.x/roles/mount_sync
+
+## Networking
+Regardless of the scenario, ECS or EC2, if you decide to use a private subnet instead of giving your instances or containers public IP addresses, you will need at least one NAT gateway (more than one for resilience). When you are creating NAT gateways they must be in a *public* subnet and your routing tables in the private subnets should use the NAT gateway as the default route. Do not put the NAT gateways on the private subnets, it cannot possibly work and your containers or instances will not have internet access.
+
+`ce-provision` will handle this for you in most cases.
 
 <!--TOC-->
 <!--ENDTOC-->
