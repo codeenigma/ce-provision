@@ -2,7 +2,7 @@
 
 # stop services
 {% for service in _ssl_services %}
-service {{ service }} stop
+/usr/sbin/service {{ service }} stop
 {% endfor %}
 
 # Give Nginx more time to stop before certbot
@@ -25,10 +25,10 @@ done
 
 # start services again
 {% for service in _ssl_services %}
-service {{ service }} start
+/usr/sbin/service {{ service }} start
 {% endfor %}
 
 # reload dependent services
 {% for service in ssl.reload %}
-service {{ service }} {{ ssl.reload_command }}
+/usr/sbin/service {{ service }} {{ ssl.reload_command }}
 {% endfor %}
