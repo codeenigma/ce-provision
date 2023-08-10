@@ -1,6 +1,6 @@
 - name: Ensure duplicity is installed.
-  ansible.builtin.apt:
-    pkg: duplicity
+  ansible.builtin.pip:
+    name: duplicity
     state: present
 
 - name: Create install dir.
