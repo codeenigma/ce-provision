@@ -16,7 +16,7 @@
 
 - name: Refine to the summary list of current certificates.
   ansible.builtin.set_fact:
-    _aws_acm_cert_list: "{{ _aws_acm_cert_list.CertificateSummaryList | to_json }}"
+    _aws_acm_cert_list: "{{ _aws_acm_cert_list.CertificateSummaryList }}"
 
 - name: Explicitly initialise existing cert vars.
   ansible.builtin.set_fact:
