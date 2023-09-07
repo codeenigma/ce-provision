@@ -2,6 +2,14 @@
   ansible.builtin.apt:
     pkg: duplicity
     state: present
+  when: ansible_distribution_major_version | int >= 12
+
+- name: Ensure duplicity is installed.
+  ansible.builtin.pip:
+    name: duplicity
+    executable: pip3
+    state: present
+  when: ansible_distribution_major_version | int < 12
 
 - name: Create install dir.
   ansible.builtin.file:
