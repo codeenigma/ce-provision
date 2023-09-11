@@ -7,7 +7,7 @@ aws_efs_client:
   mounts:
     - path: /mnt/shared
       src: example-efs # This is the EFS "creation_token" which is not always "name" - read the role docs carefully!
-      opts: _netdev # _netdev tells OS to wait for network before attempting to mount
+      opts: "_netdev,noresvport" # _netdev tells OS to wait for network before attempting to mount
       state: present
       owner: root
       group: root
