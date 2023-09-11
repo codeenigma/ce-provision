@@ -1,4 +1,6 @@
 ---
+_mount_opts: "_netdev,noresvport"
+_mount_state: present
 aws_efs_client:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
