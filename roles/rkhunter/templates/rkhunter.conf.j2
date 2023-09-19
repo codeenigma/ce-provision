@@ -432,7 +432,7 @@ HASH_CMD=sha256sum
 # NONE is the default for Debian as well, as running --propupd takes
 # about 4 times longer when it's set to DPKG
 #
-#PKGMGR=NONE
+PKGMGR={{ rkhunter.os_package_manager }}
 
 #
 # It is possible that a file, which is part of a package, may have been
