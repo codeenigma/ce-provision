@@ -34,6 +34,8 @@ In the output of listed file systems, for each one you will find an entry like t
 ## Default variables
 ```yaml
 ---
+_mount_opts: "_netdev,noresvport" # _netdev tells OS to wait for network before attempting to mount
+_mount_state: present
 aws_efs_client:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
@@ -42,8 +44,8 @@ aws_efs_client:
   mounts:
     - path: /mnt/shared
       src: example-efs # This is the EFS "creation_token" which is not always "name" - read the role docs carefully!
-      opts: _netdev # _netdev tells OS to wait for network before attempting to mount
-      state: present
+      opts: "{{ _mount_opts }}"
+      state: "{{ _mount_state }}"
       owner: root
       group: root
 
