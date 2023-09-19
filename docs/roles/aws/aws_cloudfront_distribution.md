@@ -19,7 +19,7 @@ aws_cloudfront_distribution:
     cloudfront_default_certificate: false
     acm_certificate_arn: "" # The certificate must be in us-east-1 for CloudFront.
     ssl_support_method: "sni-only" # Do not include if cloudfront_default_certificate is true.
-    #minumum_protocol_version: "TLSv1.2_2019" # If not supplied the AWS default is TLSv1.1_2016.
+    minimum_protocol_version: "TLSv1.2_2019" # Allowed values here: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-viewercertificate.html#cfn-cloudfront-distribution-viewercertificate-minimumprotocolversion
   origins:
     - custom_origin_config:
         http_port: 80
@@ -69,6 +69,7 @@ aws_cloudfront_distribution:
   cache_behaviors: [] # A list of cache behaviors same as default_cache_behavior with additional path_pattern var required.
   enabled: true
   purge_existing: true # Set to false to append entries instead of replacing them.
+
 ```
 
 <!--ENDROLEVARS-->
