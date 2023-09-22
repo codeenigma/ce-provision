@@ -178,6 +178,7 @@
     region: "{{ aws_ec2_autoscale_cluster.region }}"
   when:
     - aws_ec2_autoscale_cluster.type == "ecs"
+    - aws_ec2_autoscale_cluster.container_repo_name | length > 0
 
 # ECS - FARGATE CLUSTER
 - name: Create ECS cluster.
