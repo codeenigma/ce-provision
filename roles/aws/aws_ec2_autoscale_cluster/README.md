@@ -61,7 +61,7 @@ aws_ec2_autoscale_cluster:
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
   # Container variables - if type is "ecs"
-  container_repo_name: example/project
+  container_repo_name: example/project # leave an empty string to not create a repo
   # ElastiCache variables
   elasticache: false
   elasticache_engine: memcached
