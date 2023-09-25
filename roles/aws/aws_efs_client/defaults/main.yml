@@ -4,11 +4,13 @@ _mount_state: present
 aws_efs_client:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  version: 1.26.2 # Version of AWS EFS utils to use.
+  version: 1.35.0 # version of AWS EFS utils to use
+  build_suffix: "-1_all" # sometimes there is a suffix appended to the package name, e.g. `amazon-efs-utils-1.35.0-1_all.deb`
+  deb_url: "" # provide an alternative location for the .deb package
   # See https://docs.ansible.com/ansible/latest/modules/mount_module.html
   mounts:
     - path: /mnt/shared
-      src: example-efs # This is the EFS "creation_token" which is not always "name" - read the role docs carefully!
+      src: example-efs # this is the EFS "creation_token" which is not always "name" - read the role docs carefully!
       opts: "{{ _mount_opts }}"
       state: "{{ _mount_state }}"
       owner: root
