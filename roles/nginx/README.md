@@ -66,7 +66,7 @@ nginx:
         # web_server: standalone
         # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
         # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
-        # reload_command: reload
+        # reload_command: restart
         # reload:
         #   - nginx
       ratelimitingcrawlers: true
