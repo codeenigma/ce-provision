@@ -47,7 +47,7 @@ ssl:
   # When certificates get renewed on a schedule you also need to reload any dependent services, such as your web server.
   # List of services to reload:
   reload: []
-  reload_command: reload # if 'reload' is not strong enough you could change this to 'restart'
+  reload_command: restart # use 'reload' if you do not want to restart, but in most cases a full restart is required to load a new cert.
 
 ############ Facts
 # ssl_facts
