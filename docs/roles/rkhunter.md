@@ -33,6 +33,7 @@ rkhunter:
     - /usr/sbin/unhide.rb
   allowhiddendir:
     - /etc/.java
+    - /tmp/.ce-deploy # see https://github.com/codeenigma/ce-deploy/blob/1.x/roles/database_backup/database_backup-mysql/defaults/main.yml#L7
   allowhiddenfile:
     - /etc/.etckeeper
   allowdevfile:
