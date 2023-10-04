@@ -15,7 +15,7 @@ location @phpprocess {
     fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
 
-# Rewrite any request not whitelisted below, 
+# Rewrite any request not whitelisted below,
 # so they get processed through the app level (and 404).
 location / {
     {% if nginx.ratelimitingcrawlers %}
@@ -109,6 +109,12 @@ location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
 # Allow robots.txt.
 location = /robots.txt {
     try_files $uri @rewrite;
+}
+
+# Deny access to autodiscover
+location /autodiscover/autodiscover.xml {
+  access_log off;
+  return 404;
 }
 
 # Deny listed requests for security reasons.
