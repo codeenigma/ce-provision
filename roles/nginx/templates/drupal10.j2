@@ -5,4 +5,9 @@ location @rewrite {
     rewrite ^ /index.php?$query_string;
 }
 
+# Rewrite rule for Drupal 10.1 js/css handling.
+location @rewrite_drupal10 {
+    rewrite ^ /index.php;
+}
+
 include "/etc/nginx/conf.d/drupal_common";
