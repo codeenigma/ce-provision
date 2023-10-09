@@ -47,6 +47,7 @@
     - drupal_common
     - drupal7
     - drupal8
+    - drupal10
     - flat
     - matomo
     - mautic
