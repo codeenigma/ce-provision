@@ -1,9 +1,7 @@
 ######### Default block.
 
-# Generic rewrite rule.
-location @rewrite {
-    rewrite ^ /index.php?$query_string;
-}
+# Generic rewrite rule is in project_type config which includes this one.
+
 #  PHP fastcgi pass.
 location @phpprocess {
     fastcgi_split_path_info ^(.+?\.php)(|/.*)$;

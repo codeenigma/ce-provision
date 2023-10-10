@@ -1,0 +1,19 @@
+######### Default block.
+
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^ /index.php?$query_string;
+}
+
+# Rewrite rule for Drupal 10.1 js/css handling.
+location @rewrite_drupal10 {
+    rewrite ^ /index.php;
+}
+
+# For Drupal 10 onwards this has changed - see https://www.drupal.org/node/2888767#nginx-php-fpm
+location ~ ^/sites/.*/files/(css|js|styles)/ {
+    try_files $uri @rewrite_drupal10;
+    expires 7d;
+}
+
+include "/etc/nginx/conf.d/drupal_common";
