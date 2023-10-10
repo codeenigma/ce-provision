@@ -98,14 +98,6 @@ location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does
   log_not_found off;
 }
 
-{% if domain.project_type == 'drupal10' %}
-# For Drupal 10 onwards this has changed - see https://www.drupal.org/node/2888767#nginx-php-fpm
-location ~ ^/sites/.*/files/(css|js|styles)/ {
-    try_files $uri @rewrite_drupal10;
-    expires 7d;
-}
-{% endif %}
-
 # This Nginx config is DENY FIRST, so only these file extensions are permitted.
 # Core and contrib assets can be pretty much anywhere.
 location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
