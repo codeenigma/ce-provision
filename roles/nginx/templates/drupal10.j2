@@ -94,11 +94,6 @@ location ~* /(?:modules|libraries)/(?:contrib/)?(?:ad|tinybrowser|f?ckeditor|tin
     try_files @phpprocess @phpprocess;
 }
 
-# Allow public files and image styles.
-location ~ ^/sites/.*/files/.* {
-    try_files $uri @rewrite;
-}
-
 # Allow private files support
 location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does not exist, it must be a private file.
   try_files $uri @rewrite;
@@ -110,6 +105,11 @@ location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does
 location ~ ^/sites/.*/files/(css|js|styles)/ {
     try_files $uri @rewrite_drupal10;
     expires 7d;
+}
+
+# Allow public files and image styles.
+location ~ ^/sites/.*/files/.* {
+    try_files $uri @rewrite;
 }
 
 # This Nginx config is DENY FIRST, so only these file extensions are permitted.
