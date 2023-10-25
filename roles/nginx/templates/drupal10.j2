@@ -1,6 +1,14 @@
 ######### Default block.
 
-# Generic rewrite rule is in project_type config which includes this one.
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^ /index.php?$query_string;
+}
+
+# Rewrite rule for Drupal 10.1 js/css handling.
+location @rewrite_drupal10 {
+    rewrite ^ /index.php;
+}
 
 #  PHP fastcgi pass.
 location @phpprocess {
@@ -86,16 +94,22 @@ location ~* /(?:modules|libraries)/(?:contrib/)?(?:ad|tinybrowser|f?ckeditor|tin
     try_files @phpprocess @phpprocess;
 }
 
-# Allow public files and image styles.
-location ~ ^/sites/.*/files/.* {
-    try_files $uri @rewrite;
-}
-
 # Allow private files support
 location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does not exist, it must be a private file.
   try_files $uri @rewrite;
   expires 7d;
   log_not_found off;
+}
+
+# For Drupal 10 onwards this has changed - see https://www.drupal.org/node/2888767#nginx-php-fpm
+location ~ ^/sites/.*/files/(css|js|styles)/ {
+    try_files $uri @rewrite_drupal10;
+    expires 7d;
+}
+
+# Allow public files and image styles.
+location ~ ^/sites/.*/files/.* {
+    try_files $uri @rewrite;
 }
 
 # This Nginx config is DENY FIRST, so only these file extensions are permitted.
