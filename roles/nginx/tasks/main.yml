@@ -47,6 +47,7 @@
     - drupal_common
     - drupal7
     - drupal8
+    - drupal10
     - flat
     - matomo
     - mautic
@@ -111,7 +112,7 @@
 
 - name: Display Nginx test result.
   ansible.builtin.debug:
-    msg: "{{ nginx_test_result.stdout }}"
+    msg: "{{ nginx_test_result.stderr }}"
 
 - name: Fail the playbook if Nginx test fails.
   ansible.builtin.fail:
