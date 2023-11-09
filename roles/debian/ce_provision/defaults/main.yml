@@ -36,11 +36,5 @@ ce_provision:
   galaxy_custom_requirements_file: "/home/{{ _ce_provision.username }}/ce-provision/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "/usr/local/bin/ansible-galaxy collection install --force"
-    # cron variables - see https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html
-    minute: 0
-    hour: 1
-    # day: 1
-    # weekday: 7
-    # month: 12
-    # disabled: true
+    command: "/home/{{ _ce_provision.username }}/ansible/bin/ansible-galaxy collection install --force"
+    on_calendar: "Mon *-*-* 04:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events

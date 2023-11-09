@@ -1,11 +1,4 @@
 ---
-# cron is not necessarily installed by default.
-- name: Ensure cron is installed.
-  ansible.builtin.apt:
-    name: cron
-    state: present
-    update_cache: true
-
 - name: Create the provision group for provisioning.
   ansible.builtin.group:
     name: "{{ ce_provision.username }}"
@@ -175,7 +168,7 @@
 - name: Fetch additional roles not in Ansible Galaxy.
   ansible.builtin.git:
     repo: "{{ item.repo }}"
-    dest: "{{ ce_provision.local_dir }}/contrib/{{ item.directory }}"
+    dest: "{{ ce_provision.local_dir }}/roles/contrib/{{ item.directory }}"
     update: true
     version: "{{ item.branch }}"
   become: true
@@ -183,34 +176,26 @@
   with_items: "{{ ce_provision.contrib_roles }}"
   when: ce_provision.contrib_roles | length > 0
 
-- name: Create cron entries to upgrade mandatory ansible-galaxy collections.
-  ansible.builtin.cron:
-    name: "upgrade_ce_provision_ansible_galaxy_mandatory"
-    minute: "{{ ce_provision.upgrade_galaxy.minute | default(omit) }}"
-    hour: "{{ ce_provision.upgrade_galaxy.hour | default(omit) }}"
-    day: "{{ ce_provision.upgrade_galaxy.day | default(omit) }}"
-    weekday: "{{ ce_provision.upgrade_galaxy.weekday | default(omit) }}"
-    month: "{{ ce_provision.upgrade_galaxy.month | default(omit) }}"
-    job: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
-    state: present
-    disabled: "{{ ce_provision.upgrade_galaxy.disabled | default(omit) }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
+- name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_provision_ansible_galaxy_mandatory:
+        timer_command: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+        timer_user: "{{ ce_provision.username }}"
+        timer_OnCalendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
   when: ce_provision.upgrade_galaxy.enabled
 
-- name: Create cron entries to upgrade custom ansible-galaxy collections.
-  ansible.builtin.cron:
-    name: "upgrade_ce_provision_ansible_galaxy_custom"
-    minute: "{{ ce_provision.upgrade_galaxy.minute | default(omit) }}"
-    hour: "{{ ce_provision.upgrade_galaxy.hour | default(omit) }}"
-    day: "{{ ce_provision.upgrade_galaxy.day | default(omit) }}"
-    weekday: "{{ ce_provision.upgrade_galaxy.weekday | default(omit) }}"
-    month: "{{ ce_provision.upgrade_galaxy.month | default(omit) }}"
-    job: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.galaxy_custom_requirements_file }}"
-    state: present
-    disabled: "{{ ce_provision.upgrade_galaxy.disabled | default(omit) }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
+- name: Create systemd timer to upgrade custom ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_provision_ansible_galaxy_custom:
+        timer_command: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.galaxy_custom_requirements_file }}"
+        timer_user: "{{ ce_provision.username }}"
+        timer_OnCalendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
   when:
     - _ce_provision_custom_galaxy_requirements.stat.exists
     - ce_provision.upgrade_galaxy.enabled
