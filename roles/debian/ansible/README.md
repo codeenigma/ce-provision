@@ -9,6 +9,9 @@
 ```yaml
 ---
 ce_ansible:
+  # These are usually set within another role using _venv_path and _venv_command but can be overridden.
+  #venv_path: "/home/{{ ce_provision.username }}/ansible"
+  #venv_command: /usr/bin/python3.11 -m venv
   upgrade:
     enabled: true # create cron job to auto-upgrade Ansible
     command: "/usr/bin/python -m pip install --upgrade ansible"
