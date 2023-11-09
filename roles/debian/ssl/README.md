@@ -78,19 +78,17 @@ ssl:
   certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n" # root of the command to register a new cert
   http_01_port: 80 # you can set a non-standard port to listen on, but certbot still needs port 80 - see https://letsencrypt.org/docs/challenge-types/#http-01-challenge
   # For "letsencrypt" auto renewal
-  autorenew: false # set to true to create a cron job to renew LE certs
-  certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew" # root of the command used in the cron job
-  # renewal_minute: "0" # minute to run renewal cron job
-  # renewal_hour: "0" # hour to run renewal cron job
-  # renewal_day: "7" # day of month to run renewal cron job
-  # renewal_weekday: "0" # day of week to run renewal cron job
+  autorenew: false # set to true to create a systemd timer to renew LE certs
+  certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew" # root of the command used in the systemd timer
+  # See systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+  #on_calendar: "Mon *-*-* 04:00:00"
   web_server: standalone # values are standalone, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
   # List of services to be stopped during renewal, e.g.
-  # services:
-  #   - nginx
+  #services:
+  #  - nginx
   services: []
   # When certificates get renewed on a schedule you also need to reload any dependent services, such as your web server.
   # List of services to reload:
