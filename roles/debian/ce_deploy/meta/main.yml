@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: debian/aws_cli
+  - role: debian/ansible
+  - role: debian/python_boto

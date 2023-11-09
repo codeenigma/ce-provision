@@ -15,7 +15,7 @@
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
-        name: ce_provision
+        name: debian/ce_provision
     - name: Remove example git hooks.
       ansible.builtin.file:
         path: "/home/ce-dev/ce-provision/.git/hooks"

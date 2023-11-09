@@ -1,0 +1,2 @@
+# Contributed roles
+This is a space for ce-provision to clone roles we use into. It is specifically for roles not available via [Ansible Galaxy](https://galaxy.ansible.com), which is always the preferred route for including other roles.
