@@ -11,8 +11,6 @@ Supports standalone managers, scaled out services and agent installation (defaul
 ```yaml
 ---
 wazuh:
-  #roles_directory: "/path/to/roles" # defaults to /home/controller/.ansible/roles/wazuh-ansible
-  branch: "4.3" # wazuh-ansible git branch to checkout - not to be confused with wazuh_version!
   # Agent variables, installed locally by default
   # Role defaults - https://github.com/wazuh/wazuh-ansible/blob/master/roles/wazuh/ansible-wazuh-agent/defaults/main.yml
   agent:
