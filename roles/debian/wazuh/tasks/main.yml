@@ -1,18 +1,8 @@
 ---
 # Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles.
-- name: Set the Wazuh version branch for the playbooks and roles.
-  ansible.builtin.git:
-    repo: https://github.com/wazuh/wazuh-ansible.git
-    dest: "{{ wazuh.roles_directory | default('/home/' + user_provision.username + '/.ansible/roles/wazuh-ansible') }}"
-    version: "{{ wazuh.branch }}"
-    update: true
-  become: true
-  become_user: "{{ user_provision.username }}"
-  delegate_to: localhost
-
 - name: Generate certificates.
   ansible.builtin.import_role:
-    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+    name: contrib/wazuh/wazuh-indexer
   delegate_to: localhost
   vars:
     indexer_node_master: "{{ wazuh.indexer.indexer_node_master }}"
@@ -23,7 +13,7 @@
 
 - name: Install Wazuh indexer.
   ansible.builtin.import_role:
-    name: wazuh-ansible/roles/wazuh/wazuh-indexer
+    name: contrib/wazuh/wazuh-indexer
   vars:
     single_node: "{{ wazuh.indexer.single_node }}"
     domain_name: "{{ wazuh.indexer.domain_name }}"
@@ -51,7 +41,7 @@
 
 - name: Install Wazuh Manager.
   ansible.builtin.import_role:
-    name: wazuh-ansible/roles/wazuh/ansible-wazuh-manager
+    name: contrib/wazuh/ansible-wazuh-manager
   vars:
     wazuh_manager_mailto: "{{ wazuh.manager.wazuh_manager_mailto }}"
     wazuh_manager_email_smtp_server: "{{ wazuh.manager.wazuh_manager_email_smtp_server }}"
@@ -68,7 +58,7 @@
 
 - name: Install Filebeat.
   ansible.builtin.import_role:
-    name: wazuh-ansible/roles/wazuh/ansible-filebeat-oss
+    name: contrib/wazuh/ansible-filebeat-oss
   vars:
     filebeat_version: "{{ wazuh.filebeat.filebeat_version }}"
     filebeat_node_name: "{{ wazuh.filebeat.filebeat_node_name }}"
@@ -81,7 +71,7 @@
 
 - name: Install Wazuh dashboard.
   ansible.builtin.import_role:
-    name: wazuh-ansible/roles/wazuh/wazuh-dashboard
+    name: contrib/wazuh/wazuh-dashboard
   vars:
     dashboard_node_name: "{{ wazuh.dashboard.dashboard_node_name }}"
     dashboard_server_host: "{{ wazuh.dashboard.dashboard_server_host }}"
@@ -98,7 +88,7 @@
 
 - name: Install Wazuh agent.
   ansible.builtin.import_role:
-    name: wazuh-ansible/roles/wazuh/ansible-wazuh-agent
+    name: contrib/wazuh/ansible-wazuh-agent
   vars:
     wazuh_managers: "{{ wazuh.agent.managers }}"
     wazuh_agent_enrollment:
