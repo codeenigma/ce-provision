@@ -1,11 +1,4 @@
 ---
-# cron is not necessarily installed by default.
-- name: Ensure cron is installed.
-  ansible.builtin.apt:
-    name: cron
-    state: present
-    update_cache: true
-
 - name: Ensure Certbot is installed.
   ansible.builtin.apt:
     pkg: certbot
@@ -85,14 +78,15 @@
     mode: 0755
   when: ssl.autorenew
 
-- name: Create cron job for certificate renewal.
-  ansible.builtin.cron:
-    name: "certbot renewal"
-    minute: "{{ ssl.renewal_minute | default('0') }}"
-    hour: "{{ ssl.renewal_hour | default('0') }}"
-    day: "{{ ssl.renewal_day | default(omit) }}"
-    weekday: "{{ ssl.renewal_weekday | default('0') }}" # default is weekly at midnight on Sunday
-    job: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
-    cron_file: "le_autorenewal_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}"
-    user: root
+- name: Build timer variables with dynamic key.
+  ansible.builtin.set_fact:
+    _certbot_renewal_timer: "{'certbot_renewal_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}':{'timer_command':'/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh','timer_OnCalendar':'{{ ssl.on_calendar }}'}}"
+  when: ssl.autorenew
+
+- name: Create systemd timer for certificate renewal.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      certbot_renewal: "{{ _certbot_renewal_timer }}"
   when: ssl.autorenew
