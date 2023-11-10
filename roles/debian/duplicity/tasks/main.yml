@@ -62,13 +62,16 @@
   loop_control:
     loop_var: dir
 
-- name: Copy Duplicity cron config.
-  ansible.builtin.template:
-    src: "duplicity-cron.j2"
-    dest: "/etc/cron.d/duplicity_cron"
-    owner: root
-    group: root
-    mode: 0644
+# @TODO - cannot currently send failure notifications - see https://github.com/codeenigma/ce-provision/issues/1215
+- name: Create systemd timer for Duplicity backup.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      duplicity_backup:
+        timer_command: /usr/local/bin/duplicity_backup
+        timer_OnCalendar: "{{ duplicity.on_calendar }}"
+  when: duplicity.create_timer
 
 - name: Trigger overrides
   ansible.builtin.include_role:

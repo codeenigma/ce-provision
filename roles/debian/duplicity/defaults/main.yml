@@ -21,4 +21,6 @@ duplicity:
   install_dir: "/opt/duplicity"
   mail_recipient: "foo@bar.com"
   retention_period: "12M"
-  schedule: "0 0 * * *"
+  # systemd timer settings
+  create_timer: true # sometimes you might want to trigger duplicity some other way than a systemd timer
+  on_calendar: "*-*-* 03:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
