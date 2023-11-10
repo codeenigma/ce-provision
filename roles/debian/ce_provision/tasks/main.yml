@@ -37,20 +37,6 @@
     dest: "{{ _ce_provision_data_dir }}"
     src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.key_name }}"
 
-# Install Python applications.
-- name: Set up Python venv variables.
-  ansible.builtin.set_fact:
-    _venv_path: "{{ ce_provision.venv_path }}"
-    _venv_command: "{{ ce_provision.venv_command }}"
-
-- name: Install Ansible.
-  ansible.builtin.include_role:
-    name: debian/ansible
-
-- name: Install python_boto.
-  ansible.builtin.include_role:
-    name: debian/python_boto
-
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
   ansible.builtin.set_fact:
@@ -60,17 +46,6 @@
   ansible.builtin.apt:
     pkg: ["git", "parallel"]
     state: present
-
-- name: Ensure dnspython, certifi and pyopenssl are installed.
-  ansible.builtin.pip:
-    name:
-      - dnspython
-      - certifi
-      - pyopenssl
-    virtualenv: "{{ _venv_path }}"
-    virtualenv_command: "{{ _venv_command }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
@@ -140,12 +115,49 @@
     path: "{{ ce_provision.local_dir }}/data"
     state: directory
 
-- name: Ensure ownership of Ansible folder.
+- name: Ensure ownership of controller user folder.
   ansible.builtin.file:
     path: "/home/{{ ce_provision.username }}"
     state: directory
     owner: "{{ ce_provision.username }}"
     recurse: true
+
+# Must happen prior to Ansible install.
+- name: Fetch additional roles not in Ansible Galaxy.
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ ce_provision.local_dir }}/roles/contrib/{{ item.directory }}"
+    update: true
+    version: "{{ item.branch }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  with_items: "{{ ce_provision.contrib_roles }}"
+  when: ce_provision.contrib_roles | length > 0
+
+# Install Python applications.
+- name: Set up Python venv variables.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_provision.venv_path }}"
+    _venv_command: "{{ ce_provision.venv_command }}"
+
+- name: Install Ansible.
+  ansible.builtin.include_role:
+    name: debian/ansible
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
+- name: Ensure dnspython, certifi and pyopenssl are installed.
+  ansible.builtin.pip:
+    name:
+      - dnspython
+      - certifi
+      - pyopenssl
+    virtualenv: "{{ _venv_path }}"
+    virtualenv_command: "{{ _venv_command }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
 
 - name: Check if ansible-galaxy custom requirements file exists.
   ansible.builtin.stat:
@@ -164,17 +176,6 @@
   become: true
   become_user: "{{ ce_provision.username }}"
   when: _ce_provision_custom_galaxy_requirements.stat.exists
-
-- name: Fetch additional roles not in Ansible Galaxy.
-  ansible.builtin.git:
-    repo: "{{ item.repo }}"
-    dest: "{{ ce_provision.local_dir }}/roles/contrib/{{ item.directory }}"
-    update: true
-    version: "{{ item.branch }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
-  with_items: "{{ ce_provision.contrib_roles }}"
-  when: ce_provision.contrib_roles | length > 0
 
 - name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
   ansible.builtin.include_role:
