@@ -46,3 +46,12 @@
   become: true
   become_user: "{{ ce_provision.username }}"
 
+- name: Create systemd timer to upgrade Ansible.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ansible:
+        timer_command: "{{ ce_ansible.upgrade.command }}"
+        timer_OnCalendar: "{{ ce_ansible.upgrade.on_calendar }}"
+  when: ce_ansible.upgrade.enabled

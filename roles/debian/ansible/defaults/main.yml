@@ -4,14 +4,8 @@ ce_ansible:
   #venv_path: "/home/{{ ce_provision.username }}/ansible"
   #venv_command: /usr/bin/python3.11 -m venv
   upgrade:
-    enabled: true # create cron job to auto-upgrade Ansible
-    command: "/usr/bin/python -m pip install --upgrade ansible"
-    # cron variables - see https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html
-    minute: 10
-    hour: 1
-    # day: 1
-    # weekday: 7
-    # month: 12
-    # disabled: true
+    enabled: true # create systemd timer to auto-upgrade Ansible
+    command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade ansible" # if you set venv_path above then set it here too
+    on_calendar: "*-*-* 01:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
   linters:
     enabled: true # will not install linters if false, installing linters breaks cloud-init
