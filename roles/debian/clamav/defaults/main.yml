@@ -1,11 +1,8 @@
 ---
 clamav:
-  provide_cron: false
+  create_timer: false
   server_name: "{{ inventory_hostname }}" # for identification via email, defaults to Ansible inventory name.
-  cron_minute: "0" # Runs daily at midnight by default.
-  cron_hour: "0"
-  # cron_day: "*"
-  # cron_weekday: "0" # 0-6 for Sunday-Saturday
+  on_calendar: "*-*-* 02:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
   scripts_location: /usr/local/clamav/script
   log_location: /usr/local/clamav/log
   send_mail: false # Important: will not send any emails by default.
