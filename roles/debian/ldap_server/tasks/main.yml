@@ -1,11 +1,4 @@
 ---
-# cron is not necessarily installed by default.
-- name: Ensure cron is installed.
-  ansible.builtin.apt:
-    name: cron
-    state: present
-    update_cache: true
-
 - name: Stop slapd service.
   ansible.builtin.include_role:
     name: process_manager
@@ -190,12 +183,12 @@
     mode: 0755
   when: ldap_server.config.backup
 
-- name: Create cron job for slapd backups.
-  ansible.builtin.cron:
-    name: "ldap backup"
-    minute: "{{ ldap_server.config.backup_minute }}"
-    hour: "{{ ldap_server.config.backup_hour }}"
-    job: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r rm"
-    cron_file: slapd-backup
-    user: root
-  when: ldap_server.config.backup
+- name: Create systemd timer for slapd backups.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      slapd_backups:
+        timer_command: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r rm"
+        timer_OnCalendar: "{{ ldap_server.config.on_calendar }}"
+  when: ssl.autorenew
