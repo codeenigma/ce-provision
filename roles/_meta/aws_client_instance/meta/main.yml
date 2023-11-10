@@ -1,5 +1,5 @@
 ---
 dependencies:
-  - { role: apt_extra_packages, apt_extra_packages: ["cloud-init"] }
-  - role: aws_cloudwatch_agent
-  - role: aws_ssm_agent
+  - { role: debian/apt_extra_packages, apt_extra_packages: ["cloud-init"] }
+  - role: debian/aws_cloudwatch_agent
+  - role: debian/aws_ssm_agent
