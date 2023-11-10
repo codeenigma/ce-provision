@@ -78,6 +78,7 @@
     db_instance_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
+    storage_throughput: "{{ aws_rds.storage_throughput | default(omit) }}" # required if storage_type is "gp3".
     master_username: "{{ aws_rds.master_username }}"
     master_user_password: "{{ aws_rds.master_user_password }}"
     state: "{{ aws_rds.state }}"
