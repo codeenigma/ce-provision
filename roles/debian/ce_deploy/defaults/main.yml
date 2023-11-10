@@ -3,6 +3,10 @@ _ce_deploy:
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
 
 ce_deploy:
+  # Location of Ansible installation and components.
+  venv_path: "/home/{{ _ce_deploy.username }}/ansible"
+  venv_command: /usr/bin/python3.11 -m venv
+  # Other ce-deploy settings.
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
   key_name: id_rsa.pub # existing users may have a key of a different name
   username: "{{ _ce_deploy.username }}"
@@ -19,11 +23,5 @@ ce_deploy:
   galaxy_custom_requirements_file: "/home/{{ _ce_deploy.username }}/ce-deploy/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "/usr/local/bin/ansible-galaxy collection install --force"
-    # cron variables - see https://docs.ansible.com/ansible/latest/collections/ansible/builtin/cron_module.html
-    minute: 0
-    hour: 1
-    # day: 1
-    # weekday: 7
-    # month: 12
-    # disabled: true
+    command: "/home/{{ _ce_deploy.username }}/ansible/bin/ansible-galaxy collection install --force" # must match venv_path
+    on_calendar: "Mon *-*-* 01:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events

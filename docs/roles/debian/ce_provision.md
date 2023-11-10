@@ -44,7 +44,7 @@ ce_provision:
   galaxy_custom_requirements_file: "/home/{{ _ce_provision.username }}/ce-provision/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "/home/{{ _ce_provision.username }}/ansible/bin/ansible-galaxy collection install --force"
+    command: "/home/{{ _ce_provision.username }}/ansible/bin/ansible-galaxy collection install --force" # must match venv_path
     on_calendar: "Mon *-*-* 04:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
 
 ```

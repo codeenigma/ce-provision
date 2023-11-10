@@ -43,6 +43,20 @@
     dest: "{{ _ce_provision_data_dir }}"
     src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.key_name }}"
 
+# Install Python applications.
+- name: Set up Python venv variables.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_deploy.venv_path }}"
+    _venv_command: "{{ ce_deploy.venv_command }}"
+
+- name: Install Ansible.
+  ansible.builtin.include_role:
+    name: debian/ansible
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
 - name: Ensure Git is installed.
   ansible.builtin.apt:
     pkg: "git"
@@ -159,34 +173,26 @@
   become_user: "{{ ce_deploy.username }}"
   when: _ce_deploy_custom_galaxy_requirements.stat.exists
 
-- name: Create cron entries to upgrade mandatory ansible-galaxy collections.
-  ansible.builtin.cron:
-    name: "upgrade_ce_deploy_ansible_galaxy_mandatory"
-    minute: "{{ ce_deploy.upgrade_galaxy.minute | default(omit) }}"
-    hour: "{{ ce_deploy.upgrade_galaxy.hour | default(omit) }}"
-    day: "{{ ce_deploy.upgrade_galaxy.day | default(omit) }}"
-    weekday: "{{ ce_deploy.upgrade_galaxy.weekday | default(omit) }}"
-    month: "{{ ce_deploy.upgrade_galaxy.month | default(omit) }}"
-    job: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
-    state: present
-    disabled: "{{ ce_deploy.upgrade_galaxy.disabled | default(omit) }}"
-  become: true
-  become_user: "{{ ce_deploy.username }}"
+- name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_deploy_ansible_galaxy_mandatory:
+        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
+        timer_user: "{{ ce_deploy.username }}"
+        timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
   when: ce_deploy.upgrade_galaxy.enabled
 
-- name: Create cron entries to upgrade custom ansible-galaxy roles and collections.
-  ansible.builtin.cron:
-    name: "upgrade_ce_deploy_ansible_galaxy_custom"
-    minute: "{{ ce_deploy.upgrade_galaxy.minute | default(omit) }}"
-    hour: "{{ ce_deploy.upgrade_galaxy.hour | default(omit) }}"
-    day: "{{ ce_deploy.upgrade_galaxy.day | default(omit) }}"
-    weekday: "{{ ce_deploy.upgrade_galaxy.weekday | default(omit) }}"
-    month: "{{ ce_deploy.upgrade_galaxy.month | default(omit) }}"
-    job: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.galaxy_custom_requirements_file }}"
-    state: present
-    disabled: "{{ ce_deploy.upgrade_galaxy.disabled | default(omit) }}"
-  become: true
-  become_user: "{{ ce_deploy.username }}"
+- name: Create systemd timer to upgrade custom ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_deploy_ansible_galaxy_custom:
+        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.galaxy_custom_requirements_file }}"
+        timer_user: "{{ ce_deploy.username }}"
+        timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
   when:
     - _ce_deploy_custom_galaxy_requirements.stat.exists
     - ce_deploy.upgrade_galaxy.enabled
