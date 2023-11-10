@@ -82,8 +82,7 @@ ldap_server:
     purge: false
     backup: false # set to true to create local backups of LDAP
     backup_path: /opt/slap-bak
-    backup_minute: "45"
-    backup_hour: "23"
+    on_calendar: "*-*-* 23:45:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
   # TLS settings in LDAP are not separately handled, you need to manually set it up or use the config import feature.
   # If you use 'manual' SSL handling you need to provide a separate CA certificate.
   # If you use 'letsencrypt' SSL handling then the LDAP TLS settings in your imported config should be as follows:
