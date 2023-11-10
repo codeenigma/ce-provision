@@ -20,8 +20,12 @@ aws_rds:
   # db_parameters: {} # dictionary of available parameters
   allocated_storage: 100 # Initial size in GB. Minimum is 100.
   max_allocated_storage: 1000 # Max size in GB for autoscaling.
-  # storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
-  # storage_throughput: 125 # required if storage_type is "gp3". For <400Gb storage it's limited to 125Mbs.
+  # storage_type: standard # not required. choices: standard;gp2;gp3;io1. I(storage_type) does not apply to Aurora DB instances.
+  # storage_throughput: 125 # required if storage_type is "gp3". For <400Gb storage it's limited to 125Mbs. Requires botocore >= 1.29.0
+  # character_set_name: undefined # not required. The character set to associate with the DB cluster.
+  # preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
+  # preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
+  # enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
   storage_encrypted: false # Whether to encrypt the RDS instance or not.
   master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
   master_user_password: hellothere

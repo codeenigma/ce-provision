@@ -144,6 +144,8 @@
       allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
       max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
       storage_encrypted: "{{ aws_ec2_autoscale_cluster.rds.storage_encrypted }}"
+      storage_type: "{{ aws_ec2_autoscale_cluster.rds.storage_type | default(omit) }}"
+      storage_throughput: "{{ aws_ec2_autoscale_cluster.rds.storage_throughput | default(omit) }}"
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
