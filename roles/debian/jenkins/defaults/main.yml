@@ -27,3 +27,5 @@ jenkins:
   ldap_binddn: "{{ ldap_client.binddn }}"
   ldap_bindpw: "{{ ldap_client.bindpw }}"
   mailto: "admins@example.com"
+  # daily key renewal execution with systemd timer
+  on_calendar: "*-*-* 02:15:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events

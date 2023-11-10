@@ -106,11 +106,22 @@
     validate_certs: false
     dest: /opt/jenkins-cli.jar
 
-- name: Add Jenkins cert renewal job.
+- name: Add Jenkins cert renewal script.
   ansible.builtin.template:
     src: "jenkins-cert-renewal.sh.j2"
-    dest: /etc/cron.daily/jenkins-cert-renewal
+    dest: /usr/local/sbin/jenkins-cert-renewal
+    owner: root
+    group: root
     mode: 0755
+
+- name: Create systemd timer for Jenkins cert renewal.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      jenkins_cert_renewal:
+        timer_command: /usr/local/sbin/jenkins-cert-renewal
+        timer_OnCalendar: "{{ jenkins.on_calendar }}"
 
 - name: Install Jenkins Plugins.
   ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
