@@ -28,6 +28,6 @@ jobs:
       - name: Run linters.
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          ansible-lint ./roles --exclude ./roles/wazuh/defaults/
+          ansible-lint ./roles
           yamllint ./roles
           cd scripts && shellcheck *.sh

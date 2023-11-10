@@ -1,13 +1,13 @@
 ---
 dependencies:
-  - role: user_provision
-  - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
+  - role: debian/user_provision
+  - { role: debian/ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: _meta/common_base
-  - role: ce_deploy
+  - role: debian/ce_deploy
   - role: aws/aws_credentials
-  - role: gitlab
-  - role: gitlab_runner
-  - role: sops
-  - role: gpg_key
-  - role: pam_ldap
-  - role: pam_linotp
+  - role: debian/gitlab
+  - role: debian/gitlab_runner
+  - role: debian/sops
+  - role: debian/gpg_key
+  - role: debian/pam_ldap
+  - role: debian/pam_linotp
