@@ -7,15 +7,17 @@
     state: present
     update_cache: true
 
-- name: Set ossec-watchdog cron
-  ansible.builtin.copy:
-    src: "ossec-watchdog-cron"
-    dest: "/etc/cron.d/ossec_watchdog"
-    owner: root
-    group: root
-    mode: "0644"
+# systemd timer that starts the ossec-watchdog 1 minute after server start up
+- name: Set ossec-watchdog systemd timer.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      ossec_watchdog:
+        timer_command: "nohup /usr/local/bin/ossec-watchdog > /tmp/ossec-watchdog.log"
+        timer_OnStartupSec: 1m
 
-- name: Set ossec-watchdog script
+- name: Set ossec-watchdog script.
   ansible.builtin.template:
     src: "ossec_watchdog.j2"
     dest: "/usr/local/bin/ossec-watchdog"
@@ -23,7 +25,7 @@
     group: root
     mode: "0755"
 
-- name: Copy OSSEC rules
+- name: Copy OSSEC rules.
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: "/var/ossec/rules/"

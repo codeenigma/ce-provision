@@ -1,1 +1,0 @@
-@reboot root    nohup /usr/local/bin/ossec-watchdog > /tmp/ossec-watchdog.log &
