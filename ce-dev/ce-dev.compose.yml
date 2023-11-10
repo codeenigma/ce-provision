@@ -7,7 +7,7 @@ x-ce_dev:
     - ce-dev/ansible/setup.yml
 services:
   controller:
-    image: codeenigma/ce-dev-1.x:devel
+    image: codeenigma/ce-dev-controller-1.x:devel
     x-ce_dev: {}
     volumes:
       - ../:/home/ce-dev/ce-provision

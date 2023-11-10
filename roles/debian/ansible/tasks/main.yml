@@ -1,27 +1,4 @@
 ---
-- name: Remove old PPA repository key for Ansible.
-  ansible.builtin.apt_key:
-    id: 93C4A3FD7BB9C367
-    keyserver: keyserver.ubuntu.com
-    state: absent
-
-- name: Remove old repository for Ansible.
-  ansible.builtin.apt_repository:
-    repo: "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
-    state: absent
-
-# Linters need a newer version of PyYAML than the one that ships with Debian.
-- name: Remove older PyYAML package.
-  ansible.builtin.apt:
-    pkg: python3-yaml
-    state: absent
-  when: ce_ansible.linters.enabled
-
-- name: Remove system Ansible.
-  ansible.builtin.apt:
-    pkg: ansible
-    state: absent
-
 - name: Set up Python packages.
   ansible.builtin.include_role:
     name: debian/python_common
