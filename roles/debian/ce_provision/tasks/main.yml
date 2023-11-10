@@ -1,0 +1,201 @@
+---
+- name: Create the provision group for provisioning.
+  ansible.builtin.group:
+    name: "{{ ce_provision.username }}"
+    system: true
+  when: ce_provision.new_user
+
+- name: Create additional groups.
+  ansible.builtin.group:
+    name: "{{ group }}"
+    state: present
+    system: true
+  with_items: "{{ ce_provision.groups }}"
+  loop_control:
+    loop_var: group
+  when: ce_provision.groups | length
+
+- name: Create the provision user for provisioning.
+  ansible.builtin.user:
+    name: "{{ ce_provision.username }}"
+    comment: Provisioning user
+    shell: /bin/bash
+    create_home: true
+    group: "{{ ce_provision.username }}"
+    uid: "{{ ce_provision.uid | default(omit) }}"
+    generate_ssh_key: true
+    home: "/home/{{ ce_provision.username }}"
+    password: "*"
+    ssh_key_bits: 4096
+    ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
+    system: true
+    groups: "{{ ce_provision.groups }}"
+  when: ce_provision.new_user
+
+- name: Fetch back the SSH pub key.
+  ansible.builtin.fetch:
+    dest: "{{ _ce_provision_data_dir }}"
+    src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.key_name }}"
+
+# Install Python applications.
+- name: Set up Python venv variables.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_provision.venv_path }}"
+    _venv_command: "{{ ce_provision.venv_command }}"
+
+- name: Install Ansible.
+  ansible.builtin.include_role:
+    name: debian/ansible
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
+# This prevent the original var to be re-evaluated when we move things around.
+- name: Register config repository.
+  ansible.builtin.set_fact:
+    ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
+
+- name: Ensure APT dependencies are installed.
+  ansible.builtin.apt:
+    pkg: ["git", "parallel"]
+    state: present
+
+- name: Ensure dnspython, certifi and pyopenssl are installed.
+  ansible.builtin.pip:
+    name:
+      - dnspython
+      - certifi
+      - pyopenssl
+    virtualenv: "{{ _venv_path }}"
+    virtualenv_command: "{{ _venv_command }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+# This is needed for "pushing" in certain cases.
+- name: Setup Git identity.
+  ansible.builtin.command:
+    cmd: "git config --global user.name {{ ce_provision.username }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+- name: Setup Git identity email.
+  ansible.builtin.command:
+    cmd: "git config --global user.email {{ ce_provision.username }}@{{ _domain_name }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+- name: Ensure provision scripts are presents.
+  ansible.builtin.git:
+    repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git') }}"
+    dest: "{{ ce_provision.local_dir }}"
+    version: "{{ ce_provision.own_repository_branch  | default('master') }}"
+    update: true
+    accept_hostkey: true #@todo?
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  when:
+    - not ce_provision.own_repository_skip_checkout
+
+- name: Checkout config directory.
+  ansible.builtin.git:
+    repo: "{{ ce_provision.config_repository }}"
+    accept_hostkey: true
+    dest: "{{ ce_provision.local_dir }}/config"
+    version: "{{ ce_provision.config_repository_branch  | default('master') }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  when:
+    - ce_provision_has_config_repo
+    - not ce_provision.config_repository_skip_checkout
+
+- name: Create defaults folders.
+  ansible.builtin.file:
+    path: "{{ ce_provision.local_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - hosts
+  when: not ce_provision_has_config_repo
+
+- name: Create default config.
+  ansible.builtin.copy:
+    src: ansible.cfg
+    dest: "{{ ce_provision.local_dir }}/ansible.cfg"
+  when: not ce_provision_has_config_repo
+
+- name: Symlink config folders to /etc/ansible.
+  ansible.builtin.file:
+    dest: "{{ ce_provision.local_dir }}/{{ item }}"
+    src: "{{ ce_provision.local_dir }}/config/{{ item }}"
+    state: link
+  with_items:
+    - hosts
+    - files
+    - templates
+    - ansible.cfg
+  when: ce_provision_has_config_repo
+
+- name: Create data dir.
+  ansible.builtin.file:
+    path: "{{ ce_provision.local_dir }}/data"
+    state: directory
+
+- name: Ensure ownership of Ansible folder.
+  ansible.builtin.file:
+    path: "/home/{{ ce_provision.username }}"
+    state: directory
+    owner: "{{ ce_provision.username }}"
+    recurse: true
+
+- name: Check if ansible-galaxy custom requirements file exists.
+  ansible.builtin.stat:
+    path: "{{ ce_provision.galaxy_custom_requirements_file }}"
+  register: _ce_provision_custom_galaxy_requirements
+
+- name: Install mandatory ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml --force-with-deps"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+- name: Install custom ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  when: _ce_provision_custom_galaxy_requirements.stat.exists
+
+- name: Fetch additional roles not in Ansible Galaxy.
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ ce_provision.local_dir }}/roles/contrib/{{ item.directory }}"
+    update: true
+    version: "{{ item.branch }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+  with_items: "{{ ce_provision.contrib_roles }}"
+  when: ce_provision.contrib_roles | length > 0
+
+- name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_provision_ansible_galaxy_mandatory:
+        timer_command: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+        timer_user: "{{ ce_provision.username }}"
+        timer_OnCalendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
+  when: ce_provision.upgrade_galaxy.enabled
+
+- name: Create systemd timer to upgrade custom ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_provision_ansible_galaxy_custom:
+        timer_command: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.galaxy_custom_requirements_file }}"
+        timer_user: "{{ ce_provision.username }}"
+        timer_OnCalendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
+  when:
+    - _ce_provision_custom_galaxy_requirements.stat.exists
+    - ce_provision.upgrade_galaxy.enabled

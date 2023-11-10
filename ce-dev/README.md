@@ -57,12 +57,14 @@ You need to ensure this exists and the correct IP addresses are defined (you can
 
 `ce-dev shell`
 
-Select the `provision-controller` instance to connect to. From there, you can run a playbook to provision the provision-target server. There are two ways to run playbooks.
+Select the `provision-controller` instance to connect to. From there, you can run a playbook to provision the provision-target server. But first you will need to create your playbooks and vars, these are deliberately excluded because they will necessarily change with what you are testing, but instructions and examples can be found in `ce-dev/ansible/plays/provision-target/README.md`. 
+
+Once that's done, there are two ways to run playbooks:
 
 1.  From the **~/ce-provision** directory, run:
-    `ansible-playbook ce-dev/ansible/local/provision-target.yml`
+    `ansible-playbook ce-dev/ansible/plays/provision-target/provision-target.yml`
 
-1.  Use the `provision.sh` wrapper script. As you're working locally, you can use the `--workspace` argument:
-    `/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh --repo unused --branch master --workspace /home/ce-dev/ce-provision --playbook ce-dev/ansible/local/provision-target.yml`
+2.  Use the `provision.sh` wrapper script. As you're working locally, you can use the `--workspace` argument:
+    `/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh --repo unused --branch master --workspace /home/ce-dev/ce-provision --playbook ce-dev/ansible/plays/provision-target/provision-target.yml`
 
         The `--repo` and `--branch` arguments are still mandatory, but they won't be used because you're passing in the `--workspace` argument as well, so you can pass through any value for those two arguments. The `--workspace` and `--playbook` arguments **must** create an absolute path to the playbook that you want to run.

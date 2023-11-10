@@ -1,0 +1,194 @@
+---
+- name: Stop slapd service.
+  ansible.builtin.include_role:
+    name: process_manager
+  when: ldap_server.slapd.purge
+  vars:
+    process_manager:
+      process_name: slapd
+
+- name: Purge existing LDAP server installation.
+  ansible.builtin.apt:
+    pkg: ["slapd", "ldapscripts"]
+    state: absent
+    purge: true
+  when: ldap_server.slapd.purge
+
+# @TODO remove when https://redmine.codeenigma.net/issues/58246 can be done
+- name: Ensure LDAP and dependencies are installed from backports.
+  ansible.builtin.apt:
+    pkg: ["slapd", "ldapscripts", "libldap2-dev"] # python-ldap needs libldap2-dev
+    state: present
+    default_release: buster-backports
+  when:
+    - is_local is defined
+    - is_local
+
+- name: Ensure LDAP and python-ldap and dependencies are installed.
+  ansible.builtin.apt:
+    pkg: ["slapd", "ldapscripts", "libldap2-dev"]
+    state: present
+  when: is_local is not defined
+
+- name: Ensure additional dependencies for python-ldap are installed.
+  ansible.builtin.apt:
+    pkg: ["libsasl2-dev", "libssl-dev", "python3-dev"] # python-ldap needs some dev packages
+    state: present
+
+- name: Install python-ldap with pip3.
+  ansible.builtin.pip:
+    name: python-ldap
+    executable: pip3
+  when: ansible_distribution_major_version | int < 12
+
+- name: Ensure python3-ldap is installed with apt.
+  ansible.builtin.apt:
+    pkg: python3-ldap
+    state: present
+  when: ansible_distribution_major_version | int >= 12
+
+- name: Create the slapd config file.
+  ansible.builtin.template:
+    src: slapd.j2
+    dest: /etc/default/slapd
+    owner: root
+    group: root
+    mode: 0644
+  register: _ldap_server_slapd_config
+
+- name: Stop slapd service.
+  ansible.builtin.include_role:
+    name: process_manager
+  vars:
+    process_manager:
+      process_name: slapd
+  when:
+    - _ldap_server_slapd_config.changed or ldap_server.config.import
+
+- name: Purge existing LDAP schema files.
+  ansible.builtin.file:
+    path: /usr/local/src/custom-ldap-schemas
+    state: absent
+  when: ldap_server.config.purge
+
+- name: Check if LDAP schema directory exists.
+  ansible.builtin.stat:
+    path: "{{ ldap_server.config.path }}"
+  register: _ldap_server_ldifs
+  delegate_to: localhost
+
+- name: Copy LDAP schemas from config repo.
+  ansible.builtin.copy:
+    src: "{{ ldap_server.config.path }}/"
+    dest: /usr/local/src/custom-ldap-schemas
+    owner: openldap
+    group: openldap
+    directory_mode: 0700
+    mode: 0644
+  when:
+    - _ldap_server_ldifs.stat.exists
+    - ldap_server.config.import
+
+- name: Find LDIF files.
+  ansible.builtin.find:
+    paths: /usr/local/src/custom-ldap-schemas
+    file_type: file
+    recurse: true
+    patterns: "*.ldif"
+  register: _ldap_server_config_ldifs
+  when:
+    - _ldap_server_ldifs.stat.exists
+    - ldap_server.config.import
+
+- name: Delete existing slapd config prior to import.
+  ansible.builtin.file:
+    path: /etc/ldap/slapd.d
+    state: absent
+  when:
+    - _ldap_server_ldifs.stat.exists
+    - ldap_server.config.import
+
+- name: Recreate slapd config directory.
+  ansible.builtin.file:
+    path: /etc/ldap/slapd.d
+    state: directory
+    owner: openldap
+    group: openldap
+    mode: 0700
+  when:
+    - _ldap_server_ldifs.stat.exists
+    - ldap_server.config.import
+
+- name: Install the available schemas.
+  ansible.builtin.command:
+    cmd: "slapadd -F /etc/ldap/slapd.d -n 0 -l {{ item.path }}"
+  become_user: openldap
+  become: true
+  when:
+    - _ldap_server_ldifs.stat.exists
+    - ldap_server.config.import
+  loop: "{{ _ldap_server_config_ldifs.files | flatten(levels=1) | sort(attribute='path') }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Generate SSL keys if provided.
+  ansible.builtin.include_role:
+    name: ssl
+  vars:
+    ssl: "{{ ldap_server.ssl }}"
+
+# LetsEncrypt handling - see https://serverfault.com/a/864655
+- name: Ensure letsencrypt group exists.
+  ansible.builtin.group:
+    name: letsencrypt
+    state: present
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
+- name: Create user for LetsEncrypt.
+  ansible.builtin.user:
+    name: letsencrypt
+    group: letsencrypt
+    system: true
+    create_home: false
+    password: "*"
+    groups: openldap
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
+- name: Allow OpenLDAP to view the LetsEncrypt directory.
+  ansible.builtin.file:
+    path: /etc/letsencrypt
+    state: directory
+    owner: openldap
+    group: letsencrypt
+  when: ldap_server.ssl.handling == 'letsencrypt'
+
+- name: Start slapd service.
+  ansible.builtin.service:
+    name: slapd
+    state: started
+    enabled: true
+
+- name: Set up replication.
+  ansible.builtin.include_tasks: replication.yml
+  when:
+    - ldap_server.replication.host
+    - ldap_server.config.import
+
+- name: Create the slapd backup script.
+  ansible.builtin.template:
+    src: slap-bak.j2
+    dest: /usr/local/bin/slap-bak
+    owner: root
+    group: root
+    mode: 0755
+  when: ldap_server.config.backup
+
+- name: Create systemd timer for slapd backups.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      slapd_backups:
+        timer_command: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r rm"
+        timer_OnCalendar: "{{ ldap_server.config.on_calendar }}"
+  when: ssl.autorenew

@@ -1,7 +1,0 @@
----
-dependencies:
-  - role: aws/aws_cli
-  - role: ansible
-  - role: python_boto
-  - role: packer
-  - role: terraform

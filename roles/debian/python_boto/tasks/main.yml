@@ -1,0 +1,18 @@
+---
+- name: Set initial boto3 package name.
+  ansible.builtin.set_fact:
+    _boto3_install_package: boto3
+
+- name: Set specific boto3 version to install.
+  ansible.builtin.set_fact:
+    _boto3_install_package: "boto3=={{ python_boto.boto3_version}}"
+  when:
+    - python_boto.boto3_version | length > 0
+
+- name: Ensure boto3 is installed.
+  ansible.builtin.pip:
+    name: "{{ _boto3_install_package }}"
+    virtualenv: "{{ python_boto.venv_path | default(_venv_path) }}"
+    virtualenv_command: "{{ python_boto.venv_command | default(_venv_command) }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"

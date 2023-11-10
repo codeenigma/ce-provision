@@ -2,7 +2,7 @@
 ce_provision:
   username: "ce-dev"
   own_repository: "https://github.com/codeenigma/ce-provision.git"
-  own_repository_branch: "1.x"
+  own_repository_branch: "devel-2.x"
   own_repository_skip_checkout: true
   config_repository: "https://github.com/codeenigma/ce-dev-ce-provision-config.git"
   config_repository_branch: "1.x"
