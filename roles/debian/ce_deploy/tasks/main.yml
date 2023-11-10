@@ -1,11 +1,4 @@
 ---
-# cron is not necessarily installed by default.
-- name: Ensure cron is installed.
-  ansible.builtin.apt:
-    name: cron
-    state: present
-    update_cache: true
-
 - name: Create the deploy group.
   ansible.builtin.group:
     name: "{{ ce_deploy.username }}"
@@ -162,13 +155,13 @@
 
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
   become: true
   become_user: "{{ ce_deploy.username }}"
 
 - name: Install custom ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "ansible-galaxy install -r {{ ce_deploy.galaxy_custom_requirements_file }} --force"
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.galaxy_custom_requirements_file }} --force"
   become: true
   become_user: "{{ ce_deploy.username }}"
   when: _ce_deploy_custom_galaxy_requirements.stat.exists
