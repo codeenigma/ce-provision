@@ -21,6 +21,7 @@
     system: true
     groups: "{{ ce_deploy.groups }}"
   when: ce_deploy.new_user
+
 # @see https://github.com/ansible/ansible/issues/24862
 - name: Ensure home ownership.
   ansible.builtin.file:
@@ -35,20 +36,6 @@
   ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
     src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.key_name }}"
-
-# Install Python applications.
-- name: Set up Python venv variables.
-  ansible.builtin.set_fact:
-    _venv_path: "{{ ce_deploy.venv_path }}"
-    _venv_command: "{{ ce_deploy.venv_command }}"
-
-- name: Install Ansible.
-  ansible.builtin.include_role:
-    name: debian/ansible
-
-- name: Install python_boto.
-  ansible.builtin.include_role:
-    name: debian/python_boto
 
 - name: Ensure Git is installed.
   ansible.builtin.apt:
@@ -118,7 +105,7 @@
     - ansible.cfg
   when: ce_deploy_has_config_repo
 
-- name: Symlink config folders to /etc/ansible.
+- name: Symlink config folders to ce-deploy root.
   ansible.builtin.file:
     dest: "{{ ce_deploy.local_dir }}/{{ item }}"
     src: "{{ ce_deploy.local_dir }}/config/{{ item }}"
@@ -133,12 +120,32 @@
     path: "{{ ce_deploy.local_dir }}/data"
     state: directory
 
-- name: Ensure ownership of Ansible folder.
+- name: Ensure ownership of ce-deploy folder.
   ansible.builtin.file:
     path: "{{ ce_deploy.local_dir }}"
     state: directory
     owner: "{{ ce_deploy.username }}"
     recurse: true
+
+# Install Python applications.
+- name: Set up Python venv variables.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_deploy.venv_path }}"
+    _venv_command: "{{ ce_deploy.venv_command }}"
+
+- name: Install Ansible.
+  ansible.builtin.include_role:
+    name: debian/ansible
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
+- name: Add Python virtual environment to $PATH.
+  ansible.builtin.copy:
+    dest: /etc/profile.d/ansible-path.sh
+    content: "PATH=$PATH:{{ _venv_path }}/bin"
+    force: true
 
 - name: Check if ansible-galaxy custom requirements file exists.
   ansible.builtin.stat:
