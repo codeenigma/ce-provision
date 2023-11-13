@@ -160,6 +160,12 @@
   become: true
   become_user: "{{ ce_provision.username }}"
 
+- name: Add Python virtual environment to $PATH.
+  ansible.builtin.copy:
+    dest: /etc/profile.d/ansible-path.sh
+    content: "PATH=$PATH:{{ _venv_path }}/bin"
+    force: true
+
 - name: Check if ansible-galaxy custom requirements file exists.
   ansible.builtin.stat:
     path: "{{ ce_provision.galaxy_custom_requirements_file }}"
