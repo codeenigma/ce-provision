@@ -46,6 +46,7 @@
   ansible.builtin.apt:
     pkg: ["git", "parallel"]
     state: present
+    update_cache: true
 
 # This is needed for "pushing" in certain cases.
 - name: Setup Git identity.
