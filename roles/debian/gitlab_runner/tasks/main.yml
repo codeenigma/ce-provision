@@ -35,6 +35,19 @@
 # gitlab-runner register --url https://gitlab.com/ --registration-token TOKEN_HERE --name fargate-test-runner --run-untagged --executor custom -n
 # This will automatically update /etc/gitlab-runner/config.toml
 
+# Populates the _aws_security_group_list variable used in fargate.toml.j2
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_elasticache.aws_profile }}"
+    region: "{{ aws_elasticache.region }}"
+    group_names:
+      - "{{ gitlab_runner.fargate.security_group }}"
+    return_type: ids
+  when: gitlab_runner.install_fargate
+  delegate_to: localhost
+
 - name: Create the Fargate driver directory if it does not exist.
   ansible.builtin.file:
     path: /opt/gitlab-runner
