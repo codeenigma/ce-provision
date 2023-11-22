@@ -36,6 +36,8 @@ aws_ec2_autoscale_cluster:
   vpc_id: vpc-XXXX # One of vpc_id or vpc_name is mandatory.
   # vpc_name: example-vpc
   subnets:
+    # If rds.rds.true is set and you are creating an RDS instance then you must use at least two AZs, this is hard requirement.
+    # This means your region and environment must also have a minimum of two subnets - see `aws_vpc_subnet`
     # - az: a
     #   cidr: "10.0.3.0/26"
     - az: b

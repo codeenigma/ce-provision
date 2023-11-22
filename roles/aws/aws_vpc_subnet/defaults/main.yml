@@ -3,6 +3,7 @@ aws_vpc_subnet:
   # vpc_name: example-vpc
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
+  # If you intend to have RDS instances you must provide at least two subnets.
   subnets:
     - cidr_block: "10.0.0.0/24"
       # ipv6_cidr_block: "1" # This will create something like xxxx:xxxx:xxxx:xxyy::/64 where yy is created using the ansible.utils.ipsubnet filter automatically - DO NOT DEFINE IF IPV6 IS NOT REQUIRED
