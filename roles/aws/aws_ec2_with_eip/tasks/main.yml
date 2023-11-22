@@ -13,7 +13,7 @@
     _aws_ec2_with_eip_image_latest: "{{ _aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
 
 - name: Gather IAM role info.
-  community.aws.iam_role_info:
+  amazon.aws.iam_role_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
     region: "{{ aws_ec2_with_eip.region }}"
     name: "{{ aws_ec2_with_eip.iam_role_name }}"
