@@ -20,6 +20,7 @@ php:
     upload_max_filesize: 200M
     max_file_uploads: 20
     date_timezone: "Europe/London"
+    gc_maxlifetime: 1440
     overrides: {}
     opcache:
       enable: 1
