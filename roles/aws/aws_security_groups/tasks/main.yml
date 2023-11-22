@@ -1,0 +1,30 @@
+---
+- name: Set up lists.
+  ansible.builtin.set_fact:
+    _aws_security_groups: []
+    _aws_security_group_ids: []
+    _aws_security_group_names: "{{ aws_security_groups.group_names }}"
+    _aws_security_group_list: []
+
+- name: Fetch groups.
+  amazon.aws.ec2_security_group_info:
+    profile: "{{ aws_security_groups.aws_profile }}"
+    region: "{{ aws_security_groups.region }}"
+    filters:
+      group-name: "{{ _aws_security_group_names }}"
+  register: _aws_security_groups
+
+- name: Create list of security group IDs.
+  ansible.builtin.set_fact:
+    _aws_security_group_ids: "{{ _aws_security_group_ids + [ item.group_id ] }}"
+  with_items: "{{ _aws_security_groups.security_groups }}"
+
+- name: Set return variable to SG names.
+  ansible.builtin.set_fact:
+    _aws_security_group_list: "{{ _aws_security_group_names }}"
+  when: aws_security_groups.return_type == 'names'
+
+- name: Set return variable to SG IDs.
+  ansible.builtin.set_fact:
+    _aws_security_group_list: "{{ _aws_security_group_ids }}"
+  when: aws_security_groups.return_type == 'ids'

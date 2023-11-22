@@ -1,0 +1,8 @@
+---
+aws_security_groups:
+  aws_profile: "{{ _aws_profile }}"
+  region: "{{ _aws_region }}"
+  group_names:
+    - ssh_open
+    - web_open
+  return_type: ids # can be either 'names' or 'ids'
