@@ -29,6 +29,7 @@ php:
     max_spare_servers: 3
     process_idle_timeout: 10s
     max_requests: 500
+    gc_maxlifetime: 1440
     opcache:
       enable: 1
       enable_cli: 0
