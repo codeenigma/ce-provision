@@ -291,7 +291,7 @@
     - aws_ec2_autoscale_cluster.deploy_cluster
 
 - name: Gather IAM role info.
-  community.aws.iam_role_info:
+  amazon.aws.iam_role_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     name: "{{ aws_ec2_autoscale_cluster.iam_role_name }}"
