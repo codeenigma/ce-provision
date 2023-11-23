@@ -22,6 +22,7 @@ php:
     date_timezone: "Europe/London"
     gc_maxlifetime: 1440
     overrides: {}
+    gc_maxlifetime: 1440
     opcache:
       enable: 1
       enable_cli: 0
