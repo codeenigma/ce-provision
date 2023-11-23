@@ -31,7 +31,7 @@ aws_ec2_with_eip:
   root_volume_encrypted: "{{ aws_ami.encrypt_boot }}" # in most cases this should match encrypt_boot in the aws_ami role
   root_volume_delete_on_termination: true
   ebs_optimized: true
-  security_groups: []
+  security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
   tags:
     Name: "{{ _domain_name }}"
   # Add an A record tied to the EIP.

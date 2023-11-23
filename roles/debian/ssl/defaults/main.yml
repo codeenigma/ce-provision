@@ -1,0 +1,53 @@
+---
+ssl:
+  domains: # you can provide multiple domains if you need
+    - www.example.com
+  # Handling for certs, can be one of:
+  # - letsencrypt: Generates individual LetsEncrypt certificate using the HTTP challenge
+  # - selfsigned: Generates self-signed certificates
+  # - manual: Use provided certificates. Requires key/cert.
+  # - unmanaged: Doesn't do anything. Note that for consistency reasons, key/cert paths are still needed.
+  handling: selfsigned
+  # For "manual" handling, this is the content of the certificate.
+  # If you want to to provide a file instead, use lookup('file', '/path/on/the/controller') as the value.
+  # For "unmanaged" handling, this must be set to the absolute path on the target.
+  # For "manual" handling you can optionally include a ca_cert variable if your CA cert must be a separate file.
+  cert: |
+    -----BEGIN CERTIFICATE-----
+    f34XAAVI+R04k0TLUcfeU4/8QYQ3qY1aDvwonT3PE6VYRAGMGJflz//133EquNUR
+    oMz3CA==
+    -----END CERTIFICATE-----
+  # For "manual" handling, this is the content of the key.
+  # For "unmanaged" handling, this must be set to the absolute path on the target.
+  key: |
+    -----BEGIN PRIVATE KEY-----
+    79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
+    6XoQQlb5mYuLKCzAZws9uceeVH+z
+    -----END PRIVATE KEY-----
+
+  # For "letsencrypt" handling.
+  email: admin@example.com
+  certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n" # root of the command to register a new cert
+  http_01_port: 80 # you can set a non-standard port to listen on, but certbot still needs port 80 - see https://letsencrypt.org/docs/challenge-types/#http-01-challenge
+  # For "letsencrypt" auto renewal
+  autorenew: false # set to true to create a systemd timer to renew LE certs
+  certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew" # root of the command used in the systemd timer
+  # See systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+  #on_calendar: "Mon *-*-* 04:00:00"
+  web_server: standalone # values are standalone, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
+
+  # For "letsencrypt" handling, a list of service to stop while creating the certificate.
+  # This is because we need port 80 to be free.
+  # List of services to be stopped during renewal, e.g.
+  #services:
+  #  - nginx
+  services: []
+  # When certificates get renewed on a schedule you also need to reload any dependent services, such as your web server.
+  # List of services to reload:
+  reload: []
+  reload_command: restart # use 'reload' if you do not want to restart, but in most cases a full restart is required to load a new cert.
+
+############ Facts
+# ssl_facts
+# A dict of domain names with key/cert destination paths.
+# { }

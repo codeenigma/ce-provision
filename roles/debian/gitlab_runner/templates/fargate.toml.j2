@@ -1,0 +1,18 @@
+LogLevel = "info"
+LogFormat = "text"
+
+[Fargate]
+  Cluster = "{{ gitlab_runner.fargate.cluster }}"
+  Region = "{{ gitlab_runner.fargate.region }}"
+  Subnet = "{{ gitlab_runner.fargate.subnet }}"
+  SecurityGroup = "{{ _aws_security_group_list[0] }}"
+  TaskDefinition = "{{ gitlab_runner.fargate.task_definition }}"
+  EnablePublicIP = {{ gitlab_runner.fargate.public_ip }}
+  PlatformVersion = "{{ gitlab_runner.fargate.version }}"
+
+[TaskMetadata]
+  Directory = "{{ gitlab_runner.fargate.metadata_dir }}"
+
+[SSH]
+  Username = "{{ gitlab_runner.fargate.ssh_user }}"
+  Port = {{ gitlab_runner.fargate.ssh_port }}

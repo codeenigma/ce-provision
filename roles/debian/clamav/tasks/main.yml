@@ -1,0 +1,31 @@
+---
+- name: Ensure the ClamAV scripts directory exists.
+  ansible.builtin.file:
+    path: "{{ clamav.scripts_location }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy clamscan script to server.
+  ansible.builtin.template:
+    src: "clamscan.j2"
+    dest: "{{ clamav.scripts_location }}/clamscan"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure the ClamAV log directory exists.
+  ansible.builtin.file:
+    path: "{{ clamav.log_location }}"
+    state: directory
+    mode: '0755'
+  when: clamav.create_timer
+
+- name: Set up a ClamAV systemd timer.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      clamav_scan:
+        timer_command: "{{ clamav.scripts_location }}/clamscan"
+        timer_OnCalendar: "{{ clamav.on_calendar }}"
+  when: clamav.create_timer

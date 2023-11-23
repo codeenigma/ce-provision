@@ -1,4 +1,14 @@
 ---
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_elasticache.aws_profile }}"
+    region: "{{ aws_elasticache.region }}"
+    group_names: "{{ aws_elasticache.elasticache_security_groups }}"
+    return_type: ids
+  when: aws_elasticache.elasticache_security_groups | length > 0
+
 - name: Create ElastiCache subnet group.
   community.aws.elasticache_subnet_group:
     name: "{{ aws_elasticache.name }}"
@@ -24,7 +34,7 @@
     node_type: "{{ aws_elasticache.elasticache_node_type }}"
     num_nodes: "{{ aws_elasticache.elasticache_nodes }}"
     cache_port: "{{ aws_elasticache.elasticache_port }}"
-    security_group_ids: "{{ aws_elasticache.elasticache_security_groups }}"
+    security_group_ids: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
     zone: "{{ aws_elasticache.zone | default(omit) }}"
 
 # @TODO grab the endpoint data for the memcached client role

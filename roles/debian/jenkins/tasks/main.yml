@@ -1,0 +1,136 @@
+---
+- name: Add repository key for Jenkins.
+  ansible.builtin.apt_key:
+    url: https://pkg.jenkins.io/debian/jenkins.io.key
+    state: present
+
+- name: Add repository for Jenkins.
+  ansible.builtin.apt_repository:
+    repo: "deb http://pkg.jenkins.io/debian binary/"
+    state: present
+
+- name: Ensure Jenkins is installed.
+  ansible.builtin.apt:
+    pkg: "jenkins"
+    state: present
+    update_cache: true
+  register: aptoutput
+
+- name: Generates SSL keys.
+  ansible.builtin.include_role:
+    name: "{{ jenkins.ssl_handling }}"
+  vars:
+    ssl:
+      domain: "{{ jenkins.server_name }}"
+      services: []
+
+- name: Check if we have an existing keystore.
+  ansible.builtin.stat:
+    path: "/var/lib/jenkins/{{ jenkins.server_name }}.jks"
+  register: jenkins_keystore
+
+- name: Convert SSL key to intermediate PK12.
+  ansible.builtin.command: "openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ _ssl_paths[jenkins.server_name].key }} -in {{ _ssl_paths[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}"
+  when: not jenkins_keystore.stat.exists
+
+- name: Convert PK12 to keystore.
+  ansible.builtin.command: "keytool -importkeystore -srckeystore /dev/shm/jenkins_keystore.p12 -srcstorepass '{{ jenkins.keystore_pass }}' -srcstoretype PKCS12 -srcalias {{ jenkins.server_name }} -deststoretype JKS -destkeystore /var/lib/jenkins/{{ jenkins.server_name }}.jks -deststorepass '{{ jenkins.keystore_pass }}' -destalias {{ jenkins.server_name }}"
+  when: not jenkins_keystore.stat.exists
+
+- name: Ensure keystore ownership.
+  ansible.builtin.file:
+    path: /var/lib/jenkins
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    recurse: true
+
+- name: Ensure log ownership.
+  ansible.builtin.file:
+    path: /var/log/jenkins
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    recurse: true
+
+- name: Ensure cache ownership.
+  ansible.builtin.file:
+    path: /var/cache/jenkins
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    recurse: true
+
+- name: Copy Jenkins configuration file.
+  ansible.builtin.template:
+    src: "jenkins.j2"
+    dest: /etc/default/jenkins
+
+- name: Trigger overrides
+  ansible.builtin.include_role:
+    name: _overrides
+  vars:
+    _overrides: "{{ jenkins.overrides }}"
+  when:
+    - jenkins.overrides is defined
+    - jenkins.overrides | length > 0
+
+- name: Create init.groovy.d directory
+  ansible.builtin.file:
+    path: "/var/lib/jenkins/init.groovy.d"
+    state: directory
+    mode: "0755"
+
+- name: Check if groovy security file exists
+  ansible.builtin.stat:
+    path: "/var/lib/jenkins/init.groovy.d/basic-security.groovy"
+
+- name: Copy groovy security file
+  ansible.builtin.template:
+    src: "basic-security.groovy.j2"
+    dest: "/var/lib/jenkins/init.groovy.d/basic-security.groovy"
+    owner: "{{ jenkins.user }}"
+    group: "{{ jenkins.user }}"
+    mode: 0775
+
+- name: Restart Jenkins.
+  ansible.builtin.service:
+    name: jenkins
+    state: restarted
+  when: aptoutput.changed
+
+- ansible.builtin.pause:
+    minutes: 2
+  when: aptoutput.changed
+
+- name: Download Jenkins CLI.
+  ansible.builtin.get_url:
+    url: "https://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
+    validate_certs: false
+    dest: /opt/jenkins-cli.jar
+
+- name: Add Jenkins cert renewal script.
+  ansible.builtin.template:
+    src: "jenkins-cert-renewal.sh.j2"
+    dest: /usr/local/sbin/jenkins-cert-renewal
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create systemd timer for Jenkins cert renewal.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      jenkins_cert_renewal:
+        timer_command: /usr/local/sbin/jenkins-cert-renewal
+        timer_OnCalendar: "{{ jenkins.on_calendar }}"
+
+- name: Install Jenkins Plugins.
+  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
+  become: true
+  become_user: "{{ jenkins.user }}"
+  register: pluginoutput
+
+- name: Safe restart Jenkins.
+  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
+  become: true
+  become_user: "{{ jenkins.user }}"
+  when: pluginoutput.changed

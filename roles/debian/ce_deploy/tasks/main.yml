@@ -1,0 +1,198 @@
+---
+- name: Create the deploy group.
+  ansible.builtin.group:
+    name: "{{ ce_deploy.username }}"
+    system: true
+  when: ce_deploy.new_user
+
+- name: Create the deploy user for deployments.
+  ansible.builtin.user:
+    name: "{{ ce_deploy.username }}"
+    comment: Continuous Deployment
+    shell: /bin/bash
+    group: "{{ ce_deploy.username }}"
+    uid: "{{ ce_deploy.uid | default(omit) }}"
+    create_home: true
+    generate_ssh_key: true
+    home: "/home/{{ ce_deploy.username }}"
+    password: "*"
+    ssh_key_bits: 4096
+    ssh_key_comment: "{{ ce_deploy.username }}@{{ ansible_host }}"
+    system: true
+    groups: "{{ ce_deploy.groups }}"
+  when: ce_deploy.new_user
+
+# @see https://github.com/ansible/ansible/issues/24862
+- name: Ensure home ownership.
+  ansible.builtin.file:
+    path: "/home/{{ ce_deploy.username }}"
+    state: directory
+    owner: "{{ ce_deploy.username }}"
+    group: "{{ ce_deploy.username }}"
+    recurse: true
+  when: ce_deploy.new_user
+
+- name: Fetch back the SSH pub key.
+  ansible.builtin.fetch:
+    dest: "{{ _ce_provision_data_dir }}"
+    src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.key_name }}"
+
+- name: Ensure Git is installed.
+  ansible.builtin.apt:
+    pkg: "git"
+    state: present
+
+- name: Ensure deploy scripts are presents.
+  ansible.builtin.git:
+    repo: "{{ ce_deploy.own_repository | default('https://github.com/codeenigma/ce-deploy.git') }}"
+    dest: "{{ ce_deploy.local_dir }}"
+    version: "{{ ce_deploy.own_repository_branch  | default('master') }}"
+    update: true
+    # @todo?
+    accept_hostkey: true
+  become: true
+  become_user: "{{ ce_deploy.username }}"
+
+- name: Checkout config directory.
+  ansible.builtin.git:
+    repo: "{{ ce_deploy.config_repository }}"
+    accept_hostkey: true
+    dest: "{{ _ce_provision_build_tmp_dir }}/config"
+    version: "{{ ce_deploy.config_repository_branch  | default('master') }}"
+  become: false
+  delegate_to: localhost
+  when: ce_deploy.config_repository is defined and ce_deploy.config_repository
+
+- name: Synchronize config directory.
+  ansible.posix.synchronize:
+    src: "{{ _ce_provision_build_tmp_dir }}/config"
+    dest: "{{ ce_deploy.local_dir }}/"
+    delete: true
+    rsync_opts:
+      - "--chown={{ ce_deploy.username }}:{{ ce_deploy.username }}"
+  when: ce_deploy.config_repository is defined and ce_deploy.config_repository
+
+- name: Check if we have a config directory.
+  ansible.builtin.stat:
+    path: "{{ ce_deploy.local_dir }}/config"
+  register: ce_deploy_config_repo
+
+- name: Register config repository.
+  ansible.builtin.set_fact:
+    key_value: ce_deploy_has_config_repo
+    ce_deploy_has_config_repo: "{{ 'yes' if ce_deploy_config_repo.stat.isdir is defined and ce_deploy_config_repo.stat.isdir else 'no' }}"
+
+- name: Create defaults folders.
+  ansible.builtin.file:
+    path: "{{ ce_deploy.local_dir }}/{{ item }}"
+    state: directory
+  with_items:
+    - hosts
+  when: not ce_deploy_has_config_repo
+
+- name: Create default config.
+  ansible.builtin.copy:
+    src: ansible.cfg
+    dest: "{{ ce_deploy.local_dir }}/ansible.cfg"
+  when: not ce_deploy_has_config_repo
+
+- name: Remove defaults folders.
+  ansible.builtin.file:
+    path: "{{ ce_deploy.local_dir }}/{{ item }}"
+    state: absent
+  with_items:
+    - hosts
+    - ansible.cfg
+  when: ce_deploy_has_config_repo
+
+- name: Symlink config folders to ce-deploy root.
+  ansible.builtin.file:
+    dest: "{{ ce_deploy.local_dir }}/{{ item }}"
+    src: "{{ ce_deploy.local_dir }}/config/{{ item }}"
+    state: link
+  with_items:
+    - hosts
+    - ansible.cfg
+  when: ce_deploy_has_config_repo
+
+- name: Create data dir.
+  ansible.builtin.file:
+    path: "{{ ce_deploy.local_dir }}/data"
+    state: directory
+
+- name: Ensure ownership of ce-deploy folder.
+  ansible.builtin.file:
+    path: "{{ ce_deploy.local_dir }}"
+    state: directory
+    owner: "{{ ce_deploy.username }}"
+    recurse: true
+
+# Install Python applications.
+- name: Set up Python venv variables.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_deploy.venv_path }}"
+    _venv_command: "{{ ce_deploy.venv_command }}"
+
+- name: Install Ansible.
+  ansible.builtin.include_role:
+    name: debian/ansible
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
+- name: Add Python virtual environment to $PATH.
+  ansible.builtin.copy:
+    dest: /etc/profile.d/ansible-path.sh
+    content: "PATH=$PATH:{{ _venv_path }}/bin"
+    force: true
+
+- name: Check if ansible-galaxy custom requirements file exists.
+  ansible.builtin.stat:
+    path: "{{ ce_deploy.galaxy_custom_requirements_file }}"
+  register: _ce_deploy_custom_galaxy_requirements
+
+- name: Copy mandatory ansible-galaxy requirements file to deploy server.
+  ansible.builtin.copy:
+    src: "{{ ce_deploy.ce_provision_dir }}/roles/debian/ce_deploy/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+    dest: "{{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
+    owner: "{{ ce_deploy.username }}"
+    group: "{{ ce_deploy.username }}"
+    mode: '0644'
+
+- name: Install mandatory ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
+  become: true
+  become_user: "{{ ce_deploy.username }}"
+
+- name: Install custom ansible-galaxy roles and collections.
+  ansible.builtin.command:
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.galaxy_custom_requirements_file }} --force"
+  become: true
+  become_user: "{{ ce_deploy.username }}"
+  when: _ce_deploy_custom_galaxy_requirements.stat.exists
+
+- name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_deploy_ansible_galaxy_mandatory:
+        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
+        timer_user: "{{ ce_deploy.username }}"
+        timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
+  when: ce_deploy.upgrade_galaxy.enabled
+
+- name: Create systemd timer to upgrade custom ansible-galaxy collections.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ce_deploy_ansible_galaxy_custom:
+        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.galaxy_custom_requirements_file }}"
+        timer_user: "{{ ce_deploy.username }}"
+        timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
+  when:
+    - _ce_deploy_custom_galaxy_requirements.stat.exists
+    - ce_deploy.upgrade_galaxy.enabled
