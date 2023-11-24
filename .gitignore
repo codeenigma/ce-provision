@@ -14,3 +14,4 @@
 /test.yml
 /ce-dev/ansible/plays/provision-target/indexer
 /roles/contrib
+/docs/roles/contrib

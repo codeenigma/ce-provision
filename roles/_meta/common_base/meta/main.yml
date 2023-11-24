@@ -1,6 +1,7 @@
 ---
 dependencies:
-  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron", "bsd-mailx", "dnsutils", "telnet", "atop", "sysstat"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron", "bsd-mailx"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["dnsutils", "telnet", "atop", "sysstat"], when: ( is_local is not defined or not is_local ) }
   - role: locales
   - role: user_root
   - role: apt_extra_packages
