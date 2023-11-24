@@ -22,14 +22,21 @@ LINT="no"
 ABSOLUTE_PLAYBOOK_PATH="no"
 PARALLEL_RUN="no"
 BOTO_PROFILE=""
+# Ensure build workspace exists.
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
 fi
 BUILD_TMP_DIR=$(mktemp -d -p "$BUILD_WORKSPACE_BASE")
+# Ensure ce-provision data directory exists.
 ANSIBLE_DATA_DIR="$OWN_DIR/data"
 if [ ! -d "$ANSIBLE_DATA_DIR" ]; then
     mkdir "$ANSIBLE_DATA_DIR"
 fi
+# Load the contents of profile.d in case we added items to $PATH there.
+for f in /etc/profile.d/*; do
+# shellcheck source=/dev/null
+   . "$f"
+done
 # Parse options arguments.
 parse_options(){
   while [ "${1:-}" ]; do

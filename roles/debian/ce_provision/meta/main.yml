@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: debian/aws_cli
+  - role: debian/packer
+  - role: debian/terraform

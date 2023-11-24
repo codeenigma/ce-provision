@@ -7,12 +7,12 @@ x-ce_dev:
     - ce-dev/ansible/setup.yml
 services:
   controller:
-    image: codeenigma/ce-dev-1.x
+    image: codeenigma/ce-dev-1.x:devel
     x-ce_dev: {}
     volumes:
       - ../:/home/ce-dev/ce-provision
   target:
-    image: codeenigma/ce-dev-1.x
+    image: codeenigma/ce-dev-1.x:devel
     x-ce_dev:
       host_aliases:
         - provision-target.local
@@ -22,7 +22,7 @@ services:
     cap_add:
       - NET_ADMIN
   privileged:
-    image: codeenigma/ce-dev-1.x
+    image: codeenigma/ce-dev-1.x:devel
     x-ce_dev:
       host_aliases:
         - provision-privileged.local

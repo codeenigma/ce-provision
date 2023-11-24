@@ -1,0 +1,52 @@
+---
+ldap_server:
+  slapd:
+    user: openldap
+    services: "ldap:/// ldapi:/// ldaps:///"
+    ulimit: "8192"
+    options: ""
+    purge: false # Use this only for a completely clean install.
+  # For safety, by default no config handling will occur. Use these variables to enable and provide LDIF files.
+  config:
+    import: false
+    # The path to your LDIF files which define your schema.
+    # All organisations have a different schema so this should be kept in your config repository.
+    # Execution order can be important, so ensure your files are named in alphabetical order.
+    path: "{{ _ce_provision_base_dir }}/config/files/ldap_server/config"
+    purge: false
+    backup: false # set to true to create local backups of LDAP
+    backup_path: /opt/slap-bak
+    on_calendar: "*-*-* 23:45:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+  # TLS settings in LDAP are not separately handled, you need to manually set it up or use the config import feature.
+  # If you use 'manual' SSL handling you need to provide a separate CA certificate.
+  # If you use 'letsencrypt' SSL handling then the LDAP TLS settings in your imported config should be as follows:
+  #   olcTLSCACertificateFile: /etc/letsencrypt/live/{{ _domain_name }}/chain.pem
+  #   olcTLSCertificateFile: /etc/letsencrypt/live/{{ _domain_name }}/cert.pem
+  #   olcTLSCertificateKeyFile:  /etc/letsencrypt/live/{{ _domain_name }}/privkey.pem
+  ssl: # @see the 'ssl' role - does nothing by default.
+    domain: "{{ _domain_name }}"
+    handling: "unmanaged"
+    key: ""
+    cert: ""
+    ca_cert: ""
+    # Sample LetsEncrypt config, because include_role will not merge defaults these all need providing:
+    # handling: letsencrypt
+    # http_01_port: 5000
+    # autorenew: true
+    # email: sysadm@codeenigma.com
+    # services: []
+    # web_server: standalone
+    # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
+    # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+    # reload_command: restart
+    # reload:
+    #   - slapd
+  replication:
+    host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
+    port: "636"
+    searchbase: "dc=example,dc=com"
+    admin_cn: "cn=admin" # the admin user's canonical name, assumed to be the same on host and consumer
+    admin_pwd: "" # the host admin bind password
+    bind_cn: "cn={{ _domain_name }}" # the canonical name of the user on the host with read access to fetch changes
+    bind_pwd: "" # the desired replication user password - will be generated if not provided
+    interval: "00:00:07:00" # defaults to every 7 minutes

@@ -16,7 +16,7 @@ aws_opensearch:
   subnets:
     - "subnet-aaaaaaaa"
     - "subnet-bbbbbbbb"
-  security_groups: []
+  security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
   automated_snapshot_start_hour: 3
   auto_tune: "DISABLED" # not supported when t3's are used
   # List of maintenance schedules to use if auto_tune is set to "ENABLED":

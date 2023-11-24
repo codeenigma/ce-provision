@@ -23,7 +23,7 @@ aws_elb:
     zone: "example.com"
     record: "*.{{ _domain_name }}"
     aws_profile: "{{ _aws_profile }}" # Not necessarily the same as the "target" one.
-  elb_security_groups: []
+  elb_security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
   target_groups: # list of target groups
     - name: example-target-group
       protocol: http
