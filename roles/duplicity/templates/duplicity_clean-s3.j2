@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Duplicity Cleanup script
+
+# Declare and export secrets
+export AWS_ACCESS_KEY_ID={{ duplicity.access_key_id }}
+export AWS_SECRET_ACCESS_KEY={{ duplicity.secret_access_key }}
+export PASSPHRASE={{ duplicity.gpg_passphrase }}
+
+if [ ! `whoami` = "root" ] ; then
+  echo "You must run this script as root"
+  exit 1
+fi
+
+## Configurable variables
+
+# Args to pass to duplicity
+cleanup_options="clean --force --s3-use-new-style --s3-european-buckets"
+
+# An array of directories to clean
+DIRS=(
+{% for item in duplicity.dirs %}
+  {{ item.name }}
+{% endfor %}
+)
+
+
+## Cleanup code below. You should not need to edit anything here.
+
+# Loop over each dir and perform the clean.
+for dir in ${DIRS[@]}; do
+  echo "Cleaning up $dir..."
+  DEST=s3://{{ duplicity.backend_url }}/{{ duplicity.bucketname }}$dir
+  duplicity $cleanup_options $DEST || exit 1
+done
+
+unset PASSPHRASE
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_ACCESS_KEY_ID
