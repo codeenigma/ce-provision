@@ -3,9 +3,9 @@
 # Duplicity Restore script
 
 # Declare and export secrets
-export AWS_ACCESS_KEY_ID={{duplicity.aws_access_key_id}}
-export AWS_SECRET_ACCESS_KEY={{duplicity.aws_secret_access_key}}
-export PASSPHRASE={{duplicity.gpg_passphrase}}
+export PASSPHRASE={{ duplicity.gpg_passphrase }}
+export B2_KEY_ID={{ duplicity.access_key_id }}
+export B2_SECRET_KEY={{ duplicity.secret_access_key }}
 
 if [ ! `whoami` = "root" ] ; then
   echo "You must run this script as root"
@@ -19,7 +19,6 @@ RESTORE_DIR=/tmp/restore-`date '+%F-%H%M'`
 
 # Restore to what point in time (ago) ?
 #RESTORE_OPTIONS="-t 3D"
-RESTORE_OPTIONS="--s3-use-new-style --s3-european-buckets"
 
 # An array of directories to restore
 DIRS=(
@@ -36,8 +35,10 @@ mkdir -p $RESTORE_DIR
 # Loop over each dir and perform the restoration
 for dir in ${DIRS[@]}; do
   echo "Restoring $dir..."
-  DEST=s3://{{duplicity.backend_url}}/{{duplicity.bucketname}}$dir
+  DEST=b2://$B2_KEY_ID:$B2_SECRET_KEY@{{ duplicity.bucketname }}$dir
   duplicity restore $RESTORE_OPTIONS $DEST $RESTORE_DIR$dir
 done
 
 unset PASSPHRASE
+unset B2_KEY_ID
+unset B2_SECRET_KEY
