@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Duplicity Restore script
+
+# Declare and export secrets
+export AWS_ACCESS_KEY_ID={{ duplicity.access_key_id }}
+export AWS_SECRET_ACCESS_KEY={{ duplicity.secret_access_key }}
+export PASSPHRASE={{ duplicity.gpg_passphrase }}
+
+if [ ! `whoami` = "root" ] ; then
+  echo "You must run this script as root"
+  exit 1
+fi
+
+## Configurable variables
+
+# Directory to restore to
+RESTORE_DIR=/tmp/restore-`date '+%F-%H%M'`
+
+# Restore to what point in time (ago) ?
+#RESTORE_OPTIONS="-t 3D"
+RESTORE_OPTIONS="{{ duplicity.s3_options }}"
+
+# An array of directories to restore
+DIRS=(
+{% for item in duplicity.dirs %}
+  {{ item.name }}
+{% endfor %}
+)
+
+
+## Restore code below. You should not need to edit anything here.
+
+mkdir -p $RESTORE_DIR
+
+# Loop over each dir and perform the restoration
+for dir in ${DIRS[@]}; do
+  echo "Restoring $dir..."
+  DEST=s3://{{ duplicity.backend_url }}/{{ duplicity.bucketname }}$dir
+  duplicity restore $RESTORE_OPTIONS $DEST $RESTORE_DIR$dir
+done
+
+unset PASSPHRASE
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_ACCESS_KEY_ID

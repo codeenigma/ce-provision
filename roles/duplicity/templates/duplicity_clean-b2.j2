@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Duplicity Cleanup script
+
+# Declare and export secrets
+export PASSPHRASE={{ duplicity.gpg_passphrase }}
+export B2_KEY_ID={{ duplicity.access_key_id }}
+export B2_SECRET_KEY={{ duplicity.secret_access_key }}
+
+if [ ! `whoami` = "root" ] ; then
+  echo "You must run this script as root"
+  exit 1
+fi
+
+## Configurable variables
+
+# Args to pass to duplicity
+cleanup_options="clean --force"
+
+# An array of directories to clean
+DIRS=(
+{% for item in duplicity.dirs %}
+  {{ item.name }}
+{% endfor %}
+)
+
+
+## Cleanup code below. You should not need to edit anything here.
+
+# Loop over each dir and perform the clean.
+for dir in ${DIRS[@]}; do
+  echo "Cleaning up $dir..."
+  DEST=b2://$B2_KEY_ID:$B2_SECRET_KEY@{{ duplicity.bucketname }}$dir
+  duplicity $cleanup_options $DEST || exit 1
+done
+
+unset PASSPHRASE
+unset B2_KEY_ID
+unset B2_SECRET_KEY

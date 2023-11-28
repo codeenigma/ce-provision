@@ -1,3 +1,12 @@
+# Duplicity
+Role to install and configure [the Duplicity backup engine](https://duplicity.us/) for off site backups in Linux.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 duplicity:
   backend: s3 # currently also support b2 for Backblaze
@@ -24,3 +33,7 @@ duplicity:
   mail_recipient: "foo@bar.com"
   retention_period: "12M"
   schedule: "0 0 * * *"
+
+```
+
+<!--ENDROLEVARS-->
