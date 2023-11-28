@@ -19,7 +19,7 @@ RESTORE_DIR=/tmp/restore-`date '+%F-%H%M'`
 
 # Restore to what point in time (ago) ?
 #RESTORE_OPTIONS="-t 3D"
-RESTORE_OPTIONS="--s3-use-new-style --s3-european-buckets"
+RESTORE_OPTIONS="{{ duplicity.s3_options }}"
 
 # An array of directories to restore
 DIRS=(

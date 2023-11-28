@@ -13,6 +13,7 @@ duplicity:
   access_key_id: "somekey"
   secret_access_key: "somesecret"
   backend_url: "s3-eu-west-1.amazonaws.com"
+  s3_options: "--s3-european-buckets --s3-use-glacier-ir" # see the --s3 options in the documentation - https://duplicity.us/stable/duplicity.1.html#options
   bucketname: "somebucket"
   dirs:
     - name: "/boot"
