@@ -36,7 +36,7 @@ mkdir -p $RESTORE_DIR
 for dir in ${DIRS[@]}; do
   echo "Restoring $dir..."
   DEST=b2://$B2_KEY_ID:$B2_SECRET_KEY@{{ duplicity.bucketname }}$dir
-  duplicity restore $RESTORE_OPTIONS $DEST $RESTORE_DIR$dir
+  /usr/local/bin/duplicity restore $RESTORE_OPTIONS $DEST $RESTORE_DIR$dir
 done
 
 unset PASSPHRASE
