@@ -42,6 +42,7 @@
        - [Automated patching](/roles/debian/ce_patcher)
        - [ce-provision](/roles/debian/ce_provision)
        - [ClamAV](/roles/debian/clamav)
+       - [Duplicity](/roles/debian/duplicity)
        - [Firewall Config](/roles/debian/firewall_config)
        - [Frontail](/roles/debian/frontail)
        - [Gitlab](/roles/debian/gitlab)
