@@ -1,3 +1,12 @@
+# Duplicity
+Role to install and configure [the Duplicity backup engine](https://duplicity.us/) for off site backups in Linux.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 duplicity:
   backend: s3 # currently also support b2 for Backblaze
@@ -26,3 +35,7 @@ duplicity:
   # systemd timer settings
   create_timer: true # sometimes you might want to trigger duplicity some other way than a systemd timer
   on_calendar: "*-*-* 03:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+
+```
+
+<!--ENDROLEVARS-->
