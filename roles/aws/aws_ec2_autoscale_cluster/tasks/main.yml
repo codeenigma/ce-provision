@@ -321,7 +321,6 @@
   register: _aws_ec2_target_group_created
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
-    - aws_ec2_autoscale_cluster.create_elb
 
 - name: Define default ALB listeners.
   ansible.builtin.set_fact:
