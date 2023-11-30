@@ -1,0 +1,34 @@
+---
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+
+- name: Install Ansible.
+  ansible.builtin.pip:
+    name:
+      - ansible
+    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
+    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+- name: Install linters.
+  ansible.builtin.pip:
+    name:
+      - ansible-lint
+      - yamllint
+    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
+    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  when: ce_ansible.linters.enabled
+  become: true
+  become_user: "{{ ce_provision.username }}"
+
+- name: Create systemd timer to upgrade Ansible.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_ansible:
+        timer_command: "{{ ce_ansible.upgrade.command }}"
+        timer_OnCalendar: "{{ ce_ansible.upgrade.on_calendar }}"
+  when: ce_ansible.upgrade.enabled

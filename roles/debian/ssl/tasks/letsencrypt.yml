@@ -1,0 +1,92 @@
+---
+- name: Ensure Certbot is installed.
+  ansible.builtin.apt:
+    pkg: certbot
+    state: present
+
+- name: Set LetsEncrypt variables.
+  ansible.builtin.set_fact:
+    _ssl_web_server: "{{ ssl.web_server | default('standalone') }}"
+    _ssl_services: "{{ ssl.services | default ([]) }}"
+
+# @todo - add support for Route 53 DNS plugin
+- name: "Ensure certbot-{{ _ssl_web_server }} plugin is installed."
+  ansible.builtin.apt:
+    pkg: "python3-certbot-{{ _ssl_web_server }}"
+    state: present
+  when:
+    - _ssl_web_server != 'standalone'
+
+- name: Define SSL base path.
+  ansible.builtin.set_fact:
+    _ssl_base_path: "/etc/letsencrypt/live"
+
+- name: Add key/cert pairs to know paths information.
+  ansible.builtin.set_fact:
+    ssl_facts: "{{ ssl_facts | combine({ certificate_domain: { 'domain': certificate_domain, 'certificate': _ssl_base_path + '/' + certificate_domain + '/fullchain.pem', 'key': _ssl_base_path + '/' + certificate_domain + '/privkey.pem' } }) }}"
+  with_items: "{{ _ssl_domains }}"
+  loop_control:
+    loop_var: certificate_domain
+
+- name: Check if we have a certificate.
+  ansible.builtin.stat:
+    path: "{{ ssl_facts[_ssl_domains[0]].certificate }}" # it's sufficient to check the first domain for a SAN cert
+  register: letsencrypt_cert
+
+- name: Stop services listening on port 80.
+  ansible.builtin.service:
+    name: "{{ ssl_service }}"
+    state: stopped
+  with_items: "{{ _ssl_services }}"
+  loop_control:
+    loop_var: ssl_service
+  when:
+    - not letsencrypt_cert.stat.exists
+    - _ssl_services | length > 0
+
+- name: Build certificate domains string.
+  ansible.builtin.set_fact:
+    _letsencrypt_domain_string: "{{ _letsencrypt_domain_string | default('') + ' -d ' + certificate_domain }}"
+  with_items: "{{ _ssl_domains }}"
+  loop_control:
+    loop_var: certificate_domain
+  when: not letsencrypt_cert.stat.exists
+
+- name: Register certificate bypassing web server if needed.
+  ansible.builtin.command: "{{ ssl.certbot_register_command }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} -m {{ ssl.email }} --{{ _ssl_web_server }}{{ _letsencrypt_domain_string }}"
+  when:
+    - not letsencrypt_cert.stat.exists
+
+- name: Restart services.
+  ansible.builtin.service:
+    name: "{{ ssl_service }}"
+    state: started
+  with_items: "{{ _ssl_services }}"
+  loop_control:
+    loop_var: ssl_service
+  when:
+    - not letsencrypt_cert.stat.exists
+    - _ssl_services | length > 0
+
+# Because of the scripted command each SSL implementation needs it's own uniquely named cron script.
+- name: Create the certbot renewal script.
+  ansible.builtin.template:
+    src: le_cron.sh.j2
+    dest: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
+    owner: root
+    group: root
+    mode: 0755
+  when: ssl.autorenew
+
+- name: Build timer variables with dynamic key.
+  ansible.builtin.set_fact:
+    _certbot_renewal_timer: "{'certbot_renewal_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}':{'timer_command':'/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh','timer_OnCalendar':'{{ ssl.on_calendar }}'}}"
+  when: ssl.autorenew
+
+- name: Create systemd timer for certificate renewal.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      certbot_renewal: "{{ _certbot_renewal_timer }}"
+  when: ssl.autorenew

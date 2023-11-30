@@ -1,6 +1,13 @@
-- name: Reset security groups info
-  ansible.builtin.set_fact:
-    _aws_efs_security_group_ids: []
+---
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_efs.aws_profile }}"
+    region: "{{ aws_efs.region }}"
+    group_names: "{{ aws_efs.security_groups }}"
+    return_type: ids
+  when: aws_efs.security_groups | length > 0
 
 - name: Reset subnet ids info
   ansible.builtin.set_fact:
@@ -9,12 +16,6 @@
 - name: Reset targets info
   ansible.builtin.set_fact:
     _aws_efs_targets: {}
-
-- name: Gather security groups info.
-  ansible.builtin.include_tasks: security_group.yml
-  with_items: "{{ aws_efs.security_groups }}"
-  loop_control:
-    loop_var: security_group
 
 - name: Gather subnets info.
   ansible.builtin.include_tasks: subnet.yml

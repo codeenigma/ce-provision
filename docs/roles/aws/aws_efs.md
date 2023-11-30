@@ -19,8 +19,7 @@ aws_efs:
   wait: true
   # Subnets names.
   subnets: []
-  # SG names - ID lookup is automatic. Note, the assumption is that all subnets have the same SGs.
-  security_groups: []
+  security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
   # Whether to encrypt the volume or not.
   encrypt: false
   backup: "{{ _infra_name }}-{{ _env_type }}" # Name of the AWS Backup plan to use to backup the instance.

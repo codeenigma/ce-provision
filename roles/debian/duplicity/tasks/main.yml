@@ -1,0 +1,83 @@
+- name: Ensure duplicity is installed.
+  ansible.builtin.apt:
+    pkg: duplicity
+    state: present
+  when: ansible_distribution_major_version | int >= 12
+
+- name: Ensure duplicity is installed.
+  ansible.builtin.pip:
+    name: duplicity
+    executable: pip3
+    state: present
+  when: ansible_distribution_major_version | int < 12
+
+- name: Create install dir.
+  ansible.builtin.file:
+    path: "{{ duplicity.install_dir }}"
+    state: directory
+
+- name: Create binary dir.
+  ansible.builtin.file:
+    path: "{{ duplicity.install_dir }}/bin"
+    state: directory
+
+- name: Create config dir.
+  ansible.builtin.file:
+    path: "{{ duplicity.install_dir }}/etc"
+    state: directory
+
+- name: Copy backup script in place.
+  ansible.builtin.template:
+    src: "duplicity_backup-{{ duplicity.backend }}.j2"
+    dest: "{{ duplicity.install_dir }}/bin/duplicity_backup"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Copy restore script in place.
+  ansible.builtin.template:
+    src: duplicity_restore-{{ duplicity.backend }}.j2
+    dest: "{{ duplicity.install_dir }}/bin/duplicity_restore"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Copy clean-up script in place.
+  ansible.builtin.template:
+    src: duplicity_clean-{{ duplicity.backend }}.j2
+    dest: "{{ duplicity.install_dir }}/bin/duplicity_clean"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Copy include-exclude filelist.
+  ansible.builtin.template:
+    src: include-exclude-filelist.j2
+    dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-filelist"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ duplicity.dirs }}"
+  when: "dir.rules|length"
+  loop_control:
+    loop_var: dir
+
+# @TODO - cannot currently send failure notifications - see https://github.com/codeenigma/ce-provision/issues/1215
+- name: Create systemd timer for Duplicity backup.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      duplicity_backup:
+        timer_command: "{{ duplicity.install_dir }}/bin/duplicity_backup"
+        timer_OnCalendar: "{{ duplicity.on_calendar }}"
+  when: duplicity.create_timer
+
+- name: Trigger overrides
+  ansible.builtin.include_role:
+    name: _overrides
+  vars:
+    _overrides: "{{ duplicity.overrides }}"
+  when:
+    - duplicity.overrides is defined
+    - duplicity.overrides | length > 0

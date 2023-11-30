@@ -2,6 +2,7 @@ aws_rds:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   multi_az: true
+  # You must provide at least two subnets in two different AZs, even for single AZ deployments.
   subnets:
     - subnet-aaaaaaaa
     - subnet-bbbbbbbb
@@ -24,8 +25,7 @@ aws_rds:
   master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
   master_user_password: hellothere
   publicly_accessible: false # Wether to allocate an IP address
-  # SG names - ID lookup is automatic.
-  security_groups: []
+  security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
   rds_cloudwatch_alarms: # name will have the RDS identifier prepended.
     - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
       description: "Average database free storage space over the last 10 minutes too low."

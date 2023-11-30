@@ -1,0 +1,56 @@
+---
+# tasks file for ossec-server
+
+- name: Ensure OSSEC is installed.
+  ansible.builtin.apt:
+    pkg: ["ossec-hids-server"]
+    state: present
+    update_cache: true
+
+# systemd timer that starts the ossec-watchdog 1 minute after server start up
+- name: Set ossec-watchdog systemd timer.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      ossec_watchdog:
+        timer_command: "nohup /usr/local/bin/ossec-watchdog > /tmp/ossec-watchdog.log"
+        timer_OnStartupSec: 1m
+
+- name: Set ossec-watchdog script.
+  ansible.builtin.template:
+    src: "ossec_watchdog.j2"
+    dest: "/usr/local/bin/ossec-watchdog"
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Copy OSSEC rules.
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/var/ossec/rules/"
+    owner: root
+    group: ossec
+    mode: "0550"
+  with_fileglob: "*_rules.xml"
+  notify: Restart OSSEC.
+
+- name: Copy OSSEC authentication password.
+  ansible.builtin.template:
+    src: authd.pass.j2
+    dest: "/var/ossec/etc/authd.pass"
+    owner: root
+    group: ossec
+    mode: "0440"
+  notify:
+    - Stop ossec-authd.
+    - Start ossec-authd.
+
+- name: Generates SSL keys.
+  ansible.builtin.include_role:
+    name: ssl
+  vars:
+    ssl: "{{ ossec.ssl }}"
+
+- name: Start ossec-authd.
+  ansible.builtin.command: "/var/ossec/bin/ossec-authd -k {{ ssl_facts[ossec.ssl.domain].key }} -x {{ ssl_facts[ossec.ssl.domain].certificate }}"

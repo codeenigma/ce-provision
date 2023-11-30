@@ -1,11 +1,11 @@
 ---
 dependencies:
-  - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
+  - { role: debian/ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: _meta/common_base
-  - role: user_provision
-  - role: user_deploy
-  - role: mysql_client
-  - role: nodejs
-  - role: php-cli
-  - role: php-fpm
-  - role: nginx
+  - role: debian/user_provision
+  - role: debian/user_deploy
+  - role: debian/mysql_client
+  - role: debian/nodejs
+  - role: debian/php-cli
+  - role: debian/php-fpm
+  - role: debian/nginx

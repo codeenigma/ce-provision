@@ -1,0 +1,11 @@
+---
+- name: Ensure obsolete Python packages are not installed.
+  ansible.builtin.apt:
+    pkg: "{{ python_common.remove_packages }}"
+    state: absent
+
+- name: Ensure commonly required Python packages are installed.
+  ansible.builtin.apt:
+    pkg: "{{ python_common.install_packages }}"
+    state: present
+    update_cache: true

@@ -8,16 +8,6 @@
     description: "{{ aws_rds.description }}"
   register: _aws_rds_rds_subnet_group
 
-- name: Reset security groups info.
-  ansible.builtin.set_fact:
-    _aws_rds_security_group_ids: []
-
-- name: Gather security groups info.
-  ansible.builtin.include_tasks: security_group.yml
-  with_items: "{{ aws_rds.security_groups }}"
-  loop_control:
-    loop_var: security_group
-
 - name: Create RDS parameter group
   amazon.aws.rds_param_group:
     state: present
@@ -73,6 +63,16 @@
     - "'aurora' in aws_rds.engine"
     - aws_rds.aurora_reader
 
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_rds.aws_profile }}"
+    region: "{{ aws_rds.region }}"
+    group_names: "{{ aws_rds.security_groups }}"
+    return_type: ids
+  when: aws_rds.security_groups | length > 0
+
 - name: Create RDS instance
   amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}"
@@ -94,7 +94,7 @@
     #enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
     allocated_storage: "{{ aws_rds.allocated_storage }}"
     max_allocated_storage: "{{ aws_rds.max_allocated_storage }}"
-    vpc_security_group_ids: "{{ _aws_rds_security_group_ids }}"
+    vpc_security_group_ids: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
     profile: "{{ aws_rds.aws_profile }}"
     tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
     allow_major_version_upgrade: false

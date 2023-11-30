@@ -13,5 +13,7 @@
 /ce-dev/ansible/vars/_common/*_exporter.yml
 /test.yml
 /ce-dev/ansible/plays/provision-target/indexer
-/roles/contrib
-/docs/roles/contrib
+/roles/contrib/*
+/roles/ce_provision
+!/roles/contrib/README.md
+/docs/roles/contrib/*

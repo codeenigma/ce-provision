@@ -22,7 +22,7 @@ aws_elasticache:
   elasticache_node_type: cache.t3.medium
   elasticache_nodes: 1
   elasticache_port: 11211
-  elasticache_security_groups: [] # list of security group IDs, @TODO - support names like the EFS role
+  elasticache_security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
   #zone: eu-west-1a # AZ where the cluster will reside
 ```
 

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Duplicity Restore script
+
+# Declare and export secrets
+export PASSPHRASE={{ duplicity.gpg_passphrase }}
+export B2_KEY_ID={{ duplicity.access_key_id }}
+export B2_SECRET_KEY={{ duplicity.secret_access_key }}
+
+if [ ! `whoami` = "root" ] ; then
+  echo "You must run this script as root"
+  exit 1
+fi
+
+## Configurable variables
+
+# Directory to restore to
+RESTORE_DIR=/tmp/restore-`date '+%F-%H%M'`
+
+# Restore to what point in time (ago) ?
+#RESTORE_OPTIONS="-t 3D"
+
+# An array of directories to restore
+DIRS=(
+{% for item in duplicity.dirs %}
+  {{ item.name }}
+{% endfor %}
+)
+
+
+## Restore code below. You should not need to edit anything here.
+
+mkdir -p $RESTORE_DIR
+
+# Loop over each dir and perform the restoration
+for dir in ${DIRS[@]}; do
+  echo "Restoring $dir..."
+  DEST=b2://$B2_KEY_ID:$B2_SECRET_KEY@{{ duplicity.bucketname }}$dir
+  /usr/local/bin/duplicity restore $RESTORE_OPTIONS $DEST $RESTORE_DIR$dir
+done
+
+unset PASSPHRASE
+unset B2_KEY_ID
+unset B2_SECRET_KEY
