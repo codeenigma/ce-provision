@@ -50,7 +50,7 @@ gitlab_runner:
     cluster: "my-cluster" # ECS cluster name
     region: "eu-west-1" # AWS region name
     subnet: "subnet-abcdef123456" # subnet ID
-    security_group: "sg-abcdef123456" # SG ID
+    security_group: "my-security-group" # SG name
     task_definition: "my-task:1" # task definition in format name:revision, if revision is not provided ECS will use latest
     public_ip: "false" # if your containers need a public IP assigning
     version: "1.4.0" # Fargate platform version

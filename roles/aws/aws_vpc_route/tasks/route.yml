@@ -7,6 +7,7 @@
       gateway_id: "{{ route.gateway_id | default(omit) }}"
       nat_gateway_id: "{{ route.nat_gateway_id | default(omit) }}"
       network_interface_id: "{{ route.network_interface_id | default(omit) }}"
+      transit_gateway_id: "{{ route.transit_gateway_id | default(omit) }}"
       vpc_peering_connection_id: "{{ route.vpc_peering_connection_id | default(omit) }}"
       instance_id: "{{ route.instance_id | default(omit) }}"
 
