@@ -47,7 +47,7 @@
 
 - name: Add the venv to $PATH using profile.d.
   ansible.builtin.copy:
-    content: "export PATH=$PATH:'{{ ce_ansible.venv_path | default(_venv_path) }}/bin'"
+    content: "export PATH=$PATH:{{ ce_ansible.venv_path | default(_venv_path) }}/bin"
     dest: "/etc/profile.d/ansible-path.sh"
 
 - name: Create systemd timer to upgrade Ansible.
