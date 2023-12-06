@@ -1,5 +1,7 @@
 # Ansible
-(Re-)install Ansible from the official repository.
+Install Ansible in a Python virtual environment.
+
+Note, it is vitally important that Ansible is *not* installed via `apt` or `pip` globally, or you will likely not get the correct version of Ansible when you try to run shell scripts.
 
 <!--TOC-->
 <!--ENDTOC-->
