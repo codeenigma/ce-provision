@@ -22,7 +22,6 @@
     state: latest
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
-    update_only: true
   become: true
   become_user: "{{ ce_provision.username }}"
 
