@@ -11,6 +11,7 @@ TARGET_PROVISION_PLAYBOOK=""
 TARGET_PROVISION_BRANCH=""
 ANSIBLE_EXTRA_VARS=""
 ANSIBLE_DEFAULT_EXTRA_VARS=""
+ANSIBLE_PATH=""
 BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
@@ -144,7 +145,7 @@ cleanup_build_tmp_dir(){
 }
 # Trigger actual Ansible job.
 ansible_play(){
-  if [ -n "$ANSIBLE_PATH" ]; then
+  if [ -z "$ANSIBLE_PATH" ]; then
     if [ "$LINT" = "yes" ]; then
       # apt repo installed
       ANSIBLE_BIN=$(command -v ansible-lint)
