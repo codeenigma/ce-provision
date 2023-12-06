@@ -94,6 +94,10 @@ parse_options(){
           shift
           BOTO_PROFILE="$1"
         ;;
+      "--ansible-path")
+          shift
+          ANSIBLE_PATH="$1"
+        ;;
         *)
         usage
         exit 1
@@ -140,11 +144,20 @@ cleanup_build_tmp_dir(){
 }
 # Trigger actual Ansible job.
 ansible_play(){
-  if [ "$LINT" = "yes" ]; then
-    # apt repo installed
-    ANSIBLE_BIN=$(command -v ansible-lint)
+  if [ -n "$ANSIBLE_PATH" ]; then
+    if [ "$LINT" = "yes" ]; then
+      # apt repo installed
+      ANSIBLE_BIN=$(command -v ansible-lint)
+    else
+      ANSIBLE_BIN=$(command -v ansible-playbook)
+    fi
   else
-    ANSIBLE_BIN=$(command -v ansible-playbook)
+    if [ "$LINT" = "yes" ]; then
+      # apt repo installed
+      ANSIBLE_BIN="$ANSIBLE_PATH/ansible-lint"
+    else
+      ANSIBLE_BIN="$ANSIBLE_PATH/ansible-playbook"
+    fi
   fi
   if [ "$ABSOLUTE_PLAYBOOK_PATH" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_BIN $TARGET_PROVISION_PLAYBOOK"
