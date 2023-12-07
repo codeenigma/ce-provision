@@ -21,7 +21,7 @@
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
-    name: apt_unattended_upgrades
+    name: debian/apt_unattended_upgrades
   when: apt_unattended_upgrades.enable
 
 - name: Ensure Gitlab Runner is installed.
@@ -135,7 +135,7 @@
 
 - name: Run docker_ce role when Fargate driver to be installed.
   ansible.builtin.include_role:
-    name: docker_ce
+    name: debian/docker_ce
   when: gitlab_runner.install_fargate
 
 - name: Add the ce-provision user to the docker group.

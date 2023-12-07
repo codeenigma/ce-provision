@@ -27,7 +27,7 @@
 
 - name: Setup xdebug.
   ansible.builtin.include_role:
-    name: php_xdebug
+    name: debian/php_xdebug
 
 - name: Trigger overrides
   ansible.builtin.include_role:

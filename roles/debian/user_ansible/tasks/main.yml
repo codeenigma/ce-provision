@@ -29,7 +29,7 @@
 
 - name: Add user to sudoers.
   ansible.builtin.include_role:
-    name: sudo_config
+    name: debian/sudo_config
   vars:
     sudo_config:
       entity_name: "{{ user_ansible.username }}"
