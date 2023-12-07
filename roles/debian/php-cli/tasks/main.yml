@@ -52,4 +52,4 @@
 
 - name: Setup composer.
   ansible.builtin.include_role:
-    name: php_composer
+    name: debian/php_composer

@@ -40,7 +40,7 @@
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
-    name: apt_unattended_upgrades
+    name: debian/apt_unattended_upgrades
   when: apt_unattended_upgrades.enable
 
 - name: Ensure NodeJS and Yarn are installed.
