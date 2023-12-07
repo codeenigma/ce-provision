@@ -1,7 +1,7 @@
 ---
 - name: Generates SSL keys.
   ansible.builtin.include_role:
-    name: ssl
+    name: debian/ssl
   when: domain.ssl is defined
   vars:
     ssl: "{{ domain.ssl }}"
