@@ -18,7 +18,7 @@
     group: root
     mode: 0644
     force: true
-  with_items: apparmor.custom_profiles
+  with_items: "{{ apparmor.custom_profiles }}"
   when: apparmor.custom_profiles | length > 0
 
 - name: Reload the apparmor service.
