@@ -1,0 +1,8 @@
+---
+apparmor:
+  custom_profiles: []
+    # example
+    #- filename: usr.sbin.clamd
+    #  contents: |
+    #    /home/deploy/** r,
+    #
