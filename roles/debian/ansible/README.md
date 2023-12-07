@@ -1,13 +1,7 @@
 # Ansible
 Install Ansible in a Python virtual environment.
 
-Note, it is vitally important that Ansible is *not* installed via `apt` or `pip` globally, or you will likely not get the correct version of Ansible when you try to run shell scripts.
-
-This will not usually be necessary but, depending on your CI user set-up, you may need to add this as a pre-build step in your config where shell profiles are not automatically loaded, so Ansible is loaded into `$PATH`:
-
-```sh
-. /etc/profile.d/ansible-path.sh
-```
+Note, it is vitally important that Ansible is *not* installed via `apt` or `pip` globally, or you will likely not get the correct version of Ansible when you try to run shell scripts. The role will try and take care of this for you, but for extra safety you could manually check prior to running `ce-provision`.
 
 <!--TOC-->
 <!--ENDTOC-->
