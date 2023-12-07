@@ -31,6 +31,7 @@
      - [Debian Packages](/roles/debian)
        - [Ansible](/roles/debian/ansible)
        - [APACHE](/roles/debian/apache)
+       - [Apparmor](/roles/debian/apparmor)
        - [Extra packages](/roles/debian/apt_extra_packages)
        - [APT Unattended Upgrades](/roles/debian/apt_unattended_upgrades)
        - [AWS CLI](/roles/debian/aws_cli)
