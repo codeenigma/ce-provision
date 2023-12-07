@@ -1,0 +1,8 @@
+---
+phpmyadmin:
+  version: 5.2.1 # see https://www.phpmyadmin.net/files/
+  method: install # can be changed to 'upgrade' to overwrite an existing installation
+  install_path: "/home/{{ ce_deploy.username }}/deploy"
+  # Assuming user and group should match php-fpm by default
+  www_user: "{{ php.fpm.pool_user }}"
+  www_group: "{{ php.fpm.pool_group }}"

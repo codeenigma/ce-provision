@@ -1,0 +1,19 @@
+---
+- name: Place the phpMyAdmin installer script on the server.
+  ansible.builtin.template:
+    src: phpmyadmin_install.sh.j2
+    dest: /usr/local/bin/phpmyadmin.sh
+    owner: root
+    group: root
+    mode: 0755
+    force: true
+
+- name: Execute the installer to install phpMyAdmin.
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/phpmyadmin.sh -v {{ phpmyadmin.version }}"
+  when: phpmyadmin.method == 'install'
+
+- name: Execute the installer to upgrade phpMyAdmin.
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/phpmyadmin.sh -u -v {{ phpmyadmin.version }}"
+  when: phpmyadmin.method == 'upgrade'

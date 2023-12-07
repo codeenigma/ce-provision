@@ -64,6 +64,7 @@
        - [OSSEC](/roles/debian/ossec)
        - [Packer](/roles/debian/packer)
        - [PHP Composer](/roles/debian/php_composer)
+       - [phpMyAdmin](/roles/debian/phpmyadmin)
        - [PHP XDebug](/roles/debian/php_xdebug)
        - [Postfix](/roles/debian/postfix)
        - [Process Manager](/roles/debian/process_manager)
