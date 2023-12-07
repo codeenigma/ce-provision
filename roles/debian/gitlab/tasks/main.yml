@@ -51,7 +51,7 @@
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
-    name: apt_unattended_upgrades
+    name: debian/apt_unattended_upgrades
   when: apt_unattended_upgrades.enable
 
 - name: Ensure Gitlab is installed.
@@ -62,7 +62,7 @@
 
 - name: Generates SSL keys.
   ansible.builtin.include_role:
-    name: ssl
+    name: debian/ssl
   when: gitlab.ssl.enabled
   vars:
     ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"

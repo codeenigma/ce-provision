@@ -18,7 +18,7 @@
 
 - name: Generates SSL keys.
   ansible.builtin.include_role:
-    name: "{{ jenkins.ssl_handling }}"
+    name: debian/ssl
   vars:
     ssl:
       domain: "{{ jenkins.server_name }}"
