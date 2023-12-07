@@ -1,3 +1,3 @@
 ---
 dependencies:
-  - role: python_boto
+  - role: debian/python_boto

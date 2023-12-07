@@ -1,0 +1,4 @@
+---
+dependencies:
+  - role: debian/nginx
+  - role: debian/php-fpm
