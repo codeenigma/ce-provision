@@ -25,7 +25,7 @@
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
-    name: apt_unattended_upgrades
+    name: debian/apt_unattended_upgrades
   when: apt_unattended_upgrades.enable
 
 - name: Install PHP packages.
@@ -64,8 +64,8 @@
 
 - name: Setup xdebug.
   ansible.builtin.include_role:
-    name: php_xdebug
+    name: debian/php_xdebug
 
 - name: Setup Blackfire.
   ansible.builtin.include_role:
-    name: php_blackfire
+    name: debian/php_blackfire

@@ -2,6 +2,7 @@ skip_list:
   - '204' # Lines should be no longer than 160 chars
   - '301' # Commands should not change things if nothing needs doing
   - '701' # 701 No 'galaxy_info' found
+  - package-latest # do not insist on avoiding 'latest', we need it in some cases
   - unnamed-task
   - risky-file-permissions
   - role-name

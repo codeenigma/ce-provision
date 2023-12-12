@@ -67,12 +67,12 @@
   notify:
     - Reload Postfix configuration.
 
-- name: Initialise sasl_passwd
+- name: Initialise sasl_passwd.
   ansible.builtin.command:
     cmd: /usr/sbin/postmap /etc/postfix/sasl_passwd
   when: postfix.use_ses
 
-- name: Configure virtual
+- name: Configure virtual.
   ansible.builtin.template:
     src: "virtual.j2"
     dest: "/etc/postfix/virtual"
@@ -83,6 +83,15 @@
   notify:
     - Initialise virtual.
     - Reload Postfix configuration.
+
+- name: Configure mail aliases.
+  ansible.builtin.template:
+    src: aliases.j2
+    dest: /etc/aliases
+    owner: root
+    group: root
+    mode: 0644
+  when: postfix.aliases | length > 0
 
 - name: Ensure host maildir exists.
   ansible.builtin.file:
