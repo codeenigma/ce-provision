@@ -87,6 +87,5 @@
   ansible.builtin.include_role:
     name: contrib/systemd_timers
   vars:
-    timers:
-      certbot_renewal: "{{ _certbot_renewal_timer }}"
+    timers: "{{ _certbot_renewal_timer }}"
   when: ssl.autorenew
