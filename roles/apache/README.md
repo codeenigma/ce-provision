@@ -11,7 +11,7 @@ Install and configure the apache webserver.
 ---
 php:
   version:
-    - 7.2
+    - 8.1 # see https://www.php.net/supported-versions.php
 symfony_env: "{{ _env_type }}"
 apache:
   # Global default config for apache2.conf.
@@ -39,6 +39,7 @@ apache:
   max_clients: 256
   max_requests_per_child: 10000
   keepalive: "Off"
+  recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml
   overrides: [] # See the '_overrides' role.
   domains:
     - server_name: "{{ _domain_name }}"
@@ -61,7 +62,7 @@ apache:
         # web_server: standalone
         # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
         # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
-        # reload_command: reload
+        # reload_command: restart
         # reload:
         #   - apache
       is_default: true

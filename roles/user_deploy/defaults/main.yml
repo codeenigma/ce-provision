@@ -12,7 +12,8 @@ user_deploy:
   utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
   sudoer: false
   # List of additional groups to add the user to.
-  groups: []
+  groups:
+    - docker # add the docker group so we can do container builds
   ssh_keys: []
   # If you add more than one key here, make sure the original private key of your deploy server is the first.
   ssh_private_keys: []

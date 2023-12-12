@@ -1,23 +1,24 @@
 ---
 - name: Ensure rkhunter is installed.
   ansible.builtin.apt:
-    pkg: "rkhunter"
+    pkg: rkhunter
     state: present
     update_cache: true
     cache_valid_time: 240
+  notify: Update rkhunter
 
 - name: Copy rkhunter configuration.
   ansible.builtin.template:
-    src: "rkhunter.conf.j2"
-    dest: "/etc/rkhunter.conf"
+    src: rkhunter.conf.j2
+    dest: /etc/rkhunter.conf
     owner: root
     group: root
     mode: 0644
 
 - name: Copy rkhunter default startup configuration.
   ansible.builtin.template:
-    src: "rkhunter.default.j2"
-    dest: "/etc/default/rkhunter"
+    src: rkhunter.default.j2
+    dest: /etc/default/rkhunter
     owner: root
     group: root
     mode: 0644
