@@ -21,7 +21,7 @@
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
-    name: apt_unattended_upgrades
+    name: debian/apt_unattended_upgrades
   when: apt_unattended_upgrades.enable
 
 - name: Ensure Gitlab Runner is installed.
@@ -34,6 +34,19 @@
 # Then run the registration command, e.g.
 # gitlab-runner register --url https://gitlab.com/ --registration-token TOKEN_HERE --name fargate-test-runner --run-untagged --executor custom -n
 # This will automatically update /etc/gitlab-runner/config.toml
+
+# Populates the _aws_security_group_list variable used in fargate.toml.j2
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_elasticache.aws_profile }}"
+    region: "{{ aws_elasticache.region }}"
+    group_names:
+      - "{{ gitlab_runner.fargate.security_group }}"
+    return_type: ids
+  when: gitlab_runner.install_fargate
+  delegate_to: localhost
 
 - name: Create the Fargate driver directory if it does not exist.
   ansible.builtin.file:
@@ -122,7 +135,7 @@
 
 - name: Run docker_ce role when Fargate driver to be installed.
   ansible.builtin.include_role:
-    name: docker_ce
+    name: debian/docker_ce
   when: gitlab_runner.install_fargate
 
 - name: Add the ce-provision user to the docker group.

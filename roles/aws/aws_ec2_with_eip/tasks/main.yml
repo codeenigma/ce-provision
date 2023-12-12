@@ -90,6 +90,17 @@
     dest: "{{ _ce_provision_data_dir + '/' + _aws_resource_name + '/ec2-subnet-id' }}"
     force: true
 
+# Convert security group names to IDs for consistency.
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    group_names: "{{ aws_ec2_with_eip.security_groups }}"
+    return_type: ids
+  when: aws_ec2_with_eip.security_groups | length > 0
+
 # Do not create an instance if _aws_hostname is not an EC2 generated address unless `force: true`
 - name: Create new EC2 instance.
   amazon.aws.ec2_instance:
@@ -105,7 +116,7 @@
     vpc_subnet_id: "{{ _aws_ec2_with_eip_vpc_subnet_id }}"
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
-    security_groups: "{{ aws_ec2_with_eip.security_groups }}"
+    security_groups: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
     ebs_optimized: "{{ aws_ec2_with_eip.ebs_optimized }}"
     volumes:
       - device_name: /dev/xvda
@@ -131,7 +142,7 @@
     vpc_subnet_id: "{{ _aws_ec2_with_eip_vpc_subnet_id }}"
     name: "{{ aws_ec2_with_eip.instance_name }}"
     tags: "{{ aws_ec2_with_eip.tags }}"
-    security_groups: "{{ aws_ec2_with_eip.security_groups }}"
+    security_groups: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
     ebs_optimized: "{{ aws_ec2_with_eip.ebs_optimized }}"
     volumes:
       - device_name: /dev/xvda

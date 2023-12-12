@@ -1,6 +1,7 @@
 ---
 dependencies:
-  - { role: debian/apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron", "bsd-mailx"] }
+  - { role: debian/apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron", "bsd-mailx", "vim", "unzip", "ca-certificates"] }
+  - { role: debian/apt_extra_packages, apt_extra_packages: ["dnsutils", "telnet", "atop", "sysstat"], when: ( is_local is not defined or not is_local ) }
   - role: debian/locales
   - role: debian/user_root
   - role: debian/apt_extra_packages

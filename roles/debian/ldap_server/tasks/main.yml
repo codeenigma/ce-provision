@@ -1,7 +1,7 @@
 ---
 - name: Stop slapd service.
   ansible.builtin.include_role:
-    name: process_manager
+    name: debian/process_manager
   when: ldap_server.slapd.purge
   vars:
     process_manager:
@@ -58,7 +58,7 @@
 
 - name: Stop slapd service.
   ansible.builtin.include_role:
-    name: process_manager
+    name: debian/process_manager
   vars:
     process_manager:
       process_name: slapd
@@ -133,7 +133,7 @@
 
 - name: Generate SSL keys if provided.
   ansible.builtin.include_role:
-    name: ssl
+    name: debian/ssl
   vars:
     ssl: "{{ ldap_server.ssl }}"
 

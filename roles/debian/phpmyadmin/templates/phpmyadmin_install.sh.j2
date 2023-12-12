@@ -1,0 +1,102 @@
+#!/bin/bash
+
+usage()
+{
+cat << EOF
+usage: $0 -v VERSION
+
+Installs or upgrades phpMyAdmin to the specified version (-v).
+
+Arguments:
+  -v          Version number to upgrade to
+  -u          Upgrade an existing phpmyadmin (if there is no {{ phpmyadmin.install_path }}/phpmyadmin, it will abort. Omit if you want a fresh install)
+  -h          This help message
+EOF
+}
+
+# Default variables
+TODAY=$(date +%Y%m%d%H%M%S)
+EXISTING=0
+UPGRADE=0
+VERSION=
+
+# Parse arguments
+while getopts "v:uh" OPTION
+do
+  case $OPTION in
+    h)
+      usage
+      exit
+      ;;
+    u)
+      UPGRADE=1
+      ;;
+    v)
+      VERSION=$OPTARG
+      ;;
+    ?)
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+# Need to be root or sudo
+if [ ! `whoami` = "root" ] ; then
+  echo "You must run this script as root or with sudo."
+  exit 1
+fi
+
+# Exit early if we don't have a version
+if [[ -z $VERSION ]]; then
+  echo "Please specify a version of phpMyAdmin with the -v flag, e.g -v 4.9.0.1"
+  exit 1
+fi
+
+if [ -d {{ phpmyadmin.install_path }}/phpmyadmin ]; then
+  echo "Found an existing phpmyadmin installation. Moving it to {{ phpmyadmin.install_path }}/phpmyadmin.bak.${TODAY}"
+  mv {{ phpmyadmin.install_path }}/phpmyadmin {{ phpmyadmin.install_path }}/phpmyadmin.bak.${TODAY}
+  EXISTING=1
+fi
+
+# If we want to upgrade, but there was no existing directory, bail out
+if [ $EXISTING -ne 1 ] && [ $UPGRADE -eq 1 ]; then
+  echo "You asked to upgrade an instance of phpmyadmin, but we found no such instance. Exiting early"
+  exit 0
+fi
+
+builtin cd /tmp
+echo "Downloading phpmyadmin version $VERSION..."
+wget https://files.phpmyadmin.net/phpMyAdmin/${VERSION}/phpMyAdmin-${VERSION}-all-languages.zip || exit 1
+
+# SHA check
+wget https://files.phpmyadmin.net/phpMyAdmin/${VERSION}/phpMyAdmin-${VERSION}-all-languages.zip.sha256 || exit 1
+sha256sum phpMyAdmin-${VERSION}-all-languages.zip > ourshasum.txt
+diff phpMyAdmin-${VERSION}-all-languages.zip.sha256 ourshasum.txt
+if [ $? -ne 0 ]; then
+  echo "Something is wrong, we couldn't verify the SHA256 of the zip file. Please investigate manually."
+  if [ $EXISTING -eq 1 ]; then
+    echo "Moving old phpmyadmin back into place"
+    mv {{ phpmyadmin.install_path }}/phpmyadmin.bak.${TODAY} {{ phpmyadmin.install_path }}/phpmyadmin
+  fi
+  exit 1
+fi
+echo "Unzipping phpmyadmin"
+unzip phpMyAdmin-${VERSION}-all-languages.zip
+
+echo "Moving phpmyadmin codebase into place"
+mv phpMyAdmin-${VERSION}-all-languages {{ phpmyadmin.install_path }}/phpmyadmin
+mkdir -p {{ phpmyadmin.install_path }}/phpmyadmin/.well-known
+chown {{ phpmyadmin.www_user }}.{{ phpmyadmin.www_group }} {{ phpmyadmin.install_path }}/phpmyadmin/.well-known
+
+if [ $EXISTING -eq 1 ]; then
+  echo "Copying old config.inc.php into place..."
+  cp -a {{ phpmyadmin.install_path }}/phpmyadmin.bak.${TODAY}/config.inc.php  {{ phpmyadmin.install_path }}/phpmyadmin/config.inc.php
+else
+  echo "Copying config.sample.inc.php into place..."
+  cp -a {{ phpmyadmin.install_path }}/phpmyadmin/config.sample.inc.php {{ phpmyadmin.install_path }}/phpmyadmin/config.inc.php
+  echo "Now visit https://phpsolved.com/phpmyadmin-blowfish-secret-generator/ to generate a unique blowfish secret, and add it to {{ phpmyadmin.install_path }}/phpmyadmin/config.inc.php"
+fi
+
+rm -f /tmp/phpMyAdmin-${VERSION}-all-languages.zip
+rm -f /tmp/phpMyAdmin-${VERSION}-all-languages.zip.sha256

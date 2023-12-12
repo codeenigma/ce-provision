@@ -109,6 +109,16 @@
     - aws_elb is defined
     - aws_elb | length
 
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_elb.aws_profile }}"
+    region: "{{ aws_elb.region }}"
+    group_names: "{{ aws_elb.elb_security_groups }}"
+    return_type: ids
+  when: aws_elb.elb_security_groups | length > 0
+
 - name: Create the ALB.
   amazon.aws.elb_application_lb:
     name: "{{ aws_elb.name }}"
@@ -117,7 +127,7 @@
     state: "{{ aws_elb.state }}"
     tags: "{{ aws_elb.tags }}"
     subnets: "{{ _aws_ec2_elb_public_subnets_ids }}"
-    security_groups: "{{ aws_elb.elb_security_groups }}"
+    security_groups: "{{ _aws_security_group_list }}" # accepts names or IDs, variable populated by the aws_security_groups role
     listeners: "{{ _aws_ec2_listeners }}"
     idle_timeout: "{{ aws_elb.idle_timeout }}"
     ip_address_type: "{{ aws_elb.ip_address_type }}"

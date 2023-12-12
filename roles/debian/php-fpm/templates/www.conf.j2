@@ -1,7 +1,7 @@
 [www]
 user = {{ php.fpm.pool_user }}
 group = {{ php.fpm.pool_group }}
-listen = 127.0.0.1:90{{ version | replace('.','') }}
+listen = {% if php.fpm.unix_socket %}'/var/run/php{{ version | replace('.','') }}-fpm.sock'{% else %}127.0.0.1:90{{ version | replace('.','') }}{% endif %}
 listen.owner = {{ php.fpm.pool_user }}
 listen.group = {{ php.fpm.pool_group }}
 pm = dynamic

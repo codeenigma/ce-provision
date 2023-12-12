@@ -1,3 +1,4 @@
+---
 - name: Gather subnet information
   amazon.aws.ec2_vpc_subnet_info:
     profile: "{{ aws_efs.aws_profile }}"
