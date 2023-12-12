@@ -19,8 +19,9 @@ rkhunter:
   append_log: "0"
   copy_log_on_error: "0"
   use_syslog: authpriv.warning
-  allow_ssh_root_user: "no"
+  allow_ssh_root_user: "{{ sshd.PermitRootLogin | default('prohibit-password') }}"
   disable_tests: "suspscan hidden_procs deleted_files packet_cap_apps apps os_specific"
+  os_package_manager: "NONE" # PKGMGR=NONE is default for Debian, set it to what you need.
   scriptwhitelist:
     - /bin/egrep
     - /bin/fgrep
@@ -32,6 +33,7 @@ rkhunter:
     - /usr/sbin/unhide.rb
   allowhiddendir:
     - /etc/.java
+    - /tmp/.ce-deploy # see https://github.com/codeenigma/ce-deploy/blob/1.x/roles/database_backup/database_backup-mysql/defaults/main.yml#L7
   allowhiddenfile:
     - /etc/.etckeeper
   allowdevfile:
@@ -43,6 +45,7 @@ rkhunter:
   use_locking: "0"
   lock_timeout: "300"
   show_lock_messages: "1"
+
 ```
 
 <!--ENDROLEVARS-->

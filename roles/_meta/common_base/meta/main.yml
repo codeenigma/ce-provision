@@ -1,13 +1,14 @@
 ---
 dependencies:
-  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["rsync", "python3-apt", "acl", "gnupg", "build-essential", "cron", "bsd-mailx"] }
+  - { role: apt_extra_packages, apt_extra_packages: ["dnsutils", "telnet", "atop", "sysstat"], when: ( is_local is not defined or not is_local ) }
   - role: locales
   - role: user_root
   - role: apt_extra_packages
-  - role: apt_unattended_upgrades
+  - { role: apt_unattended_upgrades, when: ( is_local is not defined or not is_local ) }
   - { role: hosts, when: ( is_local is not defined or not is_local ) }
-  - role: rkhunter
+  - { role: rkhunter, when: ( is_local is not defined or not is_local ) }
   - role: postfix
-  - role: clamav
+  - { role: clamav, when: ( is_local is not defined or not is_local ) }
   - { role: firewall_config, when: ( is_local is not defined or not is_local ) }
-  - role: sudo_config
+  - { role: sudo_config, when: ( is_local is not defined or not is_local ) }

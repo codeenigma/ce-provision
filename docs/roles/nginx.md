@@ -11,10 +11,13 @@ Note, the directives are mostly DENY FIRST so if you're expecting to find config
 ## Default variables
 ```yaml
 ---
+# We might not want to install PHP, but we do need the version variable for templates, hence including this.
+# Default version should track the php-common role.
 php:
   version:
-    - 7.3
+    - 8.1 # see https://www.php.net/supported-versions.php
 symfony_env: "{{ _env_type }}"
+# Nginx variables actually start here.
 nginx:
   # Global default config for nginx.conf.
   user: www-data
@@ -25,7 +28,7 @@ nginx:
     server_names_hash_bucket_size: 256
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
-    ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2"
+    ssl_protocols: "TLSv1.2 TLSv1.3"
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.
@@ -38,6 +41,7 @@ nginx:
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
   fastcgi_read_timeout: 60
+  recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml.
   overrides: [] # See the '_overrides' role.
   domains:
     - server_name: "{{ _domain_name }}"
@@ -62,7 +66,7 @@ nginx:
         # web_server: standalone
         # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
         # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
-        # reload_command: reload
+        # reload_command: restart
         # reload:
         #   - nginx
       ratelimitingcrawlers: true

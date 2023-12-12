@@ -45,6 +45,7 @@
       - "php{{ version }}-xml"
       - "php{{ version }}-zip"
       - "php{{ version }}-bcmath"
+      - "php{{ version }}-apcu"
     state: present
   with_items: "{{ php.version }}"
   loop_control:

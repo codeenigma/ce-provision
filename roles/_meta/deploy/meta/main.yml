@@ -1,12 +1,12 @@
 ---
 dependencies:
   - role: user_provision
+  - { role: ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: _meta/common_base
   - role: ce_deploy
   - role: aws/aws_credentials
   - role: gitlab
   - role: gitlab_runner
-  - role: ssh_server
   - role: sops
   - role: gpg_key
   - role: pam_ldap

@@ -2,4 +2,4 @@
 dependencies:
   - role: aws/aws_cli
   - role: ansible
-  - role: python-boto
+  - role: python_boto

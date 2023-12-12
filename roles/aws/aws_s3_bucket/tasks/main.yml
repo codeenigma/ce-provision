@@ -8,7 +8,7 @@
   register: _aws_s3_bucket_bucket
 
 - name: Create a matching policy.
-  community.aws.iam_managed_policy:
+  amazon.aws.iam_managed_policy:
     profile: "{{ aws_s3_bucket.aws_profile }}"
     region: "{{ aws_s3_bucket.region }}"
     policy_name: "{{ aws_s3_bucket.name }}"

@@ -1,7 +1,6 @@
 ---
 php:
-  version:
-    - 8.1
+  # see php-common for default version
   fpm:
     unix_socket: false # set to true to use a unix socket, you must also update nginx and cachetool if you do
     expose_php: "{% if _env_type == 'prod' %}Off{% else %}On{% endif %}"
@@ -32,6 +31,7 @@ php:
     max_spare_servers: 3
     process_idle_timeout: 10s
     max_requests: 500
+    gc_maxlifetime: 1440
     opcache:
       enable: 1
       enable_cli: 0

@@ -27,18 +27,37 @@
     mode: "0666"
   delegate_to: localhost
 
+- name: Check if vars dirs exist.
+  ansible.builtin.stat:
+    path: "{{ _init_vars_dir }}"
+  delegate_to: localhost
+  register: _init_vars_dir_exists
+  with_items: "{{ _init.vars_dirs }}"
+  loop_control:
+    loop_var: _init_vars_dir
+
+- name: Set an empty _init_vars_dirs_list variable in case none are provided.
+  ansible.builtin.set_fact:
+    _init_vars_dirs_list: []
+
 - name: Build the list of directories to scan for changes.
   ansible.builtin.set_fact:
-    _init_vars_dirs_list: "{{ _init.vars_dirs + [playbook_dir] }}"
+    _init_vars_dirs_list: "{{ _init_vars_dirs_list + [_init_vars_dir._init_vars_dir] }}"
+  when: _init_vars_dir.stat.exists
+  with_items: "{{ _init_vars_dir_exists.results }}"
+  loop_control:
+    loop_var: _init_vars_dir
 
 - name: Compute files md5 hash.
   ansible.builtin.shell: 'set -o pipefail && find {{ _init_vars_dir }} -type f -exec md5sum {} \; | cut -d " " -f1 | md5sum'
   args:
-    warn: false
     executable: /bin/bash
   delegate_to: "localhost"
   register: _init_vars_dirs_md5
-  with_items: "{{ _init_vars_dirs_list }}"
+  failed_when: false
+  with_items:
+    - "{{ _init_vars_dirs_list }}"
+    - "{{ playbook_dir }}"
   loop_control:
     loop_var: _init_vars_dir
 
@@ -65,7 +84,7 @@
     dir: "{{ _init_vars_dir_include }}"
     extensions:
       - "yml"
-  with_items: "{{ _init.vars_dirs }}"
+  with_items: "{{ _init_vars_dirs_list }}"
   loop_control:
     loop_var: _init_vars_dir_include
 

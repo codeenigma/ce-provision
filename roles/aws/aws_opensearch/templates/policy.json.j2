@@ -1,0 +1,17 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+        "Effect": "Allow",
+        "Principal": {
+            "AWS": [
+            "*"
+            ]
+        },
+        "Action": [
+            "es:ESHttp*"
+        ],
+        "Resource": "arn:aws:es:{{ aws_opensearch.aws_region }}:{{ _aws_account_info.account }}:domain/{{ aws_opensearch.domain_name }}/*"
+        }
+    ]
+}

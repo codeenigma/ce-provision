@@ -25,7 +25,7 @@ aws_ami:
   instance_type: t3.micro
   virtualization_type: hvm
   root_device_type: ebs
-  name_filter: "debian-10-amd64-*"
+  name_filter: "debian-11-amd64-*"
   ami_name: "example"
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   ssh_username: "admin"

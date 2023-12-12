@@ -5,6 +5,7 @@ clamav:
   cron_minute: "0" # Runs daily at midnight by default.
   cron_hour: "0"
   # cron_day: "*"
+  # cron_weekday: "0" # 0-6 for Sunday-Saturday
   scripts_location: /usr/local/clamav/script
   log_location: /usr/local/clamav/log
   send_mail: false # Important: will not send any emails by default.

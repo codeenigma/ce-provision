@@ -1,5 +1,5 @@
 - name: Create an IAM role.
-  community.aws.iam_role:
+  amazon.aws.iam_role:
     profile: "{{ aws_iam_role.aws_profile }}"
     name: "{{ aws_iam_role.name }}"
     assume_role_policy_document: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
