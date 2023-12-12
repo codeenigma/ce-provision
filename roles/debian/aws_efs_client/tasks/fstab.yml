@@ -15,7 +15,6 @@
     state: directory
     owner: "{{ mount.owner }}"
     group: "{{ mount.group }}"
-    recurse: true
 
 - name: Create fstab entry.
   ansible.posix.mount:
