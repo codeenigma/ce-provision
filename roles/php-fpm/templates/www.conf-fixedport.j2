@@ -1,0 +1,13 @@
+[www]
+user = {{ php.fpm.pool_user }}
+group = {{ php.fpm.pool_group }}
+listen = 127.0.0.1:{{ php.fpm.tcp_port }}
+listen.owner = {{ php.fpm.pool_user }}
+listen.group = {{ php.fpm.pool_group }}
+pm = dynamic
+pm.max_children = {{ php.fpm.max_children }}
+pm.start_servers = {{ php.fpm.start_servers }}
+pm.min_spare_servers = {{ php.fpm.min_spare_servers }}
+pm.max_spare_servers = {{ php.fpm.max_spare_servers }}
+pm.process_idle_timeout = {{ php.fpm.process_idle_timeout }}
+pm.max_requests = {{ php.fpm.max_requests }}
