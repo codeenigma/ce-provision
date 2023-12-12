@@ -1,7 +1,29 @@
 ---
+- name: Ensure system Ansible is not installed.
+  ansible.builtin.apt:
+    pkg: ansible
+    state: absent
+
+- name: Ensure Ansible is not installed globally with pip3 on older versions of Debian.
+  ansible.builtin.pip:
+    name: ansible
+    state: absent
+    executable: pip3
+  when: ansible_distribution_major_version | int < 12
+
 - name: Set up Python packages.
   ansible.builtin.include_role:
     name: debian/python_common
+
+- name: Ensure pip is at latest version.
+  ansible.builtin.pip:
+    name:
+      - pip
+    state: latest
+    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
+    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
 
 - name: Install Ansible.
   ansible.builtin.pip:
@@ -22,6 +44,11 @@
   when: ce_ansible.linters.enabled
   become: true
   become_user: "{{ ce_provision.username }}"
+
+- name: Add the venv to $PATH using profile.d.
+  ansible.builtin.copy:
+    content: "export PATH=$PATH:{{ ce_ansible.venv_path | default(_venv_path) }}/bin"
+    dest: "/etc/profile.d/ansible-path.sh"
 
 - name: Create systemd timer to upgrade Ansible.
   ansible.builtin.include_role:

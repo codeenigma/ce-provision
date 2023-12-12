@@ -1,3 +1,15 @@
+---
+# Convert security group names to IDs for consistency.
+- name: Generate security group information.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_opensearch.aws_profile }}"
+    region: "{{ aws_opensearch.region }}"
+    group_names: "{{ aws_opensearch.security_groups }}"
+    return_type: ids
+  when: aws_opensearch.security_groups | length > 0
+
 - name: Get the current AWS account caller identity information
   amazon.aws.aws_caller_info:
     profile: "{{ aws_opensearch.aws_profile }}"
@@ -30,7 +42,7 @@
     access_policies: "{{ lookup('template', 'policy.json.j2') }}"
     vpc_options:
       subnets: "{{ aws_opensearch.subnets }}"
-      security_groups: "{{ aws_opensearch.security_groups }}"
+      security_groups: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
     snapshot_options:
       automated_snapshot_start_hour: "{{ aws_opensearch.automated_snapshot_start_hour }}"
     auto_tune_options:

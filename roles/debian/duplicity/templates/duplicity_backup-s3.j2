@@ -3,9 +3,9 @@
 # Duplicity Backup script
 
 # Declare and export secrets
-export AWS_ACCESS_KEY_ID={{duplicity.aws_access_key_id}}
-export AWS_SECRET_ACCESS_KEY={{duplicity.aws_secret_access_key}}
-export PASSPHRASE={{duplicity.gpg_passphrase}}
+export AWS_ACCESS_KEY_ID={{ duplicity.access_key_id }}
+export AWS_SECRET_ACCESS_KEY={{ duplicity.secret_access_key }}
+export PASSPHRASE={{ duplicity.gpg_passphrase }}
 
 if [ ! `whoami` = "root" ] ; then
   echo "You must run this script as root"
@@ -15,21 +15,21 @@ fi
 ## Configurable variables
 
 # How often should we make a full backup? Recommended: 3 months
-FULL_BACKUPS="{{duplicity.full_backup_frequency}}"
+FULL_BACKUPS="{{ duplicity.full_backup_frequency }}"
 
 # Remove old backups? 0 for no, 1 for yes
 REMOVE_OLD_BACKUPS=1
 
 # How often should we purge old backups? Recommended: 12 months.
-REMOVE_OLDER_THAN="{{duplicity.retention_period}}"
+REMOVE_OLDER_THAN="{{ duplicity.retention_period }}"
 
 # Args to pass to duplicity
 {% if duplicity.exclude_other_filesystems %}
-backup_options="--full-if-older-than $FULL_BACKUPS --exclude-other-filesystems --num-retries=30 --s3-use-new-style --s3-european-buckets"
+backup_options="--full-if-older-than $FULL_BACKUPS --exclude-other-filesystems --num-retries=30 {{ duplicity.s3_options }}"
 {% else %}
-backup_options="--full-if-older-than $FULL_BACKUPS --num-retries=30 --s3-use-new-style --s3-european-buckets"
+backup_options="--full-if-older-than $FULL_BACKUPS --num-retries=30 {{ duplicity.s3_options }}"
 {% endif %}
-maintenance_options="remove-older-than $REMOVE_OLDER_THAN --force --s3-use-new-style --s3-european-buckets"
+maintenance_options="remove-older-than $REMOVE_OLDER_THAN --force {{ duplicity.s3_options }}"
 
 # An array of directories to back up
 DIRS=(
@@ -46,8 +46,8 @@ for dir in ${DIRS[@]}; do
   echo "Backing up $dir..."
 
   extra_options=""
-  if [ -f "{{duplicity.install_dir}}/etc/$dir-include-exclude-filelist" ]; then
-    extra_options="--include-filelist {{duplicity.install_dir}}/etc/$dir-include-exclude-filelist"
+  if [ -f "{{ duplicity.install_dir }}/etc/$dir-include-exclude-filelist" ]; then
+    extra_options="--include-filelist {{ duplicity.install_dir }}/etc/$dir-include-exclude-filelist"
   fi
 
   # A special clause for /root. We don't want the local duplicity cache data
@@ -55,14 +55,16 @@ for dir in ${DIRS[@]}; do
     extra_options="$extra_options --exclude /root/.cache"
   fi
 
-  DEST=s3://{{duplicity.backend_url}}/{{duplicity.bucketname}}$dir
-  duplicity $backup_options $extra_options $dir $DEST || exit 1
+  DEST=s3://{{ duplicity.backend_url }}/{{ duplicity.bucketname }}$dir
+  /usr/local/bin/duplicity $backup_options $extra_options $dir $DEST || exit 1
 
   if [ $REMOVE_OLD_BACKUPS -eq 1 ]; then
     # Do some maintenance on the remote end to clean up old backups
     echo "Performing routine maintenance on $dir..."
-    duplicity $maintenance_options $DEST || exit 1
+    /usr/local/bin/duplicity $maintenance_options $DEST || exit 1
   fi
 done
 
 unset PASSPHRASE
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_ACCESS_KEY_ID

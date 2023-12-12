@@ -31,8 +31,11 @@ postfix:
   forward_domains:
     - another.com
     - lalala.com
-  forward_from: "admin@example.com"
-  forward_to: "admin@example.com"
+  forward_from: admin@example.com
+  forward_to: admin@example.com
+  aliases: []
+    #- user: root
+    #  alias: admin@example.com
 
 ```
 

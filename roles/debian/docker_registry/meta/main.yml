@@ -1,4 +1,4 @@
 ---
 dependencies:
-  - role: docker_compose
-  - { role: "nginx", when: docker_registry.proxy }
+  - role: debian/docker_compose
+  - { role: "debian/nginx", when: docker_registry.proxy }

@@ -116,7 +116,7 @@
       elasticache_node_type: "{{ aws_ec2_autoscale_cluster.elasticache_node_type }}"
       elasticache_nodes: "{{ aws_ec2_autoscale_cluster.elasticache_nodes }}"
       elasticache_port: "{{ aws_ec2_autoscale_cluster.elasticache_port }}"
-      elasticache_security_groups: "{{ aws_ec2_autoscale_cluster.elasticache_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
+      elasticache_security_groups: "{{ aws_ec2_autoscale_cluster.elasticache_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
   when:
     - aws_ec2_autoscale_cluster.elasticache
 
@@ -321,7 +321,6 @@
   register: _aws_ec2_target_group_created
   when:
     - aws_ec2_autoscale_cluster.asg_refresh
-    - aws_ec2_autoscale_cluster.create_elb
 
 - name: Define default ALB listeners.
   ansible.builtin.set_fact:
@@ -376,6 +375,18 @@
     - aws_ec2_autoscale_cluster | length
     - aws_ec2_autoscale_cluster.create_elb
 
+- name: Generate security group information for the ALB.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    group_names: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
+    return_type: ids
+  when:
+    - aws_ec2_autoscale_cluster.alb_security_groups | length > 0
+    - aws_ec2_autoscale_cluster.create_elb
+
 - name: Create the ALB.
   amazon.aws.elb_application_lb:
     name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -384,7 +395,7 @@
     state: "{{ aws_ec2_autoscale_cluster.state }}"
     tags: "{{ aws_ec2_autoscale_cluster.tags }}"
     subnets: "{{ _aws_ec2_autoscale_cluster_public_subnets_ids }}"
-    security_groups: "{{ aws_ec2_autoscale_cluster.alb_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
+    security_groups: "{{ _aws_security_group_list + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
     listeners: "{{ _aws_ec2_autoscale_cluster_listeners }}"
     idle_timeout: "{{ aws_ec2_autoscale_cluster.alb_idle_timeout }}"
   register: _aws_ec2_autoscale_cluster_alb
@@ -410,6 +421,20 @@
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
 
 # EC2 - BUILD ASG
+- name: Generate security group information for the ASG.
+  ansible.builtin.include_role:
+    name: aws/aws_security_groups
+  vars:
+    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    region: "{{ aws_ec2_autoscale_cluster.region }}"
+    group_names: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
+    return_type: ids
+  when:
+    - aws_ec2_autoscale_cluster.cluster_security_groups | length > 0
+    - aws_ec2_autoscale_cluster.asg_refresh
+    - aws_ec2_autoscale_cluster.type == "ec2"
+    - aws_ec2_autoscale_cluster.deploy_cluster
+
 - name: Create launch template.
   community.aws.ec2_launch_template:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -427,7 +452,7 @@
         delete_on_termination: "{{ aws_ec2_autoscale_cluster.instance_nic_delete_on_termination }}"
         subnet_id: "{{ subnet_id }}" # picked randomly from _aws_ec2_autoscale_cluster_subnets_ids, see with_random_choice
         device_index: 0 # must be 0 - see https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html#change-network-interface
-        groups: "{{ aws_ec2_autoscale_cluster.cluster_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
+        groups: "{{ _aws_security_group_list + [_aws_ec2_autoscale_cluster_security_group.group_id] }}"
     block_device_mappings:
       - ebs:
           delete_on_termination: "{{ aws_ec2_autoscale_cluster.root_volume_delete_on_termination }}"
