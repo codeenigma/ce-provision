@@ -1,0 +1,140 @@
+######### Default block.
+
+# Generic rewrite rule.
+location @rewrite {
+    rewrite ^ /index.php?$query_string;
+}
+
+# Rewrite rule for Drupal 10.1 js/css handling.
+location @rewrite_drupal10 {
+    rewrite ^ /index.php;
+}
+
+#  PHP fastcgi pass.
+location @phpprocess {
+    fastcgi_split_path_info ^(.+?\.php)(|/.*)$;
+    fastcgi_index index.php;
+    fastcgi_param SCRIPT_FILENAME $request_filename;
+    fastcgi_intercept_errors on;
+    fastcgi_read_timeout {{ nginx.fastcgi_read_timeout }};
+    include fastcgi_params;
+    fastcgi_pass {{ nginx.php_fastcgi_backend }};
+}
+
+# Rewrite any request not whitelisted below,
+# so they get processed through the app level (and 404).
+location / {
+    {% if nginx.ratelimitingcrawlers %}
+#    @todo
+#    limit_req zone=bots burst=5 nodelay;
+    {% endif %}
+    try_files @rewrite /index.php?$query_string;
+}
+
+############ Blacklist block.
+# Most of those should not be in the webroot in the first place,
+# but we still provide a safety net.
+
+# Private files protection.
+location ~* ^/sites/.*/files/private/ {
+    access_log off;
+    deny    all;
+}
+
+# Backup & Migrate default folder.
+#@todo Is that still the default for D8 ?
+location ~* ^/sites/.*/files/backup_migrate/ {
+    access_log off;
+    deny     all;
+}
+
+# Deny direct access to config files in Drupal 8.
+location ~* ^/sites/.*/files/config_.* {
+    access_log off;
+    deny     all;
+}
+
+# Deny requests to serve (potentially uploaded malicious) html files.
+location ~* ^/sites/.*/files/.*\.html$ {
+    deny all;
+}
+# @see https://gist.github.com/jonpugh/88cfb0aad1ef18c0016486557fcb28fe
+set $rce "ZZ";
+if ( $query_string ~* (23value|23default_value|23markup|element_parents=%23) ) {
+    set $rce "A";
+}
+if ( $request_method = POST ) {
+    set $rce "${rce}B";
+}
+if ( $rce = "AB" ) {
+    return 403;
+}
+
+############ Whitelist block.
+
+# Whitelisted php files.
+location ~ ^/(index|cron|modules\/statistics\/statistics|core\/modules\/statistics\/statistics)\.php$ {
+    #@todo there probably a better way to do this.
+    try_files @phpprocess @phpprocess;
+}
+# Allow install/update for local stack.
+{% if is_local is defined and is_local %}
+location ~ ^/(install|update)\.php$ {
+    try_files @phpprocess @phpprocess;
+}
+# Allow install/update for local stack for Drupal8+.
+location ~ ^/core/(install|update).php$ {
+    try_files @phpprocess @phpprocess;
+}
+{% endif %}
+
+# Allow some known php files (like serve.php in the ad module).
+# @todo Are these all still accurate for D8?
+location ~* /(?:modules|libraries)/(?:contrib/)?(?:ad|tinybrowser|f?ckeditor|tinymce|wysiwyg_spellcheck|ecc|civicrm|fbconnect|radioactivity)/.*\.php$ {
+    try_files @phpprocess @phpprocess;
+}
+
+# Allow private files support
+location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does not exist, it must be a private file.
+  try_files $uri @rewrite;
+  expires 7d;
+  log_not_found off;
+}
+
+# For Drupal 10 onwards this has changed - see https://www.drupal.org/node/2888767#nginx-php-fpm
+location ~ ^/sites/.*/files/(css|js|styles)/ {
+    try_files $uri @rewrite_drupal10;
+    expires 7d;
+}
+
+# Allow public files and image styles.
+location ~ ^/sites/.*/files/.* {
+    try_files $uri @rewrite;
+}
+
+# This Nginx config is DENY FIRST, so only these file extensions are permitted.
+# Core and contrib assets can be pretty much anywhere.
+location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
+    try_files $uri @rewrite =404;
+}
+
+# Allow robots.txt.
+location = /robots.txt {
+    try_files $uri @rewrite;
+}
+
+# Deny access to autodiscover
+location /autodiscover/autodiscover.xml {
+  access_log off;
+  return 404;
+}
+
+# Deny listed requests for security reasons.
+# location ~* (?:delete.+from|insert.+into|select.+from|union.+select|onload|\.php.+src|system\(.+|document\.cookie|\;|\.\.) {
+#   return 403;
+# }
+
+# Deny listed requests for security reasons.
+# location ~* (/\..*|settings\.php$|settings\.php\..*$|web\.config|composer\..*|\.(?:git|htaccess|engine|inc|info|install|module|profile|pl|po|sh|.*sql|theme|tpl(?:\.php)?|xtmpl)$|^(?:Entries.*|Repository|Root|Tag|Template))$ {
+#   return 403;
+#}

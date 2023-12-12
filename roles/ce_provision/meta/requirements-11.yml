@@ -2,6 +2,7 @@
 collections:
   - name: ansible.posix
   - name: ansible.utils
+  - name: ansible.windows # required by Wazuh roles
   - name: community.sops
   - name: community.aws
   - name: community.general
@@ -9,6 +10,7 @@ collections:
 
 roles:
   - name: geerlingguy.varnish
+    version: "3.3.1" # bad release, remove later when 'master' is gone from here: https://galaxy.ansible.com/ui/standalone/roles/geerlingguy/varnish/
   - name: geerlingguy.firewall
   - name: geerlingguy.composer
   - name: geerlingguy.clamav

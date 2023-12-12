@@ -16,7 +16,7 @@
 
 - name: Refine to the summary list of current certificates.
   ansible.builtin.set_fact:
-    _aws_acm_cert_list: "{{ _aws_acm_cert_list.CertificateSummaryList | to_json }}"
+    _aws_acm_cert_list: "{{ _aws_acm_cert_list.CertificateSummaryList }}"
 
 - name: Explicitly initialise existing cert vars.
   ansible.builtin.set_fact:
@@ -33,7 +33,6 @@
 - ansible.builtin.set_fact:
     _aws_tags_list: []
     _aws_tags_string: ""
-  when: aws_acm.tags | length > 0
 
 - name: Build list of tags as Key,Value strings.
   ansible.builtin.set_fact:

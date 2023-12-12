@@ -1,4 +1,15 @@
 # Autoscale cluster
+Supports either AWS EC2 Autoscaling Groups (ASGs) or AWS ECS clusters. Note, this role only deals with setting up the config and surrounding services, it does not handle any deployment of code or containers. If you want to use Code Enigma complementary tools, see these two roles in our `ce-deploy` project:
+* https://github.com/codeenigma/ce-deploy/tree/1.x/roles/deploy_container (ECS)
+* https://github.com/codeenigma/ce-deploy/tree/1.x/roles/deploy_code (EC2)
+
+Note also that the `deploy_code` role needs to be used in tandem with this `ce-provision` role, which ensures there is a `cloud-init` script in place to install the code in the event of an instance replacement:
+* https://github.com/codeenigma/ce-provision/tree/1.x/roles/mount_sync
+
+## Networking
+Regardless of the scenario, ECS or EC2, if you decide to use a private subnet instead of giving your instances or containers public IP addresses, you will need at least one NAT gateway (more than one for resilience). When you are creating NAT gateways they must be in a *public* subnet and your routing tables in the private subnets should use the NAT gateway as the default route. Do not put the NAT gateways on the private subnets, it cannot possibly work and your containers or instances will not have internet access.
+
+`ce-provision` will handle this for you in most cases.
 
 <!--TOC-->
 <!--ENDTOC-->
@@ -11,6 +22,8 @@ aws_ec2_autoscale_cluster:
   region: "{{ _aws_region }}"
   name: "example"
   state: present
+  type: "ec2" # can also be "ecs"
+  deploy_cluster: true # setting this to false will make Ansible prepare the way for a cluster without actually building it, so deployment can be deferred to the code pipeline
   acm:
     create_cert: false
     extra_domains: [] # list of Subject Alternative Name domains and zones
@@ -32,7 +45,12 @@ aws_ec2_autoscale_cluster:
     - az: c
       cidr_block: "10.0.3.128/26"
       public_subnet: public-c
+  instance_nic_delete_on_termination: true
   instance_type: t3.micro
+  instance_disable_api_termination: true
+  # Only valid for t2/3 instances, omit for other types.
+  #instance_credit_specification:
+  #  cpu_credits: unlimited # unlimited or standard
   assign_public_ip: false
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
@@ -42,6 +60,25 @@ aws_ec2_autoscale_cluster:
   device_name: /dev/xvda
   ebs_optimized: true
   encrypt_boot: false # Whether to encrypt the EBS volumes or not, passed to the aws_ami role and to EBS volumes when instances are built
+  # Container variables - if type is "ecs"
+  container_repo_name: example/project # leave an empty string to not create a repo
+  # ElastiCache variables
+  elasticache: false
+  elasticache_engine: memcached
+  #cache_engine_version: 1.4.14
+  #cache_parameter_group: my_custom_parameters
+  elasticache_node_type: cache.t3.medium
+  elasticache_nodes: 1
+  elasticache_port: 11211
+  # ECS variables - role assumes container, service and task creation will be done by code pipelines
+  ecs_capacity_providers:
+    - FARGATE
+  ecs_capacity_provider_strategy:
+    - capacity_provider: FARGATE
+      base: 1
+      weight: 1
+  ecs_purge_capacity_providers: true
+  # EC2 variables
   ami_playbook_file: "{{ playbook_dir }}/ami.yml"
   ami_operation: create # see aws_ami for details, use 'repack' to build AMIs from running instances, use 'create' to force a new Packer image each time
   # Overrides extra_vars in the aws_ami role.
@@ -103,14 +140,16 @@ aws_ec2_autoscale_cluster:
   max_size: 8
   # Security groups for the instances cluster.
   # An internal one will be created automatically, use these vars to provide additional groups
-  cluster_security_groups: []
-  alb_security_groups: []
-  efs_security_groups: []
-  rds_security_groups: []
+  cluster_security_groups: [] # used in launch template, must be SG IDs
+  alb_security_groups: [] # edge case, the module supports SG names or IDs
+  efs_security_groups: [] # must be SG names because the role uses the name to find the ID
+  rds_security_groups: [] # must be SG names because the role uses the name to find the ID
+  elasticache_security_groups: [] # must be SG IDs
   # ALB health checks - these are health check settings applied to the load balancer
   alb_health_check_type: ELB # Uses ALB health checks, set to EC2 to use default AWS instance status checks
   alb_health_check_period: 1200 # Length of time in seconds after a new EC2 instance comes into service that Auto Scaling starts checking its health
-  # Target Group health checks - these are distinct and separate checks carried out by the Target Group for the ASG
+  # Target Group health checks - these are distinct and separate checks carried out by the Target Group for the cluster
+  target_group_http_port: 80
   deregistration_delay_timeout: 60 # seconds to wait before removing instance from Target Group
   health_check_protocol: "http"
   health_check_path: "/"
@@ -123,6 +162,8 @@ aws_ec2_autoscale_cluster:
   # ALB settings
   create_elb: true # determines whether an ELB (currently, this is an ALB) is created as part of the ASG. This needs to be `true` in order to create a CloudFront distribution.
   alb_idle_timeout: 60
+  alb_http_port: 80
+  alb_https_port: 443
   tags:
     Name: "example"
   # An IAM Role name to associate with instances.

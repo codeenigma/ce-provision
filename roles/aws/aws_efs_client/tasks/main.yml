@@ -1,13 +1,22 @@
 ---
-- name: Install NFS client
+- name: Install NFS client.
   ansible.builtin.apt:
     name: nfs-common
     state: present
     update_cache: true
     cache_valid_time: 240
-- name: Install EWS EFS utils
+
+- name: Install AWS EFS utils packaged by Code Enigma.
   ansible.builtin.apt:
-    deb: "https://github.com/codeenigma/aws-efs-utils-deb-builder/releases/download/v{{ aws_efs_client.version }}/amazon-efs-utils-{{ aws_efs_client.version }}.deb"
+    deb: "https://github.com/codeenigma/aws-efs-utils-deb-builder/releases/download/v{{ aws_efs_client.version }}/amazon-efs-utils-{{ aws_efs_client.version }}{{ aws_efs_client.build_suffix }}.deb"
+  when:
+    - aws_efs_client.deb_url | length == 0
+
+- name: Install AWS EFS utils from another source.
+  ansible.builtin.apt:
+    deb: "{{ aws_efs_client.deb_url }}"
+  when:
+    - aws_efs_client.deb_url | length > 0
 
 - name: Create fstab entries.
   ansible.builtin.include_tasks: fstab.yml
@@ -15,7 +24,7 @@
   loop_control:
     loop_var: mount
 
-- name: Create cloud-init script
+- name: Create cloud-init script.
   ansible.builtin.template:
     src: init.sh.j2
     dest: "/var/lib/cloud/scripts/per-boot/aws_efs_client.sh"

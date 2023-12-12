@@ -1,6 +1,6 @@
 - name: Get the current AWS account caller identity information
   amazon.aws.aws_caller_info:
-    profile: "{{ aws_iam_saml.aws_profile }}"
+    profile: "{{ aws_opensearch.aws_profile }}"
   delegate_to: localhost
   register: _aws_account_info
 
@@ -27,14 +27,14 @@
       ebs_enabled: true
       volume_type: "{{ aws_opensearch.volume_type }}"
       volume_size: "{{ aws_opensearch.volume_size }}"
-    access_policies: "{{ lookup('template', 'policy.json.j2') | from_json }}"
+    access_policies: "{{ lookup('template', 'policy.json.j2') }}"
     vpc_options:
       subnets: "{{ aws_opensearch.subnets }}"
       security_groups: "{{ aws_opensearch.security_groups }}"
     snapshot_options:
       automated_snapshot_start_hour: "{{ aws_opensearch.automated_snapshot_start_hour }}"
     auto_tune_options:
-      enabled: "{{ aws_opensearch.auto_tune }}"
+      desired_state: "{{ aws_opensearch.auto_tune }}"
       maintenance_schedules: "{{ aws_opensearch.auto_tune_maintenance_schedules | default(omit) }}"
     tags: "{{ aws_opensearch.tags }}"
     wait: true

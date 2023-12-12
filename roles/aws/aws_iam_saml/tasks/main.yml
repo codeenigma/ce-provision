@@ -23,7 +23,7 @@
   register: _aws_account_info
 
 - name: Create a role for administrative access
-  community.aws.iam_role:
+  amazon.aws.iam_role:
     name: "{{ aws_iam_saml.admin_role }}"
     profile: "{{ aws_iam_saml.aws_profile }}"
     tags: "{{ aws_iam_saml.tags }}"
@@ -37,7 +37,7 @@
     - aws_iam_saml.admin_groups[0] is defined
 
 - name: Create a role for read-only access
-  community.aws.iam_role:
+  amazon.aws.iam_role:
     name: "{{ aws_iam_saml.readonly_role }}"
     profile: "{{ aws_iam_saml.aws_profile }}"
     tags: "{{ aws_iam_saml.tags }}"
@@ -51,7 +51,7 @@
     - aws_iam_saml.readonly_groups[0] is defined
 
 - name: Create a customer managed policy for billing access
-  community.aws.iam_managed_policy:
+  amazon.aws.iam_managed_policy:
     policy_name: "{{ aws_iam_saml.billing_policy }}"
     policy_description: "Custom policy for billing access"
     profile: "{{ aws_iam_saml.aws_profile }}"
@@ -64,7 +64,7 @@
     - aws_iam_saml.billing_groups[0] is defined
 
 - name: Create a role for billing access
-  community.aws.iam_role:
+  amazon.aws.iam_role:
     name: "{{ aws_iam_saml.billing_role }}"
     profile: "{{ aws_iam_saml.aws_profile }}"
     tags: "{{ aws_iam_saml.tags }}"
