@@ -2,7 +2,6 @@ location / {
     try_files $uri /index.php$is_args$args;
 }
 
-# Dev only
 location ~ \.php(/|$) {
   fastcgi_pass {{ nginx.php_fastcgi_backend }};
   fastcgi_split_path_info ^(.+\.php)(/.*)$;
