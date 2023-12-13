@@ -69,7 +69,7 @@
 
 - name: Create string from alt_domains
   ansible.builtin.set_fact:
-    alt_domains_gitlab: "{{ gitlab.alt_domains | join('\', \'') }}"
+    alt_domains_gitlab: "{{ gitlab.alt_domains | join(\"', '\") }}"
   when: gitlab.alt_domains | length > 0
 
 - name: Copy Gitlab configuration file.
