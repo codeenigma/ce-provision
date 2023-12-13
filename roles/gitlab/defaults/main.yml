@@ -10,6 +10,7 @@ ldap_client:
 gitlab:
   apt_origin: "origin=packages.gitlab.com/gitlab/gitlab-ce,codename=${distro_codename},label=gitlab-ce" # used by apt_unattended_upgrades
   server_name: "gitlab.{{ _domain_name }}"
+  alt_domains: []
   # Add a record for GitLab in AWS Route 53
   # If you use the aws_ec2_with_eip role to create your server this will not be necessary
   gitlab_route_53:
