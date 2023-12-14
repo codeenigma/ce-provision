@@ -14,6 +14,7 @@ user_deploy:
   # List of additional groups to add the user to.
   groups:
     - docker # add the docker group so we can do container builds
+    - www-data # add the www-data group to enable access on shared filesystem from both puppet and ansible servers
   ssh_keys: []
   # If you add more than one key here, make sure the original private key of your deploy server is the first.
   ssh_private_keys: []
