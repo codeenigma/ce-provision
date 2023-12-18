@@ -28,7 +28,7 @@
 
 - name: Copy backup script in place.
   ansible.builtin.template:
-    src: duplicity_backup.j2
+    src: "duplicity_backup-{{ duplicity.backend }}.j2"
     dest: "{{ duplicity.install_dir }}/bin/duplicity_backup"
     owner: root
     group: root
@@ -36,7 +36,7 @@
 
 - name: Copy restore script in place.
   ansible.builtin.template:
-    src: duplicity_restore.j2
+    src: duplicity_restore-{{ duplicity.backend }}.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_restore"
     owner: root
     group: root
@@ -44,7 +44,7 @@
 
 - name: Copy clean-up script in place.
   ansible.builtin.template:
-    src: duplicity_clean.j2
+    src: duplicity_clean-{{ duplicity.backend }}.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_clean"
     owner: root
     group: root
@@ -69,6 +69,8 @@
     owner: root
     group: root
     mode: 0644
+  when:
+    - duplicity.schedule | length > 0
 
 - name: Trigger overrides
   ansible.builtin.include_role:

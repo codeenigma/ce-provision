@@ -39,6 +39,7 @@
      - [Automated patching](/roles/ce_patcher)
      - [ce-provision](/roles/ce_provision)
      - [ClamAV](/roles/clamav)
+     - [Duplicity](/roles/duplicity)
      - [Firewall Config](/roles/firewall_config)
      - [Frontail](/roles/frontail)
      - [Gitlab](/roles/gitlab)
