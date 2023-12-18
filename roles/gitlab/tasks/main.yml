@@ -67,6 +67,11 @@
   vars:
     ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
 
+- name: Create string from alt_domains
+  ansible.builtin.set_fact:
+    alt_domains_gitlab: "{{ gitlab.alt_domains | join(\"', '\") }}"
+  when: gitlab.alt_domains | length > 0
+
 - name: Copy Gitlab configuration file.
   ansible.builtin.template:
     src: gitlab.rb.j2
