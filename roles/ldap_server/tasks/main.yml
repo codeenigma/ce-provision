@@ -21,21 +21,10 @@
     purge: true
   when: ldap_server.slapd.purge
 
-# @TODO remove when https://redmine.codeenigma.net/issues/58246 can be done
-- name: Ensure LDAP and dependencies are installed from backports.
-  ansible.builtin.apt:
-    pkg: ["slapd", "ldapscripts", "libldap2-dev"] # python-ldap needs libldap2-dev
-    state: present
-    default_release: buster-backports
-  when:
-    - is_local is defined
-    - is_local
-
 - name: Ensure LDAP and python-ldap and dependencies are installed.
   ansible.builtin.apt:
     pkg: ["slapd", "ldapscripts", "libldap2-dev"]
     state: present
-  when: is_local is not defined
 
 - name: Ensure additional dependencies for python-ldap are installed.
   ansible.builtin.apt:
