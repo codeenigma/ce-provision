@@ -10,26 +10,6 @@
     state: present
     filename: google-chrome
 
-# @TODO remove when https://redmine.codeenigma.net/issues/58246 can be done
-- name: Install Google Chrome "headful" mode dependencies from backports.
-  ansible.builtin.apt:
-    name:
-      - xorg
-      - xvfb
-      - gtk2-engines-pixbuf
-      - dbus-x11
-      - xfonts-base
-      - xfonts-100dpi
-      - xfonts-75dpi
-      - xfonts-cyrillic
-      - xfonts-scalable
-    default_release: buster-backports
-    state: present
-  when:
-    - is_local
-    - ansible_distribution == "Debian"
-    - ansible_distribution_major_version == "10"
-
 - name: Install Google Chrome "headful" mode dependencies.
   ansible.builtin.apt:
     name:
@@ -43,19 +23,6 @@
       - xfonts-cyrillic
       - xfonts-scalable
     state: present
-  when: is_local is not defined
-
-# @TODO remove when https://redmine.codeenigma.net/issues/58246 can be done
-- name: Install VNC support from backports.
-  ansible.builtin.apt:
-    name: x11vnc
-    default_release: buster-backports
-    state: present
-  when:
-    - lhci.enable_vnc
-    - is_local
-    - ansible_distribution == "Debian"
-    - ansible_distribution_major_version == "10"
 
 - name: Install VNC support.
   ansible.builtin.apt:
@@ -63,7 +30,6 @@
     state: present
   when:
     - lhci.enable_vnc
-    - is_local is not defined
 
 - name: Configure Xvfb to start on boot.
   ansible.builtin.shell: |
