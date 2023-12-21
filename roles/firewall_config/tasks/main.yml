@@ -1,14 +1,4 @@
 ---
-# @TODO remove when https://redmine.codeenigma.net/issues/58246 can be done
-- name: Install iptables with backports. # we have to do this in ce-dev or the contrib role will fail
-  ansible.builtin.apt:
-    pkg: ["iptables"]
-    state: present
-    default_release: buster-backports
-  when:
-    - is_local is defined
-    - is_local
-
 - name: Shift general firewall settings to expected variables.
   ansible.builtin.set_fact:
     firewall_state: "{{ firewall_config.firewall_state }}"
