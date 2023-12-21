@@ -1,0 +1,57 @@
+---
+- name: Download latest openvpn-install script.
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
+    dest: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+    mode: '0750'
+    owner: "{{ user_provision.username }}"
+    group: "{{ user_provision.username }}"
+    force: true
+
+- name: Place the headless installer script.
+  ansible.builtin.template:
+    src: headless-openvpn-install.sh.j2
+    dest: "{{ openvpn.script_install_path }}/headless-openvpn-install.sh"
+    mode: "0750"
+    owner: "{{ user_provision.username }}"
+    group: "{{ user_provision.username }}"
+
+- name: Attempt to install OpenVPN in headless mode.
+  ansible.builtin.command:
+    cmd: "{{ openvpn.script_install_path }}/headless-openvpn-install.sh"
+  when: openvpn.auto_install
+
+# @TODO handle adding push routes to config
+# @TODO look into the duplicate-cn and float values in our config
+# @TODO find and replace replace IP range - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L785
+# @TODO find and replace the cipher - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L895-L896
+
+# LDAP integration
+- name: Install OpenVPN plugin for PAM.
+  ansible.builtin.apt:
+    pkg: openvpn-auth-ldap
+    state: present
+  when: openvpn.ldap_integration
+
+- name: Ensure the OpenVPN PAM config is in place.
+  ansible.builtin.template:
+    src: openvpn.pam.j2
+    dest: /etc/pam.d/openvpn
+    mode: "0644"
+    owner: root
+    group: root
+  when: openvpn.ldap_integration
+
+# @TODO add line to config file for LDAP integration
+# plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn
+
+- name: Restart OpenVPN.
+  ansible.builtin.service:
+    name: "openvpn@server"
+    state: restarted
+  when: openvpn.ldap_integration
+
+# Installation complete - provide user information
+- name: Service notice.
+  ansible.builtin.debug:
+    msg: "OpenVPN is ready to use, to manage the server run {{ openvpn.script_install_path }}/openvpn-install.sh as root."

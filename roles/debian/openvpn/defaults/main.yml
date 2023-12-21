@@ -1,0 +1,22 @@
+---
+openvpn:
+  script_install_path: "/home/{{ user_provision.username }}"
+  auto_install: true
+  ldap_integration: false # this cannot work without running the pam_ldap role first
+  name: vpn.example.com
+  approve_ip: "y"
+  ipv6_support: "n"
+  port_choice: "1" # 1 = use default 1194, 3 means use a random port
+  protocol_choice: "1" # 1 = udp, 2 = tcp
+  dns: "1" # 1 = system default, see options - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L314-L327
+  compression_enabled: "n"
+  compression_choice: "1" # only works if compression_enabled is "y", 1 = LZ4-v2, 2 = LZ4, 3 = LZ0
+  customize_enc: "n"
+  pass: "1"
+  #nat_endpoint: "$(curl -4 ifconfig.co)" # for servers behind NAT, see https://github.com/angristan/openvpn-install?tab=readme-ov-file#headless-install
+  push_routes_ipv4: [] # list of VPN push routes for ipv4 networks
+    # Examples:
+    # - 192.168.1.0 # push range 192.168.1.0/24
+    # - 1.2.3.4 # push specific IP 1.2.3.4
+    # - www.google-analytics.com # push any IP resolving to www.google-analytics.com
+  push_routes_ipv6: [] # list of VPN push routes for ipv6 networks - ipv6_support must be "y"
