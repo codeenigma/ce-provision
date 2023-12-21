@@ -3,15 +3,32 @@
   "Statement": [
     {
       "Action": [
-        "aws-portal:View*",
-        "budgets:View*",
-        "cur:*"
+        "account:*",
+        "billing:*",
+        "invoicing:*",
+        "freetier:*",
+        "ce:*",
+        "cur:*",
+        "tax:*",
+        "sustainability:*"
       ],
       "Effect": "Allow",
       "Resource": "*"
     },
     {
-      "Action": "aws-portal:*Account",
+      "Action": [
+        "account:CloseAccount",
+        "account:DeleteAlternateContact",
+        "account:PutAlternateContact",
+        "account:PutChallengeQuestions",
+        "account:PutContactInformation",
+        "billing:PutContractInformation",
+        "billing:UpdateIAMAccessPreference",
+        "billing:UpdateBillingPreferences",
+        "tax:BatchPutTaxRegistration",
+        "tax:DeleteTaxRegistration",
+        "tax:PutTaxInheritance"
+      ]
       "Effect": "Deny",
       "Resource": "*"
     }
