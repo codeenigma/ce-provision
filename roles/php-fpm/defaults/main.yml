@@ -1,6 +1,9 @@
 ---
 php:
+  # see php-common for default version
   fpm:
+    unix_socket: false # set to true to use a unix socket, you must also update nginx and cachetool if you do
+    tcp_port: "" # leave empty to automate port selection - port will be "90{{ version | replace('.','') }}" - e.g. 9081 for PHP 8.1
     expose_php: "{% if _env_type == 'prod' %}Off{% else %}On{% endif %}"
     error_reporting: "{% if _env_type == 'prod' %}E_ALL & ~E_DEPRECATED & ~E_STRICT{% else %}E_ALL{% endif %}"
     display_errors: "{% if _env_type == 'prod' %}Off{% else %}On{% endif %}"
@@ -21,7 +24,7 @@ php:
     max_file_uploads: 20
     date_timezone: "Europe/London"
     pool_user: "{{ user_deploy.username }}"
-    pool_group: "{{ user_deploy.username }}"
+    pool_group: "{{ user_deploy.username }}" # if using unix socket this should be the web server user
     default_socket_timeout: 60
     max_children: 5
     start_servers: 2
@@ -29,6 +32,7 @@ php:
     max_spare_servers: 3
     process_idle_timeout: 10s
     max_requests: 500
+    gc_maxlifetime: 1440
     opcache:
       enable: 1
       enable_cli: 0

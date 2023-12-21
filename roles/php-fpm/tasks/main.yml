@@ -16,12 +16,20 @@
   loop_control:
     loop_var: version
 
-- name: Copy default pool configuration.
+- name: Copy default pool configuration for a single, fixed port PHP version.
+  ansible.builtin.template:
+    dest: "/etc/php/{{ php.version[0] }}/fpm/pool.d/www.conf"
+    src: "www.conf-fixedport.j2"
+    mode: 0555
+  when: php.fpm.tcp_port | length > 0
+
+- name: Copy default pool configuration for dynamic PHP versioning.
   ansible.builtin.template:
     dest: "/etc/php/{{ version }}/fpm/pool.d/www.conf"
     src: "www.conf.j2"
     mode: 0555
   with_items: "{{ php.version }}"
+  when: php.fpm.tcp_port | length == 0
   loop_control:
     loop_var: version
 
