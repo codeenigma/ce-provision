@@ -21,6 +21,20 @@
     cmd: "{{ openvpn.script_install_path }}/headless-openvpn-install.sh"
   when: openvpn.auto_install
 
+- name: Allow multiple simultaneous VPN connections.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: duplicate-cn
+  when: openvpn.multiple_connections
+  notify: Restart OpenVPN.
+
+- name: Add ipv4 push routes comment for readability.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: float
+  when: openvpn.allow_floating_client_ip
+  notify: Restart OpenVPN.
+
 # Push routes
 - name: Add ipv4 push routes comment for readability.
   ansible.builtin.lineinfile:
@@ -34,6 +48,7 @@
     line: 'push "route {{ item }}"'
   with_items: "{{ openvpn.push_routes_ipv4 }}"
   when: openvpn.push_routes_ipv4 | length > 0
+  notify: Restart OpenVPN.
 
 - name: Add ipv6 push routes comment for readability.
   ansible.builtin.lineinfile:
@@ -51,9 +66,8 @@
   when:
     - openvpn.push_routes_ipv6 | length > 0
     - openvpn.ipv6_support == "y"
+  notify: Restart OpenVPN.
 
-# @TODO handle adding push routes to config
-# @TODO look into the duplicate-cn and float values in our config
 # @TODO find and replace replace IP range - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L785
 # @TODO find and replace the cipher - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L895-L896
 
@@ -73,8 +87,12 @@
     group: root
   when: openvpn.ldap_integration
 
-# @TODO add line to config file for LDAP integration
-# plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn
+- name: Add LDAP integration config to OpenVPN.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: "plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn"
+  when: openvpn.ldap_integration
+  notify: Restart OpenVPN.
 
 - name: Restart OpenVPN.
   ansible.builtin.service:
