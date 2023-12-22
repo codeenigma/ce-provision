@@ -69,6 +69,7 @@ nginx:
         # reload_command: restart
         # reload:
         #   - nginx
+        # on_calendar: "Mon *-*-* 04:00:00"
       ratelimitingcrawlers: true
       is_default: true
       basic_auth:

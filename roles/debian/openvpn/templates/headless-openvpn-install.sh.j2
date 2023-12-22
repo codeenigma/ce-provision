@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Set headless defaults
+export AUTO_INSTALL=y
+export APPROVE_INSTALL=y
+export APPROVE_IP={{ openvpn.approve_ip }}
+export IPV6_SUPPORT={{ openvpn.ipv6_support }}
+export PORT_CHOICE={{ openvpn.port_choice }}
+export PROTOCOL_CHOICE={{ openvpn.protocol_choice }}
+export DNS={{ openvpn.dns }}
+export COMPRESSION_ENABLED={{ openvpn.compression_enabled }}
+export COMPRESSION_CHOICE={{ openvpn.compression_choice }}
+export CUSTOMIZE_ENC=n
+export CLIENT={{ openvpn.name }}
+export PASS={{ openvpn.pass }}
+{% if openvpn.nat_endpoint is defined and openvpn.nat_endpoint | length %}
+export ENDPOINT={{ openvpn.nat_endpoint }}
+{% endif %}
+
+# Execute installer
+{{ openvpn.script_install_path }}/openvpn-install.sh
