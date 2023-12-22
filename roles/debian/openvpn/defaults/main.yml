@@ -4,7 +4,6 @@ openvpn:
   auto_install: true
   # post install server config tweaks
   ipv4_settings: "" # defaults to `10.8.0.0 255.255.255.0` - example, to use 192.168.140.0/24 set "192.168.140.0 255.255.255.0"
-  # Alter cipher with care, you must alter the client_tls_cipher to match, do not set them to incompatible values
   cipher: "" # defaults to AES-128-GCM, see https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L404-L410
   allow_floating_client_ip: true # allow for ISP address change with DHCP (option float)
   multiple_connections: false # set to true to enable multiple VPN connections (option duplicate-cn)
@@ -32,7 +31,7 @@ openvpn:
     ssl_certificate: "{{ pam_ldap.ssl_certificate | default('') }}"
     ssl_certificate_check: "{{ pam_ldap.ssl_certificate_check | default(true) }}"
   # post install client config tweaks
-  client_tls_cipher: "" # defaults to TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256, see https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L486-L518
+  tls_cipher: "" # defaults to TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256, see https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L486-L518
   allow_pull_fqdn: true # this must be enabled if you want to push FQDNs (option allow-pull-fqdn)
   auth_user_pass: false # enforce authorisation with a username and password - desired for LDAP authentication
   # headless script variables
