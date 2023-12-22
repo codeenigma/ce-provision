@@ -1,5 +1,6 @@
-auth sufficient pam_ldap.so config=/etc/openvpn/ldap/ldap
-auth required pam_deny.so
+# {{ ansible_managed }}
+# Basic config taken from
+# https://wiki.ipfire.org/configuration/services/openvpn/extensions/auth/auth-pam
 
-account required pam_ldap.so config=/etc/openvpn/ldap/ldap
-account required pam_permit.so
+auth    required        pam_unix.so    shadow    nodelay
+account required        pam_unix.so
