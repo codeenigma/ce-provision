@@ -2,7 +2,7 @@
 openvpn:
   script_install_path: "/home/{{ user_provision.username }}"
   auto_install: true
-  name: vpn.example.com
+  test_username: example # this will be used to create a client config in the `script_install_path` location
   ipv4_settings: "" # defaults to `10.8.0.0 255.255.255.0` - example, to use 192.168.140.0/24 set "192.168.140.0 255.255.255.0"
   cipher: "" # defaults to AES-128-GCM, see https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L404-L410
   allow_floating_client_ip: true # allow for ISP address change with DHCP (option float)
@@ -14,7 +14,6 @@ openvpn:
   dns: "1" # 1 = system default, see options - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L314-L327
   compression_enabled: "n"
   compression_choice: "1" # only works if compression_enabled is "y", 1 = LZ4-v2, 2 = LZ4, 3 = LZ0
-  pass: "1"
   #nat_endpoint: "$(curl -4 ifconfig.co)" # for servers behind NAT, see https://github.com/angristan/openvpn-install?tab=readme-ov-file#headless-install
   push_routes_ipv4: [] # list of VPN push routes for ipv4 networks
     # Examples:

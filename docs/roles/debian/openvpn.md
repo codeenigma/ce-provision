@@ -1,6 +1,9 @@
 # OpenVPN
 This role installs [the `openvpn-install.sh`` bash script from GitHub](https://github.com/angristan/openvpn-install) and optionally runs it in headless mode.
 
+## Server address
+This will be detected automatically as the IP address of the server. If the server is configured with only internal addressing then the script will attempt to look up the public IP. To specify a value use `openvpn.nat_endpoint`.
+
 ## PAM authentication
 There are two options here, one is simple PAM authentication against Linux users, the other is PAM authentication with LDAP. If you want to provide a custom PAM configuration you should set `openvpn.pam.enabled` to `true` and create your own template to override the `openvpn.pam.j2` template provided. This file is placed in `/etc/pam.d/openvpn` and loaded by the OpenVPN authentication module to perform authorisation checks.
 
@@ -18,7 +21,7 @@ At the moment we do not support headless customisation of encryption settings. T
 openvpn:
   script_install_path: "/home/{{ user_provision.username }}"
   auto_install: true
-  name: vpn.example.com
+  test_username: example # this will be used to create a client config in the `script_install_path` location
   ipv4_settings: "" # defaults to `10.8.0.0 255.255.255.0` - example, to use 192.168.140.0/24 set "192.168.140.0 255.255.255.0"
   cipher: "" # defaults to AES-128-GCM, see https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L404-L410
   allow_floating_client_ip: true # allow for ISP address change with DHCP (option float)
@@ -30,7 +33,6 @@ openvpn:
   dns: "1" # 1 = system default, see options - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L314-L327
   compression_enabled: "n"
   compression_choice: "1" # only works if compression_enabled is "y", 1 = LZ4-v2, 2 = LZ4, 3 = LZ0
-  pass: "1"
   #nat_endpoint: "$(curl -4 ifconfig.co)" # for servers behind NAT, see https://github.com/angristan/openvpn-install?tab=readme-ov-file#headless-install
   push_routes_ipv4: [] # list of VPN push routes for ipv4 networks
     # Examples:
