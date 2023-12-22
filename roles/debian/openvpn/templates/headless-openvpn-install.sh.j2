@@ -11,8 +11,8 @@ export DNS={{ openvpn.dns }}
 export COMPRESSION_ENABLED={{ openvpn.compression_enabled }}
 export COMPRESSION_CHOICE={{ openvpn.compression_choice }}
 export CUSTOMIZE_ENC=n
-export CLIENT={{ openvpn.name }}
-export PASS={{ openvpn.pass }}
+export CLIENT={{ openvpn.test_username }}
+export PASS=1
 {% if openvpn.nat_endpoint is defined and openvpn.nat_endpoint | length %}
 export ENDPOINT={{ openvpn.nat_endpoint }}
 {% endif %}
