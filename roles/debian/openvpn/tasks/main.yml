@@ -68,8 +68,37 @@
     - openvpn.ipv6_support == "y"
   notify: Restart OpenVPN.
 
-# @TODO find and replace replace IP range - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L785
-# @TODO find and replace the cipher - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L895-L896
+- name: Replace OpenVPN client IP range.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'server 10.8.0.0 255.255.255.0'
+    line: "server {{ openvpn.ipv4_settings }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.ipv4_settings | length > 0
+  notify: Restart OpenVPN.
+
+- name: Replace OpenVPN cipher.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'cipher AES-128-GCM'
+    line: "cipher {{ openvpn.cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.cipher | length > 0
+
+- name: Replace OpenVPN ncp-ciphers.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'ncp-ciphers AES-128-GCM'
+    line: "ncp-ciphers {{ openvpn.cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.cipher | length > 0
+  notify: Restart OpenVPN.
 
 # PAM integration
 - name: Ensure the OpenVPN PAM config is in place.

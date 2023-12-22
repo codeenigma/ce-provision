@@ -3,6 +3,8 @@ openvpn:
   script_install_path: "/home/{{ user_provision.username }}"
   auto_install: true
   name: vpn.example.com
+  ipv4_settings: "" # defaults to `10.8.0.0 255.255.255.0` - example, to use 192.168.140.0/24 set "192.168.140.0 255.255.255.0"
+  cipher: "" # defaults to AES-128-GCM, see https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L404-L410
   allow_floating_client_ip: true # allow for ISP address change with DHCP (option float)
   multiple_connections: false # set to true to enable multiple VPN connections (option duplicate-cn)
   approve_ip: "y"
