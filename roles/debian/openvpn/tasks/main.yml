@@ -120,6 +120,12 @@
     group: root
   when: openvpn.ldap.enabled
 
+- name: Ensure the OpenVPN LDAP config directory exists.
+  ansible.builtin.file:
+    path: /etc/openvpn/ldap
+    state: directory
+    mode: '0755'
+
 - name: Ensure the pam-ldap config for OpenVPN is in place.
   ansible.builtin.template:
     src: openvpn.ldap.j2
