@@ -30,14 +30,13 @@ openvpn:
   dns: "1" # 1 = system default, see options - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L314-L327
   compression_enabled: "n"
   compression_choice: "1" # only works if compression_enabled is "y", 1 = LZ4-v2, 2 = LZ4, 3 = LZ0
-  customize_enc: "n"
   pass: "1"
   #nat_endpoint: "$(curl -4 ifconfig.co)" # for servers behind NAT, see https://github.com/angristan/openvpn-install?tab=readme-ov-file#headless-install
   push_routes_ipv4: [] # list of VPN push routes for ipv4 networks
     # Examples:
     # - "192.168.1.0 255.255.255.0" # push range 192.168.1.0/24, format = "IP-address/range netmask"
     # - "1.2.3.4 255.255.255.255" # push specific IP 1.2.3.4
-    # - www.google-analytics.com # push any IP resolving to www.google-analytics.com
+    # - "www.google-analytics.com 255.255.255.255" # push any IP resolving to www.google-analytics.com
   push_routes_ipv6: [] # list of VPN push routes for ipv6 networks - ipv6_support must be "y"
   pam:
     enabled: false # relies on `openvpn-plugin-auth-pam.so` which is bundled with OpenVPN server for Debian
