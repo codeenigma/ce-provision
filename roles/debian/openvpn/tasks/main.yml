@@ -142,7 +142,7 @@
     block: |
       # Let OpenVPN use PAM for authentication
       plugin {{ openvpn.pam.module_path }} openvpn
-  when: openvpn.pam.enabled || openvpn.ldap.enabled
+  when: openvpn.pam.enabled or openvpn.ldap.enabled
   notify: Restart OpenVPN.
 
 # Installation complete - provide user information
