@@ -71,34 +71,44 @@
 # @TODO find and replace replace IP range - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L785
 # @TODO find and replace the cipher - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L895-L896
 
-# LDAP integration
-- name: Install OpenVPN plugin for PAM.
-  ansible.builtin.apt:
-    pkg: openvpn-auth-ldap
-    state: present
-  when: openvpn.ldap_integration
-
+# PAM integration
 - name: Ensure the OpenVPN PAM config is in place.
   ansible.builtin.template:
-    src: openvpn.pam.j2
+    src: "{{ openvpn.pam.config_template }}"
     dest: /etc/pam.d/openvpn
     mode: "0644"
     owner: root
     group: root
-  when: openvpn.ldap_integration
+  when: openvpn.pam.enabled
 
-- name: Add LDAP integration config to OpenVPN.
-  ansible.builtin.lineinfile:
+# PAM integration using LDAP
+- name: Ensure the OpenVPN PAM config for LDAP is in place.
+  ansible.builtin.template:
+    src: "{{ openvpn.ldap.config_template }}"
+    dest: /etc/pam.d/openvpn
+    mode: "0644"
+    owner: root
+    group: root
+  when: openvpn.ldap.enabled
+
+- name: Ensure the pam-ldap config for OpenVPN is in place.
+  ansible.builtin.template:
+    src: openvpn.ldap.j2
+    dest: /etc/openvpn/ldap/ldap
+    mode: "0644"
+    owner: root
+    group: root
+  when: openvpn.ldap.enabled
+
+# Enable PAM in OpenVPN
+- name: Add PAM integration config to OpenVPN.
+  ansible.builtin.blockinfile:
     path: /etc/openvpn/server.conf
-    line: "plugin /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so openvpn"
-  when: openvpn.ldap_integration
+    block: |
+      # Let OpenVPN use PAM for authentication
+      plugin {{ openvpn.pam.module_path }} openvpn
+  when: openvpn.pam.enabled || openvpn.ldap.enabled
   notify: Restart OpenVPN.
-
-- name: Restart OpenVPN.
-  ansible.builtin.service:
-    name: "openvpn@server"
-    state: restarted
-  when: openvpn.ldap_integration
 
 # Installation complete - provide user information
 - name: Service notice.

@@ -2,7 +2,6 @@
 openvpn:
   script_install_path: "/home/{{ user_provision.username }}"
   auto_install: true
-  ldap_integration: false # this cannot work without running the pam_ldap role first
   name: vpn.example.com
   allow_floating_client_ip: true # allow for ISP address change with DHCP (option float)
   multiple_connections: false # set to true to enable multiple VPN connections (option duplicate-cn)
@@ -22,3 +21,19 @@ openvpn:
     # - "1.2.3.4 255.255.255.255" # push specific IP 1.2.3.4
     # - www.google-analytics.com # push any IP resolving to www.google-analytics.com
   push_routes_ipv6: [] # list of VPN push routes for ipv6 networks - ipv6_support must be "y"
+  pam:
+    enabled: false # relies on `openvpn-plugin-auth-pam.so` which is bundled with OpenVPN server for Debian
+    module_path: /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so # use `dpkg -L openvpn | grep '\bpam\b'` to discover the path
+    config_template: openvpn.pam.j2 # allow override of PAM config template
+  ldap:
+    enabled: false # if true we assume the pam_ldap role is also being used on this server
+    config_template: openvpn.pam.ldap.j2 # allow override of PAM config template for LDAP
+    endpoints: "{{ pam_ldap.endpoints | default('[]') }}"
+    lookup_base: "{{ pam_ldap.lookup_base | default('') }}"
+    lookup_filter: "|(objectClass=inetOrgPerson)" # LDAP filter to apply to lookups
+    login_attribute: uid # the LDAP attribute to check the OpenVPN username against
+    group_base: "" # e.g. ou=Groups,dc=example,dc=com
+    group_dn: "" # restrict to specific group, e.g. cn=admins,ou=Groups,dc=example,dc=com
+    group_attribute: memberUid # the LDAP group attribute to check the OpenVPN username against
+    ssl_certificate: "{{ pam_ldap.ssl_certificate | default('') }}"
+    ssl_certificate_check: "{{ pam_ldap.ssl_certificate_check | default(true) }}"
