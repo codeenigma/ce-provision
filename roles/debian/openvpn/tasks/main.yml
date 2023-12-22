@@ -145,6 +145,29 @@
   when: openvpn.pam.enabled or openvpn.ldap.enabled
   notify: Restart OpenVPN.
 
+# Tweak client config template
+- name: Replace OpenVPN client tls-cipher.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    search_string: 'tls-cipher TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256'
+    line: "tls-cipher {{ openvpn.client_tls_cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.client_tls_cipher | length > 0
+
+- name: Allow FQDN push routes.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    line: allow-pull-fqdn
+  when: openvpn.allow_pull_fqdn
+
+- name: Enforce username and password authentication.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    line: auth-user-pass
+  when: openvpn.auth_user_pass
+
 # Installation complete - provide user information
 - name: Service notice.
   ansible.builtin.debug:
