@@ -16,7 +16,7 @@ openvpn:
   #nat_endpoint: "$(curl -4 ifconfig.co)" # for servers behind NAT, see https://github.com/angristan/openvpn-install?tab=readme-ov-file#headless-install
   push_routes_ipv4: [] # list of VPN push routes for ipv4 networks
     # Examples:
-    # - 192.168.1.0 # push range 192.168.1.0/24
-    # - 1.2.3.4 # push specific IP 1.2.3.4
+    # - "192.168.1.0 255.255.255.0" # push range 192.168.1.0/24, format = "IP-address/range netmask"
+    # - "1.2.3.4 255.255.255.255" # push specific IP 1.2.3.4
     # - www.google-analytics.com # push any IP resolving to www.google-analytics.com
   push_routes_ipv6: [] # list of VPN push routes for ipv6 networks - ipv6_support must be "y"

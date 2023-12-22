@@ -21,6 +21,37 @@
     cmd: "{{ openvpn.script_install_path }}/headless-openvpn-install.sh"
   when: openvpn.auto_install
 
+# Push routes
+- name: Add ipv4 push routes comment for readability.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: "# ipv4 push routes"
+  when: openvpn.push_routes_ipv4 | length > 0
+
+- name: Add ipv4 push routes to the VPN.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: 'push "route {{ item }}"'
+  with_items: "{{ openvpn.push_routes_ipv4 }}"
+  when: openvpn.push_routes_ipv4 | length > 0
+
+- name: Add ipv6 push routes comment for readability.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: "# ipv6 push routes"
+  when:
+    - openvpn.push_routes_ipv6 | length > 0
+    - openvpn.ipv6_support == "y"
+
+- name: Add ipv6 push routes to the VPN.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: 'push "route-ipv6  {{ item }}"'
+  with_items: "{{ openvpn.push_routes_ipv6 }}"
+  when:
+    - openvpn.push_routes_ipv6 | length > 0
+    - openvpn.ipv6_support == "y"
+
 # @TODO handle adding push routes to config
 # @TODO look into the duplicate-cn and float values in our config
 # @TODO find and replace replace IP range - https://github.com/angristan/openvpn-install/blob/master/openvpn-install.sh#L785
