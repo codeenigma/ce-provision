@@ -16,7 +16,6 @@
   loop_control:
     loop_var: version
 
-
 - name: Copy default pool configuration for a single, fixed port PHP version.
   ansible.builtin.template:
     dest: "/etc/php/{{ php.version[0] }}/fpm/pool.d/www.conf"
