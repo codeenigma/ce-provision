@@ -9,7 +9,7 @@ By default, role is set to add 2G of swap space.
 ## Default variables
 ```yaml
 ---
-ce_swap:
+swap:
   count: 2048
   size: "2G"
   swap_space: swapfile
