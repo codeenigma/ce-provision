@@ -34,10 +34,9 @@ nginx:
   # Group prefix. Useful for grouping by environments.
   log_group_prefix: ""
   # Main log stream for nginx (Cloudwatch).
-  log_stream_name: example
-  # We can only have one backend, due to the way we use "common" templates.
-  # Moving this per domain means instead having templates per project type.
-  php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.','') }}"
+  log_stream_name: example # We can only have one backend, due to the way we use "common" templates, moving this per domain means instead having templates per project type.
+  # See php.fpm.unix_socket, if true use a socket here:
+  php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.','') }}" # for unix socket use "unix:/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock"
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
   fastcgi_read_timeout: 60
