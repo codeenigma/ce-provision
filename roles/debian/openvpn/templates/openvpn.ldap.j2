@@ -30,5 +30,5 @@ ssl on
 {% if openvpn.ldap.ssl_certificate_check is defined and not openvpn.ldap.ssl_certificate_check %}
 tls_checkpeer no
 {% endif %}
-tls_cacertfile /etc/ldap/ssl/{{ openvpn.ldap.ssl_certificate }}
+tls_cacertfile /etc/ldap/ssl/{{ openvpn.ldap.ssl_certificate | basename }}
 {% endif %}
