@@ -1,5 +1,5 @@
 ---
-ce_swap:
+swap:
   count: 2048
   size: "2G"
   swap_space: swapfile
