@@ -77,5 +77,6 @@
      - [SSHD](/roles/ssh_server)
      - [SSL](/roles/ssl)
      - [sudo config](/roles/sudo_config)
+     - [General swap role to add swap space](/roles/swap)
      - [varnish-config](/roles/varnish_config)
      - [wazuh](/roles/wazuh)
