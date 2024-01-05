@@ -60,7 +60,6 @@
        - [MySQL Server - Oracle Community Edition](/roles/debian/mysql_server_oracle_ce)
        - [NGINX](/roles/debian/nginx)
        - [NodeJS](/roles/debian/nodejs)
-       - [OpenVPN Config](/roles/debian/openvpn_config)
        - [OpenVPN](/roles/debian/openvpn)
        - [OSSEC](/roles/debian/ossec)
        - [Packer](/roles/debian/packer)
