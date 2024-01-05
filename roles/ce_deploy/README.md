@@ -19,7 +19,6 @@ ce_deploy:
   config_repository: ""
   config_repository_branch: "master"
   local_dir: "/home/{{ _ce_deploy.username }}/ce-deploy"
-  asg_processes_policy_name: "DeployManageASGProcesses"
   ce_provision_dir: "/home/controller/ce-provision"
   # List of additional groups to add the user to.
   groups: []
