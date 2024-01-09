@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+auth sufficient pam_ldap.so config=/etc/openvpn/ldap/ldap
+auth required pam_deny.so
+
+account required pam_ldap.so config=/etc/openvpn/ldap/ldap
+account required pam_permit.so
