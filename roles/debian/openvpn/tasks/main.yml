@@ -1,0 +1,186 @@
+---
+- name: Download latest openvpn-install script.
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/angristan/openvpn-install/master/openvpn-install.sh
+    dest: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+    mode: '0750'
+    owner: "{{ user_provision.username }}"
+    group: "{{ user_provision.username }}"
+    force: true
+
+- name: Place the headless installer script.
+  ansible.builtin.template:
+    src: headless-openvpn-install.sh.j2
+    dest: "{{ openvpn.script_install_path }}/headless-openvpn-install.sh"
+    mode: "0750"
+    owner: "{{ user_provision.username }}"
+    group: "{{ user_provision.username }}"
+
+- name: Attempt to install OpenVPN in headless mode.
+  ansible.builtin.command:
+    cmd: "{{ openvpn.script_install_path }}/headless-openvpn-install.sh"
+  when: openvpn.auto_install
+
+# Tweak server config
+- name: Allow multiple simultaneous VPN connections.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: duplicate-cn
+  when: openvpn.multiple_connections
+  notify: Restart OpenVPN.
+
+- name: Allow client IP to float without disconnecting.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: float
+  when: openvpn.allow_floating_client_ip
+  notify: Restart OpenVPN.
+
+- name: Replace OpenVPN server tls-cipher.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'tls-cipher TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256'
+    line: "tls-cipher {{ openvpn.tls_cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.tls_cipher | length > 0
+  notify: Restart OpenVPN.
+
+- name: Replace OpenVPN client IP range.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'server 10.8.0.0 255.255.255.0'
+    line: "server {{ openvpn.ipv4_settings }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.ipv4_settings | length > 0
+  notify: Restart OpenVPN.
+
+- name: Replace OpenVPN cipher.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'cipher AES-128-GCM'
+    line: "cipher {{ openvpn.cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.cipher | length > 0
+
+- name: Replace OpenVPN ncp-ciphers.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    search_string: 'ncp-ciphers AES-128-GCM'
+    line: "ncp-ciphers {{ openvpn.cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.cipher | length > 0
+  notify: Restart OpenVPN.
+
+# Push routes
+- name: Add ipv4 push routes comment for readability.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: "# ipv4 push routes"
+  when: openvpn.push_routes_ipv4 | length > 0
+
+- name: Add ipv4 push routes to the VPN.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: 'push "route {{ item }}"'
+  with_items: "{{ openvpn.push_routes_ipv4 }}"
+  when: openvpn.push_routes_ipv4 | length > 0
+  notify: Restart OpenVPN.
+
+- name: Add ipv6 push routes comment for readability.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: "# ipv6 push routes"
+  when:
+    - openvpn.push_routes_ipv6 | length > 0
+    - openvpn.ipv6_support == "y"
+
+- name: Add ipv6 push routes to the VPN.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: 'push "route-ipv6  {{ item }}"'
+  with_items: "{{ openvpn.push_routes_ipv6 }}"
+  when:
+    - openvpn.push_routes_ipv6 | length > 0
+    - openvpn.ipv6_support == "y"
+  notify: Restart OpenVPN.
+
+# PAM integration
+- name: Ensure the OpenVPN PAM config is in place.
+  ansible.builtin.template:
+    src: "{{ openvpn.pam.config_template }}"
+    dest: /etc/pam.d/openvpn
+    mode: "0644"
+    owner: root
+    group: root
+  when: openvpn.pam.enabled
+
+# PAM integration using LDAP
+- name: Ensure the OpenVPN PAM config for LDAP is in place.
+  ansible.builtin.template:
+    src: "{{ openvpn.ldap.config_template }}"
+    dest: /etc/pam.d/openvpn
+    mode: "0644"
+    owner: root
+    group: root
+  when: openvpn.ldap.enabled
+
+- name: Ensure the OpenVPN LDAP config directory exists.
+  ansible.builtin.file:
+    path: /etc/openvpn/ldap
+    state: directory
+    mode: '0755'
+
+- name: Ensure the pam-ldap config for OpenVPN is in place.
+  ansible.builtin.template:
+    src: openvpn.ldap.j2
+    dest: /etc/openvpn/ldap/ldap
+    mode: "0644"
+    owner: root
+    group: root
+  when: openvpn.ldap.enabled
+
+# Enable PAM in OpenVPN
+- name: Add PAM integration config to OpenVPN.
+  ansible.builtin.blockinfile:
+    path: /etc/openvpn/server.conf
+    block: |
+      # Let OpenVPN use PAM for authentication
+      plugin {{ openvpn.pam.module_path }} openvpn
+  when: openvpn.pam.enabled or openvpn.ldap.enabled
+  notify: Restart OpenVPN.
+
+# Tweak client config template
+- name: Replace OpenVPN client tls-cipher.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    search_string: 'tls-cipher TLS-ECDHE-ECDSA-WITH-AES-128-GCM-SHA256'
+    line: "tls-cipher {{ openvpn.tls_cipher }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.tls_cipher | length > 0
+
+- name: Allow FQDN push routes.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    line: allow-pull-fqdn
+  when: openvpn.allow_pull_fqdn
+
+- name: Enforce username and password authentication.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    line: auth-user-pass
+  when: openvpn.auth_user_pass
+
+# Installation complete - provide user information
+- name: Service notice.
+  ansible.builtin.debug:
+    msg: "OpenVPN is ready to use, to manage the server run {{ openvpn.script_install_path }}/openvpn-install.sh as root."
