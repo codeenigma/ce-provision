@@ -1,0 +1,34 @@
+uri     {{ openvpn.ldap.endpoints | join(' ') }}
+base    {{ openvpn.ldap.lookup_base }}
+scope one
+timelimit 5
+bind_timelimit 2
+bind_policy soft
+idle_timelimit 6
+
+#pam_min_uid 1000
+#pam_max_uid 2000
+pam_password crypt
+
+pam_filter {{ openvpn.ldap.lookup_filter }}
+pam_login_attribute {{ openvpn.ldap.login_attribute }}
+
+{% if openvpn.ldap.group_dn is defined and openvpn.ldap.group_dn %}
+pam_groupdn {{ openvpn.ldap.group_dn }}
+pam_member_attribute {{ openvpn.ldap.group_attribute }}
+{% endif %}
+
+nss_base_passwd {{ openvpn.ldap.lookup_base }}
+nss_base_shadow {{ openvpn.ldap.lookup_base }}
+nss_base_group {{ openvpn.ldap.group_base }}
+
+nss_initgroups_ignoreusers root,ldap,named,avahi,haldaemon,dbus,radvd,tomcat,radiusd,news,mailman,nscd,gdm
+
+{% if openvpn.ldap.ssl_certificate is defined and openvpn.ldap.ssl_certificate %}
+ssl start_tls
+ssl on
+{% if openvpn.ldap.ssl_certificate_check is defined and not openvpn.ldap.ssl_certificate_check %}
+tls_checkpeer no
+{% endif %}
+tls_cacertfile /etc/ldap/ssl/{{ openvpn.ldap.ssl_certificate | basename }}
+{% endif %}
