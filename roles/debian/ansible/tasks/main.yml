@@ -10,6 +10,7 @@
     state: absent
     executable: pip3
   when: ansible_distribution_major_version | int < 12
+  failed_when: false # don't stop the build if there's no system pip
 
 - name: Set up Python packages.
   ansible.builtin.include_role:
@@ -23,7 +24,7 @@
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ ce_ansible.install_username | default(_install_username) }}"
 
 - name: Install Ansible.
   ansible.builtin.pip:
@@ -32,7 +33,7 @@
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ ce_ansible.install_username | default(_install_username) }}"
 
 - name: Install linters.
   ansible.builtin.pip:
@@ -43,7 +44,7 @@
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
   when: ce_ansible.linters.enabled
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ ce_ansible.install_username | default(_install_username) }}"
 
 - name: Add the venv to $PATH using profile.d.
   ansible.builtin.copy:

@@ -132,6 +132,7 @@
   ansible.builtin.set_fact:
     _venv_path: "{{ ce_deploy.venv_path }}"
     _venv_command: "{{ ce_deploy.venv_command }}"
+    _install_username: "{{ ce_deploy.install_username }}"
 
 - name: Install Ansible.
   ansible.builtin.include_role:

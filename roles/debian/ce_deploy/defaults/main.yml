@@ -6,6 +6,7 @@ ce_deploy:
   # Location of Ansible installation and components.
   venv_path: "/home/{{ _ce_deploy.username }}/ansible"
   venv_command: /usr/bin/python3 -m venv
+  install_username: "{{ _ce_deploy.username }}"
   # Other ce-deploy settings.
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
   key_name: id_rsa.pub # existing users may have a key of a different name
