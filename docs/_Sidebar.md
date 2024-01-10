@@ -76,6 +76,7 @@
        - [SSHD](/roles/debian/ssh_server)
        - [SSL](/roles/debian/ssl)
        - [sudo config](/roles/debian/sudo_config)
+       - [General swap role to add swap space](/roles/debian/swap)
        - [varnish-config](/roles/debian/varnish_config)
        - [wazuh](/roles/debian/wazuh)
      - [Init role](/roles/_init)
