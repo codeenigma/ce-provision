@@ -15,4 +15,4 @@
     virtualenv: "{{ python_boto.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ python_boto.venv_command | default(_venv_command) }}"
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ python_boto.install_username | default(_install_username) }}"
