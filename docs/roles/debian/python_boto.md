@@ -12,6 +12,8 @@ python_boto:
   # These are usually set within another role using _venv_path and _venv_command but can be overridden.
   #venv_path: /path/to/venv
   #venv_command: /usr/bin/python3.11 -m venv
+  #install_username: deploy # user to become when creating venv
+
 ```
 
 <!--ENDROLEVARS-->
