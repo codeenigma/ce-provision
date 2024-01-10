@@ -24,7 +24,7 @@
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
   become: true
-  become_user: "{{ ce_ansible.ansible_user | default(_ansible_user) }}"
+  become_user: "{{ ce_ansible.ansible_install_username | default(_ansible_install_username) }}"
 
 - name: Install Ansible.
   ansible.builtin.pip:
@@ -33,7 +33,7 @@
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
   become: true
-  become_user: "{{ ce_ansible.ansible_user | default(_ansible_user) }}"
+  become_user: "{{ ce_ansible.ansible_install_username | default(_ansible_install_username) }}"
 
 - name: Install linters.
   ansible.builtin.pip:
@@ -44,7 +44,7 @@
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
   when: ce_ansible.linters.enabled
   become: true
-  become_user: "{{ ce_ansible.ansible_user | default(_ansible_user) }}"
+  become_user: "{{ ce_ansible.ansible_install_username | default(_ansible_install_username) }}"
 
 - name: Add the venv to $PATH using profile.d.
   ansible.builtin.copy:
