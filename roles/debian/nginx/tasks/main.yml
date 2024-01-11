@@ -6,6 +6,19 @@
     update_cache: true
     cache_valid_time: 240
 
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+  vars:
+    python_common:
+      remove_packages:
+        - python-pip
+        - python3-yaml
+        - python-botocore
+        - python-urllib3
+      install_packages:
+        - python3-pip
+
 - name: Ensure passlib is installed with pip3.
   ansible.builtin.pip:
     name: passlib
