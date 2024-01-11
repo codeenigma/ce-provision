@@ -8,5 +8,4 @@ python_common:
   install_packages:
     - python3-distutils
     - python3-venv
-    - python3-pip
     - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
