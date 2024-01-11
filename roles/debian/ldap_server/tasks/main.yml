@@ -14,6 +14,19 @@
     purge: true
   when: ldap_server.slapd.purge
 
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+  vars:
+    python_common:
+      remove_packages:
+        - python-pip
+        - python3-yaml
+        - python-botocore
+        - python-urllib3
+      install_packages:
+        - python3-pip
+
 - name: Ensure LDAP and python-ldap and dependencies are installed.
   ansible.builtin.apt:
     pkg: ["slapd", "ldapscripts", "libldap2-dev"]
