@@ -42,11 +42,12 @@
     apply:
       delegate_to: localhost # this is how you delegate the include_role module
   vars:
-    profile: "{{ gitlab_runner.fargate.profile }}"
-    region: "{{ gitlab_runner.fargate.region }}"
-    group_names:
-      - "{{ gitlab_runner.fargate.security_group }}"
-    return_type: ids
+    aws_security_groups:
+      profile: "{{ gitlab_runner.fargate.profile }}"
+      region: "{{ gitlab_runner.fargate.region }}"
+      group_names:
+        - "{{ gitlab_runner.fargate.security_group }}"
+      return_type: ids
   when: gitlab_runner.install_fargate
 
 - name: Create the Fargate driver directory if it does not exist.
