@@ -4,12 +4,17 @@
     pkg: ansible
     state: absent
 
-- name: Ensure Ansible is not installed globally with pip3 on older versions of Debian.
+- name: Ensure Ansible is not installed globally with pip or pip3 on older versions of Debian.
   ansible.builtin.pip:
-    name: ansible
+    name:
+      - ansible
+      - ansible-core
     state: absent
-    executable: pip3
+    executable: "{{ item }}"
   when: ansible_distribution_major_version | int < 12
+  with_items:
+    - pip
+    - pip3
   failed_when: false # don't stop the build if there's no system pip
 
 - name: Set up Python packages.
