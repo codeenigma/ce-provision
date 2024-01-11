@@ -379,10 +379,11 @@
   ansible.builtin.include_role:
     name: aws/aws_security_groups
   vars:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    group_names: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
-    return_type: ids
+    aws_security_groups:
+      profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      group_names: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
+      return_type: ids
   when:
     - aws_ec2_autoscale_cluster.alb_security_groups | length > 0
     - aws_ec2_autoscale_cluster.create_elb
@@ -425,10 +426,11 @@
   ansible.builtin.include_role:
     name: aws/aws_security_groups
   vars:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    group_names: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
-    return_type: ids
+    aws_security_groups:
+      profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      group_names: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
+      return_type: ids
   when:
     - aws_ec2_autoscale_cluster.cluster_security_groups | length > 0
     - aws_ec2_autoscale_cluster.asg_refresh
