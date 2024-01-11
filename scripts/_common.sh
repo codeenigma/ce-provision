@@ -34,10 +34,12 @@ if [ ! -d "$ANSIBLE_DATA_DIR" ]; then
     mkdir "$ANSIBLE_DATA_DIR"
 fi
 # Load the contents of profile.d in case we added items to $PATH there.
-for f in /etc/profile.d/*; do
-# shellcheck source=/dev/null
-   . "$f"
-done
+if [ -n "$(ls -A /etc/profile.d)" ]; then
+  for f in /etc/profile.d/*; do
+  # shellcheck source=/dev/null
+    . "$f"
+  done
+fi
 # Parse options arguments.
 parse_options(){
   while [ "${1:-}" ]; do
