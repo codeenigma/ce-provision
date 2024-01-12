@@ -1,5 +1,5 @@
 ---
-- name: check if fownload folder exists
+- name: Check if fownload folder exists
   ansible.builtin.file:
     path: /home/{{ deploy_user }}/apt_exta
     state: directory

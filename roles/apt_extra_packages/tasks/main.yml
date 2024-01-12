@@ -26,5 +26,5 @@
   include_tasks: "wget_install.yml"
   when: wget_list | length > 0
   loop: "{{ wget_list }}"
+  loop_control:
     loop_var: wget_item
-
