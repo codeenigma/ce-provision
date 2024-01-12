@@ -1,7 +1,7 @@
 ---
 - name: Check if download folder exists
   ansible.builtin.file:
-    path: /home/{{ user_deoloy.username }}/apt_exta
+    path: /home/{{ user_deploy.username }}/apt_exta
     state: directory
     mode: '0755'
 
@@ -10,8 +10,8 @@
     package_name: "{{ wget_item.split('/')[-1] }}"
 
 - name: Download package
-  ansible.builtin.command: wget {{ wget_item }} -O /home/{{ user_deoloy.username }}/apt_exta/{{ package_name }}
+  ansible.builtin.command: wget {{ wget_item }} -O /home/{{ user_deploy.username }}/apt_exta/{{ package_name }}
 
 - name: Instal package
   apt:
-    deb: /home/{{ user_deoloy.username }}/apt_exta/{{ package_name }}
+    deb: /home/{{ user_deploy.username }}/apt_exta/{{ package_name }}
