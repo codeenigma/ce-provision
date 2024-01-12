@@ -1,7 +1,30 @@
 ---
-- name: Install additional extra packages.
+- set_fact:
+    wget_list: []
+
+- set_fact:
+    apt_list: []
+
+- set_fact:
+    wget_list: "{{ wget_list + [item] }}"
+  loop: "{{ apt_extra_packages }}"
+  when: "item is regex('^https?://')"
+
+- set_fact:
+    apt_list: "{{ apt_list + [item] }}"
+  when: "item is not regex('^https?://')"
+  loop: "{{ apt_extra_packages }}"
+
+- name: Install additional apt extra packages.
   ansible.builtin.apt:
-    pkg: "{{ apt_extra_packages | list }}"
+    pkg: "{{ apt_list | list }}"
     state: present
     update_cache: true
-  when: apt_extra_packages | length
+  when: apt_list | length > 0
+
+- name: Install additional wget extra packages.
+  include_tasks: "wget_install.yml"
+  when: wget_list | length > 0
+  loop: "{{ wget_list }}"
+    loop_var: wget_item
+
