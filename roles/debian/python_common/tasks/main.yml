@@ -3,6 +3,7 @@
   ansible.builtin.apt:
     pkg: "{{ python_common.remove_packages }}"
     state: absent
+  when: python_common.cleanup
 
 - name: Ensure commonly required Python packages are installed.
   ansible.builtin.apt:
