@@ -12,6 +12,7 @@ TARGET_PROVISION_BRANCH=""
 ANSIBLE_EXTRA_VARS=""
 ANSIBLE_DEFAULT_EXTRA_VARS=""
 ANSIBLE_PATH=""
+PYTHON_INTERPRETER=""
 BUILD_WORKSPACE=""
 BUILD_WORKSPACE_BASE="$OWN_DIR/build"
 BUILD_ID=""
@@ -101,6 +102,10 @@ parse_options(){
           shift
           ANSIBLE_PATH="$1"
         ;;
+      "--python-interpreter")
+          shift
+          PYTHON_INTERPRETER="$1"
+        ;;
         *)
         usage
         exit 1
@@ -123,7 +128,11 @@ get_build_workspace(){
 # Common extra-vars to pass to Ansible.
 get_ansible_defaults_vars(){
   get_build_id
-  ANSIBLE_DEFAULT_EXTRA_VARS="{_ce_provision_base_dir: $OWN_DIR, _ce_provision_build_dir: $BUILD_WORKSPACE, _ce_provision_build_tmp_dir: $BUILD_TMP_DIR, _ce_provision_data_dir: $ANSIBLE_DATA_DIR, _ce_provision_build_id: $BUILD_ID, _ce_provision_force_play: $FORCE_PLAY, target_branch: $TARGET_PROVISION_BRANCH}"
+  if [ -n "$PYTHON_INTERPRETER" ]; then
+    ANSIBLE_DEFAULT_EXTRA_VARS="{ansible_python_interpreter: $PYTHON_INTERPRETER, _ce_provision_base_dir: $OWN_DIR, _ce_provision_build_dir: $BUILD_WORKSPACE, _ce_provision_build_tmp_dir: $BUILD_TMP_DIR, _ce_provision_data_dir: $ANSIBLE_DATA_DIR, _ce_provision_build_id: $BUILD_ID, _ce_provision_force_play: $FORCE_PLAY, target_branch: $TARGET_PROVISION_BRANCH}"
+  else
+    ANSIBLE_DEFAULT_EXTRA_VARS="{_ce_provision_base_dir: $OWN_DIR, _ce_provision_build_dir: $BUILD_WORKSPACE, _ce_provision_build_tmp_dir: $BUILD_TMP_DIR, _ce_provision_data_dir: $ANSIBLE_DATA_DIR, _ce_provision_build_id: $BUILD_ID, _ce_provision_force_play: $FORCE_PLAY, target_branch: $TARGET_PROVISION_BRANCH}"
+  fi
 }
 
 # Clone our target repo.
