@@ -1,0 +1,17 @@
+---
+- name: check if fownload folder exists
+  ansible.builtin.file:
+    path: /home/{{ deploy_user }}/apt_exta
+    state: directory
+    mode: '0755'
+
+- name: Get package name
+  set_fact:
+    package_name: "{{ wget_item.split('/')[-1] }}"
+
+- name: Download package
+  ansible.builtin.command: wget {{ wget_item }} -O /home/{{ deploy_user }}/apt_exta/{{ package_name }}
+
+- name: Instal package
+  apt:
+    deb: /home/{{ deploy_user }}/apt_exta/{{ package_name }}
