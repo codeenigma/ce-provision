@@ -14,6 +14,7 @@ usage(){
   echo 'Available options:'
   echo '--ansible-extra-vars: Variable to pass as --extra-vars arguments to ansible-playbook. Make sure to escape them properly.'
   echo '--ansible-path: Pass the path to the directory containing the Ansible binaries if you are not using the version of Ansible in PATH.'
+  echo '--python-interpreter: When using Python virtual environments Ansible may not correctly determine the Python interpreter, use this to set it manually.'
   echo '--workspace: Local existing clone of the repo/branch (if your deployment tool already has one). This will skip the cloning/fetching of the repo.'
   echo '--user: Linux user executing the script (defaults to controller).'
   echo '--absolute-playbook-path: Prevent prepending of the workspace path to the playbook path when Ansible is called.'
