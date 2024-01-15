@@ -9,6 +9,22 @@
   when:
     - python_boto.boto3_version | length > 0
 
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+  vars:
+    python_common:
+      cleanup: true
+      remove_packages:
+        - python-pip
+        - python3-yaml # linters need a newer version of PyYAML than the one that ships with Debian
+        - python-botocore
+        - python-urllib3
+      install_packages:
+        - python3-distutils
+        - python3-venv
+        - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
+
 - name: Ensure boto3 is installed.
   ansible.builtin.pip:
     name: "{{ _boto3_install_package }}"

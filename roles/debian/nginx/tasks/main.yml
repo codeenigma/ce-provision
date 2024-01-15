@@ -11,11 +11,8 @@
     name: debian/python_common
   vars:
     python_common:
-      remove_packages:
-        - python-pip
-        - python3-yaml
-        - python-botocore
-        - python-urllib3
+      cleanup: false
+      remove_packages: []
       install_packages:
         - python3-pip
 
