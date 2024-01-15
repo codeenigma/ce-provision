@@ -4,14 +4,20 @@
     path: /home/{{ user_deploy.username }}/apt_exta
     state: directory
     mode: '0755'
+    owner: "{{ user_deploy.username }}"
+    group: "{{ user_deploy.username }}"
 
 - name: Get package name
-  set_fact:
+  ansible.builtin.set_fact:
     package_name: "{{ wget_item.split('/')[-1] }}"
 
 - name: Download package
-  ansible.builtin.command: wget {{ wget_item }} -O /home/{{ user_deploy.username }}/apt_exta/{{ package_name }}
+  ansible.builtin.get_url:
+    url: "{{ wget_item }}"
+    dest: "/home/{{ user_deploy.username }}/apt_exta/{{ package_name }}"
+    owner: "{{ user_deploy.username }}"
+    group: "{{ user_deploy.username }}"
 
 - name: Instal package
-  apt:
+  ansible.builtin.apt:
     deb: /home/{{ user_deploy.username }}/apt_exta/{{ package_name }}
