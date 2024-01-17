@@ -7,6 +7,20 @@
         msg: "ce-provision currently only supports Debian based distributions of Linux."
     - ansible.builtin.meta: end_host
 
+- name: Get Debian version
+  ansible.builtin.set_fact:
+    debian_version: "{{ ansible_facts['distribution_major_version'] }}"
+
+- name : Set python3.9 venv if Bullseye
+  ansible.builtin.set_fact:
+    venv_command: "/usr/bin/python3.9 -m venv"
+  when: debian_version == "11"
+
+- name : Set python3.11 venv if Bookworm
+  ansible.builtin.set_fact:
+    venv_command: "/usr/bin/python3.11 -m venv"
+  when: debian_version == "12"
+
 # Load Linux services into ansible_facts.services.
 - name: Populate service facts
   ansible.builtin.service_facts:

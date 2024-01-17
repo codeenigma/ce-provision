@@ -45,7 +45,7 @@ dependencies:
   - role: debian/ansible
     ce_ansible:
       venv_path: "/home/{{ ce_provision.username }}/ansible"
-      venv_command: "/usr/bin/python3 -m venv"
+      venv_command: "{{ venv_command }}"
       install_username: "{{ ce_provision.username }}"
       upgrade:
         enabled: true
