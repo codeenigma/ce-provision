@@ -41,6 +41,7 @@ ldap_server:
     # reload_command: restart
     # reload:
     #   - slapd
+    # on_calendar: "Mon *-*-* 04:00:00"
   replication:
     host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
     port: "636"
