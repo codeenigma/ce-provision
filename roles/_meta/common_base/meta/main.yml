@@ -51,5 +51,6 @@ dependencies:
         enabled: true
         command: "/home/{{ ce_provision.username }}/ansible/bin/python3 -m pip install --upgrade ansible"
         on_calendar: "*-*-* 01:30:00"
+        timer_name: upgrade_ansible
       linters:
         enabled: false
