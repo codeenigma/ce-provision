@@ -19,6 +19,7 @@ ce_ansible:
     enabled: true # create systemd timer to auto-upgrade Ansible
     command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade ansible" # if you set venv_path above then set it here too
     on_calendar: "*-*-* 01:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+    #timer_name: upgrade_ansible
   linters:
     enabled: true # will not install linters if false, installing linters breaks cloud-init
 
