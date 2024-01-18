@@ -1,0 +1,5 @@
+---
+swap:
+  count: 2048
+  size: "4G"
+  swap_space: swapfile

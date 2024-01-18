@@ -1,0 +1,44 @@
+---
+- name: Set swap_file variable.
+  ansible.builtin.set_fact:
+    swap_file: "/{{ swap.swap_space }}.swap"
+
+- name: Check if swap file exists.
+  ansible.builtin.stat:
+    path: "{{ swap_file }}"
+  register: swap_file_check
+
+- name: Create swap file.
+  ansible.builtin.command:
+    cmd: fallocate -l {{ swap.size }} {{ swap_file }}
+  when: not swap_file_check.stat.exists
+
+- name: Create swap space.
+  ansible.builtin.command:
+    cmd: dd if=/dev/zero of={{ swap_file }} bs=1M count={{ swap.count }}
+  when: not swap_file_check.stat.exists
+
+- name: Set permissions on swap file.
+  ansible.builtin.file:
+    path: "{{ swap_file }}"
+    mode: 0600
+
+- name: Format swap file.
+  ansible.builtin.command:
+    cmd: mkswap {{ swap_file }}
+  when: not swap_file_check.stat.exists
+
+- name: Add to fstab.
+  ansible.builtin.lineinfile:
+    path: '/etc/fstab'
+    regexp: '^{{ swap_file }}'
+    line: "{{ swap_file }} none swap sw 0 0"
+
+- name: Turn on swap.
+  ansible.builtin.command:
+    cmd: swapon -a
+
+- name: Set swapiness.
+  ansible.posix.sysctl:
+    name: vm.swappiness
+    value: "1"
