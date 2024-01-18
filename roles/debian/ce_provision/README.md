@@ -16,6 +16,7 @@ ce_provision:
   venv_path: "/home/{{ _ce_provision.username }}/ansible"
   venv_command: /usr/bin/python3 -m venv
   install_username: "{{ _ce_provision.username }}"
+  upgrade_timer_name: upgrade_ce_provision_ansible
   # Other ce-provision settings.
   username: "{{ _ce_provision.username }}"
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
