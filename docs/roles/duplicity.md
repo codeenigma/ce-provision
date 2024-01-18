@@ -32,7 +32,7 @@ duplicity:
   install_dir: "/opt/duplicity"
   mail_recipient: "foo@bar.com"
   retention_period: "12M"
-  schedule: "0 0 * * *"
+  schedule: "0 0 * * *" # make this an empty string to not provide a cron job at all
 
 ```
 
