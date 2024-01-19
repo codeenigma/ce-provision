@@ -70,7 +70,7 @@
 
 - name: Build systemd timer variables.
   ansible.builtin.set_fact:
-    _timer: {"{{ ce_ansible.upgrade.timer_name | default(_ce_ansible_timer_name) }}": { timer_command: "{{ ce_ansible.upgrade.command }}", timer_OnCalendar: "{{ ce_ansible.upgrade.on_calendar }}" }}
+    _timer: "{'{{ ce_ansible.upgrade.timer_name | default(_ce_ansible_timer_name) }}': { timer_command: '{{ ce_ansible.upgrade.command }}', timer_OnCalendar: '{{ ce_ansible.upgrade.on_calendar }}' }}"
 
 - name: Create systemd timer to upgrade Ansible.
   ansible.builtin.include_role:
