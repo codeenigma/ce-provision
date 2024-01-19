@@ -68,12 +68,17 @@
     content: "export PATH=$PATH:{{ ce_ansible.venv_path | default(_venv_path) }}/bin"
     dest: "/etc/profile.d/ansible-path.sh"
 
+- name: Build systemd timer variables string.
+  ansible.builtin.set_fact:
+    _timer: "{'{{ ce_ansible.upgrade.timer_name | default(_ce_ansible_timer_name) }}': { timer_command: '{{ ce_ansible.upgrade.command }}', timer_OnCalendar: '{{ ce_ansible.upgrade.on_calendar }}' }}"
+
+- name: Turn the timer string into a dictionary.
+  ansible.builtin.set_fact:
+    _timer: "{{ _timer.splitlines()|map('from_yaml')|list }}"
+
 - name: Create systemd timer to upgrade Ansible.
   ansible.builtin.include_role:
     name: contrib/systemd_timers
   vars:
-    timers:
-      upgrade_ansible:
-        timer_command: "{{ ce_ansible.upgrade.command }}"
-        timer_OnCalendar: "{{ ce_ansible.upgrade.on_calendar }}"
+    timers: "{{ _timer }}"
   when: ce_ansible.upgrade.enabled
