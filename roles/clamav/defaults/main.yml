@@ -7,7 +7,8 @@ clamav:
   # cron_day: "*"
   # cron_weekday: "0" # 0-6 for Sunday-Saturday
   scripts_location: /usr/local/clamav/script
-  log_location: /usr/local/clamav/log
+  log_location: /var/log/clamav
+  log_name: clamav.log
   send_mail: false # Important: will not send any emails by default.
   send_on_fail: true # Only sends emails on scan failure, will not email for successful scans.
   report_recipient_email: mail@example.com
