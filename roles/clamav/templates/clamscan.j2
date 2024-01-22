@@ -1,7 +1,7 @@
 #!/bin/bash
 SUBJECT="{{ clamav.server_name }} PASSED SCAN"
 EMAIL="{{ clamav.report_recipient_email }}"
-LOG={{ clamav.log_location }}/clamav.log
+LOG={{ clamav.log_location }}/{{ clamav.log_name }}
 TMP_LOG=/tmp/clam.daily
 
 rm -rf ${TMP_LOG}
