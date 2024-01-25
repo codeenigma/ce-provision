@@ -159,8 +159,12 @@
       - pyopenssl
     virtualenv: "{{ _venv_path }}"
     virtualenv_command: "{{ _venv_command }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
+
+- name: Ensure Ansible venv permissions.
+  ansible.builtin.file:
+    path: "{{ _venv_path }}"
+    owner: "{{ ce_provision.username }}"
+    group: "{{ ce_provision.username }}"
 
 - name: Add Python virtual environment to $PATH.
   ansible.builtin.copy:
