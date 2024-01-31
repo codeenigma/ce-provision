@@ -1,3 +1,4 @@
+---
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
     profile: "{{ aws_cloudfront_distribution.aws_profile }}"
