@@ -14,7 +14,7 @@
     purge_origins: "{{ aws_cloudfront_distribution.purge_existing }}"
     purge_aliases: "{{ aws_cloudfront_distribution.purge_existing }}"
     purge_tags: "{{ aws_cloudfront_distribution.purge_existing }}"
-    logging: "{{ aws_cloudfront_distribution.logging }}"
+    logging: "{{ aws_cloudfront_distribution.logging | default('') }}"
     purge_cache_behaviors: "{{ aws_cloudfront_distribution.purge_existing }}"
     enabled: "{{ aws_cloudfront_distribution.enabled }}"
   register: _aws_cloudfront_distribution
