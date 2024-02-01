@@ -1,7 +1,7 @@
 ---
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ certificate_domain:{ 'certificate': ssl.cert, 'key': ssl.key } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({certificate_domain: {'certificate': ssl.cert, 'key': ssl.key}}) }}"
   with_items: "{{ _ssl_domains }}"
   loop_control:
     loop_var: certificate_domain

@@ -1,8 +1,10 @@
+---
 - name: Define dict for rules
   ansible.builtin.set_fact:
     acl_rules: []
 
 - name: Set IP allow rule
+  when: cf_acl.ip_allow is defined
   block:
     - name: Create IP allow set for WAF
       community.aws.wafv2_ip_set:
@@ -33,21 +35,10 @@
     - name: Add rule to list
       ansible.builtin.set_fact:
         acl_rules: "{{ acl_rules + ip_allow_rule }}"
-  when: cf_acl.ip_allow is defined
 
 - name: Set IP block rule
+  when: cf_acl.cc_block_list is defined
   block:
-    - name: Create IP block set for WAF
-      community.aws.wafv2_ip_set:
-        name: "{{ cf_acl.ip_block.name }}"
-        state: present
-        description: Set of blocked IPs
-        scope: "{{ cf_acl.scope }}"
-        region: "{{ cf_acl.region }}"
-        ip_address_version: IPV4
-        addresses: "{{ cf_acl.ip_block.list }}"
-      register: ip_set_info
-
     - name: Create IP block rule
       ansible.builtin.set_fact:
         ip_block_rule:
@@ -60,21 +51,16 @@
               cloud_watch_metrics_enabled: true
               metric_name: block_countries
             statement:
-              geo_match_statement: # Can't find the actual name, I got this from aws rule JSON formated
+              geo_match_statement:
                 country_codes: "{{ cf_acl.cc_block_list }}"
 
     - name: Add rule to list
       ansible.builtin.set_fact:
-        acl_rules: "{{ acl_rules + ip_block_rule}}"
-  when: cf_acl.ip_block is defined
+        acl_rules: "{{ acl_rules + ip_block_rule }}"
 
-# Workaround for rate limit rule in ACL (any variable gets interpreted as string instead of int)
 - name: Set rate limit variable
+  when: rate_limit is defined
   block:
-    - name: Define r_limit to avoid issues
-      ansible.builtin.set_fact:
-        r_limit: "{{ rate_limit | int }}"
-
     - name: Define rate rule
       ansible.builtin.set_fact:
         rate_rule:
@@ -93,8 +79,7 @@
 
     - name: Add rule to list
       ansible.builtin.set_fact:
-        acl_rules: "{{ acl_rules + rate_rule}}"
-  when: rate_limit is defined
+        acl_rules: "{{ acl_rules + rate_rule }}"
 
 - name: Create web acl
   community.aws.wafv2_web_acl:
