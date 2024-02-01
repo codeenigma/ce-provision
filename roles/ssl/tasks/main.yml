@@ -9,7 +9,7 @@
 
 - name: Catch legacy implementations with ssl.domain set. # @todo: this can be removed in a later release
   ansible.builtin.set_fact:
-    _ssl_domains: "{{ [ ssl.domain ] }}"
+    _ssl_domains: "{{ [ssl.domain] }}"
   when: ssl.domain is defined
 
 - name: Generates SSL keys.

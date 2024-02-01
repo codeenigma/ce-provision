@@ -27,7 +27,7 @@
     description: "{{ aws_rds.db_parameter_group_description }}"
     engine: "{{ aws_rds.db_parameter_group_engine }}"
     params: "{{ aws_rds.db_parameters }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
   when:
     - aws_rds.db_parameters is defined
     - aws_rds.db_parameters | length > 0
@@ -43,7 +43,7 @@
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name ) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
@@ -63,7 +63,7 @@
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-reader' }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name + '-reader'}) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
@@ -96,7 +96,7 @@
     max_allocated_storage: "{{ aws_rds.max_allocated_storage }}"
     vpc_security_group_ids: "{{ _aws_rds_security_group_ids }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
     allow_major_version_upgrade: false
     storage_encrypted: "{{ aws_rds.storage_encrypted }}"
     apply_immediately: true
@@ -196,7 +196,7 @@
 
 - name: Add instance info.
   ansible.builtin.set_fact:
-    aws_rds_facts: "{{ aws_rds_facts | combine( {aws_rds.name: _rds_instance_info} ) }}"
+    aws_rds_facts: "{{ aws_rds_facts | combine({aws_rds.name: _rds_instance_info}) }}"
 
 - name: Assign resource to backup plan.
   ansible.builtin.include_role:
