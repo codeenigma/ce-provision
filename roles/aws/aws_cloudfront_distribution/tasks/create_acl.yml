@@ -37,8 +37,8 @@
         acl_rules: "{{ acl_rules + ip_allow_rule }}"
 
 - name: Set IP block rule
-  block:
   when: cf_acl.cc_block_list is defined
+  block:
     - name: Create IP block rule
       ansible.builtin.set_fact:
         ip_block_rule:
@@ -59,8 +59,8 @@
         acl_rules: "{{ acl_rules + ip_block_rule }}"
 
 - name: Set rate limit variable
-  block:
   when: rate_limit is defined
+  block:
     - name: Define rate rule
       ansible.builtin.set_fact:
         rate_rule:
