@@ -1,7 +1,8 @@
 ---
 # Uncomment cf_acl to create firewall rules for Cloudfront distro
+#rate_limit: 600 # rate_limit needs to be standalone variable to avoid casting issues (it will be considrate as string instead of int)
 #cf_acl:
-#  rate_limit: 600
+#  acl_name: "dummy_master_acl"
 #  scope: "CLOUDFRONT" # Can be "REGIONAL"
 #  region: "us-east-1" # If scope is set to CLOUDFRONT, region must be us-east-1, even though docs say it will be skipped
 #
