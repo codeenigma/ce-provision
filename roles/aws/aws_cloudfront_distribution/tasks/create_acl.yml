@@ -97,4 +97,4 @@
 #      A: B
 #      C: D
     state: present
-  register: created_acl
+  register: _created_acl
