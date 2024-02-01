@@ -1,3 +1,4 @@
+---
 - name: Define dict for rules
   ansible.builtin.set_fact:
     acl_rules: []
