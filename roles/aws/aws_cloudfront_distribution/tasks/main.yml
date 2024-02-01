@@ -1,7 +1,7 @@
 ---
 - name: Create web acl if defined
   ansible.builtin.include_tasks: create_acl.yml
-  when: cf_acl is defined
+  when: aws_cloudfront_distribution.cf_acl is defined
 
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
