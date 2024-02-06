@@ -1,0 +1,21 @@
+location / {
+    try_files $uri /app_{{ symfony_env }}.php$is_args$args;
+}
+
+# Prod only
+location ~ ^/(app_dev|config)\.php(/|$) {
+  fastcgi_pass {{ nginx.php_fastcgi_backend }};
+  fastcgi_split_path_info ^(.+\.php)(/.*)$;
+  include fastcgi_params;
+  fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+  fastcgi_param DOCUMENT_ROOT $realpath_root;
+  internal;
+}
+
+location ~ \.php(/|$) {
+  fastcgi_pass {{ nginx.php_fastcgi_backend }};
+  fastcgi_split_path_info ^(.+\.php)(/.*)$;
+  include fastcgi_params;
+  fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+  fastcgi_param DOCUMENT_ROOT $realpath_root;
+}
