@@ -64,6 +64,7 @@
     - proxy
     - simplesamlphp
     - symfony3
+    - symfony3_prod
     - symfony4
     - wordpress
 
