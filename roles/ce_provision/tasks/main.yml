@@ -171,7 +171,7 @@
     repo: https://github.com/wazuh/wazuh-ansible.git
     dest: "{{ ce_provision.galaxy_roles_directory }}/wazuh-ansible"
     update: true
-    version: "v4.7.1"
+    version: "v4.7.2"
   become: true
   become_user: "{{ ce_provision.username }}"
   when: ce_provision.galaxy_roles_directory | length > 0
