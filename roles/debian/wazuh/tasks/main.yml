@@ -1,8 +1,25 @@
 ---
-# Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles.
+# Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles
+- name: Set the Wazuh version branch for the playbooks and roles.
+  ansible.builtin.git:
+    repo: https://github.com/wazuh/wazuh-ansible.git
+    dest: "{{ wazuh.roles_directory | default('/home/' + user_provision.username + '/.ansible/roles/wazuh-ansible') }}"
+    version: "{{ wazuh.branch }}"
+  become: true
+  become_user: "{{ user_provision.username }}"
+  delegate_to: localhost
+
+- name: Import elastic-stack.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/elastic-stack/ansible-kibana
+
+- name: Import opendistro.
+  ansible.builtin.import_role:
+    name: wazuh-ansible/roles/opendistro/opendistro-kibana
+
 - name: Generate certificates.
   ansible.builtin.import_role:
-    name: contrib/wazuh/wazuh-indexer
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
   delegate_to: localhost
   vars:
     indexer_node_master: "{{ wazuh.indexer.indexer_node_master }}"
@@ -13,7 +30,7 @@
 
 - name: Install Wazuh indexer.
   ansible.builtin.import_role:
-    name: contrib/wazuh/wazuh-indexer
+    name: wazuh-ansible/roles/wazuh/wazuh-indexer
   vars:
     single_node: "{{ wazuh.indexer.single_node }}"
     domain_name: "{{ wazuh.indexer.domain_name }}"
@@ -41,7 +58,7 @@
 
 - name: Install Wazuh Manager.
   ansible.builtin.import_role:
-    name: contrib/wazuh/ansible-wazuh-manager
+    name: wazuh-ansible/roles/wazuh/ansible-wazuh-manager
   vars:
     wazuh_manager_mailto: "{{ wazuh.manager.wazuh_manager_mailto }}"
     wazuh_manager_email_smtp_server: "{{ wazuh.manager.wazuh_manager_email_smtp_server }}"
@@ -54,24 +71,25 @@
     wazuh_manager_extra_emails: "{{ wazuh.manager.wazuh_manager_extra_emails }}"
     wazuh_manager_reports: "{{ wazuh.manager.wazuh_manager_reports }}"
     wazuh_manager_api: "{{ wazuh.manager.wazuh_manager_api }}"
+    agent_groups: "{{ wazuh.manager.agent_groups }}"
   when: wazuh.manager.install
 
 - name: Install Filebeat.
   ansible.builtin.import_role:
-    name: contrib/wazuh/ansible-filebeat-oss
+    name: wazuh-ansible/roles/wazuh/ansible-filebeat-oss
   vars:
     filebeat_version: "{{ wazuh.filebeat.filebeat_version }}"
     filebeat_node_name: "{{ wazuh.filebeat.filebeat_node_name }}"
     filebeat_output_indexer_hosts: "{{ wazuh.filebeat.filebeat_output_indexer_hosts }}"
     filebeat_module_package_url: "{{ wazuh.filebeat.filebeat_module_package_url }}"
     filebeat_module_package_name: "{{ wazuh.filebeat.filebeat_module_package_name }}"
-    indexer_security_user: "{{ wazuh.indexer.indexer_custom_user | default('admin') }}"
+    indexer_security_user: "{{ wazuh.filebeat.indexer_security_user | default('admin') }}"
     indexer_security_password: "{{ wazuh.indexer.indexer_admin_password }}"
   when: wazuh.filebeat.install
 
 - name: Install Wazuh dashboard.
   ansible.builtin.import_role:
-    name: contrib/wazuh/wazuh-dashboard
+    name: wazuh-ansible/roles/wazuh/wazuh-dashboard
   vars:
     dashboard_node_name: "{{ wazuh.dashboard.dashboard_node_name }}"
     dashboard_server_host: "{{ wazuh.dashboard.dashboard_server_host }}"
@@ -81,6 +99,7 @@
     dashboard_security: "{{ wazuh.dashboard.dashboard_security }}"
     dashboard_user: "{{ wazuh.dashboard.dashboard_user }}"
     dashboard_password: "{{ wazuh.dashboard.dashboard_password }}"
+    indexer_admin_password: "{{ wazuh.indexer.indexer_admin_password }}"
     indexer_http_port: "{{ wazuh.indexer.indexer_http_port }}"
     indexer_api_protocol: "{{ wazuh.indexer.indexer_api_protocol }}"
     ansible_shell_allow_world_readable_temp: true
@@ -88,7 +107,7 @@
 
 - name: Install Wazuh agent.
   ansible.builtin.import_role:
-    name: contrib/wazuh/ansible-wazuh-agent
+    name: wazuh-ansible/roles/wazuh/ansible-wazuh-agent
   vars:
     wazuh_managers: "{{ wazuh.agent.managers }}"
     wazuh_agent_enrollment:
@@ -97,5 +116,8 @@
       groups: "{{ wazuh.agent.wazuh_agent_enrollment.groups }}"
       agent_address: "{{ wazuh.agent.wazuh_agent_enrollment.agent_address }}"
       ssl_ciphers: "{{ wazuh.agent.wazuh_agent_enrollment.ssl_ciphers }}"
+      wazuh_custom_packages_installation_agent_enabled: false
     ansible_shell_allow_world_readable_temp: true
-  when: wazuh.agent.install
+    wazuh_agent_sources_installation:
+      enabled: true
+  when: wazuh.agent.install and not wazuh_agent_sources_installation.enabled
