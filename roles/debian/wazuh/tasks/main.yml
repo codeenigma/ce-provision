@@ -4,9 +4,13 @@
   ansible.builtin.set_fact:
     wazuh_items: "{{ ce_provision.contrib_roles | selectattr('repo', 'equalto', 'https://github.com/wazuh/wazuh-ansible.git') | list }}"
 
-- name: Set wazuh path
+- name: Debug print wazuh_items
+  ansible.builtin.debug:
+    msg: "{{ wazuh_items }}"
+
+- name: Set wazuh path based on matching repo
   ansible.builtin.set_fact:
-    wazuh_path: "{{ wazuh_items.directory }}"
+    wazuh_path: "{{ wazuh_items | map(attribute='directory') | first }}"
   when: wazuh_items | length > 0
 
 - name: Include task to install based on selected items
