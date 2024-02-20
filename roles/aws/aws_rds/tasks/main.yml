@@ -43,7 +43,7 @@
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name ) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
