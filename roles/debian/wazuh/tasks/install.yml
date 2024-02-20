@@ -1,10 +1,10 @@
 - name: Import elastic-stack.
   ansible.builtin.import_role:
-    name: "contrib/{{ wazuh_path }}/roles/elastic-stack/ansible-kibana"
+    name: "contrib/{{ _wazuh_path }}/roles/elastic-stack/ansible-kibana"
 
 - name: Import opendistro.
   ansible.builtin.import_role:
-    name: "contrib/{{ wazuh_path }}/roles/opendistro/opendistro-kibana"
+    name: "contrib/{{ _wazuh_path }}/roles/opendistro/opendistro-kibana"
 
 - name: Generate certificates.
   ansible.builtin.import_role:
