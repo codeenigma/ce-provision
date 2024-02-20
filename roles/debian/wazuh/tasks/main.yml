@@ -1,14 +1,18 @@
 ---
 # Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles
 - name: Select items with URL https://github.com/wazuh/wazuh-ansible.git
-  set_fact:
+  ansible.builtin.set_fact:
     wazuh_items: "{{ ce_provision.contrib_roles | selectattr('repo', 'equalto', 'https://github.com/wazuh/wazuh-ansible.git') | list }}"
 
-- name: Set wazuh path
-  set_fact:
-    wazuh_path: "{{ wazuh_items.directory }}"
+- name: Debug print wazuh_items
+  ansible.builtin.debug:
+    msg: "{{ wazuh_items }}"
+
+- name: Set wazuh path based on matching repo
+  ansible.builtin.set_fact:
+    wazuh_path: "{{ wazuh_items | map(attribute='directory') | first }}"
   when: wazuh_items | length > 0
 
 - name: Include task to install based on selected items
-  include_tasks: install.yml
+  ansible.builtin.include_tasks: install.yml
   when: wazuh_items | length > 0
