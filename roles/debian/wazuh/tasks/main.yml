@@ -1,13 +1,5 @@
 ---
 # Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles
-- name: Set the Wazuh version branch for the playbooks and roles.
-  ansible.builtin.git:
-    repo: https://github.com/wazuh/wazuh-ansible.git
-    dest: "{{ wazuh.roles_directory | default('/home/' + user_provision.username + '/.ansible/roles/wazuh-ansible') }}"
-    version: "{{ wazuh.branch }}"
-  become: true
-  become_user: "{{ user_provision.username }}"
-  delegate_to: localhost
 
 - name: Import elastic-stack.
   ansible.builtin.import_role:
