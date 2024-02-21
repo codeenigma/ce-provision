@@ -1,4 +1,8 @@
 ---
+- name: Version check.
+  ansible.builtin.debug:
+    msg: "Using ce-provision {{ _init.ce_provision_version }}"
+
 - name: Check OS family.
   when: ansible_os_family != "Debian"
   block:
