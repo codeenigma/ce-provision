@@ -29,3 +29,9 @@
         timer_command: "{{ clamav.scripts_location }}/clamscan"
         timer_OnCalendar: "{{ clamav.on_calendar }}"
   when: clamav.create_timer
+
+- name: Install clamdscan.
+  ansible.builtin.apt:
+    pkg: clamdscan
+    state: present
+  when: clamav.install_clamdscan
