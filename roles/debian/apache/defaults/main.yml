@@ -58,8 +58,10 @@ apache:
       is_default: true
       basic_auth:
         auth_enabled: false
+        auth_file: ""  # optionally provide the path on the deploy server to a htpasswd file - WARNING - it must be valid and will not be checked!
         auth_user: "hello"
-        auth_pass: "P3nguin!"
+        auth_pass: "P3nguin!" # if no password is provided one will be generated automatically and displayed in the build output.
+        auth_message: "Restricted content"
       servers:
         - port: 80
           ssl: false
