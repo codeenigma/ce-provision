@@ -24,6 +24,7 @@ clamav:
   scan_location: /
   exclude_directories:
     - /sys/
+  install_clamdscan: false # flag to install additional 'clamdscan' package
 
 ```
 

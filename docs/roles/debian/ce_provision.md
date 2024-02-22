@@ -37,7 +37,7 @@ ce_provision:
   contrib_roles:
     - directory: wazuh
       repo: https://github.com/wazuh/wazuh-ansible.git
-      branch: stable
+      branch: "v4.7.2"
     - directory: systemd_timers
       repo: https://github.com/vlcty/ansible-systemd-timers.git
       branch: master
