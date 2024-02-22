@@ -70,7 +70,16 @@
     - domain.basic_auth.auth_pass is defined
     - domain.basic_auth.auth_pass | length > 0
 
-- name: Create basic htauth files.
+- name: Print basic htauth password.
+  ansible.builtin.debug:
+    msg: Basic auth password is {{ _nginx_htauth_pass }}
+  when:
+    - domain.basic_auth.auth_enabled is defined
+    - domain.basic_auth.auth_enabled
+    - _nginx_htauth_pass is defined
+
+# Create a basic htauth file if a username is supplied.
+- name: Create basic htauth file.
   community.general.web_infrastructure.htpasswd:
     path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
     name: "{{ domain.basic_auth.auth_user }}"
@@ -81,14 +90,22 @@
   when:
     - domain.basic_auth.auth_enabled is defined
     - domain.basic_auth.auth_enabled
+    - domain.basic_auth.auth_user is defined
+    - domain.basic_auth.auth_user | length > 0
 
-- name: Print basic htauth password.
-  ansible.builtin.debug:
-    msg: Basic auth password is {{ _nginx_htauth_pass }}
+# Place provided basic htauth file if a path is supplied.
+- name: Copy basic htauth file to server.
+  ansible.builtin.copy:
+    src: "{{ domain.basic_auth.auth_file }}"
+    dest: "/etc/nginx/passwords/{{ domain.server_name }}.provided.htpasswd"
+    owner: root
+    group: root
+    mode: 0644
   when:
     - domain.basic_auth.auth_enabled is defined
     - domain.basic_auth.auth_enabled
-    - _nginx_htauth_pass is defined
+    - domain.basic_auth.auth_file is defined
+    - domain.basic_auth.auth_file | length > 0
 
 - name: Copy vhost in place.
   ansible.builtin.template:
