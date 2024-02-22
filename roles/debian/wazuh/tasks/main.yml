@@ -13,6 +13,13 @@
     _wazuh_path: "{{ _wazuh_items | map(attribute='directory') | first }}"
   when: _wazuh_items | length > 0
 
+- name: Debug _wazuh_path before including install.yml
+  ansible.builtin.debug:
+    msg: "The value of _wazuh_path is: '{{ _wazuh_path | default('Not set') }}'"
+
 - name: Include task to install based on selected items
   ansible.builtin.include_tasks: install.yml
+    file: install.yml
+  vars:
+    _wazuh_path: "{{ _wazuh_path }}"
   when: _wazuh_items | length > 0
