@@ -18,7 +18,7 @@
     msg: "The value of _wazuh_path is: '{{ _wazuh_path | default('Not set') }}'"
 
 - name: Include task to install based on selected items
-  ansible.builtin.include_tasks: install.yml
+  ansible.builtin.include_tasks:
     file: install.yml
   vars:
     _wazuh_path: "{{ _wazuh_path }}"
