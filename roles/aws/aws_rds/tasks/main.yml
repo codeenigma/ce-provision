@@ -1,3 +1,4 @@
+---
 - name: Create DB subnet group.
   amazon.aws.rds_subnet_group:
     name: "{{ aws_rds.name }}"
@@ -24,16 +25,16 @@
 
 - name: Create Aurora RDS instance.
   amazon.aws.rds_instance:
-    db_instance_identifier: "{{ aws_rds.name }}"
+    db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_suffix }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
-    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_cluster_identifier: "{{ aws_rds.name }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-' + aws_rds.aurora_suffix }) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
@@ -44,8 +45,8 @@
 
 - name: Create Aurora RDS reader instance.
   amazon.aws.rds_instance:
-    db_instance_identifier: "{{ aws_rds.name }}-reader"
-    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_reader_suffix }}"
+    db_cluster_identifier: "{{ aws_rds.name }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
     state: "{{ aws_rds.state }}"
@@ -53,7 +54,7 @@
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-reader' }) }}"
+    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-' + aws_rds.aurora_reader_suffix }) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
