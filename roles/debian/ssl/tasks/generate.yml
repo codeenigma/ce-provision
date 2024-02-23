@@ -2,8 +2,20 @@
 - name: Check if we have an existing SSL key.
   ansible.builtin.stat:
     path: "{{ ssl_facts[certificate_domain].key }}"
-  register: ssl_key
+  register: _ssl_key
+
+- name: Delete existing SSL key.
+  ansible.builtin.file:
+    path: "{{ ssl_facts[certificate_domain].key }}"
+    state: absent
+  when: ssl.replace_existing
+
+- name: Delete existing SSL cert.
+  ansible.builtin.file:
+    path: "{{ ssl_facts[certificate_domain].certificate }}"
+    state: absent
+  when: ssl.replace_existing
 
 - name: Generates a new key/cert.
   ansible.builtin.command: "openssl req -new -newkey rsa:4096 -days 365 -nodes -x509 -subj '/C=GB/ST=Test/L=London/O=CodeEnigma/OU=Test/CN={{ certificate_domain }}' -keyout {{ ssl_facts[certificate_domain].key }} -out {{ ssl_facts[certificate_domain].certificate }}"
-  when: not ssl_key.stat.exists
+  when: not _ssl_key.stat.exists or ssl.replace_existing
