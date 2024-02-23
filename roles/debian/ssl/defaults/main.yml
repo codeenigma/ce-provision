@@ -24,6 +24,8 @@ ssl:
     79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
     6XoQQlb5mYuLKCzAZws9uceeVH+z
     -----END PRIVATE KEY-----
+  # Set this to true to have Ansible replace the existing certificate.
+  replace_existing: false
 
   # For "letsencrypt" handling.
   email: admin@example.com

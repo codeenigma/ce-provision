@@ -1,10 +1,11 @@
 # SSL
-Manages SSL certificates.
+Manages SSL certificates on servers. See the `aws/aws_acm` role for SSL handling in AWS services.
 
 <!--TOC-->
 <!--ENDTOC-->
 
-If you are using LetsEncrypt for handling it assume `standalone` mode. If you want to do DNS validation, please do not use this role at this time. There are a few pre-requisites for `standalone` mode to work:
+## LetsEncrypt
+If you are using LetsEncrypt for handling it assumes `standalone` mode. If you want to do DNS validation, please do not use this role at this time. There are a few pre-requisites for `standalone` mode to work:
 
 * You must have firewalls open to allow traffic to ports 80 and/or 443, regardless of your configuration
 * LetsEncrypt's certbot application will try to use port 80, if this will not be possible you can either:
@@ -72,6 +73,8 @@ ssl:
     79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
     6XoQQlb5mYuLKCzAZws9uceeVH+z
     -----END PRIVATE KEY-----
+  # Set this to true to have Ansible replace the existing certificate.
+  replace_existing: false
 
   # For "letsencrypt" handling.
   email: admin@example.com
