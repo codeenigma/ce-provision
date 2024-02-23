@@ -14,6 +14,7 @@ _init:
   # This is used to detect if the playbook must re-run or not.
   vars_dirs: []
   force_play: false
+  ce_provision_version: 2.x # Outputted by the _init role at the start of plays.
 
   # Although these variables logically belong with ce_provision, the _init role needs to
   # gather the extra variables if there are any, so there are _init variables.
