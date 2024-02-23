@@ -12,7 +12,10 @@ aws_rds:
   state: present
   description: example
   engine: mariadb
+  # In an Aurora cluster reader and writer can swap role at any time, so by default we name them 'blue' and 'green'
+  aurora_suffix: blue # appended to cluster name to create a unique instance name for the first (initially write) instance
   aurora_reader: false # If true, an Aurora reader instance will be created.
+  aurora_reader_suffix: green # appended to cluster name to create unique instance name for the second (initially read-only) instance - must not match aurora_suffix
   # engine_version: '5.7.2' # Omit to use latest.
   # See parameter group docs: https://docs.ansible.com/ansible/latest/collections/community/aws/rds_param_group_module.html
   # db_parameter_group_name: "example" # Omit to use default
