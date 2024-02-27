@@ -1,0 +1,100 @@
+---
+- name: Define dict for rules
+  ansible.builtin.set_fact:
+    acl_rules: []
+
+- name: Set IP allow rule
+  when: aws_cloudfront_distribution.cf_acl.ip_allow is defined
+  block:
+    - name: Create IP allow set for WAF
+      community.aws.wafv2_ip_set:
+        name: "{{ aws_cloudfront_distribution.cf_acl.ip_allow.name }}"
+        state: present
+        description: Set of allowed IPs
+        scope: "{{ aws_cloudfront_distribution.cf_acl.scope }}"
+        region: "{{ aws_cloudfront_distribution.cf_acl.region }}"
+        ip_address_version: IPV4
+        addresses: "{{ aws_cloudfront_distribution.cf_acl.ip_allow.list }}"
+      register: ip_set_info
+
+    - name: Create IP allow rule
+      ansible.builtin.set_fact:
+        ip_allow_rule:
+        - name: allow_ips
+          priority: 0
+          action:
+            allow: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: Allow_IPs
+          statement:
+            ip_set_reference_statement:
+              arn: "{{ ip_set_info.arn }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        acl_rules: "{{ acl_rules + ip_allow_rule }}"
+
+- name: Set block countries rule
+  when: aws_cloudfront_distribution.cf_acl.cc_block_list is defined
+  block:
+    - name: Create IP block rule
+      ansible.builtin.set_fact:
+        block_countries_rule:
+          - name: block_countries
+            priority: 1
+            action:
+              block: {}
+            visibility_config:
+              sampled_requests_enabled: true
+              cloud_watch_metrics_enabled: true
+              metric_name: block_countries
+            statement:
+              geo_match_statement:
+                country_codes: "{{ aws_cloudfront_distribution.cf_acl.cc_block_list }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        acl_rules: "{{ acl_rules + block_countries_rule }}"
+
+- name: Set rate limit variable
+  when: _cf_acl_rate_limit is defined
+  block:
+    - name: Define rate rule
+      ansible.builtin.set_fact:
+        rate_rule:
+        - name: rate_limit
+          priority: 2
+          action:
+            block: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: rate_limit
+          statement:
+            rate_based_statement:
+              limit: "{{ _cf_acl_rate_limit }}"
+              aggregate_key_type: IP
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        acl_rules: "{{ acl_rules + rate_rule }}"
+
+- name: Create web acl
+  community.aws.wafv2_web_acl:
+    name: "{{ aws_cloudfront_distribution.cf_acl.acl_name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
+    description: "WAF protecting the {{ _domain_name }}"
+    scope: "{{ aws_cloudfront_distribution.cf_acl.scope }}"
+    region: "{{ aws_cloudfront_distribution.cf_acl.region }}"
+    default_action: Allow # or "Block"
+    sampled_requests: false
+    cloudwatch_metrics: true # or "false" to disable metrics
+    metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
+    rules: "{{ acl_rules }}"
+    purge_rules: true
+#    tags:
+#      A: B
+#      C: D
+    state: present
+  register: _created_acl
