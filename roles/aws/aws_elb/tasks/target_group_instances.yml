@@ -9,4 +9,4 @@
 
 - name: Add instance to target group list.
   ansible.builtin.set_fact:
-    _targets: "{{ _targets + [ {'Id': _aws_ec2_target_group_instance.instances[0].instance_id, 'Port': target_group.targets_port} ] }}"
+    _targets: "{{ _targets + [{'Id': _aws_ec2_target_group_instance.instances[0].instance_id, 'Port': target_group.targets_port}] }}"

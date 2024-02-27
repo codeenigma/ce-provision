@@ -8,4 +8,4 @@
 
 - name: Add subnet id to the ids list.
   ansible.builtin.set_fact:
-    _aws_efs_subnets_ids: "{{ _aws_efs_subnets_ids + [ _aws_efs_subnet.subnets[0].subnet_id ] }}"
+    _aws_efs_subnets_ids: "{{ _aws_efs_subnets_ids + [_aws_efs_subnet.subnets[0].subnet_id] }}"
