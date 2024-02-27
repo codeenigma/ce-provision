@@ -27,7 +27,7 @@
 
 - name: Construct final routes list.
   ansible.builtin.set_fact:
-    _aws_vpc_route_new_routes: "{{ _aws_vpc_route_new_routes + [ item.value ] }}"
+    _aws_vpc_route_new_routes: "{{ _aws_vpc_route_new_routes + [item.value] }}"
   with_items: "{{ _aws_vpc_route_routes | dict2items() }}"
 
 - name: Add routes to route table.
