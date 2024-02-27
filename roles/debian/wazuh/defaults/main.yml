@@ -1,5 +1,6 @@
 ---
 wazuh:
+  _wazuh_path: ""
   #roles_directory: "/path/to/roles" # defaults to /home/controller/.ansible/roles/wazuh-ansible
   branch: "v4.7.2" # wazuh-ansible git branch to checkout - not to be confused with wazuh_version!
   # Agent variables, installed locally by default
