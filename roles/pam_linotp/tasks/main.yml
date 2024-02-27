@@ -1,13 +1,13 @@
 ---
 - name: Add key for LinOTP repository.
   ansible.builtin.apt_key:
-    keyserver: http://packages.codeenigma.net/debian/codeenigma.pub
-    id: 77AFCA1C45124FBB2EFCD7267DC594C08E0497D4
+    keyserver: http://packages.codeenigma.com/debian/codeenigma.pub
+    id: A344A0826FD987C6
     state: present
 
 - name: Add repository for LinOTP.
   ansible.builtin.apt_repository:
-    repo: "deb http://packages.codeenigma.net/debian {{ ansible_distribution_release }} main"
+    repo: "deb http://packages.codeenigma.com/debian buster main"
     state: present
 
 - name: Ensure libpam-linotp is installed.
