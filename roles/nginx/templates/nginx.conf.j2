@@ -72,6 +72,14 @@ http {
     {% endfor %}
 {% endif %}
 
+{% if nginx.http_port is defined %}
+        listen {{ nginx.http_port }};
+{% endif %}
+
+{% if nginx.https_port is defined %}
+        listen {{ nginx.https_port }} ssl;
+{% endif %}
+
     ##
     # Virtual Host Configs
     ##
