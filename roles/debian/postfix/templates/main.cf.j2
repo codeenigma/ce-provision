@@ -41,16 +41,16 @@ smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
 {% if postfix.use_ses or postfix.ssl.enabled %}
 smtp_use_tls = yes
 smtp_tls_note_starttls_offer = yes
-smtp_tls_CApath = {{ postix.ssl.smtp_tls_CApath }}
-smtp_tls_CAfile = {{ postix.ssl.smtp_tls_CAfile }}
+smtp_tls_CApath = {{ postfix.ssl.smtp_tls_CApath }}
+smtp_tls_CAfile = {{ postfix.ssl.smtp_tls_CAfile }}
 {% endif %}
 {% if postfix.ssl.enabled %}
-smtp_tls_cert_file = {{ postix.ssl.smtp_tls_cert_file }}
-smtp_tls_key_file = {{ postix.ssl.smtp_tls_key_file }}
-smtpd_tls_cert_file = {{ postix.ssl.smtp_tls_cert_file }}
-smtpd_tls_key_file = {{ postix.ssl.smtp_tls_key_file }}
-smtpd_tls_CApath = {{ postix.ssl.smtp_tls_CApath }}
-smtpd_tls_CAfile = {{ postix.ssl.smtp_tls_CAfile }}
+smtp_tls_cert_file = {{ postfix.ssl.smtp_tls_cert_file }}
+smtp_tls_key_file = {{ postfix.ssl.smtp_tls_key_file }}
+smtpd_tls_cert_file = {{ postfix.ssl.smtp_tls_cert_file }}
+smtpd_tls_key_file = {{ postfix.ssl.smtp_tls_key_file }}
+smtpd_tls_CApath = {{ postfix.ssl.smtp_tls_CApath }}
+smtpd_tls_CAfile = {{ postfix.ssl.smtp_tls_CAfile }}
 {% endif %}
 {% if (is_local is defined) and is_local %}
 # Force all mail to ce-dev user.
