@@ -7,8 +7,6 @@ php:
 symfony_env: "{{ _env_type }}"
 # Nginx variables actually start here.
 nginx:
-  http_port: 80
-  https_port: 443
   # Global default config for nginx.conf.
   user: www-data
   worker_processes: auto
