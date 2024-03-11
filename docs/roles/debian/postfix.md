@@ -42,7 +42,7 @@ postfix:
   ssl:
     enabled: false
     smtp_tls_cert_file: "" # full path to certificate, e.g. /etc/letsencrypt/live/acme.com/fullchain.pem
-    smtp_tls_key_file: "" # full path to key, e.g. /etc/letsencrypt/live/redmine-app1.codeenigma.net/privkey.pem
+    smtp_tls_key_file: "" # full path to key, e.g. /etc/letsencrypt/live/acme.com/privkey.pem
     smtp_tls_CApath: /etc/ssl/certs
     smtp_tls_CAfile: /etc/ssl/certs/ca-certificates.crt
 
