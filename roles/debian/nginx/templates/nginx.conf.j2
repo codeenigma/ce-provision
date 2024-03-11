@@ -66,20 +66,6 @@ http {
 	# Additional Settings
 	##
 
-{% if nginx.http.custom_directives is defined %}
-    {% for directive in nginx.http.custom_directives %}
-    {{ directive }}
-    {% endfor %}
-{% endif %}
-
-{% if nginx.http_port is defined %}
-        listen {{ nginx.http_port }};
-{% endif %}
-
-{% if nginx.https_port is defined %}
-        listen {{ nginx.https_port }} ssl;
-{% endif %}
-
     ##
     # Virtual Host Configs
     ##
