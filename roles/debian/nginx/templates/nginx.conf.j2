@@ -66,6 +66,12 @@ http {
 	# Additional Settings
 	##
 
+{% if nginx.http.custom_directives is defined %}
+    {% for directive in nginx.http.custom_directives %}
+    {{ directive }}
+    {% endfor %}
+{% endif %}
+
     ##
     # Virtual Host Configs
     ##
