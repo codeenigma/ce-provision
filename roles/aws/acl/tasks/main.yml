@@ -2,25 +2,58 @@
   ansible.builtin.set_fact:
     acl_rules: []
 
+- name: Set IP block rule
+  when: acl.ip_block is defined
+  block:
+    - name: Create IP block set for WAF
+      community.aws.wafv2_ip_set:
+        name: "{{ acl.ip_block.name }}"
+        state: present
+        description: Set of blocked IPs
+        scope: "{{ acl.scope }}"
+        region: "{{ acl.region }}"
+        ip_address_version: IPV4
+        addresses: "{{ acl.ip_block.list }}"
+      register: ip_set_info
+
+    - name: Create IP block rule
+      ansible.builtin.set_fact:
+        ip_block_rule:
+        - name: "{{ acl.ip_block.name }}"
+          priority: 0
+          action:
+            block: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: Block_IPs
+          statement:
+            ip_set_reference_statement:
+              arn: "{{ ip_set_info.arn }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        acl_rules: "{{ acl_rules + ip_block_rule }}"
+
 - name: Set IP allow rule
-  when: cf_acl.ip_allow is defined
+  when: acl.ip_allow is defined
   block:
     - name: Create IP allow set for WAF
       community.aws.wafv2_ip_set:
-        name: "{{ cf_acl.ip_allow.name }}"
+        name: "{{ acl.ip_allow.name }}"
         state: present
         description: Set of allowed IPs
-        scope: "{{ cf_acl.scope }}"
-        region: "{{ cf_acl.region }}"
+        scope: "{{ acl.scope }}"
+        region: "{{ acl.region }}"
         ip_address_version: IPV4
-        addresses: "{{ cf_acl.ip_allow.list }}"
+        addresses: "{{ acl.ip_allow.list }}"
       register: ip_set_info
 
     - name: Create IP allow rule
       ansible.builtin.set_fact:
         ip_allow_rule:
-        - name: allow_ips
-          priority: 0
+        - name: "{{ acl.ip_allow.name }}"
+          priority: 1
           action:
             allow: {}
           visibility_config:
@@ -35,25 +68,14 @@
       ansible.builtin.set_fact:
         acl_rules: "{{ acl_rules + ip_allow_rule }}"
 
-- name: Set IP block rule
-  when: cf_acl.ip_block is defined
+- name: Set country block rule
+  when: acl.cc_block_list is defined
   block:
-    - name: Create IP block set for WAF
-      community.aws.wafv2_ip_set:
-        name: "{{ cf_acl.ip_block.name }}"
-        state: present
-        description: Set of blocked IPs
-        scope: "{{ cf_acl.scope }}"
-        region: "{{ cf_acl.region }}"
-        ip_address_version: IPV4
-        addresses: "{{ cf_acl.ip_block.list }}"
-      register: ip_set_info
-
-    - name: Create IP block rule
+    - name: Create country block rule
       ansible.builtin.set_fact:
-        ip_block_rule:
+        cc_block_rule:
           - name: block_countries
-            priority: 1
+            priority: 2
             action:
               block: {}
             visibility_config:
@@ -62,25 +84,21 @@
               metric_name: block_countries
             statement:
               geo_match_statement: # Can't find the actual name, I got this from aws rule JSON formated
-                country_codes: "{{ cf_acl.cc_block_list }}"
+                country_codes: "{{ acl.cc_block_list }}"
 
     - name: Add rule to list
       ansible.builtin.set_fact:
-        acl_rules: "{{ acl_rules + ip_block_rule}}"
+        acl_rules: "{{ acl_rules + cc_block_rule }}"
 
 # Workaround for rate limit rule in ACL (any variable gets interpreted as string instead of int)
 - name: Set rate limit variable
   when: rate_limit is defined
   block:
-    - name: Define r_limit to avoid issues
-      ansible.builtin.set_fact:
-        r_limit: "{{ rate_limit | int }}"
-
     - name: Define rate rule
       ansible.builtin.set_fact:
         rate_rule:
         - name: rate_limit
-          priority: 2
+          priority: 3
           action:
             block: {}
           visibility_config:
@@ -98,10 +116,10 @@
 
 - name: Create web acl
   community.aws.wafv2_web_acl:
-    name: "{{ cf_acl.acl_name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
+    name: "{{ acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
     description: "WAF protecting the {{ _domain_name }}"
-    scope: "{{ cf_acl.scope }}"
-    region: "{{ cf_acl.region }}"
+    scope: "{{ acl.scope }}"
+    region: "{{ acl.region }}"
     default_action: Allow # or "Block"
     sampled_requests: false
     cloudwatch_metrics: true # or "false" to disable metrics
