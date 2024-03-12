@@ -168,11 +168,12 @@
     mode: '0644'
   when: openvpn.tls_cipher | length > 0
 
+# Only works when openvpn.port_choice == '1' because otherwise port will not be 1194 and regexp will not match
 - name: Use FQDN as OpenVPN server remote in client config.
   ansible.builtin.lineinfile:
     path: /etc/openvpn/client-template.txt
-    regexp: '^remote (.*)'
-    line: "remote {{ openvpn.fqdn }}"
+    regexp: '^remote (.*) 1194'
+    line: "remote {{ openvpn.fqdn }} 1194"
     owner: root
     group: root
     mode: '0644'
