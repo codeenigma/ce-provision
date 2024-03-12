@@ -168,6 +168,16 @@
     mode: '0644'
   when: openvpn.tls_cipher | length > 0
 
+- name: Use FQDN as OpenVPN server remote in client config.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/client-template.txt
+    regexp: '^remote (.*) 1194$'
+    line: "remote {{ openvpn.fqdn }}"
+    owner: root
+    group: root
+    mode: '0644'
+  when: openvpn.fqdn | length > 0
+
 - name: Allow FQDN push routes.
   ansible.builtin.lineinfile:
     path: /etc/openvpn/client-template.txt
