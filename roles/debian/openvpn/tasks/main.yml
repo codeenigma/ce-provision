@@ -171,7 +171,7 @@
 - name: Use FQDN as OpenVPN server remote in client config.
   ansible.builtin.lineinfile:
     path: /etc/openvpn/client-template.txt
-    regexp: '^remote (.*) 1194$'
+    regexp: '^remote (.*)'
     line: "remote {{ openvpn.fqdn }}"
     owner: root
     group: root
