@@ -1,7 +1,7 @@
 ### {{ ansible_managed }}
 
 server {
-    listen 80;
+    listen 443;
     server_name {{ domain.server_name }};
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
     access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
