@@ -30,6 +30,10 @@ aws_ami:
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   ssh_username: "admin"
   encrypt_boot: false
+  # EBS volume options
+  device_name: /dev/xvda # default for Debian AMIs
+  volume_type: gp3
+  volume_size: 20
   #vpc_filter: "example" # If defined, Packer will search for a VPC with the `Name` tag of the value given. vpc_id takes precednece over this if both are defined. This also assumes the VPC is not the default and has a CIDR block of /16.
   vpc_filter: ""
   #subnet_filter_az: "a" # If vpc_id and/or vpc_filter are defined, subnet_filter_az MUST be defined and must match an AZ that has public networking.
