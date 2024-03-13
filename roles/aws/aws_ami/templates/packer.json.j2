@@ -21,7 +21,7 @@
           "volume_size": {{ aws_ami.volume_size }},
           "delete_on_termination": true
         }
-      ]
+      ],
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "{{ aws_ami.virtualization_type }}",
