@@ -14,6 +14,14 @@
       "ami_name": "{{ aws_ami.ami_name }}",
       "associate_public_ip_address": true,
       "encrypt_boot": "{{ aws_ami.encrypt_boot }}",
+      "launch_block_device_mappings": [
+        {
+          "device_name": "{{ aws_ami.device_name }}",
+          "volume_type": "{{ aws_ami.volume_type }}",
+          "volume_size": {{ aws_ami.volume_size }},
+          "delete_on_termination": true
+        }
+      ]
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "{{ aws_ami.virtualization_type }}",
