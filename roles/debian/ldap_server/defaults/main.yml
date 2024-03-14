@@ -24,6 +24,7 @@ ldap_server:
   #   olcTLSCertificateFile: /etc/letsencrypt/live/{{ _domain_name }}/cert.pem
   #   olcTLSCertificateKeyFile:  /etc/letsencrypt/live/{{ _domain_name }}/privkey.pem
   ssl: # @see the 'ssl' role - does nothing by default.
+    replace_existing: false
     domain: "{{ _domain_name }}"
     handling: "unmanaged"
     key: ""

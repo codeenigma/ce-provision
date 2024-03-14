@@ -41,6 +41,7 @@ apache:
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
+        replace_existing: false
         domain: "{{ _domain_name }}"
         handling: selfsigned
         # Sample LetsEncrypt config, because include_role will not merge defaults these all need providing:
