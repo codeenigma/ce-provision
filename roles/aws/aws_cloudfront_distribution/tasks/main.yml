@@ -1,8 +1,10 @@
 ---
 - name: Create web acl if defined
   ansible.builtin.include_role:
-    name: aws/acl
-  when: acl is defined
+    name: aws/aws_acl
+  when:
+    - aws_acl is defined
+    - aws_acl.scope == 'CLOUDFRONT'
 
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
@@ -12,7 +14,7 @@
     state: "{{ aws_cloudfront_distribution.state }}"
     aliases: "{{ aws_cloudfront_distribution.aliases }}"
     origins: "{{ aws_cloudfront_distribution.origins }}"
-    web_acl_id: "{{ created_acl.arn | default(omit) }}"
+    web_acl_id: "{{ _created_acl.arn | default(omit) }}"
     default_cache_behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
     cache_behaviors: "{{ aws_cloudfront_distribution.cache_behaviors }}"
     validate_certs: "{{ aws_cloudfront_distribution.validate_certs }}"
