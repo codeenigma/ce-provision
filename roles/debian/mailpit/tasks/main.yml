@@ -22,7 +22,7 @@
 - name: Copy basic htauth file to server.
   ansible.builtin.copy:
     src: "{{ mailpit.web_ui_authfile_src }}"
-    dest: "{{ mailpit.mailpit.web_ui_authfile_dest }}"
+    dest: "{{ mailpit.web_ui_authfile_dest }}"
     owner: root
     group: root
     mode: 0644
