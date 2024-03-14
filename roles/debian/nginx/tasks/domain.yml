@@ -9,6 +9,7 @@
   when:
     - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
+    - domain.ssl.services | length > 0 # if services[] is defined we can assume we are running certbot on port 80 or 443
 
 - name: Enable vhost.
   ansible.builtin.file:
@@ -18,6 +19,7 @@
   when:
     - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
+    - domain.ssl.services | length > 0
 
 - name: Reload the nginx service.
   ansible.builtin.service:
@@ -26,6 +28,7 @@
   when:
     - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
+    - domain.ssl.services | length > 0
 
 - name: Generates SSL keys.
   ansible.builtin.include_role:
@@ -42,6 +45,7 @@
   when:
     - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
+    - domain.ssl.services | length > 0
 
 - name: Delete the temporary vhost for LetsEncrypt.
   ansible.builtin.file:
@@ -50,6 +54,7 @@
   when:
     - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
+    - domain.ssl.services | length > 0
 
 # If auth_enabled is defined and yes, and auth_pass is not defined or is defined but empty, generate a random password.
 - name: Generate random htauth password.

@@ -55,6 +55,7 @@
        - [Jitsi](/roles/debian/jitsi)
        - [LDAP Server](/roles/debian/ldap_server)
        - [LHCI](/roles/debian/lhci)
+       - [Mailpit](/roles/debian/mailpit)
        - [Mount sync](/roles/debian/mount_sync)
        - [MariaDB Client](/roles/debian/mysql_client)
        - [MySQL Server - Oracle Community Edition](/roles/debian/mysql_server_oracle_ce)

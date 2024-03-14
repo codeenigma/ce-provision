@@ -77,6 +77,9 @@ firewall_config:
     firewall_allowed_tcp_ports:
       - "80"
       - "443"
+  mailpit_open:
+    firewall_allowed_tcp_ports:
+      - "8025"
   ftp_open:
     firewall_allowed_tcp_ports:
       - "20"
