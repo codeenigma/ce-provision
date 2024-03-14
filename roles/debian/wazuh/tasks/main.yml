@@ -1,10 +1,11 @@
-- name: Import elastic-stack.
-  ansible.builtin.import_role:
-    name: "contrib/{{ wazuh.path }}/roles/elastic-stack/ansible-kibana"
+---
+- name: Load elastic-stack variables.
+  ansible.builtin.include_vars:
+    file: "/home/{{ user_provision.username }}/ce-provision/roles/contrib/{{ wazuh.path }}/roles/elastic-stack/ansible-kibana/defaults/main.yml"
 
-- name: Import opendistro.
-  ansible.builtin.import_role:
-    name: "contrib/{{ wazuh.path }}/roles/opendistro/opendistro-kibana"
+- name: Load opendistro variables.
+  ansible.builtin.include_vars:
+    file: "/home/{{ user_provision.username }}/ce-provision/roles/contrib/{{ wazuh.path }}/roles/opendistro/opendistro-kibana/defaults/main.yml"
 
 - name: Generate certificates.
   ansible.builtin.import_role:
