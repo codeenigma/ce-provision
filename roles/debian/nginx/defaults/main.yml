@@ -41,6 +41,7 @@ nginx:
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
+        replace_existing: false
         domains:
           - "{{ _domain_name }}"
         handling: selfsigned
