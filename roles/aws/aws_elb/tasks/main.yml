@@ -124,6 +124,13 @@
   register: _aws_ec2_elb
   when: aws_elb.elb_type == "alb"
 
+- name: Create web acl if defined
+  ansible.builtin.include_role:
+    name: aws/aws_acl
+  when:
+    - aws_acl is defined
+    - aws_acl.scope == 'REGIONAL'
+
 - name: Get ALB listener ARN for port 443.
   ansible.builtin.set_fact:
     _aws_ec2_elb_listener_ARN: "{{ item.listener_arn }}"
