@@ -190,4 +190,4 @@
       slapd_backups:
         timer_command: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r rm"
         timer_OnCalendar: "{{ ldap_server.config.on_calendar }}"
-  when: ssl.autorenew
+  when: ldap_server.config.backup
