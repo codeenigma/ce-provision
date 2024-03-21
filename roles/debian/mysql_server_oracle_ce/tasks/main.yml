@@ -2,7 +2,7 @@
 #@todo Configuration is for dev.
 
 - name: Add repository key for MySQL repository using wget and apt-key
-  ansible.builtin.shell: wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 | apt-key add -
+  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 | apt-key add -"
 
 - name: Add repository for MySQL.
   ansible.builtin.apt_repository:
