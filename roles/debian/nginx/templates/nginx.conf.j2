@@ -23,11 +23,11 @@ http {
 
         log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                           '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" $request_length $body_bytes_sent';
+                          '"$http_user_agent" $request_length';
 
         log_format  proxy '$http_x_forwarded_for - $remote_user [$time_local] "$request" '
                           '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" $request_length $body_bytes_sent';
+                          '"$http_user_agent" $request_length';
 
     server_names_hash_bucket_size {{ nginx.http.server_names_hash_bucket_size }};
     # server_name_in_redirect off;
@@ -48,19 +48,6 @@ http {
 
     access_log {{ nginx.http.access_log }};
     error_log {{ nginx.http.error_log }};
-
-    ##
-    # Gzip Settings
-    ##
-
-    gzip on;
-
-    # gzip_vary on;
-	# gzip_proxied any;
-	# gzip_comp_level 6;
-	# gzip_buffers 16 8k;
-	# gzip_http_version 1.1;
-	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
 	##
 	# Additional Settings

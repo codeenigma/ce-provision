@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Location to store the AWS IP ranges JSON
+AWS_IP_RANGES_JSON="/tmp/aws-ip-ranges.json"
+# The Nginx include file for CloudFront IPs
+NGINX_CLOUDFRONT_IPS_CONF="/etc/nginx/conf.d/cloudfront-ips"
+
+# Fetch the latest AWS IP ranges
+curl https://ip-ranges.amazonaws.com/ip-ranges.json -o $AWS_IP_RANGES_JSON
+
+# Generate the Nginx include file
+echo "# Auto-generated CloudFront IP ranges for Nginx real_ip_module" > $NGINX_CLOUDFRONT_IPS_CONF
+jq -r '.prefixes[] | select(.service=="CLOUDFRONT") | .ip_prefix' $AWS_IP_RANGES_JSON | while read IP_RANGE
+do
+    echo "set_real_ip_from $IP_RANGE;" >> $NGINX_CLOUDFRONT_IPS_CONF
+done
+echo "real_ip_header X-Forwarded-For;" >> $NGINX_CLOUDFRONT_IPS_CONF
+
+# Reload Nginx to apply changes
+systemctl reload nginx
