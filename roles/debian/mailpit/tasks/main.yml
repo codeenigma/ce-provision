@@ -1,0 +1,74 @@
+---
+- name: Download latest Mailpit install script.
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/axllent/mailpit/develop/install.sh
+    dest: "{{ mailpit.script_install_path }}/mailpit-install.sh"
+    mode: '0750'
+    owner: "{{ user_provision.username }}"
+    group: "{{ user_provision.username }}"
+    force: true
+
+- name: Attempt to install Mailpit.
+  ansible.builtin.command:
+    cmd: "{{ mailpit.script_install_path }}/mailpit-install.sh"
+
+- name: Generate SSL keys if requested.
+  ansible.builtin.include_role:
+    name: debian/ssl
+  vars:
+    ssl: "{{ mailpit.ssl }}"
+  when: mailpit.create_cert
+
+- name: Copy basic htauth file to server.
+  ansible.builtin.copy:
+    src: "{{ mailpit.web_ui_authfile_src }}"
+    dest: "{{ mailpit.web_ui_authfile_dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: mailpit.web_ui_authfile_dest | length > 0
+
+- name: Start the launch string for the Mailpit service.
+  ansible.builtin.set_fact:
+    _mailpit_service_command: "{{ mailpit.base_service_command }}"
+  when: mailpit.service
+
+- name: Add web UI settings to launch string for Mailpit.
+  ansible.builtin.set_fact:
+    _mailpit_service_command: "{{ _mailpit_service_command }} --listen {{ mailpit.web_ui_listen }} --webroot {{ mailpit.web_ui_webroot }}"
+  when: mailpit.service
+
+- name: Add SMTP settings to launch string for Mailpit.
+  ansible.builtin.set_fact:
+    _mailpit_service_command: "{{ _mailpit_service_command }} --smtp {{ mailpit.smtp_listen }}"
+  when: mailpit.service
+
+- name: Add auth file to the launch string for Mailpit.
+  ansible.builtin.set_fact:
+    _mailpit_service_command: "{{ _mailpit_service_command }} --ui-auth-file {{ mailpit.web_ui_authfile_dest }}"
+  when:
+    - mailpit.service
+    - mailpit.web_ui_authfile_dest | length > 0
+
+- name: Add SSL options to the launch string for Mailpit.
+  ansible.builtin.set_fact:
+    _mailpit_service_command: "{{ _mailpit_service_command }} --ui-tls-cert {{ mailpit.web_ui_ssl_cert }} --ui-tls-key {{ mailpit.web_ui_ssl_key }}"
+  when:
+    - mailpit.service
+    - mailpit.https
+
+- name: Copy systemd service file to server.
+  ansible.builtin.template:
+    src: mailpit.service.j2
+    dest: "/etc/systemd/system/mailpit.service"
+    owner: root
+    group: root
+    mode: 0755
+  when: mailpit.service
+
+- name: Start Mailpit.
+  ansible.builtin.systemd:
+    name: mailpit
+    state: started
+    enabled: true
+  when: mailpit.service
