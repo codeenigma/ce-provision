@@ -37,9 +37,10 @@
   ansible.builtin.include_role:
     name: debian/python_boto
 
-- name: Install Duplicity.
+- name: Install Duplicity and dependencies.
   ansible.builtin.pip:
     name:
+      - fasteners
       - duplicity
     virtualenv: "{{ duplicity.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ duplicity.venv_command | default(_venv_command) }}"
@@ -65,25 +66,25 @@
   ansible.builtin.template:
     src: "duplicity_backup-{{ duplicity.backend }}.j2"
     dest: "{{ duplicity.install_dir }}/bin/duplicity_backup"
-    owner: "{{ duplicity.install_username | default(_install_username) }}"
-    group: "{{ duplicity.install_username | default(_install_username) }}"
-    mode: 0770
+    owner: root
+    group: root
+    mode: 0700
 
 - name: Copy restore script in place.
   ansible.builtin.template:
     src: duplicity_restore-{{ duplicity.backend }}.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_restore"
-    owner: "{{ duplicity.install_username | default(_install_username) }}"
-    group: "{{ duplicity.install_username | default(_install_username) }}"
-    mode: 0770
+    owner: root
+    group: root
+    mode: 0700
 
 - name: Copy clean-up script in place.
   ansible.builtin.template:
     src: duplicity_clean-{{ duplicity.backend }}.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_clean"
-    owner: "{{ duplicity.install_username | default(_install_username) }}"
-    group: "{{ duplicity.install_username | default(_install_username) }}"
-    mode: 0770
+    owner: root
+    group: root
+    mode: 0700
 
 - name: Copy include-exclude filelist.
   ansible.builtin.template:
