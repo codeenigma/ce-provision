@@ -52,6 +52,7 @@
     force: true
   with_items:
     - _common
+    - _common_cloudfront
     - custom
     - docker_registry
     - drupal_common
@@ -67,6 +68,48 @@
     - symfony3_prod
     - symfony4
     - wordpress
+
+- name: Check if any vhost is behind CloudFront
+  set_fact:
+    any_domain_behind_cloudfront: "{{ nginx.domains | json_query('[?is_behind_cloudfront]') | length > 0 }}"
+
+- name: Fetch Cloudfront IPs and keep them updated.
+  block:
+    - name: Ensure jq is installed.
+      ansible.builtin.apt:
+        name: jq
+        state: present
+        update_cache: true
+        cache_valid_time: 240
+
+    - name: Copy the CloudFront IP update script.
+      ansible.builtin.template:
+        src: update-cloudfront-ips.sh.j2
+        dest: /usr/local/bin/update-cloudfront-ips.sh
+        owner: root
+        group: root
+        mode: 0755
+        force: true
+
+    - name: Fetch CloudFront IPs with the script.
+      ansible.builtin.command:
+        cmd: /usr/local/bin/update-cloudfront-ips.sh
+
+    - name: Ensure Nginx include file placeholder for failsafe.
+      file:
+        path: /etc/nginx/conf.d/cloudfront-ips
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+
+    ## TBD
+    # - name: Create systemd timer for CF IPs renewal.
+    #   ansible.builtin.include_role:
+    #     name: contrib/systemd_timers
+    #   vars:
+    #     timers: "{{ _cloudfront_ips_renewal_timer }}"
+  when: any_domain_behind_cloudfront
 
 - name: Ensure log dir exists.
   ansible.builtin.file:
