@@ -16,17 +16,10 @@
       install_packages:
         - python3-pip
 
-- name: Ensure PyMySQL is installed with pip3.
-  ansible.builtin.pip:
-    name: pymysql
-    executable: pip3
-  when: ansible_distribution_major_version | int < 12
-
-- name: Ensure PyMySQL is installed with apt.
+- name: Ensure PyMySQL is installed.
   ansible.builtin.apt:
     pkg: python3-pymysql
     state: present
-  when: ansible_distribution_major_version | int >= 12
 
 - name: Copy debian.cnf credentials file.
   ansible.builtin.template:
