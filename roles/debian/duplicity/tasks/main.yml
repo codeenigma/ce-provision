@@ -30,6 +30,8 @@
     state: latest
     virtualenv: "{{ duplicity.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ duplicity.venv_command | default(_venv_command) }}"
+  become_user: "{{ duplicity.install_username | default(_install_username) }}"
+  become: true
 
 - name: Install python_boto.
   ansible.builtin.include_role:
@@ -41,13 +43,8 @@
       - duplicity
     virtualenv: "{{ duplicity.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ duplicity.venv_command | default(_venv_command) }}"
-
-- name: Ensure duplicity is installed.
-  ansible.builtin.pip:
-    name: duplicity
-    executable: pip3
-    state: present
-  when: ansible_distribution_major_version | int < 12
+  become_user: "{{ duplicity.install_username | default(_install_username) }}"
+  become: true
 
 - name: Create install dir.
   ansible.builtin.file:
@@ -68,25 +65,25 @@
   ansible.builtin.template:
     src: "duplicity_backup-{{ duplicity.backend }}.j2"
     dest: "{{ duplicity.install_dir }}/bin/duplicity_backup"
-    owner: root
-    group: root
-    mode: 0700
+    owner: "{{ duplicity.install_username | default(_install_username) }}"
+    group: "{{ duplicity.install_username | default(_install_username) }}"
+    mode: 0770
 
 - name: Copy restore script in place.
   ansible.builtin.template:
     src: duplicity_restore-{{ duplicity.backend }}.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_restore"
-    owner: root
-    group: root
-    mode: 0700
+    owner: "{{ duplicity.install_username | default(_install_username) }}"
+    group: "{{ duplicity.install_username | default(_install_username) }}"
+    mode: 0770
 
 - name: Copy clean-up script in place.
   ansible.builtin.template:
     src: duplicity_clean-{{ duplicity.backend }}.j2
     dest: "{{ duplicity.install_dir }}/bin/duplicity_clean"
-    owner: root
-    group: root
-    mode: 0700
+    owner: "{{ duplicity.install_username | default(_install_username) }}"
+    group: "{{ duplicity.install_username | default(_install_username) }}"
+    mode: 0770
 
 - name: Copy include-exclude filelist.
   ansible.builtin.template:
