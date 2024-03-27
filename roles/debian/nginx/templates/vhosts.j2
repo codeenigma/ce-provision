@@ -30,7 +30,6 @@ server {
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
 {% if domain.is_behind_cloudfront is defined and domain.is_behind_cloudfront %}
     include "/etc/nginx/conf.d/_common_cloudfront";
-    include "/etc/nginx/conf.d/cloudfront-ips";
 {% else %}
     include "/etc/nginx/conf.d/_common";
 {% endif %}
