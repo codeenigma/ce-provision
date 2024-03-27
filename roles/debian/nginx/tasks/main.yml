@@ -52,6 +52,7 @@
     force: true
   with_items:
     - _common
+    - _common_cloudfront
     - custom
     - docker_registry
     - drupal_common
