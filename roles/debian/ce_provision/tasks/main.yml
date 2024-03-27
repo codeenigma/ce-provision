@@ -159,6 +159,8 @@
       - pyopenssl
     virtualenv: "{{ _venv_path }}"
     virtualenv_command: "{{ _venv_command }}"
+  become_user: "{{ ce_provision.install_username | default(_install_username) }}"
+  become: true
 
 - name: Ensure Ansible venv permissions.
   ansible.builtin.file:
