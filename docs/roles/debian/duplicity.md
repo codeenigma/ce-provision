@@ -9,6 +9,11 @@ Role to install and configure [the Duplicity backup engine](https://duplicity.us
 ```yaml
 ---
 duplicity:
+  # Location of Duplicity installation and components.
+  venv_path: "/home/{{ user_provision.username }}/duplicity"
+  venv_command: /usr/bin/python3 -m venv
+  install_username: "{{ user_provision.username }}"
+  # Duplicity configuration
   backend: s3 # currently also support b2 for Backblaze
   access_key_id: "somekey"
   secret_access_key: "somesecret"
