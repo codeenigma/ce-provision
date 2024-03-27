@@ -49,9 +49,9 @@ http {
     access_log {{ nginx.http.access_log }};
     error_log {{ nginx.http.error_log }};
 
-	##
-	# Additional Settings
-	##
+    ##
+    # Additional Settings
+    ##
 
 {% if nginx.http.custom_directives is defined %}
     {% for directive in nginx.http.custom_directives %}
