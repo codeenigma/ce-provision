@@ -21,31 +21,30 @@
   ansible.builtin.set_fact:
     _venv_path: "{{ duplicity.venv_path }}"
     _venv_command: "{{ duplicity.venv_command }}"
-    _install_username: "{{ duplicity.install_username }}"
+    _venv_install_username: "{{ duplicity.install_username }}"
 
-- name: Ensure pip is at latest version.
-  ansible.builtin.pip:
-    name:
-      - pip
-    state: latest
-    virtualenv: "{{ duplicity.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ duplicity.venv_command | default(_venv_command) }}"
-  become_user: "{{ duplicity.install_username | default(_install_username) }}"
-  become: true
+- name: Manage required pip packages.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: pip
+          state: latest
+        - name: fasteners
+        - name: duplicity
 
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
 
-- name: Install Duplicity and dependencies.
-  ansible.builtin.pip:
-    name:
-      - fasteners
-      - duplicity
-    virtualenv: "{{ duplicity.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ duplicity.venv_command | default(_venv_command) }}"
-  become_user: "{{ duplicity.install_username | default(_install_username) }}"
-  become: true
+- name: Ensure Duplicity venv permissions.
+  ansible.builtin.file:
+    path: "{{ _venv_path }}"
+    state: directory
+    recurse: true
+    owner: "{{ _venv_install_username }}"
+    group: "{{ _venv_install_username }}"
 
 - name: Create install dir.
   ansible.builtin.file:

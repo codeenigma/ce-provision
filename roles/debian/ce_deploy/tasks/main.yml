@@ -32,7 +32,7 @@
     recurse: true
   when: ce_deploy.new_user
 
-- name: Fetch back the SSH pub key.
+- name: Place the public key in the ce-provision data directory on the controller server.
   ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
     src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.key_name }}"
@@ -48,7 +48,6 @@
     dest: "{{ ce_deploy.local_dir }}"
     version: "{{ ce_deploy.own_repository_branch  | default('master') }}"
     update: true
-    # @todo?
     accept_hostkey: true
   become: true
   become_user: "{{ ce_deploy.username }}"
@@ -132,7 +131,7 @@
   ansible.builtin.set_fact:
     _venv_path: "{{ ce_deploy.venv_path }}"
     _venv_command: "{{ ce_deploy.venv_command }}"
-    _install_username: "{{ ce_deploy.install_username }}"
+    _venv_install_username: "{{ ce_deploy.install_username }}"
     _ce_ansible_timer_name: "{{ ce_deploy.upgrade_timer_name }}"
 
 - name: Install Ansible.
@@ -174,6 +173,14 @@
   become: true
   become_user: "{{ ce_deploy.username }}"
   when: _ce_deploy_custom_galaxy_requirements.stat.exists
+
+- name: Ensure Ansible venv permissions.
+  ansible.builtin.file:
+    path: "{{ _venv_path }}"
+    state: directory
+    recurse: true
+    owner: "{{ ce_deploy.username }}"
+    group: "{{ ce_deploy.username }}"
 
 - name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
   ansible.builtin.include_role:

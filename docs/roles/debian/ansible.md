@@ -11,7 +11,7 @@ Note, it is vitally important that Ansible is *not* installed via `apt` or `pip`
 ```yaml
 ---
 ce_ansible:
-  # These are usually set within another role using _venv_path, _venv_command and _install_username but can be overridden.
+  # These are usually set within another role using _venv_path, _venv_command and _venv_install_username but can be overridden.
   #venv_path: "/home/{{ ce_provision.username }}/ansible"
   #venv_command: /usr/bin/python3.11 -m venv
   #install_username: deploy # user to become when creating venv

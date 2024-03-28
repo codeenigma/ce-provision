@@ -1,11 +1,5 @@
 ---
-- name: Create the provision group for provisioning.
-  ansible.builtin.group:
-    name: "{{ ce_provision.username }}"
-    system: true
-  when: ce_provision.new_user
-
-- name: Create additional groups.
+- name: Create additional controller user groups.
   ansible.builtin.group:
     name: "{{ group }}"
     state: present
@@ -15,27 +9,13 @@
     loop_var: group
   when: ce_provision.groups | length
 
-- name: Create the provision user for provisioning.
+- name: Add any additional groups to the controller user.
   ansible.builtin.user:
-    name: "{{ ce_provision.username }}"
-    comment: Provisioning user
-    shell: /bin/bash
-    create_home: true
-    group: "{{ ce_provision.username }}"
-    uid: "{{ ce_provision.uid | default(omit) }}"
-    generate_ssh_key: true
-    home: "/home/{{ ce_provision.username }}"
-    password: "*"
-    ssh_key_bits: 4096
-    ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
-    system: true
+    name: "{{ _ce_provision_username }}"
+    group: "{{ _ce_provision_username }}"
+    uid: "{{ _init.ce_provision_uid | default(omit) }}"
     groups: "{{ ce_provision.groups }}"
-  when: ce_provision.new_user
-
-- name: Fetch back the SSH pub key.
-  ansible.builtin.fetch:
-    dest: "{{ _ce_provision_data_dir }}"
-    src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.key_name }}"
+  when: ce_provision.groups | length
 
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
@@ -135,38 +115,20 @@
   with_items: "{{ ce_provision.contrib_roles }}"
   when: ce_provision.contrib_roles | length > 0
 
-# Install Python applications.
-- name: Set up Python venv variables.
-  ansible.builtin.set_fact:
-    _venv_path: "{{ ce_provision.venv_path }}"
-    _venv_command: "{{ ce_provision.venv_command }}"
-    _install_username: "{{ ce_provision.install_username }}"
-    _ce_ansible_timer_name: "{{ ce_provision.upgrade_timer_name }}"
-
-- name: Install Ansible.
-  ansible.builtin.include_role:
-    name: debian/ansible
-
+# Install Python applications - note, variables are set and Ansible is installed in _init.
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
 
 - name: Ensure dnspython, certifi and pyopenssl are installed.
-  ansible.builtin.pip:
-    name:
-      - dnspython
-      - certifi
-      - pyopenssl
-    virtualenv: "{{ _venv_path }}"
-    virtualenv_command: "{{ _venv_command }}"
-  become_user: "{{ ce_provision.install_username | default(_install_username) }}"
-  become: true
-
-- name: Ensure Ansible venv permissions.
-  ansible.builtin.file:
-    path: "{{ _venv_path }}"
-    owner: "{{ ce_provision.username }}"
-    group: "{{ ce_provision.username }}"
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: dnspython
+        - name: certifi
+        - name: pyopenssl
 
 - name: Add Python virtual environment to $PATH.
   ansible.builtin.copy:
