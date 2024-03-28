@@ -71,6 +71,7 @@
        - [Process Manager](/roles/debian/process_manager)
        - [Python Boto](/roles/debian/python_boto)
        - [Python Common](/roles/debian/python_common)
+       - [Python Pip Packages](/roles/debian/python_pip_packages)
        - [rkhunter](/roles/debian/rkhunter)
        - [Rsyslog](/roles/debian/rsyslog)
        - [solr](/roles/debian/solr)
