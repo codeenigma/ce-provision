@@ -26,7 +26,7 @@
     shell: /bin/bash
     create_home: true
     group: "{{ ce_provision.username }}"
-    uid: "{{ _init.ce_provision_uid | default(omit) }}"
+    uid: "{{ ce_provision.uid | default(omit) }}"
     generate_ssh_key: true
     home: "/home/{{ ce_provision.username }}"
     password: "*"

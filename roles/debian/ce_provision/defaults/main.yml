@@ -9,6 +9,7 @@ ce_provision:
   # Other ce-provision settings.
   new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
   username: "{{ _ce_provision_username }}" # see _init defaults
+  #uid: "{{ _init.ce_provision_uid }}" # see _init defaults, optionally hardcode the UID for this user
   public_key_name: id_rsa.pub # existing users may have a key of a different name
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
