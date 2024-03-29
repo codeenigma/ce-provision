@@ -27,7 +27,6 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/locales
   - role: debian/user_root
-  - role: debian/user_provision
   - role: debian/apt_extra_packages
   - role: debian/apt_unattended_upgrades
     when: is_local is not defined or not is_local
