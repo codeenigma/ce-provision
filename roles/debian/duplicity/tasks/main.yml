@@ -38,14 +38,7 @@
   ansible.builtin.include_role:
     name: debian/python_boto
 
-- name: Ensure Duplicity venv permissions.
-  ansible.builtin.file:
-    path: "{{ _venv_path }}"
-    state: directory
-    recurse: true
-    owner: "{{ _venv_install_username }}"
-    group: "{{ _venv_install_username }}"
-
+# Install Duplicity scripts.
 - name: Create install dir.
   ansible.builtin.file:
     path: "{{ duplicity.install_dir }}"
