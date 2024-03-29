@@ -4,7 +4,19 @@
   ansible.builtin.group:
     name: "{{ ce_provision.username }}"
     system: true
-  when: _ce_provision_username != ce_provision.username
+  when:
+    - _ce_provision_username != ce_provision.username
+    - ce_provision.new_user
+
+- name: Create additional controller user groups.
+  ansible.builtin.group:
+    name: "{{ group }}"
+    state: present
+    system: true
+  with_items: "{{ ce_provision.groups }}"
+  loop_control:
+    loop_var: group
+  when: ce_provision.groups | length
 
 # User normally created already in the _init role.
 - name: Generate SSH key for the controller user for provisioning.
@@ -21,6 +33,7 @@
     ssh_key_bits: 4096
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
     system: true
+    groups: "{{ ce_provision.groups }}"
   when: ce_provision.new_user
 
 # This action should only occur for controller servers.
@@ -42,24 +55,6 @@
       commands: "ALL"
       filename: "{{ ce_provision.username }}"
   when: _ce_provision_username != ce_provision.username
-
-- name: Create additional controller user groups.
-  ansible.builtin.group:
-    name: "{{ group }}"
-    state: present
-    system: true
-  with_items: "{{ ce_provision.groups }}"
-  loop_control:
-    loop_var: group
-  when: ce_provision.groups | length
-
-- name: Add any additional groups to the controller user.
-  ansible.builtin.user:
-    name: "{{ ce_provision.username }}"
-    group: "{{ ce_provision.username }}"
-    uid: "{{ _init.ce_provision_uid | default(omit) }}"
-    groups: "{{ ce_provision.groups }}"
-  when: ce_provision.groups | length
 
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
@@ -159,13 +154,37 @@
   with_items: "{{ ce_provision.contrib_roles }}"
   when: ce_provision.contrib_roles | length > 0
 
-# Install a new Ansible venv if we used a different username to the system Ansible venv.
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_provision.venv_path }}"
+  when:
+    - ce_provision.venv_path is defined
+
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ ce_provision.venv_command }}"
+  when:
+    - ce_provision.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ ce_provision.venv_install_username }}"
+  when:
+    - ce_provision.venv_install_username is defined
+
+- name: Override systemd timer name for Ansible if provided.
+  ansible.builtin.set_fact:
+    _ce_ansible_timer_name: "{{ ce_provision.upgrade_timer_name }}"
+  when:
+    - ce_provision.upgrade_timer_name is defined
+
+# Install a new Ansible venv if we overrode the system Ansible venv path.
 - name: Install Ansible.
   ansible.builtin.include_role:
     name: debian/ansible
-  when: _ce_provision_username != ce_provision.username
+  when: ce_provision.venv_path is defined
 
-# Install Python applications - note, variables are set and Ansible is installed in _init.
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
