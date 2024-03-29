@@ -1,16 +1,44 @@
-- name: Ensure duplicity is installed.
+---
+- name: Ensure system Duplicity is not installed.
   ansible.builtin.apt:
     pkg: duplicity
-    state: present
-  when: ansible_distribution_major_version | int >= 12
+    state: absent
 
-- name: Ensure duplicity is installed.
+- name: Ensure Duplicity is not installed globally with pip or pip3 on older versions of Debian.
   ansible.builtin.pip:
-    name: duplicity
-    executable: pip3
-    state: present
+    name:
+      - duplicity
+    state: absent
+    executable: "{{ item }}"
   when: ansible_distribution_major_version | int < 12
+  with_items:
+    - pip
+    - pip3
+  failed_when: false # don't stop the build if there's no system pip
 
+# Install Python applications.
+- name: Set up Python venv variables.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ duplicity.venv_path }}"
+    _venv_command: "{{ duplicity.venv_command }}"
+    _venv_install_username: "{{ duplicity.install_username }}"
+
+- name: Manage required pip packages.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: pip
+          state: latest
+        - name: fasteners
+        - name: duplicity
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
+# Install Duplicity scripts.
 - name: Create install dir.
   ansible.builtin.file:
     path: "{{ duplicity.install_dir }}"

@@ -1,5 +1,6 @@
 # ce-provision
-Installs Code Enigma's infrastructure management stack on a server.
+Installs Code Enigma's infrastructure management stack on a server. Note, the `_init` role creates the user and installs Ansible in a virtual environment, so that must be run prior to the `ce_provision` role.
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -7,26 +8,24 @@ Installs Code Enigma's infrastructure management stack on a server.
 ## Default variables
 ```yaml
 ---
-# See roles/_init/defaults/main.yml for extra variables repo settings.
-_ce_provision:
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
-
+# See roles/_init/defaults/main.yml for Ansible installation, controller user creation and extra variables repo settings.
 ce_provision:
-  # Location of Ansible installation and components.
-  venv_path: "/home/{{ _ce_provision.username }}/ansible"
-  venv_command: /usr/bin/python3 -m venv
-  install_username: "{{ _ce_provision.username }}"
-  upgrade_timer_name: upgrade_ce_provision_ansible
+  # Optional venv overrides - if commented out, values taken from _init defaults.
+  #venv_path: "/home/{{ _ce_provision_username }}/ansible"
+  #venv_command: /usr/bin/python3 -m venv
+  #venv_install_username: "{{ _ce_provision_username }}"
+  #upgrade_timer_name: upgrade_ce_provision_ansible
   # Other ce-provision settings.
-  username: "{{ _ce_provision.username }}"
-  new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
-  key_name: id_rsa.pub # existing users may have a key of a different name
+  new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
+  username: "{{ _ce_provision_username }}" # see _init defaults
+  #uid: "{{ _init.ce_provision_uid }}" # see _init defaults, optionally hardcode the UID for this user
+  public_key_name: id_rsa.pub # existing users may have a key of a different name
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "master"
   own_repository_skip_checkout: false
   # Destination.
-  local_dir: "/home/{{ _ce_provision.username }}/ce-provision"
+  local_dir: "/home/{{ _ce_provision_username }}/ce-provision"
   # Private config repo.
   config_repository: ""
   config_repository_branch: "master"
@@ -43,10 +42,10 @@ ce_provision:
       branch: master
   # File containing default roles and collections to install via Ansible Galaxy.
   # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
-  galaxy_custom_requirements_file: "/home/{{ _ce_provision.username }}/ce-provision/config/files/galaxy-requirements.yml"
+  galaxy_custom_requirements_file: "/home/{{ _ce_provision_username }}/ce-provision/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "/home/{{ _ce_provision.username }}/ansible/bin/ansible-galaxy collection install --force" # must match venv_path
+    command: "/home/{{ _ce_provision_username }}/ansible/bin/ansible-galaxy collection install --force" # must match venv_path
     on_calendar: "Mon *-*-* 04:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
 
 ```

@@ -56,12 +56,12 @@ for dir in ${DIRS[@]}; do
   fi
 
   DEST=s3://{{ duplicity.backend_url }}/{{ duplicity.bucketname }}$dir
-  /usr/local/bin/duplicity $backup_options $extra_options $dir $DEST || exit 1
+  {{ _venv_path }}/bin/duplicity $backup_options $extra_options $dir $DEST || exit 1
 
   if [ $REMOVE_OLD_BACKUPS -eq 1 ]; then
     # Do some maintenance on the remote end to clean up old backups
     echo "Performing routine maintenance on $dir..."
-    /usr/local/bin/duplicity $maintenance_options $DEST || exit 1
+    {{ _venv_path }}/bin/duplicity $maintenance_options $DEST || exit 1
   fi
 done
 

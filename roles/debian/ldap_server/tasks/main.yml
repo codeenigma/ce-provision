@@ -34,17 +34,10 @@
     pkg: ["libsasl2-dev", "libssl-dev", "python3-dev"] # python-ldap needs some dev packages
     state: present
 
-- name: Install python-ldap with pip3.
-  ansible.builtin.pip:
-    name: python-ldap
-    executable: pip3
-  when: ansible_distribution_major_version | int < 12
-
-- name: Ensure python3-ldap is installed with apt.
+- name: Ensure python3-ldap is installed.
   ansible.builtin.apt:
     pkg: python3-ldap
     state: present
-  when: ansible_distribution_major_version | int >= 12
 
 - name: Create the slapd config file.
   ansible.builtin.template:
