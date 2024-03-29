@@ -11,7 +11,9 @@ Installs Code Enigma's infrastructure management stack on a server. Note, the `_
 # See roles/_init/defaults/main.yml for Ansible installation, controller user creation and extra variables repo settings.
 ce_provision:
   # Other ce-provision settings.
-  username: "{{ _ce_provision_username }}"
+  new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
+  username: "{{ _ce_provision_username }}" # see _init defaults
+  public_key_name: id_rsa.pub # existing users may have a key of a different name
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "master"

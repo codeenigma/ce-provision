@@ -117,21 +117,12 @@
     create_home: true
     group: "{{ _ce_provision_username }}"
     uid: "{{ _init.ce_provision_uid | default(omit) }}"
-    generate_ssh_key: true
     home: "/home/{{ _ce_provision_username }}"
     password: "*"
-    ssh_key_bits: 4096
-    ssh_key_comment: "{{ _ce_provision_username }}@{{ ansible_host }}"
     system: true
   when:
     - _init.ce_provision_new_user
     - ansible_connection == 'ssh'
-
-- name: Place the public key in the ce-provision data directory on the controller server.
-  ansible.builtin.fetch:
-    dest: "{{ _ce_provision_data_dir }}"
-    src: "/home/{{ _ce_provision_username }}/.ssh/{{ _init.ce_provision_key_name }}"
-  when: ansible_connection == 'ssh'
 
 - name: Add controller user to sudoers.
   ansible.builtin.include_role:
