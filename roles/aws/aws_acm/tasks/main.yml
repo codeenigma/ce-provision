@@ -22,13 +22,15 @@
   ansible.builtin.set_fact:
     aws_acm_certificate_arn: ""
     _aws_acm_domain_in_cert_list: false
+    _aws_acm_extra_domains_in_cert_list: true
 
 - name: Iterate through the certificate list checking for domain.
   ansible.builtin.set_fact:
     aws_acm_certificate_arn: "{{ item.CertificateArn }}"
+    aws_acm_certificate: "{{ item }}"
     _aws_acm_domain_in_cert_list: true
-  when: item.DomainName == aws_acm.domain_name
   with_items: "{{ _aws_acm_cert_list }}"
+  when: item.DomainName == aws_acm.domain_name
 
 - ansible.builtin.set_fact:
     _aws_tags_list: []
@@ -68,6 +70,15 @@
   loop: "{{ aws_acm.extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
+- name: Check if we have all our domains in a SAN cert.
+  ansible.builtin.set_fact:
+    _aws_acm_extra_domains_in_cert_list: false
+  with_items: "{{ _acm_san_domains }}"
+  when:
+    - _acm_san_domains is defined
+    - item not in aws_acm_certificate.SubjectAlternativeNameSummaries
+    - aws_acm.extra_domains | length > 0
+
 - name: Send ACM request for a SAN cert if needed.
   ansible.builtin.command: |
     aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
@@ -78,7 +89,7 @@
     --tags {{ _aws_tags_string }}
   register: _aws_acm_new_san_certificate
   when:
-    - not _aws_acm_domain_in_cert_list
+    - not _aws_acm_extra_domains_in_cert_list
     - aws_acm.extra_domains | length > 0
 
 - name: Parse returned certificate simple certificate output.
@@ -92,102 +103,96 @@
   ansible.builtin.set_fact:
     _aws_acm_new_certificate: "{{ _aws_acm_new_san_certificate.stdout | from_json }}"
   when:
-    - not _aws_acm_domain_in_cert_list
+    - not _aws_acm_extra_domains_in_cert_list
     - aws_acm.extra_domains | length > 0
 
-- name: Fetch the new certificate's ARN.
-  ansible.builtin.set_fact:
-    aws_acm_certificate_arn: "{{ _aws_acm_new_certificate.CertificateArn }}"
-  when: not _aws_acm_domain_in_cert_list
+# Set of tasks to run if a certificate is created.
+- name: Handle new certificate actions.
+  when: not _aws_acm_domain_in_cert_list or not _aws_acm_extra_domains_in_cert_list
+  block:
+    - name: Fetch the new certificate's ARN.
+      ansible.builtin.set_fact:
+        aws_acm_certificate_arn: "{{ _aws_acm_new_certificate.CertificateArn }}"
 
-# Not currently possible to do this with the API, so we just pause 5 seconds - this is usually enough time.
-- name: Wait until the new certificate is properly issued.
-  ansible.builtin.pause:
-    seconds: 5
-  when:
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.validate
+    # Not currently possible to do this with the API, so we just pause 5 seconds - this is usually enough time.
+    - name: Wait until the new certificate is properly issued.
+      ansible.builtin.pause:
+        seconds: 5
+      when:
+        - aws_acm.validate
 
-- name: Obtain all information for a the new ACM certificate.
-  community.aws.acm_certificate_info:
-    region: "{{ aws_acm.region }}"
-    profile: "{{ aws_acm.aws_profile }}"
-    domain_name: "{{ aws_acm.domain_name }}"
-  register: _aws_acm_new_certificate
-  when:
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.validate
+    - name: Obtain all information for a the new ACM certificate.
+      community.aws.acm_certificate_info:
+        region: "{{ aws_acm.region }}"
+        profile: "{{ aws_acm.aws_profile }}"
+        domain_name: "{{ aws_acm.domain_name }}"
+      register: _aws_acm_new_certificate
+      when:
+        - aws_acm.validate
 
-- name: Initialise the DNS loop var with main domain entry DNS settings.
-  ansible.builtin.set_fact:
-    _acm_dns_all_domains:
-      - domain: "{{ aws_acm.domain_name }}"
-        zone: "{{ aws_acm.route_53.zone }}"
-        aws_profile: "{{ aws_acm.route_53.aws_profile }}"
-  when:
-    - aws_acm.route_53.zone is defined
-    - aws_acm.route_53.zone | length > 0
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.validate
+    - name: Initialise the DNS loop var with main domain entry DNS settings.
+      ansible.builtin.set_fact:
+        _acm_dns_all_domains:
+          - domain: "{{ aws_acm.domain_name }}"
+            zone: "{{ aws_acm.route_53.zone }}"
+            aws_profile: "{{ aws_acm.route_53.aws_profile }}"
+      when:
+        - aws_acm.route_53.zone is defined
+        - aws_acm.route_53.zone | length > 0
+        - aws_acm.validate
 
-- name: Add extra_domains so we can loop through DNS records.
-  ansible.builtin.set_fact:
-    _acm_dns_all_domains: "{{ _acm_dns_all_domains + [{'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile}] }}"
-  loop: "{{ aws_acm.extra_domains }}"
-  when:
-    - aws_acm.extra_domains | length > 0
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.validate
+    - name: Add extra_domains so we can loop through DNS records.
+      ansible.builtin.set_fact:
+        _acm_dns_all_domains: "{{ _acm_dns_all_domains + [{'domain': item.domain, 'zone': item.zone, 'aws_profile': item.aws_profile}] }}"
+      loop: "{{ aws_acm.extra_domains }}"
+      when:
+        - aws_acm.extra_domains | length > 0
+        - aws_acm.validate
 
-- name: Add a DNS records in Route 53 for validation.
-  amazon.aws.route53:
-    state: present
-    profile: "{{ item.aws_profile }}"
-    zone: "{{ item.zone }}"
-    record: "{{ (_aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain))[0].resource_record.name }}"
-    type: CNAME
-    value: "{{ (_aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain))[0].resource_record.value }}"
-    overwrite: true
-  loop: "{{ _acm_dns_all_domains }}"
-  when:
-    - aws_acm.route_53.zone is defined
-    - aws_acm.route_53.zone | length > 0
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.validate
+    - name: Add a DNS records in Route 53 for validation.
+      amazon.aws.route53:
+        state: present
+        profile: "{{ item.aws_profile }}"
+        zone: "{{ item.zone }}"
+        record: "{{ (_aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain))[0].resource_record.name }}"
+        type: CNAME
+        value: "{{ (_aws_acm_new_certificate.certificates[0].domain_validation_options | selectattr('domain_name', 'search', item.domain))[0].resource_record.value }}"
+        overwrite: true
+      loop: "{{ _acm_dns_all_domains }}"
+      when:
+        - aws_acm.route_53.zone is defined
+        - aws_acm.route_53.zone | length > 0
+        - aws_acm.validate
 
-- name: Wait for ACM certificate validation to complete.
-  ansible.builtin.command: |
-    aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
-    acm wait certificate-validated \
-    --certificate-arn "{{ aws_acm_certificate_arn }}"
-  when:
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.validate
+    - name: Wait for ACM certificate validation to complete.
+      ansible.builtin.command: |
+        aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
+        acm wait certificate-validated \
+        --certificate-arn "{{ aws_acm_certificate_arn }}"
+      when:
+        - aws_acm.validate
 
-# Even though we wait for validation, it's still too quick.
-- name: Wait to allow status cache time to update.
-  ansible.builtin.pause:
-    seconds: 5
-  when:
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.export
-    - aws_acm.validate
+    # Even though we wait for validation, it's still too quick.
+    - name: Wait to allow status cache time to update.
+      ansible.builtin.pause:
+        seconds: 5
+      when:
+        - aws_acm.export
+        - aws_acm.validate
 
-- name: Fetch certificate for later use.
-  ansible.builtin.command: |
-    aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
-    acm get-certificate \
-    --certificate-arn "{{ aws_acm_certificate_arn }}"
-  register: _aws_acm_exported_certificate_json
-  when:
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.export
-    - aws_acm.validate
+    - name: Fetch certificate for later use.
+      ansible.builtin.command: |
+        aws --profile "{{ aws_acm.aws_profile }}" --region "{{ aws_acm.region }}" \
+        acm get-certificate \
+        --certificate-arn "{{ aws_acm_certificate_arn }}"
+      register: _aws_acm_exported_certificate_json
+      when:
+        - aws_acm.export
+        - aws_acm.validate
 
-- name: Replace JSON certificate output with parsed results.
-  ansible.builtin.set_fact:
-    aws_acm_exported_certificate: "{{ _aws_acm_exported_certificate_json.stdout | from_json }}"
-  when:
-    - not _aws_acm_domain_in_cert_list
-    - aws_acm.export
-    - aws_acm.validate
+    - name: Replace JSON certificate output with parsed results.
+      ansible.builtin.set_fact:
+        aws_acm_exported_certificate: "{{ _aws_acm_exported_certificate_json.stdout | from_json }}"
+      when:
+        - aws_acm.export
+        - aws_acm.validate
