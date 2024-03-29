@@ -16,17 +16,18 @@
       install_packages:
         - python3-pip
 
-- name: Ensure passlib is installed with pip3.
-  ansible.builtin.pip:
-    name: passlib
-    executable: pip3
-  when: ansible_distribution_major_version | int < 12
-
-- name: Ensure python3-passlib is installed with apt.
+- name: Ensure python3-passlib is installed.
   ansible.builtin.apt:
     pkg: python3-passlib
     state: present
-  when: ansible_distribution_major_version | int >= 12
+
+- name: Install passlib in the Ansible venv.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: passlib
 
 - name: Copy main nginx config.
   ansible.builtin.template:
@@ -52,6 +53,7 @@
     force: true
   with_items:
     - _common
+    - _common_cloudfront
     - custom
     - docker_registry
     - drupal_common

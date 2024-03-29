@@ -1,0 +1,16 @@
+---
+- name: Install packages.
+  ansible.builtin.pip:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default(omit) }}"
+    virtualenv: "{{ python_pip_packages.venv_path | default(_venv_path) }}"
+    virtualenv_command: "{{ python_pip_packages.venv_command | default(_venv_command) }}"
+  with_items: "{{ python_pip_packages.packages }}"
+
+- name: Ensure venv permissions.
+  ansible.builtin.file:
+    path: "{{ python_pip_packages.venv_path | default(_venv_path) }}"
+    state: directory
+    recurse: true
+    owner: "{{ python_pip_packages.install_username | default(_venv_install_username) }}"
+    group: "{{ python_pip_packages.install_username | default(_venv_install_username) }}"

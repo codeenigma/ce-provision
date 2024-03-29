@@ -72,6 +72,7 @@ nginx:
         # on_calendar: "Mon *-*-* 04:00:00"
       ratelimitingcrawlers: true
       is_default: true
+      is_behind_cloudfront: false # set to true to disable gzip.
       basic_auth:
         auth_enabled: false
         auth_file: "" # optionally provide the path on the deploy server to a htpasswd file - WARNING - it must be valid and will not be checked!

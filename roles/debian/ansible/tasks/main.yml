@@ -33,35 +33,25 @@
         - python3-venv
         - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
 
-- name: Ensure pip is at latest version.
-  ansible.builtin.pip:
-    name:
-      - pip
-    state: latest
-    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
-
-- name: Install Ansible.
-  ansible.builtin.pip:
-    name:
-      - ansible
-    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+- name: Install pip and Ansible.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: pip
+          state: latest
+        - name: ansible
 
 - name: Install linters.
-  ansible.builtin.pip:
-    name:
-      - ansible-lint
-      - yamllint
-    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: ansible-lint
+        - name: yamllint
   when: ce_ansible.linters.enabled
-
-- name: Ensure Ansible venv permissions.
-  ansible.builtin.file:
-    path: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    owner: "{{ ce_ansible.install_username | default(_install_username) }}"
-    group: "{{ ce_ansible.install_username | default(_install_username) }}"
 
 - name: Add the venv to $PATH using profile.d.
   ansible.builtin.copy:
