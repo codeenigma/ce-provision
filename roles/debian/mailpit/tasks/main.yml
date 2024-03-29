@@ -4,8 +4,8 @@
     url: https://raw.githubusercontent.com/axllent/mailpit/develop/install.sh
     dest: "{{ mailpit.script_install_path }}/mailpit-install.sh"
     mode: '0750'
-    owner: "{{ user_provision.username }}"
-    group: "{{ user_provision.username }}"
+    owner: "{{ mailpit.user }}"
+    group: "{{ mailpit.group }}"
     force: true
 
 - name: Attempt to install Mailpit.
@@ -28,9 +28,9 @@
     mode: 0644
   when: mailpit.web_ui_authfile_dest | length > 0
 
-- name: Start the launch string for the Mailpit service.
+- name: Start the launch string for the Mailpit service with the database location.
   ansible.builtin.set_fact:
-    _mailpit_service_command: "{{ mailpit.base_service_command }}"
+    _mailpit_service_command: "-d {{ mailpit.database_directory }}/{{ mailpit.database_filename }}"
   when: mailpit.service
 
 - name: Add web UI settings to launch string for Mailpit.
@@ -57,6 +57,13 @@
     - mailpit.service
     - mailpit.https
 
+- name: Add any additionally provided options to the launch string for Mailpit.
+  ansible.builtin.set_fact:
+    _mailpit_service_command: "{{ _mailpit_service_command }} {{ mailpit.additional_options }}"
+  when:
+    - mailpit.service
+    - mailpit.additional_options | length > 0
+
 - name: Copy systemd service file to server.
   ansible.builtin.template:
     src: mailpit.service.j2
@@ -66,9 +73,15 @@
     mode: 0755
   when: mailpit.service
 
+- name: Ensure the database directory exists and is writeable.
+  ansible.builtin.file:
+    path: "{{ mailpit.database_directory }}"
+    state: directory
+
 - name: Start Mailpit.
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: mailpit
     state: started
+    daemon_reload: true
     enabled: true
   when: mailpit.service
