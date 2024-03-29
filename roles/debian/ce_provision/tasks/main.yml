@@ -185,6 +185,17 @@
     name: debian/ansible
   when: ce_provision.venv_path is defined
 
+# Install the linters if Ansible is already system installed without them.
+- name: Install linters.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: ansible-lint
+        - name: yamllint
+  when: ce_provision.venv_path is not defined
+
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
