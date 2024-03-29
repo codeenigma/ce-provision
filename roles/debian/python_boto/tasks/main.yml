@@ -30,6 +30,8 @@
     name: "{{ _boto3_install_package }}"
     virtualenv: "{{ python_boto.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ python_boto.venv_command | default(_venv_command) }}"
+  become_user: "{{ python_boto.install_username | default(_install_username) }}"
+  become: true
 
 - name: Ensure Ansible venv permissions.
   ansible.builtin.file:

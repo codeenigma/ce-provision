@@ -40,6 +40,8 @@
     state: latest
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  become_user: "{{ ce_ansible.install_username | default(_install_username) }}"
+  become: true
 
 - name: Install Ansible.
   ansible.builtin.pip:
@@ -47,6 +49,8 @@
       - ansible
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  become_user: "{{ ce_ansible.install_username | default(_install_username) }}"
+  become: true
 
 - name: Install linters.
   ansible.builtin.pip:
@@ -55,6 +59,8 @@
       - yamllint
     virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
     virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  become_user: "{{ ce_ansible.install_username | default(_install_username) }}"
+  become: true
   when: ce_ansible.linters.enabled
 
 - name: Ensure Ansible venv permissions.
