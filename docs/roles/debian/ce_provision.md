@@ -10,6 +10,11 @@ Installs Code Enigma's infrastructure management stack on a server. Note, the `_
 ---
 # See roles/_init/defaults/main.yml for Ansible installation, controller user creation and extra variables repo settings.
 ce_provision:
+  # Optional venv overrides - if commented out, values taken from _init defaults.
+  #venv_path: "/home/{{ _ce_provision_username }}/ansible"
+  #venv_command: /usr/bin/python3 -m venv
+  #venv_install_username: "{{ _ce_provision_username }}"
+  #upgrade_timer_name: upgrade_ce_provision_ansible
   # Other ce-provision settings.
   new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
   username: "{{ _ce_provision_username }}" # see _init defaults
