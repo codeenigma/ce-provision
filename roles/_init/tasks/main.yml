@@ -101,40 +101,9 @@
 
 # Install Ansible under the controller user for all servers
 # Ensure ansible_connection == 'ssh' (i.e. we are connecting to a server) before executing
-- name: Create the provision group for provisioning.
-  ansible.builtin.group:
-    name: "{{ _ce_provision_username }}"
-    system: true
-  when:
-    - _init.ce_provision_new_user
-    - ansible_connection == 'ssh'
-
-- name: Create the controller user for provisioning.
-  ansible.builtin.user:
-    name: "{{ _ce_provision_username }}"
-    comment: Infrastructure provisioning user
-    shell: /bin/bash
-    create_home: true
-    group: "{{ _ce_provision_username }}"
-    uid: "{{ _init.ce_provision_uid | default(omit) }}"
-    home: "/home/{{ _ce_provision_username }}"
-    password: "*"
-    system: true
-  when:
-    - _init.ce_provision_new_user
-    - ansible_connection == 'ssh'
-
-- name: Add controller user to sudoers.
+- name: Install Ansible.
   ansible.builtin.include_role:
-    name: debian/sudo_config
-  vars:
-    sudo_config:
-      entity_name: "{{ _ce_provision_username }}"
-      hosts: "ALL"
-      operators: "(ALL)"
-      tags: "NOPASSWD:"
-      commands: "ALL"
-      filename: "{{ _ce_provision_username }}"
+    name: debian/user_provision
   when: ansible_connection == 'ssh'
 
 - name: Install Ansible.
