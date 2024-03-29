@@ -110,6 +110,13 @@
 - name: Handle new certificate actions.
   when: not _aws_acm_domain_in_cert_list or not _aws_acm_extra_domains_in_cert_list
   block:
+    - name: Stash the old certificate ARN in case we want to delete it later.
+      ansible.builtin.set_fact:
+        aws_acm_obsolete_certificate_arn: "{{ aws_acm_certificate_arn }}"
+      when:
+        - aws_acm_certificate_arn | length > 0
+        - aws_acm_certificate_arn != _aws_acm_new_certificate.CertificateArn
+
     - name: Fetch the new certificate's ARN.
       ansible.builtin.set_fact:
         aws_acm_certificate_arn: "{{ _aws_acm_new_certificate.CertificateArn }}"
