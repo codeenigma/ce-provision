@@ -1,4 +1,48 @@
 ---
+# Group usually created already in the _init role.
+- name: Create the provision group for provisioning.
+  ansible.builtin.group:
+    name: "{{ ce_provision.username }}"
+    system: true
+  when: _ce_provision_username != ce_provision.username
+
+# User normally created already in the _init role.
+- name: Generate SSH key for the controller user for provisioning.
+  ansible.builtin.user:
+    name: "{{ ce_provision.username }}"
+    comment: Infrastructure provisioning user
+    shell: /bin/bash
+    create_home: true
+    group: "{{ ce_provision.username }}"
+    uid: "{{ _init.ce_provision_uid | default(omit) }}"
+    generate_ssh_key: true
+    home: "/home/{{ ce_provision.username }}"
+    password: "*"
+    ssh_key_bits: 4096
+    ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
+    system: true
+  when: ce_provision.new_user
+
+# This action should only occur for controller servers.
+- name: Place the public key in the ce-provision data directory on the controller server.
+  ansible.builtin.fetch:
+    dest: "{{ _ce_provision_data_dir }}"
+    src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.public_key_name }}"
+
+# In case we used a different username for the controller.
+- name: Add controller user to sudoers.
+  ansible.builtin.include_role:
+    name: debian/sudo_config
+  vars:
+    sudo_config:
+      entity_name: "{{ ce_provision.username }}"
+      hosts: "ALL"
+      operators: "(ALL)"
+      tags: "NOPASSWD:"
+      commands: "ALL"
+      filename: "{{ ce_provision.username }}"
+  when: _ce_provision_username != ce_provision.username
+
 - name: Create additional controller user groups.
   ansible.builtin.group:
     name: "{{ group }}"
@@ -11,8 +55,8 @@
 
 - name: Add any additional groups to the controller user.
   ansible.builtin.user:
-    name: "{{ _ce_provision_username }}"
-    group: "{{ _ce_provision_username }}"
+    name: "{{ ce_provision.username }}"
+    group: "{{ ce_provision.username }}"
     uid: "{{ _init.ce_provision_uid | default(omit) }}"
     groups: "{{ ce_provision.groups }}"
   when: ce_provision.groups | length
@@ -114,6 +158,12 @@
   become_user: "{{ ce_provision.username }}"
   with_items: "{{ ce_provision.contrib_roles }}"
   when: ce_provision.contrib_roles | length > 0
+
+# Install a new Ansible venv if we used a different username to the system Ansible venv.
+- name: Install Ansible.
+  ansible.builtin.include_role:
+    name: debian/ansible
+  when: _ce_provision_username != ce_provision.username
 
 # Install Python applications - note, variables are set and Ansible is installed in _init.
 - name: Install python_boto.

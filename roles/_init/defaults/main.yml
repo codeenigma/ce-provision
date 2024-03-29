@@ -17,7 +17,6 @@ _init:
 
   # ce-provision user creation
   ce_provision_new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
-  ce_provision_key_name: id_rsa.pub # existing users may have a key of a different name
   #ce_provision_uid # optionally hardcode the UID for this user
 
   # Extra config repo.
