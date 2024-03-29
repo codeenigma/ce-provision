@@ -61,6 +61,7 @@
 
 - ansible.builtin.set_fact:
     _acm_san_domains: []
+    _aws_acm_san_list: []
   when: aws_acm.extra_domains | length > 0
 
 - name: Build a list of additional domains.
@@ -69,12 +70,24 @@
   loop: "{{ aws_acm.extra_domains }}"
   when: aws_acm.extra_domains | length > 0
 
+- name: Build a list of SANs per certificate.
+  ansible.builtin.set_fact:
+    _aws_acm_san_list: "{{ _aws_acm_san_list + [item.SubjectAlternativeNameSummaries] }}"
+  with_items: "{{ _aws_acm_cert_list }}"
+  when: aws_acm.extra_domains | length > 0
+
+- name: Flatten the list of SANs.
+  ansible.builtin.set_fact:
+    _aws_acm_san_list: "{{ _aws_acm_san_list | flatten }}"
+  when: aws_acm.extra_domains | length > 0
+
 - name: Check if we have all our domains in a SAN cert.
   ansible.builtin.set_fact:
     _aws_acm_extra_domains_in_cert_list: false
   with_items: "{{ _acm_san_domains }}"
   when:
-    - item not in _aws_acm_cert_list.SubjectAlternativeNameSummaries
+    - _aws_acm_san_list is defined
+    - item not in _aws_acm_san_list
     - aws_acm.extra_domains | length > 0
 
 - name: Send ACM request for a SAN cert if needed.
