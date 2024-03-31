@@ -132,7 +132,7 @@
       community.aws.acm_certificate_info:
         region: "{{ aws_acm.region }}"
         profile: "{{ aws_acm.aws_profile }}"
-        domain_name: "{{ aws_acm.domain_name }}"
+        certificate_arn: "{{ aws_acm_certificate_arn }}"
       register: _aws_acm_new_certificate
       when:
         - aws_acm.validate
