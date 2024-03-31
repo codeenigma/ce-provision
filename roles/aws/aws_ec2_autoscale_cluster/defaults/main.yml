@@ -10,7 +10,7 @@ aws_ec2_autoscale_cluster:
     extra_domains: [] # list of Subject Alternative Name domains and zones
     #  - domain: www2.example.com
     #    zone: example.com
-    #    aws_profile: us-east-1
+    #    aws_profile: "{{ _aws_profile }}"
     route_53:
       aws_profile: another # the zone might not be in the same account as the certificate
       zone: example.com
