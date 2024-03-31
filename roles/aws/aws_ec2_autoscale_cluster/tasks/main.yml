@@ -353,6 +353,8 @@
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
   when: aws_ec2_autoscale_cluster.create_elb
 
+# @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
+
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_listeners: "{{ [_aws_ec2_autoscale_cluster_listeners_http] }}"
@@ -719,6 +721,8 @@
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
+
+# @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
 
 - name: Add DNS records in Route 53.
   amazon.aws.route53:
