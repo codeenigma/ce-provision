@@ -95,7 +95,7 @@ aws_ec2_autoscale_cluster:
   packer_force: false # see aws_ami for details
   packer_vpc_filter: "" # see aws_ami for details
   packer_subnet_filter_az: "" # see aws_ami for details
-  packer_name_filter: "debian-11-amd64-*" # see aws_ami for details, comment out to use the aws_ami default
+  packer_name_filter: "debian-12-amd64-*" # see aws_ami for details, Packer base image
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
   # Define if you want to launch config to use a specific AMI, e.g. to pack a new AMI but not use it right away for QA reasons.
