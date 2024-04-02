@@ -247,6 +247,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
+      name_filter: "{{ aws_ec2_autoscale_cluster.packer_name_filter }}"
       repack:
         root_volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
         root_volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
