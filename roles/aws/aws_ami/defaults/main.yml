@@ -2,10 +2,10 @@
 aws_ami:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  instance_type: t3.micro
+  instance_type: c7a.large # more performant packer instances mean less waiting for AMIs!
   virtualization_type: hvm
   root_device_type: ebs
-  name_filter: "debian-11-amd64-*"
+  name_filter: "debian-12-amd64-*"
   ami_name: "example"
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   ssh_username: "admin"
@@ -48,7 +48,7 @@ aws_ami:
   operation: ensure
   # Only used by the 'repack' operation to define temporary EC2 instance
   repack:
-    root_volume_type: gp2
+    root_volume_type: gp3
     root_volume_size: 20 # Important, for an ASG this must not be larger than the value set in the Launch Configuration
     cluster_name: "example" # To look up EC2 instances to use for an AMI
     iam_role: "example" # The IAM role to be assumed by the temporary EC2 instance for repacking an AMI
