@@ -57,7 +57,7 @@ aws_ec2_autoscale_cluster:
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
   root_volume_size: 30
-  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_type: gp3 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
   root_volume_delete_on_termination: true
   device_name: /dev/xvda
   ebs_optimized: true
@@ -95,6 +95,7 @@ aws_ec2_autoscale_cluster:
   packer_force: false # see aws_ami for details
   packer_vpc_filter: "" # see aws_ami for details
   packer_subnet_filter_az: "" # see aws_ami for details
+  packer_name_filter: "debian-11-amd64-*" # see aws_ami for details, comment out to use the aws_ami default
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
   # Define if you want to launch config to use a specific AMI, e.g. to pack a new AMI but not use it right away for QA reasons.
