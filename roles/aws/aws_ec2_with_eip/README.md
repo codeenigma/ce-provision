@@ -27,7 +27,7 @@ aws_ec2_with_eip:
   termination_protection: false # set to true to disable termination and avoid accidents
   instance_name: "{{ _domain_name }}"
   root_volume_size: 80
-  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_type: gp3 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
   root_volume_encrypted: "{{ aws_ami.encrypt_boot }}" # in most cases this should match encrypt_boot in the aws_ami role
   root_volume_delete_on_termination: true
   ebs_optimized: true
