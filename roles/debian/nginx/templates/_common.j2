@@ -10,6 +10,7 @@ gzip_comp_level 6;
 gzip_types
 {% for gzip_type in nginx.http.gzip_types %}
     {{ gzip_type }}{% if loop.last %};{% endif %}
+
 {% endfor %}
 gzip_buffers 16 8k;
 gzip_min_length 512;
