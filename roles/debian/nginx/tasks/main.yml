@@ -36,6 +36,7 @@
     owner: root
     group: root
     mode: 0644
+    force: true
 
 - name: Ensure passwords directory exists.
   ansible.builtin.file:
@@ -89,6 +90,7 @@
   ansible.builtin.template:
     src: cloudwatch-main.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-main.json
+    force: true
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
