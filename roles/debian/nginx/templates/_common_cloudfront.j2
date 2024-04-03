@@ -1,11 +1,11 @@
 ### {{ ansible_managed }}
 
 gzip off;
-proxy_buffer_size       512k;
-proxy_buffers           8 256k;
-client_body_buffer_size 512k;
-fastcgi_buffer_size     512k ;
-fastcgi_buffers         8 256k ;
+proxy_buffer_size       {{ nginx.http.proxy_buffer_size }};
+proxy_buffers           {{ nginx.http.proxy_buffers }};
+client_body_buffer_size {{ nginx.http.client_body_buffer_size }};
+fastcgi_buffer_size     {{ nginx.http.fastcgi_buffer_size }} ;
+fastcgi_buffers         {{ nginx.http.fastcgi_buffers }} ;
 client_max_body_size    {{ nginx.client_max_body_size }} ;
 # Disable content sniffing, since it's an attack vector.
 add_header X-Content-Type-Options nosniff;
