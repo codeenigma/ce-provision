@@ -1,3 +1,13 @@
+# PHP-FPM
+
+Installs and configures the PHP-FPM flavour of FastCGI.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 php:
   # see php-common for default version
@@ -51,3 +61,7 @@ php:
       memory_consumption: 128
       max_accelerated_files: 2000
       validate_timestamps: 1
+
+```
+
+<!--ENDROLEVARS-->

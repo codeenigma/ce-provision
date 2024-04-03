@@ -1,14 +1,21 @@
 [www]
 user = {{ php.fpm.pool_user }}
 group = {{ php.fpm.pool_group }}
-listen = {% if php.fpm.unix_socket %}'/var/run/php{{ version | replace('.','') }}-fpm.sock'{% else %}127.0.0.1:90{{ version | replace('.','') }}{% endif %}
+listen = {% if php.fpm.unix_socket %}'/var/run/php{{ version | replace('.','') }}-fpm.sock'{% else %}{{ php.fpm.server_ip }}:90{{ version | replace('.','') }}{% endif %}
 
 listen.owner = {{ php.fpm.pool_user }}
 listen.group = {{ php.fpm.pool_group }}
-pm = dynamic
+pm = {{ php.fpm.pm }}
 pm.max_children = {{ php.fpm.max_children }}
 pm.start_servers = {{ php.fpm.start_servers }}
 pm.min_spare_servers = {{ php.fpm.min_spare_servers }}
 pm.max_spare_servers = {{ php.fpm.max_spare_servers }}
 pm.process_idle_timeout = {{ php.fpm.process_idle_timeout }}
 pm.max_requests = {{ php.fpm.max_requests }}
+
+request_terminate_timeout = {{ php.fpm.request_terminate_timeout }}
+rlimit_core = {{ php.fpm.rlimit_core }}
+{% if php.fpm.slow_log %}
+request_slowlog_timeout = {{ php.fpm.request_slowlog_timeout }}
+slowlog = {{ php.fpm.slowlog_file_directory }}/php{{ version }}-fpm.slow.log
+{% endif %}

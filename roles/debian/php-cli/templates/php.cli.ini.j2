@@ -1526,7 +1526,7 @@ url_rewriter.tags = "a=href,area=href,frame=src,input=src,form=fakeentry"
 ; Development Value: 1
 ; Production Value: -1
 ; http://php.net/zend.assertions
-zend.assertions = -1
+zend.assertions = {{ php.cli.zend_assertions }}
 
 ; Assert(expr); active by default.
 ; http://php.net/assert.active
