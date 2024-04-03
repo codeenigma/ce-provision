@@ -14,10 +14,10 @@ http {
     # Basic Settings
     ##
 
-    sendfile on;
+    sendfile {{ nginx.http.sendfile }};
     tcp_nopush on;
     tcp_nodelay on;
-    keepalive_timeout 65;
+    keepalive_timeout {{ nginx.http.keepalive_timeout }};
     types_hash_max_size 2048;
     server_tokens off;
 

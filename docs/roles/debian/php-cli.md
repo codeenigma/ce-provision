@@ -1,3 +1,13 @@
+# PHP terminal client
+
+Installs and configures terminal client for PHP.
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 php:
   cli:
@@ -29,3 +39,7 @@ php:
       memory_consumption: 128
       max_accelerated_files: 2000
       validate_timestamps: 1
+
+```
+
+<!--ENDROLEVARS-->
