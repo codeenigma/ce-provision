@@ -1,6 +1,6 @@
 # NGINX
 
-Install and configure the nginx webserver.
+Install and configure the NGINX webserver.
 
 Note, the directives are mostly DENY FIRST so if you're expecting to find config that blocks a certain file extension or pattern you should consider it the other way and ensure that pattern is not *allowed* anywhere.
 
