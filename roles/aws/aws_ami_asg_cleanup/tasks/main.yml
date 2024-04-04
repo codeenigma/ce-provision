@@ -8,6 +8,16 @@
       - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
   register: _created_iam_lambda_cleanup_role
 
+- name: Ensure python script is removed
+  ansible.builtin.file:
+    path: "{{ _ce_provision_build_dir }}/clean_up_ami.py"
+    state: absent
+
+- name: Ensure zip file is removed
+  ansible.builtin.file:
+    path: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
+    state: absent
+
 - name: Write Lambda function
   ansible.builtin.template:
     src: cleanup_ami.py.j2
