@@ -1,6 +1,6 @@
 # NGINX
 
-Install and configure the nginx webserver.
+Install and configure the NGINX webserver.
 
 Note, the directives are mostly DENY FIRST so if you're expecting to find config that blocks a certain file extension or pattern you should consider it the other way and ensure that pattern is not *allowed* anywhere.
 
@@ -29,6 +29,29 @@ nginx:
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
     ssl_protocols: "TLSv1.2 TLSv1.3"
+    sendfile: "on"
+    keepalive_timeout: 65
+    gzip_vary: "on"
+    gzip_types:
+      - text/plain
+      - text/css
+      - text/xml
+      - text/javascript
+      - application/javascript
+      - application/x-javascript
+      - application/json
+      - application/xml
+      - application/xml+rss
+      - application/xhtml+xml
+      - application/x-font-ttf
+      - application/x-font-opentype
+      - image/svg+xml
+      - image/x-icon
+    proxy_buffer_size: 512k
+    proxy_buffers: "8 256k"
+    client_body_buffer_size: 512k
+    fastcgi_buffer_size: 512k
+    fastcgi_buffers: "8 256k"
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.

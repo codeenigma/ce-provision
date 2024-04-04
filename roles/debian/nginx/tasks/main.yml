@@ -1,5 +1,5 @@
 ---
-- name: Ensure nginx is installed.
+- name: Ensure NGINX is installed.
   ansible.builtin.apt:
     name: nginx
     state: present
@@ -29,13 +29,14 @@
       packages:
         - name: passlib
 
-- name: Copy main nginx config.
+- name: Copy main NGINX config.
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: "/etc/nginx/nginx.conf"
     owner: root
     group: root
     mode: 0644
+    force: true
 
 - name: Ensure passwords directory exists.
   ansible.builtin.file:
@@ -75,17 +76,10 @@
     path: "/var/log/nginx"
     state: directory
 
-- name: Remove existing vhosts
-  ansible.builtin.file:
-    path: "/etc/nginx/sites-enabled"
-    state: absent
-  when: nginx.recreate_vhosts
-
-- name: Recreate vhosts folder
+- name: Ensure vhosts folder is present.
   ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: directory
-  when: nginx.recreate_vhosts
 
 - name: Check if we have an AWS Cloudwatch folder.
   ansible.builtin.stat:
@@ -96,8 +90,19 @@
   ansible.builtin.template:
     src: cloudwatch-main.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-main.json
+    force: true
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
+
+- name: Generate SSL certificates.
+  ansible.builtin.include_tasks: ssl.yml
+  with_items: "{{ nginx.domains }}"
+  loop_control:
+    loop_var: domain
+  when:
+    - nginx.domains is defined
+    - nginx.domains | length > 0
+    - nginx.recreate_vhosts
 
 - name: Generate domain specific configuration.
   ansible.builtin.include_tasks: domain.yml
@@ -118,21 +123,21 @@
     - nginx.overrides is defined
     - nginx.overrides | length > 0
 
-- name: Test Nginx configuration.
+- name: Test NGINX configuration.
   ansible.builtin.command: nginx -t
   register: nginx_test_result
   failed_when: false
 
-- name: Display Nginx test result.
+- name: Display NGINX test result.
   ansible.builtin.debug:
     msg: "{{ nginx_test_result.stderr }}"
 
-- name: Fail the playbook if Nginx test fails.
+- name: Fail the playbook if NGINX test fails.
   ansible.builtin.fail:
-    msg: "Nginx configuration test failed."
+    msg: "NGINX configuration test failed."
   when: nginx_test_result.rc != 0
 
-- name: Ensure Nginx is restarted.
+- name: Ensure NGINX is restarted.
   ansible.builtin.service:
     name: nginx
     state: restarted
