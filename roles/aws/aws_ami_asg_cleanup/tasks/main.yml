@@ -2,7 +2,7 @@
 - name: Create a role and attach policies
   amazon.aws.iam_role:
     name: LambdaAsgAmiCleanupRole
-    assume_role_policy_document: "{{ lookup('file','assume_lambda_iam_policy.j2') }}"
+    assume_role_policy_document: "{{ lookup('file', 'assume_lambda_iam_policy.j2') }}"
     managed_policies:
       - arn:aws:iam::aws:policy/AmazonEC2FullAccess
       - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
