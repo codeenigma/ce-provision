@@ -181,6 +181,6 @@
   vars:
     timers:
       slapd_backups:
-        timer_command: "{{ ldap_server.config.backup_script }} &> ldap-backup-$( date +%y%m%d-%H%M ).log && find {{ ldap_server.config.backup_path }}/ -type f -mtime +60 -print0 | xargs -0 -r rm"
+        timer_command: "{{ ldap_server.config.backup_script }} &> {{ ldap_server.config.backup_path }}/ldap-backup-$( date +%y%m%d-%H%M ).log && find {{ ldap_server.config.backup_path }}/ -type f -mtime +60 -print0 | xargs -0 -r rm"
         timer_OnCalendar: "{{ ldap_server.config.on_calendar }}"
   when: ldap_server.config.backup
