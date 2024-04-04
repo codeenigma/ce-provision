@@ -98,6 +98,7 @@ location ~* /(?:modules|libraries)/(?:contrib/)?(?:ad|tinybrowser|f?ckeditor|tin
 location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does not exist, it must be a private file.
   try_files $uri @rewrite;
   expires 7d;
+  add_header Cache-Control "private, max-age=604800";
   log_not_found off;
 }
 
@@ -105,6 +106,7 @@ location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does
 location ~ ^/sites/.*/files/(css|js|styles)/ {
     try_files $uri @rewrite_drupal10;
     expires 7d;
+    add_header Cache-Control "public";
 }
 
 # Allow public files and image styles.
@@ -116,6 +118,8 @@ location ~ ^/sites/.*/files/.* {
 # Core and contrib assets can be pretty much anywhere.
 location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
     try_files $uri @rewrite =404;
+    expires 7d;
+    add_header Cache-Control "public";
 }
 
 # Allow robots.txt.
