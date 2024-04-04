@@ -1,0 +1,55 @@
+---
+- name: Create a role and attach policies
+  amazon.aws.iam_role:
+    name: LambdaAsgAmiCleanupRole
+    assume_role_policy_document: "{{ lookup('file', 'assume_lambda_iam_policy.j2') }}"
+    managed_policies:
+      - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+      - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+  register: _created_iam_lambda_cleanup_role
+
+- name: Ensure python script is removed
+  ansible.builtin.file:
+    path: "{{ _ce_provision_build_dir }}/clean_up_ami.py"
+    state: absent
+
+- name: Ensure zip file is removed
+  ansible.builtin.file:
+    path: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
+    state: absent
+
+- name: Write Lambda function
+  ansible.builtin.template:
+    src: cleanup_ami.py.j2
+    dest: "{{ _ce_provision_build_dir }}/clean_up_ami.py"
+
+- name: Create a zip archive of cleanup_ami.py
+  community.general.archive:
+    path: "{{ _ce_provision_build_dir }}/clean_up_ami.py"
+    dest: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
+    format: zip
+
+- name: Create Lambda function
+  amazon.aws.lambda:
+    name: "clean_up_ami"
+    region: "{{ _aws_region }}"
+    timeout: "{{ aws_ami_asg_cleanup.timeout }}"
+    state: present
+    zip_file: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
+    runtime: "{{ aws_ami_asg_cleanup.runtime }}"
+    role: "{{ _created_iam_lambda_cleanup_role.iam_role.arn }}"
+    handler: '{{ aws_ami_asg_cleanup.handler }}'
+    tags:
+      Test: 'This is test tag'
+  register: _created_iam_lambda_cleanup_function
+
+- name: Create scheduler to invoke Lambda function
+  amazon.aws.cloudwatchevent_rule:
+    name: cleanup_asg_ami
+    schedule_expression: "{{ aws_ami_asg_cleanup.scheduler_cron }}"
+    description: Clean up ASG AMIs
+    region: "{{ _aws_region }}"
+    targets:
+      - id: 'clean_up_ami'
+        arn: "{{ _created_iam_lambda_cleanup_function.configuration.function_arn }}"
+        input: '{"asg_name": "{{ _domain_name | regex_replace("\.", "-") }}"}'
