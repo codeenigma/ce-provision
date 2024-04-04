@@ -118,7 +118,7 @@ location ~ ^/sites/.*/files/.* {
     {{ nginx.http.cache_behavior_public }};
 {% endif %}
 }
- 
+
 # This Nginx config is DENY FIRST, so only these file extensions are permitted.
 # Core and contrib assets can be pretty much anywhere.
 location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
