@@ -54,7 +54,6 @@
     force: true
   with_items:
     - _common
-    - _common_cloudfront
     - custom
     - docker_registry
     - drupal_common
@@ -100,6 +99,7 @@
   loop_control:
     loop_var: domain
   when:
+    - domain.ssl is defined
     - nginx.domains is defined
     - nginx.domains | length > 0
     - nginx.recreate_vhosts
