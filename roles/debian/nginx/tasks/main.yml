@@ -100,7 +100,6 @@
   loop_control:
     loop_var: domain
   when:
-    - domain.ssl is defined
     - nginx.domains is defined
     - nginx.domains | length > 0
     - nginx.recreate_vhosts
