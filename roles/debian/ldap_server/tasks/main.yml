@@ -169,7 +169,7 @@
 - name: Create the slapd backup script.
   ansible.builtin.template:
     src: slap-bak.j2
-    dest: /usr/local/bin/slap-bak
+    dest: "{{ ldap_server.config.backup_script }}"
     owner: root
     group: root
     mode: 0755
@@ -181,6 +181,6 @@
   vars:
     timers:
       slapd_backups:
-        timer_command: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r rm"
+        timer_command: "{{ ldap_server.config.backup_script }} &> ldap-backup-$( date +%y%m%d-%H%M ).log && find {{ ldap_server.config.backup_path }}/ -type f -mtime +60 -print0 | xargs -0 -r rm"
         timer_OnCalendar: "{{ ldap_server.config.on_calendar }}"
   when: ldap_server.config.backup
