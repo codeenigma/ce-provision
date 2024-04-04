@@ -89,22 +89,26 @@ location ~* /(?:modules|libraries)/(?:contrib/)?(?:ad|tinybrowser|f?ckeditor|tin
 # Allow public files and image styles.
 location ~ ^/sites/.*/files/.* {
     try_files $uri @rewrite;
+{% if nginx.http.cache_behavior_public %}
+    {{ nginx.http.cache_behavior_public }};
+{% endif %}
 }
 
 # Allow private files support
 location ~* ^/system/files/.*\.(png|jpg|jpeg|gif|ico|svg)$ { # If the image does not exist, it must be a private file.
   try_files $uri @rewrite;
-  expires 7d;
-  add_header Cache-Control "private, max-age=604800";
-  log_not_found off;
+{% if nginx.http.cache_behavior_private %}
+    {{ nginx.http.cache_behavior_private }};
+{% endif %}
 }
 
 # This Nginx config is DENY FIRST, so only these file extensions are permitted.
 # Core and contrib assets can be pretty much anywhere.
 location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf|otf)$ {
     try_files $uri @rewrite =404;
-    expires 7d;
-    add_header Cache-Control "public";
+{% if nginx.http.cache_behavior_public %}
+    {{ nginx.http.cache_behavior_public }};
+{% endif %}
 }
 
 # Allow robots.txt.

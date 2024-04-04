@@ -40,6 +40,8 @@ nginx:
     client_body_buffer_size: 512k
     fastcgi_buffer_size: 512k
     fastcgi_buffers: "8 256k"
+    cache_behavior_private: "add_header Cache-Control \"private, max-age=604800\";"
+    cache_behavior_public: "add_header Cache-Control \"public, max-age=604800\";"
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.
