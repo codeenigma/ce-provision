@@ -45,7 +45,7 @@
 
 - name: Create scheduler to invoke Lambda function
   amazon.aws.cloudwatchevent_rule:
-    name: cleanup_asg_ami
+    name: "cleanup_asg_ami_{{ _domain_name }}"
     schedule_expression: "{{ aws_ami_asg_cleanup.scheduler_cron }}"
     description: Clean up ASG AMIs
     region: "{{ _aws_region }}"
