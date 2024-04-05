@@ -157,7 +157,10 @@
   when: nginx_test_result.rc == 0
 
 - name: Restore previous NGINX config from backup if test fails.
-  ansible.builtin.command: "tar -xzf /home/{{ _ce_provision_username }}/nginx_backup.tar.gz -C /"
+  ansible.builtin.unarchive:
+    src: /home/{{ _ce_provision_username }}/nginx_backup.tar.gz
+    dest: /
+    remote_src: yes
   when: nginx_test_result.rc != 0
 
 - name: Fail the playbook after restore.
