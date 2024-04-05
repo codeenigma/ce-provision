@@ -141,3 +141,16 @@
   ansible.builtin.service:
     name: nginx
     state: restarted
+  when: nginx_test_result.rc == 0
+
+- name: Restore previous NGINX config from backup if test fails.
+  ansible.builtin.unarchive:
+    src: /home/{{ _ce_provision_username }}/nginx_backup.tar.gz
+    dest: /
+    remote_src: true
+  when: nginx_test_result.rc != 0
+
+- name: Fail the playbook after restore.
+  ansible.builtin.fail:
+    msg: "NGINX configuration test failed. Previous configuration was restored. You need to check it manually."
+  when: nginx_test_result.rc != 0
