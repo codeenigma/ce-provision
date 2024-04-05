@@ -1,0 +1,7 @@
+aws_ami_asg_cleanup:
+  memory_size: 128 # Memory allocation for Lambda function in MB
+  timeout: 30 # Time in seconds, max is 900
+  handler: "clean_up_ami.lambda_handler" # Change this only if the main_file.main_function name is changed
+  runtime: "python3.12" # If the python version changes we need to update this as well
+  keep_backups: 10
+  scheduler_cron: "cron(0 16 ? * SUN *)"
