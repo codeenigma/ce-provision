@@ -160,7 +160,7 @@
   ansible.builtin.unarchive:
     src: /home/{{ _ce_provision_username }}/nginx_backup.tar.gz
     dest: /
-    remote_src: yes
+    remote_src: true
   when: nginx_test_result.rc != 0
 
 - name: Fail the playbook after restore.
