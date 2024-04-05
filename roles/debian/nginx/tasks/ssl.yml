@@ -5,59 +5,48 @@
     path: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
   register: _nginx_vhost_link
 
-- name: Temporarily place a vhost for LetsEncrypt to work.
-  ansible.builtin.template:
-    src: vhost_letsencrypt.j2
-    dest: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    owner: root
-    group: root
-    mode: 0644
+- name: LetsEncrypt create vhosts.
   when:
-    - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
     - _nginx_vhost_link.stat.islnk is not defined or domain.ssl.services | length > 0 # if services[] is defined we can assume we are running certbot on port 80 or 443
+  block:
+    - name: Temporarily place a vhost for LetsEncrypt to work.
+      ansible.builtin.template:
+        src: vhost_letsencrypt.j2
+        dest: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+        owner: root
+        group: root
+        mode: 0644
 
-- name: Enable vhost.
-  ansible.builtin.file:
-    src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
-    state: link
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-    - _nginx_vhost_link.stat.islnk is not defined or domain.ssl.services | length > 0
+    - name: Enable vhost.
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+        dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
+        state: link
 
-- name: Reload the nginx service.
-  ansible.builtin.service:
-    name: nginx
-    state: reloaded
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-    - _nginx_vhost_link.stat.islnk is not defined or domain.ssl.services | length > 0
+    - name: Reload the nginx service.
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
 
 - name: Generates SSL keys.
   ansible.builtin.include_role:
     name: debian/ssl
     public: true
-  when: domain.ssl is defined
   vars:
     ssl: "{{ domain.ssl }}"
 
-- name: Delete the link to the vhost for LetsEncrypt.
-  ansible.builtin.file:
-    path: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
-    state: absent
+- name: LetsEncrypt cleanup vhosts.
   when:
-    - domain.ssl is defined
     - domain.ssl.handling == 'letsencrypt'
-    - _nginx_vhost_link.stat.islnk is not defined or domain.ssl.services | length > 0
+    - _nginx_vhost_link.stat.islnk is not defined or domain.ssl.services | length > 0 # if services[] is defined we can assume we are running certbot on port 80 or 443
+  block:
+    - name: Delete the link to the vhost for LetsEncrypt.
+      ansible.builtin.file:
+        path: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
+        state: absent
 
-- name: Delete the temporary vhost for LetsEncrypt.
-  ansible.builtin.file:
-    path: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    state: absent
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-    - _nginx_vhost_link.stat.islnk is not defined or domain.ssl.services | length > 0
+    - name: Delete the temporary vhost for LetsEncrypt.
+      ansible.builtin.file:
+        path: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
+        state: absent

@@ -28,11 +28,7 @@ server {
     access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
     root "{{ domain.webroot }}";
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
-{% if domain.is_behind_cloudfront is defined and domain.is_behind_cloudfront %}
-    include "/etc/nginx/conf.d/_common_cloudfront";
-{% else %}
     include "/etc/nginx/conf.d/_common";
-{% endif %}
 {% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' %}
 {% if domain.ssl.web_server | default('standalone') == 'standalone' %}
     # Proxy for certbot (LetsEncrypt)
