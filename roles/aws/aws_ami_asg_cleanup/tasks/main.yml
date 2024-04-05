@@ -29,6 +29,10 @@
     dest: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
     format: zip
 
+- name: Sleep for 100 seconds for IAM before Lambda creation
+  ansible.builtin.wait_for:
+    timeout: 100
+
 - name: Create Lambda function
   amazon.aws.lambda:
     name: "clean_up_ami"
@@ -41,8 +45,6 @@
     handler: '{{ aws_ami_asg_cleanup.handler }}'
     tags:
       Test: 'This is test tag'
-    retries: 5
-    delay: 10
   register: _created_iam_lambda_cleanup_function
 
 - name: Create scheduler to invoke Lambda function
