@@ -19,3 +19,5 @@ rlimit_core = {{ php.fpm.rlimit_core }}
 request_slowlog_timeout = {{ php.fpm.request_slowlog_timeout }}
 slowlog = {{ php.fpm.slowlog_file_directory }}/php{{ version }}-fpm.slow.log
 {% endif %}
+
+clear_env = {{ php.fpm.clear_env }}
