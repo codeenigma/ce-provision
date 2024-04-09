@@ -29,9 +29,9 @@
     dest: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
     format: zip
 
-- name: Sleep for 100 seconds for IAM before Lambda creation
+- name: Sleep for 30 seconds for IAM before Lambda creation
   ansible.builtin.wait_for:
-    timeout: 100
+    timeout: 30
 
 - name: Create Lambda function
   amazon.aws.lambda:
