@@ -111,17 +111,6 @@
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
-- name: Generate SSL certificates.
-  ansible.builtin.include_tasks: ssl.yml
-  with_items: "{{ nginx.domains }}"
-  loop_control:
-    loop_var: domain
-  when:
-    - domain.ssl is defined
-    - nginx.domains is defined
-    - nginx.domains | length > 0
-    - nginx.recreate_vhosts
-
 - name: Generate domain specific configuration.
   ansible.builtin.include_tasks: domain.yml
   with_items: "{{ nginx.domains }}"
