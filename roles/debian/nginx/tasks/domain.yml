@@ -1,4 +1,9 @@
 ---
+- name: Generate SSL certificates.
+  ansible.builtin.include_tasks: ssl.yml
+  when:
+    - domain.ssl is defined
+
 - name: Set up basic auth.
   when:
     - domain.basic_auth.auth_enabled is defined
