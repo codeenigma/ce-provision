@@ -31,7 +31,7 @@
 
 - name: Sleep for 30 seconds for IAM before Lambda creation
   ansible.builtin.wait_for:
-    timeout: 30
+    timeout: 20
 
 - name: Create Lambda function
   amazon.aws.lambda:
@@ -49,11 +49,11 @@
 
 - name: Create scheduler to invoke Lambda function
   amazon.aws.cloudwatchevent_rule:
-    name: "cleanup_asg_ami_{{ _domain_name }}"
+    name: "cleanup_asg_ami_{{ _aws_resource_name }}"
     schedule_expression: "{{ aws_ami_asg_cleanup.scheduler_cron }}"
     description: Clean up ASG AMIs
     region: "{{ _aws_region }}"
     targets:
       - id: 'clean_up_ami'
         arn: "{{ _created_iam_lambda_cleanup_function.configuration.function_arn }}"
-        input: '{"asg_name": "{{ _domain_name | regex_replace("\.", "-") }}"}'
+        input: '{"asg_name": "{{ _aws_resource_name }}"}'
