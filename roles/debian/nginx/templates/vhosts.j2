@@ -38,9 +38,23 @@ server {
     }
 {% endif %}
 {% endif %}
-{% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
+{% if 
+    domain.basic_auth.auth_enabled is defined and
+    domain.basic_auth.auth_enabled and
+    domain.basic_auth.auth_user is defined and
+    domain.basic_auth.auth_user | length > 0
+%}
     auth_basic "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
     auth_basic_user_file "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd";
+{% endif %}
+{% if 
+    domain.basic_auth.auth_enabled is defined and
+    domain.basic_auth.auth_enabled and
+    domain.basic_auth.auth_file is defined and
+    domain.basic_auth.auth_file | length > 0
+%}
+    auth_basic "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
+    auth_basic_user_file "/etc/nginx/passwords/{{ domain.server_name }}.provided.htpasswd";
 {% endif %}
 }
 {% endfor %}

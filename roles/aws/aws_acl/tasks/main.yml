@@ -1,0 +1,142 @@
+- name: Define dict for rules
+  ansible.builtin.set_fact:
+    _acl_rules: []
+
+- name: Set IP block rule
+  when: aws_acl.ip_block is defined
+  block:
+    - name: Create IP block set for WAF
+      community.aws.wafv2_ip_set:
+        name: "{{ aws_acl.ip_block.name }}"
+        state: present
+        description: Set of blocked IPs
+        scope: "{{ aws_acl.scope }}"
+        region: "{{ aws_acl.region }}"
+        ip_address_version: IPV4
+        addresses: "{{ aws_acl.ip_block.list }}"
+      register: _ip_set_info
+
+    - name: Create IP block rule
+      ansible.builtin.set_fact:
+        ip_block_rule:
+        - name: "{{ aws_acl.ip_block.name }}"
+          priority: 0
+          action:
+            block: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: Block_IPs
+          statement:
+            ip_set_reference_statement:
+              arn: "{{ _ip_set_info.arn }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        _acl_rules: "{{ _acl_rules + ip_block_rule }}"
+
+- name: Set IP allow rule
+  when: aws_acl.ip_allow is defined
+  block:
+    - name: Create IP allow set for WAF
+      community.aws.wafv2_ip_set:
+        name: "{{ aws_acl.ip_allow.name }}"
+        state: present
+        description: Set of allowed IPs
+        scope: "{{ aws_acl.scope }}"
+        region: "{{ aws_acl.region }}"
+        ip_address_version: IPV4
+        addresses: "{{ aws_acl.ip_allow.list }}"
+      register: _ip_set_info
+
+    - name: Create IP allow rule
+      ansible.builtin.set_fact:
+        ip_allow_rule:
+        - name: "{{ aws_acl.ip_allow.name }}"
+          priority: 1
+          action:
+            allow: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: Allow_IPs
+          statement:
+            ip_set_reference_statement:
+              arn: "{{ _ip_set_info.arn }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        _acl_rules: "{{ _acl_rules + ip_allow_rule }}"
+
+- name: Set country block rule
+  when: aws_acl.cc_block_list is defined
+  block:
+    - name: Create country block rule
+      ansible.builtin.set_fact:
+        cc_block_rule:
+          - name: block_countries
+            priority: 2
+            action:
+              block: {}
+            visibility_config:
+              sampled_requests_enabled: true
+              cloud_watch_metrics_enabled: true
+              metric_name: block_countries
+            statement:
+              geo_match_statement: # Can't find the actual name, I got this from aws rule JSON formated
+                country_codes: "{{ aws_acl.cc_block_list }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        _acl_rules: "{{ _acl_rules + cc_block_rule }}"
+
+# Workaround for rate limit rule in ACL (any variable gets interpreted as string instead of int)
+- name: Set rate limit variable
+  when: rate_limit is defined
+  block:
+    - name: Define rate rule
+      ansible.builtin.set_fact:
+        rate_rule:
+        - name: rate_limit
+          priority: 3
+          action:
+            block: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: rate_limit
+          statement:
+            rate_based_statement:
+              limit: "{{ rate_limit }}"
+              aggregate_key_type: IP
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        _acl_rules: "{{ _acl_rules + rate_rule}}"
+
+- name: Create web acl
+  community.aws.wafv2_web_acl:
+    name: "{{ aws_acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
+    description: "WAF protecting the {{ _domain_name }}"
+    scope: "{{ aws_acl.scope }}"
+    region: "{{ aws_acl.region }}"
+    default_action: Allow # or "Block"
+    sampled_requests: false
+    cloudwatch_metrics: true # or "false" to disable metrics
+    metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
+    rules: "{{ _acl_rules }}"
+    purge_rules: true
+#    tags:
+#      A: B
+#      C: D
+    state: present
+  register: _created_acl
+
+- name: Add WAF to ALB
+  community.aws.wafv2_resources:
+    name: "{{ aws_acl.name }}"
+    scope: REGIONAL
+    state: present
+    region: "{{ aws_acl.region }}"
+    arn: "{{ _aws_ec2_elb.load_balancer_arn }}"
+  when: _aws_ec2_elb is defined

@@ -21,6 +21,7 @@
     name: debian/ssl
   vars:
     ssl:
+      replace_existing: false
       domain: "{{ jenkins.server_name }}"
       services: []
 

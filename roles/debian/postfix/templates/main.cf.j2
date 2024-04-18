@@ -37,9 +37,20 @@ non_smtpd_milters = inet:localhost:8891
 smtp_sasl_auth_enable = yes
 smtp_sasl_security_options = noanonymous
 smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+{% endif %}
+{% if postfix.use_ses or postfix.ssl.enabled %}
 smtp_use_tls = yes
 smtp_tls_note_starttls_offer = yes
-smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+smtp_tls_CApath = {{ postfix.ssl.smtp_tls_CApath }}
+smtp_tls_CAfile = {{ postfix.ssl.smtp_tls_CAfile }}
+{% endif %}
+{% if postfix.ssl.enabled %}
+smtp_tls_cert_file = {{ postfix.ssl.smtp_tls_cert_file }}
+smtp_tls_key_file = {{ postfix.ssl.smtp_tls_key_file }}
+smtpd_tls_cert_file = {{ postfix.ssl.smtp_tls_cert_file }}
+smtpd_tls_key_file = {{ postfix.ssl.smtp_tls_key_file }}
+smtpd_tls_CApath = {{ postfix.ssl.smtp_tls_CApath }}
+smtpd_tls_CAfile = {{ postfix.ssl.smtp_tls_CAfile }}
 {% endif %}
 {% if (is_local is defined) and is_local %}
 # Force all mail to ce-dev user.

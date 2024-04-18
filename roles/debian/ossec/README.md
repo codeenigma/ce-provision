@@ -34,6 +34,7 @@ ossec:
   ssl:
     domain: "ossec.example.com"
     handling: "selfsigned"
+    replace_existing: false
 
   syscheck:
     frequency: 79200

@@ -1,7 +1,7 @@
 #!/bin/bash
 SUBJECT="{{ clamav.server_name }} PASSED SCAN"
 EMAIL="{{ clamav.report_recipient_email }}"
-LOG={{ clamav.log_location }}/{{ clamav.log_name }}
+LOG={{ clamav.log_location }}/{{ item.log_name }}
 TMP_LOG=/tmp/clam.daily
 
 rm -rf ${TMP_LOG}
@@ -38,9 +38,10 @@ av_report() {
 }
 
 av_scan() {
+    {% if item.exclude_directories | length > 0 %}
     # build bash array of directories to exclude
     EXCLUSIONS=()
-    {% for directory in clamav.exclude_directories %}
+    {% for directory in item.exclude_directories %}
     EXCLUSIONS+=("{{ directory }}")
     {% endfor %}
 
@@ -49,9 +50,10 @@ av_scan() {
     for directory in ${EXCLUSIONS[@]}; do
       EXCLUSIONS_STRING+=" --exclude-dir=$directory"
     done
+    {% endif %}
 
 	touch ${TMP_LOG}
-	clamscan -r {{ clamav.scan_location }} --quiet --infected --log=${TMP_LOG}$EXCLUSIONS_STRING
+	clamscan -r {{ item.scan_location }} --quiet --infected --log=${TMP_LOG}$EXCLUSIONS_STRING
 
 	cat ${TMP_LOG} >> ${LOG}
 }

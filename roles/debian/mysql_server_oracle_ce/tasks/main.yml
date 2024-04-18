@@ -1,20 +1,19 @@
 ---
 #@todo Configuration is for dev.
 
-- name: Add repository key for MySQL repository.
-  ansible.builtin.apt_key:
-    keyserver: "{{ mysql_server_oracle_ce_key_server }}"
-    id: "{{ mysql_server_oracle_ce_key }}"
-    state: present
+- name: Add repository key for MySQL repository using wget and apt-key
+  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 | apt-key add -"
+  args:
+    executable: /bin/bash
 
 - name: Add repository for MySQL.
   ansible.builtin.apt_repository:
-    repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-5.7"
+    repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-8.0"
     state: present
 
 - name: Add source repository for MySQL.
   ansible.builtin.apt_repository:
-    repo: "deb-src http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-5.7"
+    repo: "deb-src http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-8.0"
     state: present
 
 - name: Pin MySQL packages.
