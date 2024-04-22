@@ -60,7 +60,7 @@ error_log {{ domain.error_log }} {{ domain.error_log_level }};
     {% if domain.basic_auth.auth_user is defined and domain.basic_auth.auth_user | length > 0 %}
         auth_basic_user_file "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd";
     {% endif %}
-    {% if domain.basic_auth.auth_file is defined and and domain.basic_auth.auth_file | length > 0 %}
+    {% if domain.basic_auth.auth_file is defined and domain.basic_auth.auth_file | length > 0 %}
         auth_basic_user_file "/etc/nginx/passwords/{{ domain.server_name }}.provided.htpasswd";
     {% endif %}
 {% endif %}
