@@ -24,10 +24,10 @@ location @phpprocess {
 # Rewrite any request not whitelisted below,
 # so they get processed through the app level (and 404).
 location / {
-    {% if nginx.ratelimitingcrawlers %}
+{% if nginx.ratelimitingcrawlers %}
 #    @todo
 #    limit_req zone=bots burst=5 nodelay;
-    {% endif %}
+{% endif %}
     try_files @rewrite /index.php?$query_string;
 }
 

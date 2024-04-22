@@ -54,9 +54,9 @@ http {
     ##
 
 {% if nginx.http.custom_directives is defined %}
-    {% for directive in nginx.http.custom_directives %}
+{% for directive in nginx.http.custom_directives %}
     {{ directive }}
-    {% endfor %}
+{% endfor %}
 {% endif %}
 
     ##
