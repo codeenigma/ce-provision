@@ -16,9 +16,9 @@ server {
     rewrite ^ https://{{ domain.server_name }}$request_uri? permanent;
 {% endif %}
 {% if server.custom_directives is defined %}
-    {% for directive in server.custom_directives %}
+{% for directive in server.custom_directives %}
     {{ directive }}
-    {% endfor %}
+{% endfor %}
 {% endif %}
 {% if server.ssl %}
     ssl_certificate {{ ssl_facts[_ssl_domains[0]].certificate }};
@@ -38,23 +38,32 @@ server {
     }
 {% endif %}
 {% endif %}
-{% if 
-    domain.basic_auth.auth_enabled is defined and
-    domain.basic_auth.auth_enabled and
-    domain.basic_auth.auth_user is defined and
-    domain.basic_auth.auth_user | length > 0
-%}
+
+{% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
+{% if _profile == 'asg' and domain.is_default is defined and domain.is_default %}
+    # Additional http_auth bypass for ASG healthchecks.
+    set $bypassagent "0";
+    set $bypass "0";
+    set $auth_status "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
+    if ($http_user_agent ~* "ELB-HealthChecker") {
+        set $bypassagent "1";
+    }
+    if ($remote_addr ~ "^{{ _aws_vpc_cidr_base | replace('.', '\\.') }}\." ) {
+        set $bypass "${bypassagent}1";
+    }
+    if ($bypass = "11") {
+        set $auth_status "off";
+    }
+    auth_basic $auth_status;
+{% else %}
     auth_basic "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
+{% endif %}
+{% if domain.basic_auth.auth_user is defined and domain.basic_auth.auth_user | length > 0 %}
     auth_basic_user_file "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd";
 {% endif %}
-{% if 
-    domain.basic_auth.auth_enabled is defined and
-    domain.basic_auth.auth_enabled and
-    domain.basic_auth.auth_file is defined and
-    domain.basic_auth.auth_file | length > 0
-%}
-    auth_basic "{{ domain.basic_auth.auth_message | default('Restricted content') }}";
+{% if domain.basic_auth.auth_file is defined and domain.basic_auth.auth_file | length > 0 %}
     auth_basic_user_file "/etc/nginx/passwords/{{ domain.server_name }}.provided.htpasswd";
+{% endif %}
 {% endif %}
 }
 {% endfor %}
