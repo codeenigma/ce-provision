@@ -138,7 +138,7 @@
     state: present
   register: _created_acl
 
-- name: Add WAF to ALB
+- name: Add WAF to ALB.
   community.aws.wafv2_resources:
     name: "{{ aws_acl.name }}"
     scope: REGIONAL
