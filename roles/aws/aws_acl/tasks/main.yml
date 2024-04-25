@@ -1,11 +1,13 @@
-- name: Define dict for rules
+- name: Define dict for rules.
   ansible.builtin.set_fact:
     _acl_rules: []
 
-- name: Set IP block rule
-  when: aws_acl.ip_block is defined
+- name: Set IP block rule.
+  when:
+    - aws_acl.ip_block is defined
+    - aws_acl.ip_block.list | length > 0
   block:
-    - name: Create IP block set for WAF
+    - name: Create IP block set for WAF.
       community.aws.wafv2_ip_set:
         name: "{{ aws_acl.ip_block.name }}"
         state: present
@@ -16,7 +18,7 @@
         addresses: "{{ aws_acl.ip_block.list }}"
       register: _ip_set_info
 
-    - name: Create IP block rule
+    - name: Create IP block rule.
       ansible.builtin.set_fact:
         ip_block_rule:
         - name: "{{ aws_acl.ip_block.name }}"
@@ -31,14 +33,16 @@
             ip_set_reference_statement:
               arn: "{{ _ip_set_info.arn }}"
 
-    - name: Add rule to list
+    - name: Add rule to list.
       ansible.builtin.set_fact:
         _acl_rules: "{{ _acl_rules + ip_block_rule }}"
 
-- name: Set IP allow rule
-  when: aws_acl.ip_allow is defined
+- name: Set IP allow rule.
+  when:
+    - aws_acl.ip_allow is defined
+    - aws_acl.ip_allow.list | length > 0
   block:
-    - name: Create IP allow set for WAF
+    - name: Create IP allow set for WAF.
       community.aws.wafv2_ip_set:
         name: "{{ aws_acl.ip_allow.name }}"
         state: present
@@ -49,7 +53,7 @@
         addresses: "{{ aws_acl.ip_allow.list }}"
       register: _ip_set_info
 
-    - name: Create IP allow rule
+    - name: Create IP allow rule.
       ansible.builtin.set_fact:
         ip_allow_rule:
         - name: "{{ aws_acl.ip_allow.name }}"
@@ -64,12 +68,14 @@
             ip_set_reference_statement:
               arn: "{{ _ip_set_info.arn }}"
 
-    - name: Add rule to list
+    - name: Add rule to list.
       ansible.builtin.set_fact:
         _acl_rules: "{{ _acl_rules + ip_allow_rule }}"
 
-- name: Set country block rule
-  when: aws_acl.cc_block_list is defined
+- name: Set country block rule.
+  when:
+    - aws_acl.cc_block_list is defined
+    - aws_acl.cc_block_list | length > 0
   block:
     - name: Create country block rule
       ansible.builtin.set_fact:
@@ -91,10 +97,12 @@
         _acl_rules: "{{ _acl_rules + cc_block_rule }}"
 
 # Workaround for rate limit rule in ACL (any variable gets interpreted as string instead of int)
-- name: Set rate limit variable
-  when: rate_limit is defined
+- name: Set rate limit variable.
+  when:
+    - rate_limit is defined
+    - rate_limit > 0
   block:
-    - name: Define rate rule
+    - name: Define rate rule.
       ansible.builtin.set_fact:
         rate_rule:
         - name: rate_limit
@@ -110,11 +118,11 @@
               limit: "{{ rate_limit }}"
               aggregate_key_type: IP
 
-    - name: Add rule to list
+    - name: Add rule to list.
       ansible.builtin.set_fact:
         _acl_rules: "{{ _acl_rules + rate_rule}}"
 
-- name: Create web acl
+- name: Create web acl.
   community.aws.wafv2_web_acl:
     name: "{{ aws_acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
     description: "WAF protecting the {{ _domain_name }}"
@@ -126,9 +134,7 @@
     metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
     rules: "{{ _acl_rules }}"
     purge_rules: true
-#    tags:
-#      A: B
-#      C: D
+    tags: "{{ aws_acl.tags }}"
     state: present
   register: _created_acl
 

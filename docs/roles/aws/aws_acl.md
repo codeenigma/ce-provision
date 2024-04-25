@@ -1,3 +1,12 @@
+# AWS ACL
+Creates an ACL to be attached to a CloudFront distribution or an Application Load Balancer (ALB).
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 rate_limit: 0 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
 aws_acl:
@@ -25,3 +34,6 @@ aws_acl:
     #- CN # China
     #- IR # Iran
     #- SA # Saudi Arabia
+```
+
+<!--ENDROLEVARS-->
