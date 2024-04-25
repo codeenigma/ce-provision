@@ -1,5 +1,5 @@
 ---
-- name: Create web acl if defined
+- name: Create web acl if defined.
   ansible.builtin.include_role:
     name: aws/aws_acl
   when:
@@ -7,19 +7,19 @@
     - aws_acl.scope == 'CLOUDFRONT'
 
 # Creating bucket for CF logging
-- name: Create S3 bucket if it does not exist
+- name: Create S3 bucket if it does not exist.
   amazon.aws.s3_bucket:
     name: "{{ _domain_name }}-cf-log"
     state: present
     object_ownership: "BucketOwnerPreferred"
 
-- name: Create S3 bucket prefix
+- name: Create S3 bucket prefix.
   amazon.aws.s3_object:
     bucket: "{{ _domain_name }}-cf-log"
     object: "cf-logging/"
     mode: "create"
 
-- name: Creating dictionary for CF logging
+- name: Creating dictionary for CF logging.
   ansible.builtin.set_fact:
     _cf_s3_log:
       bucket: "{{ _domain_name }}-cf-log.s3.amazonaws.com" # URL of S3 bucket to store logs
