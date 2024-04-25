@@ -1,0 +1,25 @@
+---
+- name: Remove legacy repository from sources list.
+  ansible.builtin.apt_repository:
+    repo: "{{ apt_repository.legacy_repo }}"
+    state: absent
+  when: apt_repository.legacy_repo | length > 0
+
+# See https://docs.ansible.com/ansible/latest/collections/ansible/builtin/deb822_repository_module.html
+- name: Add APT repository in DEB822 format.
+  ansible.builtin.deb822_repository:
+    name: "{{ apt_repository.name }}"
+    types: "{{ apt_repository.types }}"
+    uris: "{{ apt_repository.uris }}"
+    signed_by: "{{ apt_repository.signed_by | default('omit') }}"
+    suites: "{{ apt_repository.suites | default('omit') }}"
+    components: "{{ apt_repository.components }}"
+    state: "{{ apt_repository.state }}"
+    enabled: "{{ apt_repository.enabled }}"
+
+# Install systemd timer to grab the key every week - just renew weekly
+# See https://stackoverflow.com/a/72548342
+
+- name: Update the APT cache.
+  ansible.builtin.apt:
+    update_cache: true
