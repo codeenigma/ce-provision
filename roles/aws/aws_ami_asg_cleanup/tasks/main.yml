@@ -29,7 +29,13 @@
     dest: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
     format: zip
 
-- name: Sleep for 30 seconds for IAM before Lambda creation
+# Future reference - currently lambda module is not accepting log group
+#- amazon.aws.cloudwatchlogs_log_group:
+#    state: present
+#    log_group_name: ami_asg_cleanup
+#  register: _ami_asg_log
+
+- name: Sleep for 20 seconds for IAM before Lambda creation
   ansible.builtin.wait_for:
     timeout: 20
 
