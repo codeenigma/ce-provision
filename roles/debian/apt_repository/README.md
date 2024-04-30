@@ -11,7 +11,8 @@ Role for handling the installation and management of APT repos. Uses the DEB822 
 apt_repository:
   legacy_repo: "" # optionally provide repo string of old list file to clean up, we are creating a new DEB822 format source file
   name: example
-  types: deb
+  types:
+    - deb
   uris:
     - https://example.com/apt
   #signed_by: "" # either the path to the key or the key contents
