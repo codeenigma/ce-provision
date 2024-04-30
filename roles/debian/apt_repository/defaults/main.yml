@@ -11,3 +11,4 @@ apt_repository:
     - main
   state: present
   enabled: true
+  key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events

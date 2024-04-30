@@ -11,14 +11,35 @@
     name: "{{ apt_repository.name }}"
     types: "{{ apt_repository.types }}"
     uris: "{{ apt_repository.uris }}"
-    signed_by: "{{ apt_repository.signed_by | default('omit') }}"
-    suites: "{{ apt_repository.suites | default('omit') }}"
+    signed_by: "{{ apt_repository.signed_by | default(omit) }}"
+    suites: "{{ apt_repository.suites | default(omit) }}"
     components: "{{ apt_repository.components }}"
     state: "{{ apt_repository.state }}"
     enabled: "{{ apt_repository.enabled }}"
+  register: _apt_repository
 
-# Install systemd timer to grab the key every week - just renew weekly
-# See https://stackoverflow.com/a/72548342
+- name: Install systemd timer to renew the key every week.
+  when:
+    - apt_repository.key_refresh_timer | length > 0
+    - apt_repository.signed_by is defined
+    - apt_repository.signed_by | length > 0
+    - apt_repository.signed_by is url # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/url_test.html
+  block:
+    - name: Create script to refresh APT repository key.
+      ansible.builtin.template:
+        src: "refresh_key.j2"
+        dest: "/usr/local/bin/{{ apt_repository.name }}_key_refresh"
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Set up a systemd timer to refresh APT repository key.
+      ansible.builtin.include_role:
+        name: contrib/systemd_timers
+      vars:
+        timers:
+          timer_command: "/usr/local/bin/{{ apt_repository.name }}_key_refresh"
+          timer_OnCalendar: "{{ apt_repository.key_refresh_timer_OnCalendar }}"
 
 - name: Update the APT cache.
   ansible.builtin.apt:
