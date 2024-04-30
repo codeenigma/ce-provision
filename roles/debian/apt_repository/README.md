@@ -1,6 +1,19 @@
 # APT Repository
 Role for handling the installation and management of APT repos. Uses the DEB822 format.
 
+The variables `uris`, `suites` and `components` combine to build an APT repository request, for example these are the variables for the MySQL 8.0 repository:
+
+```yaml
+  uris:
+    - http://repo.mysql.com/apt/debian/
+  suites:
+    - "{{ ansible_distribution_release }}"
+  components:
+    - mysql-8.0
+```
+
+This results in APT referring to the following URI on a Debian 11 (bullseye) system: https://repo.mysql.com/apt/debian/dists/bullseye/mysql-8.0/
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -15,8 +28,9 @@ apt_repository:
     - deb
   uris:
     - https://example.com/apt
-  #signed_by: "" # either the path to the key or the key contents
-  #suites: "bookworm" # optionally provide suites information
+  #signed_by: https://example.com/apt-key.asc # either the path to the key or the key contents
+  #suites:
+  #  - "{{ ansible_distribution_release }}"
   components:
     - main
   state: present
