@@ -37,8 +37,9 @@
         name: contrib/systemd_timers
       vars:
         timers:
-          timer_command: "/usr/local/bin/{{ apt_repository.name }}_key_refresh"
-          timer_OnCalendar: "{{ apt_repository.key_refresh_timer_OnCalendar }}"
+          mysql_apt_key_refresh:
+            timer_command: "/usr/local/bin/{{ apt_repository.name }}_key_refresh"
+            timer_OnCalendar: "{{ apt_repository.key_refresh_timer_OnCalendar }}"
 
 - name: Update the APT cache.
   ansible.builtin.apt:
