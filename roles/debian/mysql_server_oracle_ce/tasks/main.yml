@@ -14,6 +14,7 @@
       uris:
         - http://repo.mysql.com/apt/debian/
       signed_by: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
+      suites: "{{ ansible_distribution_release }}"
       components:
         - mysql-8.0
       state: present
