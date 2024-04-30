@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Derived from https://gist.github.com/Ghostbird/83eb5bcd2ffd4a6b6966137a2e1c4caf
+# MIT LICENCE:
+# Copyright © 2022 Gijsbert “Ghostbird” ter Horst
+
+# Returned by the Ansible module.
+KEYRING_FILE="{{ _apt_repository.key_filename }}"
+
+cd $(mktemp -d)
+curl -fsS -o key.tmp "{{ apt_repository.signed_by }}"
+
+# Ensure dearmoured
+if [ -n "$(file key.tmp | grep 'PGP public key block')" ]
+then
+  cat key.tmp | gpg --dearmour > key2.tmp
+  mv key2.tmp key.tmp
+fi
+
+sudo install -D -o root -g root -m 644 key.tmp "${KEYRING_FILE}"
+
+rm -r $(pwd)
+cd - > /dev/null
+
+apt-get update -y
