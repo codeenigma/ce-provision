@@ -20,7 +20,6 @@
 
 - name: Install systemd timer to renew the key every week.
   when:
-    - apt_repository.key_refresh_timer | length > 0
     - apt_repository.signed_by is defined
     - apt_repository.signed_by | length > 0
     - apt_repository.signed_by is url # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/url_test.html
