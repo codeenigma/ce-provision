@@ -14,7 +14,6 @@ aws_ami_asg_cleanup:
   runtime: "python3.12" # If the python version changes we need to update this as well
   keep_backups: 10
   scheduler_cron: "cron(0 16 ? * SUN *)"
-
 ```
 
 <!--ENDROLEVARS-->
