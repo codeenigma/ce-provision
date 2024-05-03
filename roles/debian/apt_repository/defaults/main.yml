@@ -1,0 +1,16 @@
+---
+apt_repository:
+  legacy_repo: "" # optionally provide repo string of old list file to clean up, we are creating a new DEB822 format source file
+  name: example
+  types:
+    - deb
+  uris:
+    - https://example.com/apt
+  #signed_by: https://example.com/apt-key.asc # either the path to the key or the key contents
+  #suites:
+  #  - "{{ ansible_distribution_release }}"
+  components:
+    - main
+  state: present
+  enabled: true
+  key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
