@@ -12,7 +12,10 @@ The variables `uris`, `suites` and `components` combine to build an APT reposito
     - mysql-8.0
 ```
 
-This results in APT referring to the following URI on a Debian 11 (bullseye) system: https://repo.mysql.com/apt/debian/dists/bullseye/mysql-8.0/
+This example results in APT referring to the following URI on a Debian 11 (bullseye) system: https://repo.mysql.com/apt/debian/dists/bullseye/mysql-8.0/
+
+## Installing with key fingerprints
+This role does not currently support importing keys from a key server. Since key servers are deprecated, it likely never will. You should either provide an ASCII armored key as a block of text or the URL of a GPG or ASCII armored key.
 
 <!--TOC-->
 <!--ENDTOC-->
