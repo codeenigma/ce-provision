@@ -4,7 +4,7 @@
 # Simple bash script to download the APT repository public key and replace the existing one.
 
 cd $(mktemp -d)
-curl -fsS -o key.tmp "{{ apt_repository.signed_by }}"
+wget -O key.tmp "{{ apt_repository.signed_by }}"
 
 sudo install -D -o root -g root -m 644 key.tmp {{ _apt_repository.key_filename }}
 

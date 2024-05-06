@@ -26,6 +26,11 @@
     update_cache: true
   when: apt_list | length > 0
 
+- name: Ensure wget is installed.
+  ansible.builtin.apt:
+    pkg: wget
+    state: present
+
 - name: Install additional wget extra packages.
   ansible.builtin.include_tasks: "wget_install.yml"
   when: wget_list | length > 0
