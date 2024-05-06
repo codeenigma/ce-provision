@@ -17,6 +17,8 @@
       enabled: true
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
 
+# @TODO add to unattended-upgrades
+
 - name: Ensure Jenkins is installed.
   ansible.builtin.apt:
     pkg: jenkins
