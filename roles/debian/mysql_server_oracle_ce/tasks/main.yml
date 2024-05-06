@@ -1,20 +1,25 @@
 ---
 #@todo Configuration is for dev.
 
-- name: Add repository key for MySQL repository using wget and apt-key
-  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://repo.mysql.com/RPM-GPG-KEY-mysql-2023 | apt-key add -"
-  args:
-    executable: /bin/bash
-
-- name: Add repository for MySQL.
-  ansible.builtin.apt_repository:
-    repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-8.0"
-    state: present
-
-- name: Add source repository for MySQL.
-  ansible.builtin.apt_repository:
-    repo: "deb-src http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-8.0"
-    state: present
+- name: Add MySQL repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} {{ mysql_server.apt_repo_version }}"
+      name: mysql
+      types:
+        - deb
+        - deb-src
+      uris:
+        - http://repo.mysql.com/apt/debian/
+      signed_by: "{{ mysql_server.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - "{{ mysql_server.apt_repo_version }}"
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
 
 - name: Pin MySQL packages.
   ansible.builtin.template:

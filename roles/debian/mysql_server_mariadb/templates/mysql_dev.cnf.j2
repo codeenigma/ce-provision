@@ -7,7 +7,7 @@ slow_query_log_file = /var/log/mysql/slow-query.log
 log_slow_admin_statements = 1
 general_log = 1
 log_queries_not_using_indexes = 1
-long_query_time = {{ mysql_long_query_time }}
+long_query_time = {{ mysql_server.long_query_time }}
 skip-host-cache
 skip-name-resolve
 key_buffer_size = 128M

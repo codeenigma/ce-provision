@@ -33,7 +33,7 @@
         - python3-venv
         - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
 
-- name: Install pip and Ansible.
+- name: Install pip, python-debian and Ansible.
   ansible.builtin.include_role:
     name: debian/python_pip_packages
   vars:
@@ -42,6 +42,7 @@
         - name: pip
           state: latest
         - name: ansible
+        - name: python-debian
 
 - name: Install linters.
   ansible.builtin.include_role:
