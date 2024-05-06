@@ -11,7 +11,7 @@
       uris:
         - http://pkg.jenkins.io/debian
       signed_by: "{{ jenkins.apt_signed_by }}"
-      components:
+      suites:
         - binary/
       state: present
       enabled: true
