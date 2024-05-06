@@ -30,9 +30,23 @@
     mode: 0644
     force: true
 
-- name: Ensure mysql is installed.
+- name: Add MySQL repository to unattended-upgrades origins list.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ mysql_server.apt_origin ] }}"
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
+
+- name: Install the unattended-upgrades config.
+  ansible.builtin.include_role:
+    name: debian/apt_unattended_upgrades
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
+
+- name: Ensure MySQL is installed.
   ansible.builtin.apt:
-    pkg: "mysql-server"
+    pkg: mysql-server
     state: present
     update_cache: true
 
@@ -53,7 +67,7 @@
 #     - blackfire.overrides is defined
 #     - blackfire.overrides | length > 0
 
-- name: Restart mysql.
+- name: Restart MySQL.
   ansible.builtin.service:
     name: mysql
     state: restarted
@@ -69,14 +83,14 @@
     mysql -NBe 'GRANT ALL ON *.* TO "ce-dev"@"%" IDENTIFIED BY "ce-dev" WITH GRANT OPTION;'
   when: is_local is defined and is_local
 
-- name: Ensure mysql can write data.
+- name: Ensure MySQL can write data.
   ansible.builtin.file:
     path: /var/lib/mysql
     owner: mysql
     group: mysql
     recurse: true
 
-- name: Ensure mysql can write PID/lock.
+- name: Ensure MySQL can write PID/lock.
   ansible.builtin.file:
     path: /var/run/mysqld
     owner: mysql

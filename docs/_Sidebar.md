@@ -46,6 +46,8 @@
        - [Automated patching](/roles/debian/ce_patcher)
        - [ce-provision](/roles/debian/ce_provision)
        - [ClamAV](/roles/debian/clamav)
+       - [Docker CE](/roles/debian/docker_ce)
+       - [Docker Registry](/roles/debian/docker_registry)
        - [Duplicity](/roles/debian/duplicity)
        - [Firewall Config](/roles/debian/firewall_config)
        - [Frontail](/roles/debian/frontail)

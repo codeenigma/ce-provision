@@ -1,21 +1,57 @@
 ---
 - name: Remove potential older packages.
   ansible.builtin.apt:
-    pkg: ["docker", "docker-engine", "docker.io", "containerd", "runc"]
+    pkg:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
     state: absent
 
-- name: Add repository key for Docker.
-  ansible.builtin.apt_key:
-    url: https://download.docker.com/linux/debian/gpg
-    state: present
+- name: Add Docker repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+      name: docker_ce
+      types:
+        - deb
+      uris:
+        - https://download.docker.com/linux/debian
+      signed_by: "{{ docker_ce.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - stable
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:10:00"
 
-- name: Add repository for Docker.
-  ansible.builtin.apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
-    state: present
+- name: Add Docker repository to unattended-upgrades origins list.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ docker_ce.apt_origin ] }}"
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
+
+- name: Install the unattended-upgrades config.
+  ansible.builtin.include_role:
+    name: debian/apt_unattended_upgrades
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Ensure Docker is installed.
   ansible.builtin.apt:
-    pkg: ["docker-ce", "docker-ce-cli"]
+    pkg:
+      - docker-ce
+      - docker-ce-cli
     state: present
-    update_cache: true
+
+- name: Ensure Docker Compose is installed.
+  ansible.builtin.apt:
+    pkg:
+      - docker-compose-plugin
+    state: present
+  when: docker_ce.docker_compose
