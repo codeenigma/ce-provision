@@ -12,6 +12,7 @@ Installs and configures PHP core and required components.
 php:
   version:
     - 8.1 # see https://www.php.net/supported-versions.php
+  apt_signed_by: https://packages.sury.org/php/apt.gpg
   apt_origin: "origin=deb.sury.org,codename=${distro_codename}" # used by apt_unattended_upgrades
 
 ```
