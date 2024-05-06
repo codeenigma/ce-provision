@@ -1,14 +1,24 @@
 ---
-- name: Add Google Chrome key.
-  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -"
-  args:
-    executable: /bin/bash
+- name: Add Google Chrome repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb http://dl.google.com/linux/chrome/deb/ stable main"
+      name: google_chrome
+      types:
+        - deb
+      uris:
+        - http://dl.google.com/linux/chrome/deb/
+      signed_by: "{{ lhci.apt_signed_by }}"
+      suites: stable
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
 
-- name: Install Google Chrome repo.
-  ansible.builtin.apt_repository:
-    repo: deb http://dl.google.com/linux/chrome/deb/ stable main
-    state: present
-    filename: google-chrome
+# @TODO add to unattended-upgrades
 
 - name: Install Google Chrome "headful" mode dependencies.
   ansible.builtin.apt:
