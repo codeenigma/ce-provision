@@ -38,16 +38,6 @@
       enabled: true
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:25:00"
 
-- name: Add repository key for Yarn repository.
-  ansible.builtin.apt_key:
-    url: https://dl.yarnpkg.com/debian/pubkey.gpg
-    state: present
-
-- name: Add repository for Yarn.
-  ansible.builtin.apt_repository:
-    repo: "deb https://dl.yarnpkg.com/debian/ stable main"
-    state: present
-
 - name: Pin Node packages.
   ansible.builtin.template:
     src: nodesource.pref.j2
