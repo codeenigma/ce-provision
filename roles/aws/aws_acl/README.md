@@ -12,8 +12,10 @@ rate_limit: 0 # set to 0 to skip rate limit rule, set to a value to set how many
 aws_acl:
   name: example_master_acl
   scope: CLOUDFRONT # Can be REGIONAL for ALBs
-  region: us-east-1 # If scope is set to CLOUDFRONT, region must be us-east-1, even though docs say it will be skipped
   tags: {}
+
+  botControl: true
+  inspection: "COMMON" # or set to TARGETED inspection level
 
   ip_allow:
     name: "Allowed-ips"
