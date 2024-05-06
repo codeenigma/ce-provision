@@ -1,18 +1,42 @@
 ---
-- name: Add repository key for NodeJS repository.
-  ansible.builtin.apt_key:
-    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-    state: present
+- name: Add NodeJS repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://deb.nodesource.com/node_{{ nodejs.version }} {{ ansible_distribution_release }} main"
+      name: nodejs
+      types:
+        - deb
+        - deb-src
+      uris:
+        - "https://deb.nodesource.com/node_{{ nodejs.version }}"
+      signed_by: "{{ nodejs.apt_signed_by_nodejs }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:15:00"
 
-- name: Add repository for NodeJS.
-  ansible.builtin.apt_repository:
-    repo: "deb https://deb.nodesource.com/node_{{ nodejs.version }} {{ ansible_distribution_release }} main"
-    state: present
-
-- name: Add source repository for NodeJS.
-  ansible.builtin.apt_repository:
-    repo: "deb-src https://deb.nodesource.com/node_{{ nodejs.version }} {{ ansible_distribution_release }} main"
-    state: present
+- name: Add Yarn repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+      name: nodejs_yarn
+      types:
+        - deb
+      uris:
+        - https://dl.yarnpkg.com/debian/
+      signed_by: "{{ nodejs.apt_signed_by_yarn }}"
+      suites: stable
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:25:00"
 
 - name: Add repository key for Yarn repository.
   ansible.builtin.apt_key:
@@ -36,12 +60,16 @@
 - name: Add nodejs and yarn repositories to unattended-upgrades origins list.
   ansible.builtin.set_fact:
     _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ nodejs.apt_origin_nodejs, nodejs.apt_origin_yarn ] }}"
-  when: apt_unattended_upgrades.enable
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
     name: debian/apt_unattended_upgrades
-  when: apt_unattended_upgrades.enable
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Ensure NodeJS and Yarn are installed.
   ansible.builtin.apt:
