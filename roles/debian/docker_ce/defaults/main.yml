@@ -1,0 +1,4 @@
+---
+docker_ce:
+  apt_signed_by: https://download.docker.com/linux/debian/gpg
+  docker_compose: true
