@@ -27,8 +27,8 @@
   amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_suffix }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
-    db_cluster_identifier: "{{ aws_rds.name }}"
-    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
@@ -46,9 +46,9 @@
 - name: Create Aurora RDS reader instance.
   amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_reader_suffix }}"
-    db_cluster_identifier: "{{ aws_rds.name }}"
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
-    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
+    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
@@ -77,35 +77,36 @@
 
 - name: Create RDS instance
   amazon.aws.rds_instance:
-    db_instance_identifier: "{{ aws_rds.name }}"
+    profile: "{{ aws_rds.aws_profile }}"
+    region: "{{ aws_rds.region }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
-    #storage_type: standard # not required. choices: standard;gp2;io1. The storage type to be associated with the DB instance. I(storage_type) does not apply to Aurora DB instances.
-    master_username: "{{ aws_rds.master_username }}"
-    master_user_password: "{{ aws_rds.master_user_password }}"
-    state: "{{ aws_rds.state }}"
-    #preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
-    engine: "{{ aws_rds.engine }}"
-    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}" # not required. The name of the DB parameter group to associate with this DB instance. When creating the DB instance if this argument is omitted the default DBParameterGroup for the specified engine is used.
-    copy_tags_to_snapshot: true
-    #character_set_name: undefined # not required. The character set to associate with the DB cluster.
+    db_instance_identifier: "{{ aws_rds.name }}"
     multi_az: "{{ aws_rds.multi_az }}"
     db_subnet_group_name: "{{ _aws_rds_rds_subnet_group.subnet_group.name }}"
-    #auto_minor_version_upgrade: undefined # not required. Whether minor version upgrades are applied automatically to the DB instance during the maintenance window.
-    force_update_password: true # not required. Set to True to update your cluster password with I(master_user_password). Since comparing passwords to determine if it needs to be updated is not possible this is set to False by default to allow idempotence.
+    vpc_security_group_ids: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
-    #enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
+    engine: "{{ aws_rds.engine }}"
+    engine_version: "{{ aws_rds.engine_version | default(omit) }}"
+    db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
+    character_set_name:  "{{ aws_rds.character_set_name | default(omit) }}"
     allocated_storage: "{{ aws_rds.allocated_storage }}"
     max_allocated_storage: "{{ aws_rds.max_allocated_storage }}"
-    vpc_security_group_ids: "{{ _aws_security_group_list }}" # variable populated by the aws_security_groups role
-    profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
-    allow_major_version_upgrade: false
     storage_encrypted: "{{ aws_rds.storage_encrypted }}"
+    storage_type: "{{ aws_rds.storage_type | default(omit) }}"
+    storage_throughput: "{{ aws_rds.storage_throughput | default(omit) }}"
+    master_username: "{{ aws_rds.master_username }}"
+    master_user_password: "{{ aws_rds.master_user_password }}"
+    force_update_password: "{{ aws_rds.force_update_password | default(omit) }}"
+    enable_performance_insights: "{{ aws_rds.enable_performance_insights | default(omit) }}"
+    preferred_backup_window: "{{ aws_rds.preferred_backup_window | default(omit) }}"
+    copy_tags_to_snapshot: "{{ aws_rds.copy_tags_to_snapshot }}"
+    preferred_maintenance_window: "{{ aws_rds.preferred_maintenance_window | default(omit) }}"
+    allow_major_version_upgrade: "{{ aws_rds.allow_major_version_upgrade }}"
+    auto_minor_version_upgrade: "{{ aws_rds.auto_minor_version_upgrade | default(omit) }}"
+    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    state: "{{ aws_rds.state }}"
     apply_immediately: true
     wait: true
-    region: "{{ aws_rds.region }}"
-    engine_version: "{{ aws_rds.engine_version | default(omit) }}"
-    #preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. The option must be in the format "ddd:hh24:mi-ddd:hh24:mi" where ddd is one of Mon, Tue, Wed, Thu, Fri, Sat, Sun.
   register: _rds_instance_info
   when: "'aurora' not in aws_rds.engine"
 
@@ -114,8 +115,8 @@
     name: aws/aws_sns
   vars:
     aws_sns:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      aws_profile: "{{ aws_rds.aws_profile }}"
+      region: "{{ aws_rds.region }}"
       name: "{{ aws_rds.sns.name }}"
       display_name: "{{ aws_rds.sns.display_name }}"
       delivery_policy_default_healthy_retry_policy_min_delay_target: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_min_delay_target }}"
@@ -145,8 +146,8 @@
     name: aws/aws_ec2_metric_alarm
   vars:
     aws_ec2_metric_alarm:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      aws_profile: "{{ aws_rds.aws_profile }}"
+      region: "{{ aws_rds.region }}"
       name: "{{ _rds_instance_info.db_instance_identifier }}_{{ item.name }}"
       description: "{{ item.description }}"
       metric: "{{ item.metric }}"
@@ -171,8 +172,8 @@
     name: aws/aws_ec2_metric_alarm
   vars:
     aws_ec2_metric_alarm:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      aws_profile: "{{ aws_rds.aws_profile }}"
+      region: "{{ aws_rds.region }}"
       name: "{{ _rds_instance_info_aurora.db_instance_identifier }}_{{ item.name }}"
       description: "{{ item.description }}"
       metric: "{{ item.metric }}"
