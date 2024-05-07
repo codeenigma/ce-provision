@@ -130,7 +130,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       db_instance_class: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
       name: "{{ aws_ec2_autoscale_cluster.rds.name }}"
-      description: "{{ aws_ec2_autoscale_cluster.rds.name }}"
+      description: "{{ aws_ec2_autoscale_cluster.rds.description }}"
       multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
       subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
       security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
