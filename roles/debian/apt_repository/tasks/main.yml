@@ -13,10 +13,40 @@
     uris: "{{ apt_repository.uris }}"
     signed_by: "{{ apt_repository.signed_by | default(omit) }}"
     suites: "{{ apt_repository.suites | default(omit) }}"
-    components: "{{ apt_repository.components }}"
+    components: "{{ apt_repository.components | default(omit) }}"
     state: "{{ apt_repository.state }}"
     enabled: "{{ apt_repository.enabled }}"
   register: _apt_repository
+  when: apt_repository.format == 'deb822'
+
+# See https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_repository_module.html
+# This method is obsolete, but some repositories still require it.
+- name: Install legacy APT repository.
+  when: apt_repository.format == 'list'
+  block:
+    - name: Create repo string.
+      ansible.builtin.set_fact:
+        _apt_repository_list_repo_string: "{{ apt_repository.uris[0] }} {{ apt_repository.suites[0] }} {{ apt_repository.components[0] }}"
+
+    - name: Overwrite repo string with provided value, if applicable.
+      ansible.builtin.set_fact:
+        _apt_repository_list_repo_string: "{{ apt_repository.list_repo_string }}"
+      when:
+        - apt_repository.list_repo_string is defined
+        - apt_repository.list_repo_string | length > 0
+
+    - name: Add key to repo string, if applicable.
+      ansible.builtin.set_fact:
+        _apt_repository_list_repo_string: "[signed-by={{ apt_repository.signed_by }}] {{ _apt_repository_list_repo_string }}"
+      when:
+        - apt_repository.signed_by is defined
+        - apt_repository.signed_by | length > 0
+
+    - name: Add APT repository in list format.
+      ansible.builtin.apt_repository:
+        repo: "{{ item }} {{ _apt_repository_list_repo_string }}"
+        state: "{{ apt_repository.state }}"
+      with_items: "{{ apt_repository.types }}"
 
 - name: Install systemd timer to renew the key every week.
   when:
