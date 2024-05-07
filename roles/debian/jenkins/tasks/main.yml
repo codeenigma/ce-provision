@@ -5,16 +5,15 @@
   vars:
     apt_repository:
       legacy_repo: "deb http://pkg.jenkins.io/debian binary/"
+      format: list # Jenkins repo does not support deb822
+      list_repo_string: "http://pkg.jenkins.io/debian binary/" # override automated repo string generation
       name: jenkins
       types:
         - deb
       uris:
         - http://pkg.jenkins.io/debian
       signed_by: "{{ jenkins.apt_signed_by }}"
-      suites:
-        - binary/
       state: present
-      enabled: true
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
 
 # @TODO add to unattended-upgrades
