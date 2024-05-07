@@ -26,14 +26,16 @@ This role does not currently support importing keys from a key server. Since key
 ---
 apt_repository:
   legacy_repo: "" # optionally provide repo string of old list file to clean up, we are creating a new DEB822 format source file
+  format: deb822 # can be either deb822 or list for legacy repos
+  #list_repo_string: "http://pkg.jenkins.io/debian binary/" # if `format: list` is set we can override the auto-generated repo string here
   name: example
   types:
     - deb
   uris:
     - https://example.com/apt
   #signed_by: https://example.com/apt-key.asc # either the path to the key or the key contents
-  #suites:
-  #  - "{{ ansible_distribution_release }}"
+  suites:
+    - "{{ ansible_distribution_release }}"
   components:
     - main
   state: present
