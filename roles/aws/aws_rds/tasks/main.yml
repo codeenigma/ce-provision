@@ -120,8 +120,8 @@
     name: aws/aws_sns
   vars:
     aws_sns:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      aws_profile: "{{ aws_rds.aws_profile }}"
+      region: "{{ aws_rds.region }}"
       name: "{{ aws_rds.sns.name }}"
       display_name: "{{ aws_rds.sns.display_name }}"
       delivery_policy_default_healthy_retry_policy_min_delay_target: "{{ aws_rds.sns.delivery_policy_default_healthy_retry_policy_min_delay_target }}"
@@ -151,8 +151,8 @@
     name: aws/aws_ec2_metric_alarm
   vars:
     aws_ec2_metric_alarm:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      aws_profile: "{{ aws_rds.aws_profile }}"
+      region: "{{ aws_rds.region }}"
       name: "{{ _rds_instance_info.db_instance_identifier }}_{{ item.name }}"
       description: "{{ item.description }}"
       metric: "{{ item.metric }}"
@@ -177,8 +177,8 @@
     name: aws/aws_ec2_metric_alarm
   vars:
     aws_ec2_metric_alarm:
-      aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      aws_profile: "{{ aws_rds.aws_profile }}"
+      region: "{{ aws_rds.region }}"
       name: "{{ _rds_instance_info_aurora.db_instance_identifier }}_{{ item.name }}"
       description: "{{ item.description }}"
       metric: "{{ item.metric }}"
