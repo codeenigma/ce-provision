@@ -7,6 +7,7 @@ Installs the Jitsi Meet video conferencing product. See https://jitsi.github.io/
 ```yaml
 ---
 jitsi:
+  apt_signed_by: https://download.jitsi.org/jitsi-key.gpg.key
   server_name: "{{ _domain_name }}"
   email: admin@example.com
 ```

@@ -1,17 +1,26 @@
 ---
-- name: Add repository key for Jenkins.
-  ansible.builtin.apt_key:
-    url: https://pkg.jenkins.io/debian/jenkins.io.key
-    state: present
+- name: Add Jenkins repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb http://pkg.jenkins.io/debian binary/"
+      format: list # Jenkins repo does not support deb822
+      list_repo_string: "http://pkg.jenkins.io/debian binary/" # override automated repo string generation
+      name: jenkins
+      types:
+        - deb
+      uris:
+        - http://pkg.jenkins.io/debian
+      signed_by: "{{ jenkins.apt_signed_by }}"
+      state: present
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
 
-- name: Add repository for Jenkins.
-  ansible.builtin.apt_repository:
-    repo: "deb http://pkg.jenkins.io/debian binary/"
-    state: present
+# @TODO add to unattended-upgrades
 
 - name: Ensure Jenkins is installed.
   ansible.builtin.apt:
-    pkg: "jenkins"
+    pkg: jenkins
     state: present
     update_cache: true
   register: aptoutput
@@ -31,7 +40,7 @@
   register: jenkins_keystore
 
 - name: Convert SSL key to intermediate PK12.
-  ansible.builtin.command: "openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ _ssl_paths[jenkins.server_name].key }} -in {{ _ssl_paths[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}"
+  ansible.builtin.command: "openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ ssl_facts[jenkins.server_name].key }} -in {{ ssl_facts[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}"
   when: not jenkins_keystore.stat.exists
 
 - name: Convert PK12 to keystore.
