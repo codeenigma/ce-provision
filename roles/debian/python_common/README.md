@@ -19,8 +19,10 @@ python_common:
   # Commonly required Python system packages
   install_packages:
     - python3-distutils
+    - python3-debian
     - python3-venv
     - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
+
 ```
 
 <!--ENDROLEVARS-->
