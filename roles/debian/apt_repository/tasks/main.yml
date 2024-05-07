@@ -35,17 +35,22 @@
         - apt_repository.list_repo_string is defined
         - apt_repository.list_repo_string | length > 0
 
+    - name: Capture path to key for renewal script.
+      ansible.builtin.set_fact:
+        _apt_repository:
+          key_filename: "/etc/apt/keyrings/{{ apt_repository.name }}.asc"
+
     - name: Download repo key, if applicable.
       ansible.builtin.get_url:
         url: "{{ apt_repository.signed_by }}"
-        dest: "/etc/apt/keyrings/{{ apt_repository.name }}.asc"
+        dest: "{{ _apt_repository.key_filename }}"
       when:
         - apt_repository.signed_by is defined
         - apt_repository.signed_by | length > 0
 
     - name: Add key to repo string, if applicable.
       ansible.builtin.set_fact:
-        _apt_repository_list_repo_string: "[signed-by=/etc/apt/keyrings/{{ apt_repository.name }}.asc] {{ _apt_repository_list_repo_string }}"
+        _apt_repository_list_repo_string: "[signed-by={{ _apt_repository.key_filename }}] {{ _apt_repository_list_repo_string }}"
       when:
         - apt_repository.signed_by is defined
         - apt_repository.signed_by | length > 0
