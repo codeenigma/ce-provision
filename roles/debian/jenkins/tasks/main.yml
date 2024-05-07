@@ -40,7 +40,7 @@
   register: jenkins_keystore
 
 - name: Convert SSL key to intermediate PK12.
-  ansible.builtin.command: "openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ _ssl_paths[jenkins.server_name].key }} -in {{ _ssl_paths[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}"
+  ansible.builtin.command: "openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ ssl_facts[jenkins.server_name].key }} -in {{ ssl_facts[jenkins.server_name].cert }} -name {{ jenkins.server_name }}"
   when: not jenkins_keystore.stat.exists
 
 - name: Convert PK12 to keystore.
