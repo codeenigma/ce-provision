@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   registry:
-    image: registry:2
+    image: registry:{{ docker_registry.image_version }}
     restart: unless-stopped
     container_name: docker_registry
 {% if docker_registry.bind is defined and docker_registry.bind %}

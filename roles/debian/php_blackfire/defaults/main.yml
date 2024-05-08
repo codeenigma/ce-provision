@@ -1,5 +1,6 @@
 ---
 blackfire:
+  apt_signed_by: https://packages.blackfire.io/gpg.key
   enable: false
   agent_server_id: ""
   agent_server_token: ""

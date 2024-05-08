@@ -1,3 +1,0 @@
----
-dependencies:
-  - role: debian/docker_ce
