@@ -29,7 +29,7 @@ ce_provision:
       repo: https://github.com/wazuh/wazuh-ansible.git
       branch: "v4.7.2"
     - directory: systemd_timers
-      repo: https://github.com/vlcty/ansible-systemd-timers.git
+      repo: https://github.com/filiprupic/systemd-timer.git
       branch: master
   # File containing default roles and collections to install via Ansible Galaxy.
   # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
