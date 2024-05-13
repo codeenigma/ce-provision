@@ -29,30 +29,40 @@
     - gitlab.mattermost_route_53.zone is defined
     - gitlab.mattermost_route_53.zone | length > 0
 
-- name: Add repository key for Gitlab.
-  ansible.builtin.apt_key:
-    url: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
-    state: present
-
-- name: Add repository for Gitlab.
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
-    state: present
-
-- name: Add source repository for Gitlab.
-  ansible.builtin.apt_repository:
-    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
-    state: present
+- name: Add GitLab repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
+      format: deb822
+      name: gitlab
+      types:
+        - deb
+        - deb-src
+      uris:
+        - https://packages.gitlab.com/gitlab/gitlab-ce/debian/
+      signed_by: "{{ gitlab.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:20:00"
 
 - name: Add GitLab repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
     _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab.apt_origin ] }}"
-  when: apt_unattended_upgrades.enable
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
     name: debian/apt_unattended_upgrades
-  when: apt_unattended_upgrades.enable
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Ensure Gitlab is installed.
   ansible.builtin.apt:

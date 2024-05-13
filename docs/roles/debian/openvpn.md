@@ -20,6 +20,7 @@ At the moment we do not support headless customisation of encryption settings. T
 ---
 openvpn:
   script_install_path: "/home/{{ user_provision.username }}"
+  fqdn: "" # fully qualified domain name of VPN server for use in client config, uses IP address if empty - only works with port_choice: "1"
   auto_install: true
   # post install server config tweaks
   ipv4_settings: "" # defaults to `10.8.0.0 255.255.255.0` - example, to use 192.168.140.0/24 set "192.168.140.0 255.255.255.0"

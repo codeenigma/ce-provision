@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Ansible managed
+# Simple bash script to download the APT repository public key and replace the existing one.
+
+cd $(mktemp -d)
+wget -O key.tmp "{{ apt_repository.signed_by }}"
+
+sudo install -D -o root -g root -m 644 key.tmp {{ _apt_repository.key_filename }}
+
+rm -r $(pwd)
+cd - > /dev/null
+
+apt-get update -y

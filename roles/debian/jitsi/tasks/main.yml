@@ -1,14 +1,22 @@
 ---
-- name: Add Jitsi key.
-  ansible.builtin.shell: "set -o pipefail && wget -q -O - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add -"
-  args:
-    executable: /bin/bash
+- name: Add Jitsi repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://download.jitsi.org stable/"
+      format: list # Jitsi repo does not support deb822
+      list_repo_string: "https://download.jitsi.org stable/"
+      name: jitsi
+      types:
+        - deb
+      uris:
+        - https://download.jitsi.org
+      signed_by: "{{ jitsi.apt_signed_by }}"
+      state: present
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
 
-- name: Install Jitsi repo.
-  ansible.builtin.apt_repository:
-    repo: deb https://download.jitsi.org stable/
-    state: present
-    filename: jitsi-stable
+# @TODO add to unattended-upgrades
 
 - name: Update system settings for Jitsi.
   ansible.builtin.blockinfile:

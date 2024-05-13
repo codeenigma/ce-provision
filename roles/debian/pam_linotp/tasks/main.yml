@@ -1,14 +1,25 @@
 ---
-- name: Add key for LinOTP repository.
-  ansible.builtin.apt_key:
-    keyserver: https://packages.codeenigma.net/debian/codeenigma.pub
-    id: 77AFCA1C45124FBB2EFCD7267DC594C08E0497D4
-    state: present
+- name: Add Code Enigma repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://packages.codeenigma.net/debian {{ ansible_distribution_release }} main"
+      format: deb822
+      name: ce
+      types:
+        - deb
+      uris:
+        - https://packages.codeenigma.net/debian
+      signed_by: "{{ pam_linotp.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:45:00"
 
-- name: Add repository for LinOTP.
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.codeenigma.net/debian {{ ansible_distribution_release }} main"
-    state: present
+# @TODO add to unattended-upgrades - might not be necessary, as we rarely package new releases?
 
 - name: Ensure libpam-linotp is installed.
   ansible.builtin.apt:

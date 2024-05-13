@@ -1,5 +1,6 @@
 ---
 pam_linotp:
+  apt_signed_by: https://packages.codeenigma.net/debian/codeenigma.pub
   # LinOTP endpoint.
   endpoint: ""
   # PAM policies.

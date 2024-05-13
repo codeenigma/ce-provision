@@ -9,11 +9,16 @@ Role to install and configure [the Duplicity backup engine](https://duplicity.us
 ```yaml
 ---
 duplicity:
+  # Location of Duplicity installation and components.
+  venv_path: "/home/{{ user_provision.username }}/duplicity"
+  venv_command: /usr/bin/python3 -m venv
+  install_username: "{{ user_provision.username }}"
+  # Duplicity configuration
   backend: s3 # currently also support b2 for Backblaze
   access_key_id: "somekey"
   secret_access_key: "somesecret"
   backend_url: "s3-eu-west-1.amazonaws.com"
-  s3_options: "--s3-european-buckets --s3-use-glacier-ir" # see the --s3 options in the documentation - https://duplicity.us/stable/duplicity.1.html#options
+  s3_options: "--s3-use-glacier-ir" # see the --s3 options in the documentation - https://duplicity.us/stable/duplicity.1.html#options
   bucketname: "somebucket"
   dirs:
     - name: "/boot"

@@ -19,16 +19,25 @@
     state: absent
   when: not blackfire.enable
 
-- name: Add key for Blackfire repository.
-  ansible.builtin.apt_key:
-    url: https://packages.blackfire.io/gpg.key
-    state: present
-  when: blackfire.enable
-
-- name: Add repository for Blackfire.
-  ansible.builtin.apt_repository:
-    repo: "deb http://packages.blackfire.io/debian any main"
-    state: present
+- name: Add Blackfire repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb http://packages.blackfire.io/debian any main"
+      format: deb822
+      name: blackfire
+      types:
+        - deb
+      uris:
+        - http://packages.blackfire.io/debian
+      signed_by: "{{ blackfire.apt_signed_by }}"
+      suites: any
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 01:05:00"
   when: blackfire.enable
 
 - name: Ensure Blackfire agent is installed.

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Function to send email notification
+send_email_notification() {
+    local recipient="$1"
+    local subject="$2"
+    local body="$3"
+
+    echo -e "$body" | mail -s "$subject" "$recipient"
+}
+
 # stop services
 {% for service in _ssl_services %}
 /usr/sbin/service {{ service }} stop
@@ -20,8 +29,11 @@ for site in ${SITES[@]}; do
   SITESSTRING+=" -d $site"
 done
 
-# run certbot
-{{ ssl.certbot_renew_command }} --{{ _ssl_web_server }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING
+# run certbot and capture the output
+certbot_output=$( {{ ssl.certbot_renew_command }} --{{ _ssl_web_server }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING 2>&1 )
+
+# Capture exit code of Certbot command
+certbot_exit_code=$?
 
 # start services again
 {% for service in _ssl_services %}
@@ -32,3 +44,13 @@ done
 {% for service in ssl.reload %}
 /usr/sbin/service {{ service }} {{ ssl.reload_command }}
 {% endfor %}
+
+if [ $certbot_exit_code -ne 0 ]; then
+    # Certbot failed, send email notification
+    recipient="{{ ssl.email }}"
+    subject="Certbot Renewal Failed"
+    body="Certbot renewal failed with the following output:
+
+$certbot_output"
+    send_email_notification "$recipient" "$subject" "$body"
+fi

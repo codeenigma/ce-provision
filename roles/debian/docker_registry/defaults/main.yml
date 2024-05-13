@@ -2,7 +2,8 @@
 docker_registry:
   bind: 127.0.0.1
   port: 5000
-  # Wether it is behind an Nginx proxy (for auth).
+  image_version: "2.8.3" # see https://hub.docker.com/_/registry
+  # Whether it is behind an Nginx proxy (for auth).
   proxy: false
 nginx:
   client_max_body_size: 0

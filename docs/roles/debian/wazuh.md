@@ -11,6 +11,7 @@ Supports standalone managers, scaled out services and agent installation (defaul
 ```yaml
 ---
 wazuh:
+  path: wazuh
   #roles_directory: "/path/to/roles" # defaults to /home/controller/.ansible/roles/wazuh-ansible
   branch: "v4.7.2" # wazuh-ansible git branch to checkout - not to be confused with wazuh_version!
   # Agent variables, installed locally by default
@@ -39,7 +40,7 @@ wazuh:
   indexer:
     install: false # install the indexer packages
     single_node: true
-    domain_name: "{{ _domain_name }}"
+    domain_name: indexer.example.com # possible to use "{{ _domain_name }}" in local variables, but not defaults
     indexer_cluster_name: wazuh
     indexer_node_name: node-1 # this server name
     indexer_network_host: 127.0.0.1
@@ -153,7 +154,7 @@ wazuh:
     dashboard_node_name: node-1
     dashboard_server_host: "0.0.0.0"
     dashboard_server_port: "443" # if you want to use provided SSL certificates install a web server and proxy to Wazuh
-    dashboard_server_name: "{{ _domain_name }}"
+    dashboard_server_name: dashboard.example.com # possible to use "{{ _domain_name }}" in local variables, but not defaults
     dashboard_conf_path: "/etc/wazuh-dashboard/"
     wazuh_api_credentials:
       - id: "default"
