@@ -17,7 +17,7 @@ aws_rds:
   aurora_suffix: blue # appended to cluster name to create a unique instance name for the first (initially write) instance.
   aurora_reader: false # If true, an Aurora reader instance will be created.
   aurora_reader_suffix: green # appended to cluster name to create unique instance name for the second (initially read-only) instance - must not match aurora_suffix.
-  db_cluster_identifier: "{{ aws_rds.name }}"
+  # db_cluster_identifier: example # Default is RDS name.
     # See parameter group docs: https://docs.ansible.com/ansible/latest/collections/community/aws/rds_param_group_module.html
   # db_parameter_group_name: "example" # Omit to use default.
   # db_parameter_group_description: "Custom parameter group" # Description of parameter group.

@@ -159,8 +159,10 @@ aws_ec2_autoscale_cluster:
       region: "{{ _aws_region }}"
   # Associated RDS instance.
   rds:
-    rds: false # wether to create an instance.
+    rds: false # whether to create an instance.
     db_instance_class: db.t3.medium
+    # name: example # Default is cluster name.
+    # description: example # Default is cluster name.
     multi_az: true
     publicly_accessible: false # Wether to allocate an IP address.
     engine: mariadb
@@ -169,12 +171,12 @@ aws_ec2_autoscale_cluster:
     aurora_suffix: blue # appended to cluster name to create a unique instance name for the first (initially write) instance.
     aurora_reader: false # If true, an Aurora reader instance will be created.
     aurora_reader_suffix: green # appended to cluster name to create unique instance name for the second (initially read-only) instance - must not match aurora_suffix.
-    #db_cluster_identifier: example-aurora-cluster
+    # db_cluster_identifier: example # Default is cluster name.
       # See parameter group docs: https://docs.ansible.com/ansible/latest/collections/community/aws/rds_param_group_module.html
-    # db_parameter_group_name: "example" # Omit to use default
-    # db_parameter_group_description: "Custom parameter group" # Description of parameter group
+    # db_parameter_group_name: "example" # Omit to use default.
+    # db_parameter_group_description: "Custom parameter group" # Description of parameter group.
     # db_parameter_group_engine: "mariadb10.5" # accepts different values to RDS instance 'engine'
-    # db_parameters: {} # dictionary of available parameters
+    # db_parameters: {} # dictionary of available parameters.
     # character_set_name: undefined # not required. The character set to associate with the DB cluster.
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.
