@@ -5,6 +5,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb http://dl.google.com/linux/chrome/deb/ stable main"
+      format: deb822
       name: google_chrome
       types:
         - deb
