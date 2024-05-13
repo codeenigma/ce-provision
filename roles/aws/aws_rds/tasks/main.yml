@@ -27,7 +27,7 @@
   amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_suffix }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
-    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(aws_rds.name) }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
@@ -46,7 +46,7 @@
 - name: Create Aurora RDS reader instance.
   amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_reader_suffix }}"
-    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier }}"
+    db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(aws_rds.name) }}"
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     state: "{{ aws_rds.state }}"
