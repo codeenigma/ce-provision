@@ -5,6 +5,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }} main"
+      format: deb822
       name: gitlab_runner
       types:
         - deb
