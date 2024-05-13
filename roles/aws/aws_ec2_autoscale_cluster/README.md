@@ -178,22 +178,39 @@ aws_ec2_autoscale_cluster:
       region: "{{ _aws_region }}"
   # Associated RDS instance.
   rds:
-    rds: false # wether to create an instance.
+    rds: false # whether to create an instance.
     db_instance_class: db.t3.medium
-    #db_cluster_identifier: example-aurora-cluster
+    # name: example # Default is cluster name.
+    # description: example # Default is cluster name.
+    multi_az: true
+    publicly_accessible: false # Wether to allocate an IP address.
     engine: mariadb
-    aurora_reader: false
-    #engine_version: 5.7.9
-    # db_parameter_group_name: "example" # Omit to use default
-    # db_parameter_group_description: "Custom parameter group" # Description of parameter group
+    # engine_version: '5.7.2' # Omit to use latest.
+      # In an Aurora cluster reader and writer can swap role at any time, so by default we name them 'blue' and 'green'.
+    aurora_suffix: blue # appended to cluster name to create a unique instance name for the first (initially write) instance.
+    aurora_reader: false # If true, an Aurora reader instance will be created.
+    aurora_reader_suffix: green # appended to cluster name to create unique instance name for the second (initially read-only) instance - must not match aurora_suffix.
+    # db_cluster_identifier: example # Default is cluster name.
+      # See parameter group docs: https://docs.ansible.com/ansible/latest/collections/community/aws/rds_param_group_module.html
+    # db_parameter_group_name: "example" # Omit to use default.
+    # db_parameter_group_description: "Custom parameter group" # Description of parameter group.
     # db_parameter_group_engine: "mariadb10.5" # accepts different values to RDS instance 'engine'
-    # db_parameters: {} # dictionary of available parameters
+    # db_parameters: {} # dictionary of available parameters.
+    # character_set_name: undefined # not required. The character set to associate with the DB cluster.
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.
     storage_encrypted: false # Whether to encrypt the RDS instance or not.
+    # storage_type: standard # not required. choices: standard;gp2;gp3;io1. I(storage_type) does not apply to Aurora DB instances.
+    # storage_throughput: 125 # required if storage_type is "gp3". For <400Gb storage it's limited to 125Mbs. Requires botocore >= 1.29.0
     master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
     master_user_password: hellothere
-    multi_az: true
+    # force_update_password: true # not required. Set to True to update your cluster password with I(master_user_password).
+    # enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
+    # preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
+    copy_tags_to_snapshot: true
+    # preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. Sample: "sun:09:31-sun:10:01".
+    allow_major_version_upgrade: false
+    # auto_minor_version_upgrade: undefined # not required. Whether minor version upgrades are applied automatically to the DB instance during the maintenance window.
     rds_cloudwatch_alarms:
       - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
         description: "Average database free storage space over the last 10 minutes too low."
