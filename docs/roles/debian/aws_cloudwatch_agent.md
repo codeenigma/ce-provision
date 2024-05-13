@@ -14,9 +14,9 @@ module in your playbooks.
 ---
 aws_cloudwatch_agent:
   # Stream name.
-  log_stream_name: "example"
+  log_stream_name: example
   # Namespace for metrics. Leave empty to use the default CWAgent.
-  metrics_namespace: "example"
+  metrics_namespace: example
   # Group prefix. Useful for grouping by environments.
   # Eg. instead of "syslog", you can have "dev syslog", "prod syslog", etc.
   log_group_prefix: ""
@@ -26,7 +26,7 @@ aws_cloudwatch_agent:
   credentials:
     aws_access_key_id: XXX
     aws_secret_access_key: XXX
-    region: "{{ _aws_region }}"
+    region: eu-west-1 # AWS region name - can be substituted for "{{ _aws_region }}" if set
 
 ```
 
