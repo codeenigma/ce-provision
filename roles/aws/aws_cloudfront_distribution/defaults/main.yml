@@ -1,30 +1,4 @@
 ---
-# Uncomment cf_acl to create firewall rules for Cloudfront distro
-#rate_limit: 600 # rate_limit needs to be standalone variable to avoid casting issues (it will be considrate as string instead of int)
-#cf_acl:
-#  acl_name: "dummy_master_acl"
-#  scope: "CLOUDFRONT" # Can be "REGIONAL"
-#  region: "us-east-1" # If scope is set to CLOUDFRONT, region must be us-east-1, even though docs say it will be skipped
-#
-#  ip_allow
-#    name: "Allowed-ips"
-#    list:
-#    - 1.1.1.1/32
-#    - 2.2.2.2/32
-#    - 3.3.3.3/32
-#
-#  ip_block:
-#    name: "Blocked-ips"
-#    list:
-#    - 4.4.4.4/32
-#    - 5.5.5.5/32
-#    - 6.6.6.6/32
-#
-#  cc_block_list:
-#    - BY # Belarus
-#    - CN # China
-#    - IR # Iran
-#    - SA # Saudi Arabia
 aws_cloudfront_distribution:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
@@ -87,8 +61,3 @@ aws_cloudfront_distribution:
   cache_behaviors: [] # A list of cache behaviors same as default_cache_behavior with additional path_pattern var required.
   enabled: true
   purge_existing: true # Set to false to append entries instead of replacing them.
-#  logging:
-#    bucket: "" # URL of S3 bucket to store logs
-#    enabled: false # Set true to allow logging
-#    include_cookies: false # Set true to add cookies in logs
-#    prefix: "" # Prefix for S3 object names

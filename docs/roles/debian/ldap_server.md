@@ -82,6 +82,8 @@ ldap_server:
     purge: false
     backup: false # set to true to create local backups of LDAP
     backup_path: /opt/slap-bak
+    backup_script: /usr/local/bin/slap-bak # full filename of the backup script
+    slapcat_path: /usr/sbin # path to the location of slapcat on the server
     on_calendar: "*-*-* 23:45:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
   # TLS settings in LDAP are not separately handled, you need to manually set it up or use the config import feature.
   # If you use 'manual' SSL handling you need to provide a separate CA certificate.
@@ -90,6 +92,7 @@ ldap_server:
   #   olcTLSCertificateFile: /etc/letsencrypt/live/{{ _domain_name }}/cert.pem
   #   olcTLSCertificateKeyFile:  /etc/letsencrypt/live/{{ _domain_name }}/privkey.pem
   ssl: # @see the 'ssl' role - does nothing by default.
+    replace_existing: false
     domain: "{{ _domain_name }}"
     handling: "unmanaged"
     key: ""

@@ -42,6 +42,7 @@ Note, this is not protected and should not be enabled in general. See also the c
 ```yaml
 ---
 lhci:
+  apt_signed_by: https://dl-ssl.google.com/linux/linux_signing_key.pub
   enable_vnc: false
   chrome_package: google-chrome-stable # optionally set specific version, e.g. google-chrome-stable=112.0.5615.165-1
   # Optional npm version handling.

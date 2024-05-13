@@ -21,6 +21,7 @@ php:
     max_file_uploads: 20
     date_timezone: "Europe/London"
     gc_maxlifetime: 1440
+    zend_assertions: -1
     overrides: {}
     opcache:
       enable: 1

@@ -1,94 +1,59 @@
 ---
-- name: Temporarily place a vhost for LetsEncrypt to work.
-  ansible.builtin.template:
-    src: vhost_letsencrypt.j2
-    dest: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    owner: root
-    group: root
-    mode: 0644
+- name: Generate SSL certificates.
+  ansible.builtin.include_tasks: ssl.yml
   when:
     - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
 
-- name: Enable vhost.
-  ansible.builtin.file:
-    src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
-    state: link
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-
-- name: Reload the nginx service.
-  ansible.builtin.service:
-    name: nginx
-    state: reloaded
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-
-- name: Generates SSL keys.
-  ansible.builtin.include_role:
-    name: debian/ssl
-    public: true
-  when: domain.ssl is defined
-  vars:
-    ssl: "{{ domain.ssl }}"
-
-- name: Delete the link to the vhost for LetsEncrypt.
-  ansible.builtin.file:
-    path: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
-    state: absent
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-
-- name: Delete the temporary vhost for LetsEncrypt.
-  ansible.builtin.file:
-    path: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
-    state: absent
-  when:
-    - domain.ssl is defined
-    - domain.ssl.handling == 'letsencrypt'
-
-# If auth_enabled is defined and yes, and auth_pass is not defined or is defined but empty, generate a random password.
-- name: Generate random htauth password.
-  ansible.builtin.set_fact:
-    _nginx_htauth_pass: "{{ lookup('password', _ce_provision_data_dir + '/' + inventory_hostname + '/nginx-passwords/' + domain.server_name) }}"
+- name: Set up basic auth.
   when:
     - domain.basic_auth.auth_enabled is defined
     - domain.basic_auth.auth_enabled
-    - domain.basic_auth.auth_pass is not defined or domain.basic_auth.auth_pass | length == 0
+  block:
+    # If auth_enabled is defined and yes, and auth_pass is not defined or is defined but empty, generate a random password.
+    - name: Generate random htauth password.
+      ansible.builtin.set_fact:
+        _nginx_htauth_pass: "{{ lookup('password', _ce_provision_data_dir + '/' + inventory_hostname + '/nginx-passwords/' + domain.server_name) }}"
+      when:
+        - domain.basic_auth.auth_pass is not defined or domain.basic_auth.auth_pass | length == 0
 
-# If auth_enabled is defined and yes, and auth_pass is defined and not empty, use that password instead.
-- name: Set fact if htauth password is provided.
-  ansible.builtin.set_fact:
-    _nginx_htauth_pass: "{{ domain.basic_auth.auth_pass }}"
-  when:
-    - domain.basic_auth.auth_enabled is defined
-    - domain.basic_auth.auth_enabled
-    - domain.basic_auth.auth_pass is defined
-    - domain.basic_auth.auth_pass | length > 0
+    # If auth_enabled is defined and yes, and auth_pass is defined and not empty, use that password instead.
+    - name: Set fact if htauth password is provided.
+      ansible.builtin.set_fact:
+        _nginx_htauth_pass: "{{ domain.basic_auth.auth_pass }}"
+      when:
+        - domain.basic_auth.auth_pass is defined
+        - domain.basic_auth.auth_pass | length > 0
 
-- name: Create basic htauth files.
-  community.general.web_infrastructure.htpasswd:
-    path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
-    name: "{{ domain.basic_auth.auth_user }}"
-    password: "{{ _nginx_htauth_pass }}"
-    owner: root
-    group: root
-    mode: 0644
-  when:
-    - domain.basic_auth.auth_enabled is defined
-    - domain.basic_auth.auth_enabled
+    - name: Print basic htauth password.
+      ansible.builtin.debug:
+        msg: Basic auth password is {{ _nginx_htauth_pass }}
+      when:
+        - _nginx_htauth_pass is defined
 
-- name: Print basic htauth password.
-  ansible.builtin.debug:
-    msg: Basic auth password is {{ _nginx_htauth_pass }}
-  when:
-    - domain.basic_auth.auth_enabled is defined
-    - domain.basic_auth.auth_enabled
-    - _nginx_htauth_pass is defined
+    # Create a basic htauth file if a username is supplied.
+    - name: Create basic htauth file.
+      community.general.web_infrastructure.htpasswd:
+        path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
+        name: "{{ domain.basic_auth.auth_user }}"
+        password: "{{ _nginx_htauth_pass }}"
+        owner: root
+        group: root
+        mode: 0644
+      when:
+        - domain.basic_auth.auth_user is defined
+        - domain.basic_auth.auth_user | length > 0
+
+    # Place provided basic htauth file if a path is supplied.
+    - name: Copy basic htauth file to server.
+      ansible.builtin.copy:
+        src: "{{ domain.basic_auth.auth_file }}"
+        dest: "/etc/nginx/passwords/{{ domain.server_name }}.provided.htpasswd"
+        owner: root
+        group: root
+        mode: 0644
+      when:
+        - domain.basic_auth.auth_file is defined
+        - domain.basic_auth.auth_file | length > 0
 
 - name: Copy vhost in place.
   ansible.builtin.template:
@@ -97,12 +62,14 @@
     owner: root
     group: root
     mode: 0644
+    force: true
 
 - name: Enable vhost.
   ansible.builtin.file:
     src: "/etc/nginx/sites-available/{{ domain.server_name }}.conf"
     dest: "/etc/nginx/sites-enabled/{{ domain.server_name }}.conf"
     state: link
+    force: true
 
 - name: Generates AWS Cloudwatch vhost config.
   ansible.builtin.template:

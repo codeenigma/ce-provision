@@ -1,28 +1,37 @@
 ---
-- name: Add repository key for Gitlab Runner.
-  ansible.builtin.apt_key:
-    url: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
-    state: present
-
-- name: Add repository for Gitlab Runner.
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }}  main"
-    state: present
-
-- name: Add source repository for Gitlab Runner.
-  ansible.builtin.apt_repository:
-    repo: "deb-src https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }} main"
-    state: present
+- name: Add GitLab Runner repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }} main"
+      name: gitlab_runner
+      types:
+        - deb
+        - deb-src
+      uris:
+        - https://packages.gitlab.com/runner/gitlab-runner/debian/
+      signed_by: "{{ gitlab_runner.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:30:00"
 
 - name: Add GitLab Runner repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
     _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab_runner.apt_origin ] }}"
-  when: apt_unattended_upgrades.enable
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Install the unattended-upgrades config.
   ansible.builtin.include_role:
     name: debian/apt_unattended_upgrades
-  when: apt_unattended_upgrades.enable
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
 
 - name: Ensure Gitlab Runner is installed.
   ansible.builtin.apt:
