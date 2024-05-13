@@ -35,6 +35,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
+      format: deb822
       name: gitlab
       types:
         - deb
