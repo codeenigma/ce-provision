@@ -205,6 +205,8 @@ ansible_play(){
 # @param $1 absolute path to local repo.
 # @param $2 branch to checkout.
 git_checkout(){
+  # We need to fetch first for new branches.
+  git -C "$1" fetch origin "$2"
   git -C "$1" checkout "$2"
   git -C "$1" pull origin "$2"
 }
