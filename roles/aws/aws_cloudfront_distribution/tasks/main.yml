@@ -1,7 +1,31 @@
 ---
-- name: Create web acl if defined
-  ansible.builtin.include_tasks: create_acl.yml
-  when: cf_acl is defined
+- name: Create web acl if defined.
+  ansible.builtin.include_role:
+    name: aws/aws_acl
+  when:
+    - aws_acl.scope is defined
+    - aws_acl.scope == 'CLOUDFRONT'
+
+# Creating bucket for CF logging
+- name: Create S3 bucket if it does not exist.
+  amazon.aws.s3_bucket:
+    name: "{{ _domain_name }}-cf-log"
+    state: present
+    object_ownership: "BucketOwnerPreferred"
+
+- name: Create S3 bucket prefix.
+  amazon.aws.s3_object:
+    bucket: "{{ _domain_name }}-cf-log"
+    object: "cf-logging/"
+    mode: "create"
+
+- name: Creating dictionary for CF logging.
+  ansible.builtin.set_fact:
+    _cf_s3_log:
+      bucket: "{{ _domain_name }}-cf-log.s3.amazonaws.com" # URL of S3 bucket to store logs
+      enabled: true # Set true to allow logging
+      include_cookies: false # Set true to add cookies in logs
+      prefix: "cf-logging/" # Prefix for S3 object names
 
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
@@ -11,7 +35,7 @@
     state: "{{ aws_cloudfront_distribution.state }}"
     aliases: "{{ aws_cloudfront_distribution.aliases }}"
     origins: "{{ aws_cloudfront_distribution.origins }}"
-    web_acl_id: "{{ created_acl.arn | default(omit) }}"
+    web_acl_id: "{{ _created_acl.arn | default(omit) }}"
     default_cache_behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
     cache_behaviors: "{{ aws_cloudfront_distribution.cache_behaviors }}"
     validate_certs: "{{ aws_cloudfront_distribution.validate_certs }}"
@@ -19,7 +43,7 @@
     purge_origins: "{{ aws_cloudfront_distribution.purge_existing }}"
     purge_aliases: "{{ aws_cloudfront_distribution.purge_existing }}"
     purge_tags: "{{ aws_cloudfront_distribution.purge_existing }}"
-    logging: "{{ aws_cloudfront_distribution.logging | default(omit) }}"
+    logging: "{{ _cf_s3_log }}"
     purge_cache_behaviors: "{{ aws_cloudfront_distribution.purge_existing }}"
     enabled: "{{ aws_cloudfront_distribution.enabled }}"
   register: _aws_cloudfront_distribution

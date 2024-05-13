@@ -1318,7 +1318,7 @@ session.use_strict_mode = 0
 session.use_cookies = 1
 
 ; http://php.net/session.cookie-secure
-session.cookie_secure = Off
+session.cookie_secure = {{ php.fpm.session_cookie_secure }}
 
 ; This option forces PHP to fetch and use a cookie for storing and maintaining
 ; the session id. We encourage this operation as it's very helpful in combating
@@ -1337,7 +1337,7 @@ session.auto_start = 0
 
 ; Lifetime in seconds of cookie or, if 0, until browser is restarted.
 ; http://php.net/session.cookie-lifetime
-session.cookie_lifetime = 0
+session.cookie_lifetime = {{ php.fpm.cookie_lifetime }}
 
 ; The path for which the cookie is valid.
 ; http://php.net/session.cookie-path
@@ -1526,7 +1526,7 @@ url_rewriter.tags = "a=href,area=href,frame=src,input=src,form=fakeentry"
 ; Development Value: 1
 ; Production Value: -1
 ; http://php.net/zend.assertions
-zend.assertions = -1
+zend.assertions = {{ php.fpm.zend_assertions }}
 
 ; Assert(expr); active by default.
 ; http://php.net/assert.active

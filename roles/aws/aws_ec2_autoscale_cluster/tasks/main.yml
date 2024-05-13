@@ -129,25 +129,38 @@
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       db_instance_class: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
-      db_cluster_identifier: "{{ aws_ec2_autoscale_cluster.rds.db_cluster_identifier | default(omit) }}"
+      name: "{{ aws_ec2_autoscale_cluster.rds.name | default(aws_ec2_autoscale_cluster.name) }}"
+      description: "{{ aws_ec2_autoscale_cluster.rds.description | default(aws_ec2_autoscale_cluster.name) }}"
+      multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
       subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
-      name: "{{ aws_ec2_autoscale_cluster.name }}"
-      description: "{{ aws_ec2_autoscale_cluster.name }}"
-      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
+      publicly_accessible: "{{ aws_ec2_autoscale_cluster.rds.publicly_accessible }}"
       engine: "{{ aws_ec2_autoscale_cluster.rds.engine }}"
       engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
-      aurora_reader: "{{ aws_ec2_autoscale_cluster.rds.aurora_reader }}"
+      db_cluster_identifier: "{{ aws_ec2_autoscale_cluster.rds.db_cluster_identifier | default(aws_ec2_autoscale_cluster.name) }}"
+      aurora_suffix: "{{ aws_ec2_autoscale_cluster.rds.aurora_suffix }}"
+      aurora_reader: false "{{ aws_ec2_autoscale_cluster.rds.aurora_reader }}"
+      aurora_reader_suffix: "{{ aws_ec2_autoscale_cluster.rds.aurora_reader_suffix }}"
       db_parameter_group_name: "{{ aws_ec2_autoscale_cluster.rds.db_parameter_group_name | default(omit) }}"
       db_parameter_group_description: "{{ aws_ec2_autoscale_cluster.rds.db_parameter_group_description | default(omit) }}"
       db_parameter_group_engine: "{{ aws_ec2_autoscale_cluster.rds.db_parameter_group_engine | default(omit) }}"
       db_parameters: "{{ aws_ec2_autoscale_cluster.rds.db_parameters | default({}) }}"
+      character_set_name:  "{{ aws_ec2_autoscale_cluster.rds.character_set_name | default(omit) }}"
       allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
       max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
       storage_encrypted: "{{ aws_ec2_autoscale_cluster.rds.storage_encrypted }}"
+      storage_type: "{{ aws_ec2_autoscale_cluster.rds.storage_type | default(omit) }}"
+      storage_throughput: "{{ aws_ec2_autoscale_cluster.rds.storage_throughput | default(omit) }}"
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
-      multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
+      force_update_password: "{{ aws_ec2_autoscale_cluster.rds.force_update_password | default(omit) }}"
+      enable_performance_insights: "{{ aws_ec2_autoscale_cluster.rds.enable_performance_insights | default(omit) }}"
+      preferred_backup_window: "{{ aws_ec2_autoscale_cluster.rds.preferred_backup_window | default(omit) }}"
+      copy_tags_to_snapshot: "{{ aws_ec2_autoscale_cluster.rds.copy_tags_to_snapshot }}"
+      preferred_maintenance_window: "{{ aws_ec2_autoscale_cluster.rds.preferred_maintenance_window | default(omit) }}"
+      allow_major_version_upgrade: "{{ aws_ec2_autoscale_cluster.rds.allow_major_version_upgrade }}"
+      auto_minor_version_upgrade: "{{ aws_ec2_autoscale_cluster.rds.auto_minor_version_upgrade | default(omit) }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       rds_cloudwatch_alarms:
         - "{{ aws_ec2_autoscale_cluster.rds.rds_cloudwatch_alarms }}"
       sns:
@@ -247,6 +260,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
+      name_filter: "{{ aws_ec2_autoscale_cluster.packer_name_filter }}"
       repack:
         root_volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
         root_volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
@@ -289,6 +303,10 @@
   when:
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
+
+- name: Create ami cleanup function
+  ansible.builtin.include_role:
+    name: aws/aws_ami_asg_cleanup
 
 - name: Gather IAM role info.
   amazon.aws.iam_role_info:
@@ -352,6 +370,8 @@
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
   when: aws_ec2_autoscale_cluster.create_elb
+
+# @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
 
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
@@ -719,6 +739,8 @@
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
+
+# @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
 
 - name: Add DNS records in Route 53.
   amazon.aws.route53:

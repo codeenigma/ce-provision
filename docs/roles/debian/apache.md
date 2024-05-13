@@ -51,25 +51,30 @@ apache:
       webroot: "/var/www/html"
       project_type: "flat"
       ssl: # @see the 'ssl' role.
+        replace_existing: false
         domain: "{{ _domain_name }}"
         handling: selfsigned
         # Sample LetsEncrypt config, because include_role will not merge defaults these all need providing:
         # handling: letsencrypt
-        # http_01_port: 5000
+        # http_01_port: 80
         # autorenew: true
         # email: sysadm@codeenigma.com
-        # services: []
+        # services:
+        #   - apache2
         # web_server: standalone
         # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
         # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
         # reload_command: restart
         # reload:
-        #   - apache
+        #   - apache2
+        # on_calendar: "Mon *-*-* 04:00:00"
       is_default: true
       basic_auth:
         auth_enabled: false
+        auth_file: ""  # optionally provide the path on the deploy server to a htpasswd file - WARNING - it must be valid and will not be checked!
         auth_user: "hello"
-        auth_pass: "P3nguin!"
+        auth_pass: "P3nguin!" # if no password is provided one will be generated automatically and displayed in the build output.
+        auth_message: "Restricted content"
       servers:
         - port: 80
           ssl: false

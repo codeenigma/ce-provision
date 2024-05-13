@@ -27,7 +27,6 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/locales
   - role: debian/user_root
-  - role: debian/user_provision
   - role: debian/apt_extra_packages
   - role: debian/apt_unattended_upgrades
     when: is_local is not defined or not is_local
@@ -42,15 +41,3 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/sudo_config
     when: is_local is not defined or not is_local
-  - role: debian/ansible
-    ce_ansible:
-      venv_path: "/home/{{ user_provision.username }}/ansible"
-      venv_command: "/usr/bin/python3 -m venv"
-      install_username: "{{ user_provision.username }}"
-      upgrade:
-        enabled: true
-        command: "/home/{{ user_provision.username }}/ansible/bin/python3 -m pip install --upgrade ansible"
-        on_calendar: "*-*-* 01:30:00"
-        timer_name: upgrade_ansible
-      linters:
-        enabled: false

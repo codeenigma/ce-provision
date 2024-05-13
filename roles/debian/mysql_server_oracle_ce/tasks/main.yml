@@ -1,21 +1,26 @@
 ---
 #@todo Configuration is for dev.
 
-- name: Add repository key for MySQL repository.
-  ansible.builtin.apt_key:
-    keyserver: "{{ mysql_server_oracle_ce_key_server }}"
-    id: "{{ mysql_server_oracle_ce_key }}"
-    state: present
-
-- name: Add repository for MySQL.
-  ansible.builtin.apt_repository:
-    repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-5.7"
-    state: present
-
-- name: Add source repository for MySQL.
-  ansible.builtin.apt_repository:
-    repo: "deb-src http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} mysql-5.7"
-    state: present
+- name: Add MySQL repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} {{ mysql_server.apt_repo_version }}"
+      format: deb822
+      name: mysql
+      types:
+        - deb
+        - deb-src
+      uris:
+        - http://repo.mysql.com/apt/debian/
+      signed_by: "{{ mysql_server.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - "{{ mysql_server.apt_repo_version }}"
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
 
 - name: Pin MySQL packages.
   ansible.builtin.template:
@@ -26,9 +31,23 @@
     mode: 0644
     force: true
 
-- name: Ensure mysql is installed.
+- name: Add MySQL repository to unattended-upgrades origins list.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ mysql_server.apt_origin ] }}"
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
+
+- name: Install the unattended-upgrades config.
+  ansible.builtin.include_role:
+    name: debian/apt_unattended_upgrades
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
+
+- name: Ensure MySQL is installed.
   ansible.builtin.apt:
-    pkg: "mysql-server"
+    pkg: mysql-server
     state: present
     update_cache: true
 
@@ -49,7 +68,7 @@
 #     - blackfire.overrides is defined
 #     - blackfire.overrides | length > 0
 
-- name: Restart mysql.
+- name: Restart MySQL.
   ansible.builtin.service:
     name: mysql
     state: restarted
@@ -65,14 +84,14 @@
     mysql -NBe 'GRANT ALL ON *.* TO "ce-dev"@"%" IDENTIFIED BY "ce-dev" WITH GRANT OPTION;'
   when: is_local is defined and is_local
 
-- name: Ensure mysql can write data.
+- name: Ensure MySQL can write data.
   ansible.builtin.file:
     path: /var/lib/mysql
     owner: mysql
     group: mysql
     recurse: true
 
-- name: Ensure mysql can write PID/lock.
+- name: Ensure MySQL can write PID/lock.
   ansible.builtin.file:
     path: /var/run/mysqld
     owner: mysql

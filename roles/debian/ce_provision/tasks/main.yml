@@ -1,11 +1,14 @@
 ---
+# Group usually created already in the _init role.
 - name: Create the provision group for provisioning.
   ansible.builtin.group:
     name: "{{ ce_provision.username }}"
     system: true
-  when: ce_provision.new_user
+  when:
+    - _ce_provision_username != ce_provision.username
+    - ce_provision.new_user
 
-- name: Create additional groups.
+- name: Create additional controller user groups.
   ansible.builtin.group:
     name: "{{ group }}"
     state: present
@@ -15,10 +18,11 @@
     loop_var: group
   when: ce_provision.groups | length
 
-- name: Create the provision user for provisioning.
+# User normally created already in the _init role.
+- name: Generate SSH key for the controller user for provisioning.
   ansible.builtin.user:
     name: "{{ ce_provision.username }}"
-    comment: Provisioning user
+    comment: Infrastructure provisioning user
     shell: /bin/bash
     create_home: true
     group: "{{ ce_provision.username }}"
@@ -32,10 +36,25 @@
     groups: "{{ ce_provision.groups }}"
   when: ce_provision.new_user
 
-- name: Fetch back the SSH pub key.
+# This action should only occur for controller servers.
+- name: Place the public key in the ce-provision data directory on the controller server.
   ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
-    src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.key_name }}"
+    src: "/home/{{ ce_provision.username }}/.ssh/{{ ce_provision.public_key_name }}"
+
+# In case we used a different username for the controller.
+- name: Add controller user to sudoers.
+  ansible.builtin.include_role:
+    name: debian/sudo_config
+  vars:
+    sudo_config:
+      entity_name: "{{ ce_provision.username }}"
+      hosts: "ALL"
+      operators: "(ALL)"
+      tags: "NOPASSWD:"
+      commands: "ALL"
+      filename: "{{ ce_provision.username }}"
+  when: _ce_provision_username != ce_provision.username
 
 # This prevent the original var to be re-evaluated when we move things around.
 - name: Register config repository.
@@ -135,36 +154,61 @@
   with_items: "{{ ce_provision.contrib_roles }}"
   when: ce_provision.contrib_roles | length > 0
 
-# Install Python applications.
-- name: Set up Python venv variables.
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
   ansible.builtin.set_fact:
     _venv_path: "{{ ce_provision.venv_path }}"
-    _venv_command: "{{ ce_provision.venv_command }}"
-    _install_username: "{{ ce_provision.install_username }}"
-    _ce_ansible_timer_name: "{{ ce_provision.upgrade_timer_name }}"
+  when:
+    - ce_provision.venv_path is defined
 
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ ce_provision.venv_command }}"
+  when:
+    - ce_provision.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ ce_provision.venv_install_username }}"
+  when:
+    - ce_provision.venv_install_username is defined
+
+- name: Override systemd timer name for Ansible if provided.
+  ansible.builtin.set_fact:
+    _ce_ansible_timer_name: "{{ ce_provision.upgrade_timer_name }}"
+  when:
+    - ce_provision.upgrade_timer_name is defined
+
+# Install a new Ansible venv if we overrode the system Ansible venv path.
 - name: Install Ansible.
   ansible.builtin.include_role:
     name: debian/ansible
+  when: ce_provision.venv_path is defined
+
+# Install the linters if Ansible is already system installed without them.
+- name: Install linters.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: ansible-lint
+        - name: yamllint
+  when: ce_provision.venv_path is not defined
 
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
 
 - name: Ensure dnspython, certifi and pyopenssl are installed.
-  ansible.builtin.pip:
-    name:
-      - dnspython
-      - certifi
-      - pyopenssl
-    virtualenv: "{{ _venv_path }}"
-    virtualenv_command: "{{ _venv_command }}"
-
-- name: Ensure Ansible venv permissions.
-  ansible.builtin.file:
-    path: "{{ _venv_path }}"
-    owner: "{{ ce_provision.username }}"
-    group: "{{ ce_provision.username }}"
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: dnspython
+        - name: certifi
+        - name: pyopenssl
 
 - name: Add Python virtual environment to $PATH.
   ansible.builtin.copy:

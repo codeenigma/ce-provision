@@ -1,5 +1,7 @@
 # Postfix
-Installs and configures Postfix for sending mail. Mail sending is disabled by default.
+Installs and configures Postfix for sending mail. Mail sending is disabled by default using transport maps.
+
+Full TLS SMTP support is optional by enabling SSL.
 
 <!--TOC-->
 <!--ENDTOC-->
@@ -36,6 +38,13 @@ postfix:
   aliases: []
     #- user: root
     #  alias: admin@example.com
+  # Basic optional SSL handling - does not currently use the SSL role, as it is likely being handled elsewhere
+  ssl:
+    enabled: false
+    smtp_tls_cert_file: "" # full path to certificate, e.g. /etc/letsencrypt/live/acme.com/fullchain.pem
+    smtp_tls_key_file: "" # full path to key, e.g. /etc/letsencrypt/live/acme.com/privkey.pem
+    smtp_tls_CApath: /etc/ssl/certs
+    smtp_tls_CAfile: /etc/ssl/certs/ca-certificates.crt
 
 ```
 

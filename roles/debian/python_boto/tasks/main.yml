@@ -25,14 +25,10 @@
         - python3-venv
         - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
 
-- name: Ensure boto3 is installed.
-  ansible.builtin.pip:
-    name: "{{ _boto3_install_package }}"
-    virtualenv: "{{ python_boto.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ python_boto.venv_command | default(_venv_command) }}"
-
-- name: Ensure Ansible venv permissions.
-  ansible.builtin.file:
-    path: "{{ python_boto.venv_path | default(_venv_path) }}"
-    owner: "{{ python_boto.install_username | default(_install_username) }}"
-    group: "{{ python_boto.install_username | default(_install_username) }}"
+- name: Install boto3.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: "{{ _boto3_install_package }}"

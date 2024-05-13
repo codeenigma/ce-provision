@@ -22,14 +22,18 @@ Like that it will use `_aws_ami_host` if available and default to `default` if n
 aws_ami:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  instance_type: t3.micro
+  instance_type: c7a.large # more performant packer instances mean less waiting for AMIs!
   virtualization_type: hvm
   root_device_type: ebs
-  name_filter: "debian-11-amd64-*"
+  name_filter: "debian-12-amd64-*"
   ami_name: "example"
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   ssh_username: "admin"
   encrypt_boot: false
+  # EBS volume options
+  device_name: /dev/xvda # default for Debian AMIs
+  volume_type: gp3
+  volume_size: 20
   #vpc_filter: "example" # If defined, Packer will search for a VPC with the `Name` tag of the value given. vpc_id takes precednece over this if both are defined. This also assumes the VPC is not the default and has a CIDR block of /16.
   vpc_filter: ""
   #subnet_filter_az: "a" # If vpc_id and/or vpc_filter are defined, subnet_filter_az MUST be defined and must match an AZ that has public networking.
@@ -64,7 +68,7 @@ aws_ami:
   operation: ensure
   # Only used by the 'repack' operation to define temporary EC2 instance
   repack:
-    root_volume_type: gp2
+    root_volume_type: gp3
     root_volume_size: 20 # Important, for an ASG this must not be larger than the value set in the Launch Configuration
     cluster_name: "example" # To look up EC2 instances to use for an AMI
     iam_role: "example" # The IAM role to be assumed by the temporary EC2 instance for repacking an AMI
