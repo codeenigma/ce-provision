@@ -7,6 +7,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} {{ mysql_server.apt_repo_version }}"
+      format: deb822
       name: mysql
       types:
         - deb

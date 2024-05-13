@@ -5,6 +5,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+      format: deb822
       name: sury
       types:
         - deb

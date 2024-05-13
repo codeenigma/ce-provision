@@ -5,6 +5,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://packages.codeenigma.net/debian {{ ansible_distribution_release }} main"
+      format: deb822
       name: ce
       types:
         - deb
