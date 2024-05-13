@@ -15,6 +15,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+      format: deb822
       name: docker_ce
       types:
         - deb
