@@ -106,15 +106,15 @@ aws_ec2_autoscale_cluster:
     - name: "{{ _env_type }}-scale-up-policy"
       policy_type: "SimpleScaling"
       adjustment_type: "ChangeInCapacity"
-      adjustment: 2
+      adjustment: 2 # Add two servers per scaling event
       adjustment_step: 1 # Only used when adjustment_type is PercentChangeInCapacity.
-      cooldown: 300
+      cooldown: 120
     - name: "{{ _env_type }}-scale-down-policy"
       policy_type: "SimpleScaling"
       adjustment_type: "ChangeInCapacity"
-      adjustment: -2
+      adjustment: -1 # Reduce by one server at a time
       adjustment_step: -1 # Only used when adjustment_type is PercentChangeInCapacity.
-      cooldown: 300
+      cooldown: 120
   asg_cloudwatch_alarm_scale_up_name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-up"
   asg_cloudwatch_alarm_scale_down_name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-down"
   asg_cloudwatch_alarms:
@@ -126,8 +126,8 @@ aws_ec2_autoscale_cluster:
       threshold: 80
       unit: "Percent"
       comparison: "GreaterThanOrEqualToThreshold"
-      period: 120
-      evaluation_periods: 5
+      period: 30
+      evaluation_periods: 3
     - scale_direction: "down"
       description: "CPU under 40% so scale down."
       metric: "CPUUtilization"
