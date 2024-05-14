@@ -79,6 +79,10 @@
       ansible.builtin.set_fact:
         _apt_repo_timer: "{'{{ apt_repository.name }}_apt_key_refresh': { timer_command: '/usr/local/bin/{{ apt_repository.name }}_key_refresh', timer_OnCalendar: '{{ apt_repository.key_refresh_timer_OnCalendar }}' }}"
 
+    - name: Turn the timer string into a dictionary.
+      ansible.builtin.set_fact:
+        _apt_repo_timer: "{{ _apt_repo_timer.splitlines()|map('from_yaml')|list }}"
+
     - name: Set up a systemd timer to refresh APT repository key.
       ansible.builtin.include_role:
         name: contrib/systemd_timers
