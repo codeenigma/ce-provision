@@ -3,6 +3,7 @@
   ansible.builtin.include_role:
     name: aws/aws_acl
   when:
+    - aws_acl.name is defined
     - aws_acl.scope is defined
     - aws_acl.scope == 'CLOUDFRONT'
 
