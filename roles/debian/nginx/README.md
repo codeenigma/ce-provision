@@ -54,6 +54,8 @@ nginx:
     fastcgi_buffers: "8 256k"
     cache_behavior_private: "add_header Cache-Control \"private, max-age=604800\""
     cache_behavior_public: "add_header Cache-Control \"public, max-age=604800\""
+    proxy_host: localhost
+    proxy_port: 8443
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.
