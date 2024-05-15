@@ -5,7 +5,7 @@ Creates an ACL to be attached to a CloudFront distribution or an Application Loa
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-## Default variables for creation of ACL (pass it as a list)
+## Default variables
 ```yaml
 ---
 aws_acl:
@@ -38,14 +38,7 @@ aws_acl:
         #- CN # China
         #- IR # Iran
         #- SA # Saudi Arabia
-```
 
-## Default variables for assigning ACL to CF or ALB
-```yaml
----
-aws_acl:
-  name: example_master_acl # Name of the ACL to apply
-  scope: CLOUDFRONT # Can be REGIONAL for ALBs
 ```
 
 <!--ENDROLEVARS-->
