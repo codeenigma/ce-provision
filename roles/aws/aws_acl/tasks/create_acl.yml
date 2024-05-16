@@ -132,7 +132,7 @@
 
     - name: Add rule to list.
       ansible.builtin.set_fact:
-        _acl_rules: "{{ _acl_rules + rate_rule}}"
+        _acl_rules: "{{ _acl_rules + rate_rule }}"
 
 - name: Include task Bot Control.
   when:

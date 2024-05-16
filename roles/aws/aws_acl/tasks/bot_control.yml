@@ -130,4 +130,4 @@
 
 - name: Add rule to list.
   ansible.builtin.set_fact:
-    _acl_rules: "{{ _acl_rules + bot_control}}"
+    _acl_rules: "{{ _acl_rules + bot_control }}"
