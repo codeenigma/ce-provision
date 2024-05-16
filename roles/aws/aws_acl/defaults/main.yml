@@ -1,26 +1,30 @@
 ---
-rate_limit: 200
+rate_limit: 0 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
 aws_acl:
-  name: "dummy_master_acl"
-  scope: "CLOUDFRONT" # Can be "REGIONAL" for ALBs
-  region: "us-east-1" # If scope is set to CLOUDFRONT, region must be us-east-1, even though docs say it will be skipped
+  name: example_master_acl
+  description: "Describe this ACL"
+  scope: CLOUDFRONT # Can be REGIONAL for ALBs
+  tags: {}
+
+  botControl: true
+  inspection: "COMMON" # or set to TARGETED inspection level
 
   ip_allow:
     name: "Allowed-ips"
-    list:
-    - 1.1.1.1/32
-    - 2.2.2.2/32
-    - 3.3.3.3/32
+    list: []
+      #- 1.1.1.1/32 # list of ip ranges
+      #- 2.2.2.2/32
+      #- 3.3.3.3/32
 
   ip_block:
     name: "Blocked-ips"
-    list:
-    - 4.4.4.4/32
-    - 5.5.5.5/32
-    - 6.6.6.6/32
+    list: []
+      #- 4.4.4.4/32 # list of ip ranges
+      #- 5.5.5.5/32
+      #- 6.6.6.6/32
 
-  cc_block_list:
-    - BY # Belarus
-    - CN # China
-    - IR # Iran
-    - SA # Saudi Arabia
+  cc_block_list: []
+    #- BY # Belarus
+    #- CN # China
+    #- IR # Iran
+    #- SA # Saudi Arabia
