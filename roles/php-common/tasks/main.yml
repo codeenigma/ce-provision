@@ -23,7 +23,7 @@
 
 - name: Add Sury PHP repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ php.apt_origin ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [php.apt_origin] }}"
   when: apt_unattended_upgrades.enable
 
 - name: Install the unattended-upgrades config.
