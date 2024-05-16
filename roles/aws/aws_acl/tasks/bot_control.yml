@@ -1,0 +1,133 @@
+- name: Define empty action rule list
+  ansible.builtin.set_fact:
+    _action_rules: []
+
+- name: Define variables for COMMON inspection.
+  block:
+  - name: Set action rule common.
+    ansible.builtin.set_fact:
+      _action_rules_common:
+        - name: "CategoryAdvertising"
+          action_to_use:
+            block: {}
+        - name: "CategoryArchiver"
+          action_to_use:
+            block: {}
+        - name: "CategoryContentFetcher"
+          action_to_use:
+            block: {}
+        - name: "CategoryEmailClient"
+          action_to_use:
+            block: {}
+        - name: "CategoryHttpLibrary"
+          action_to_use:
+            block: {}
+        - name: "CategoryLinkChecker"
+          action_to_use:
+            block: {}
+        - name: "CategoryMiscellaneous"
+          action_to_use:
+            block: {}
+        - name: "CategoryMonitoring"
+          action_to_use:
+            block: {}
+        - name: "CategoryScrapingFramework"
+          action_to_use:
+            block: {}
+        - name: "CategorySearchEngine"
+          action_to_use:
+            block: {}
+        - name: "CategorySecurity"
+          action_to_use:
+            block: {}
+        - name: "CategorySeo"
+          action_to_use:
+            block: {}
+        - name: "CategorySocialMedia"
+          action_to_use:
+            block: {}
+        - name: "CategoryAI"
+          action_to_use:
+            block: {}
+        - name: "SignalAutomatedBrowser"
+          action_to_use:
+            block: {}
+        - name: "SignalKnownBotDataCenter"
+          action_to_use:
+            block: {}
+        - name: "SignalNonBrowserUserAgent"
+          action_to_use:
+            block: {}
+
+  - name: Define empty action rule list
+    ansible.builtin.set_fact:
+      _action_rules: "{{ _action_rules | default([]) + _action_rules_common }}"
+
+  - name: Define common config
+    ansible.builtin.set_fact:
+      _rule_config:
+        - a_w_s_managed_rules_bot_control_rule_set:
+            inspection_level: "COMMON"
+
+- name: Define rule actions targeted
+  when: aws_acl.inspection == "TARGETED"
+  block:
+    - name: Define targeted actions
+      ansible.builtin.set_fact:
+        _action_rules_tgt:
+          - name: "TGT_VolumetricIpTokenAbsent"
+            action_to_use:
+              block: {}
+          - name: "TGT_VolumetricSession"
+            action_to_use:
+              block: {}
+          - name: "TGT_SignalAutomatedBrowser"
+            action_to_use:
+              block: {}
+          - name: "TGT_SignalBrowserInconsistency"
+            action_to_use:
+              block: {}
+          - name: "TGT_TokenReuseIp"
+            action_to_use:
+              block: {}
+          - name: "TGT_ML_CoordinatedActivityMedium"
+            action_to_use:
+              block: {}
+          - name: "TGT_ML_CoordinatedActivityHigh"
+            action_to_use:
+              block: {}
+
+    - name: Define empty action rule list
+      ansible.builtin.set_fact:
+        _action_rules: "{{ _action_rules | default([]) + _action_rules_tgt }}"
+
+    - name: Define targeted config
+      ansible.builtin.set_fact:
+        _rule_config:
+          - a_w_s_managed_rules_bot_control_rule_set:
+              inspection_level: "TARGETED"
+              enable_machine_learning: true
+
+- name: Define Bot Control rule.
+  ansible.builtin.set_fact:
+    bot_control:
+    - name: bot_control
+      priority: 4
+#          action:
+#            block: {}
+      override_action:
+        none: {}
+      visibility_config:
+        sampled_requests_enabled: true
+        cloud_watch_metrics_enabled: true
+        metric_name: bot_control
+      statement:
+        managed_rule_group_statement:
+          vendor_name: AWS
+          name: AWSManagedRulesBotControlRuleSet
+          managed_rule_group_configs: "{{ _rule_config }}"
+          rule_action_overrides: "{{ _action_rules }}"
+
+- name: Add rule to list.
+  ansible.builtin.set_fact:
+    _acl_rules: "{{ _acl_rules + bot_control }}"

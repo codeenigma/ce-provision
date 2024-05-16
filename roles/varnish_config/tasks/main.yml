@@ -7,5 +7,5 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
-    - restart varnish
+    - Reload systemd
+    - Restart varnish
