@@ -3,7 +3,7 @@
     name: "{{ security_group.name }}"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
-    tags: "{{ aws_vpc.tags | combine({ 'Name': security_group.name }) }}"
+    tags: "{{ aws_vpc.tags | combine({'Name': security_group.name}) }}"
     state: "{{ aws_vpc.state }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
     description: "{{ security_group.description }}"

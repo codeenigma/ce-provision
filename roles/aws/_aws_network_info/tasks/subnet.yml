@@ -9,4 +9,4 @@
 
 - name: Add public subnet to the list.
   ansible.builtin.set_fact:
-    _aws_ecs_cluster_public_subnets_ids: "{{ _aws_ecs_cluster_public_subnets_ids + [ _aws_ecs_cluster_public_subnet.subnets[0].subnet_id ] }}"
+    _aws_ecs_cluster_public_subnets_ids: "{{ _aws_ecs_cluster_public_subnets_ids + [_aws_ecs_cluster_public_subnet.subnets[0].subnet_id] }}"
