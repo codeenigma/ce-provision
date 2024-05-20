@@ -7,7 +7,7 @@
 - name: Set LetsEncrypt variables.
   ansible.builtin.set_fact:
     _ssl_web_server: "{{ ssl.web_server | default('standalone') }}"
-    _ssl_services: "{{ ssl.services | default ([]) }}"
+    _ssl_services: "{{ ssl.services | default([]) }}"
 
 # @todo - add support for Route 53 DNS plugin
 - name: "Ensure certbot-{{ _ssl_web_server }} plugin is installed."
@@ -23,7 +23,7 @@
 
 - name: Add key/cert pairs to know paths information.
   ansible.builtin.set_fact:
-    ssl_facts: "{{ ssl_facts | combine({ certificate_domain: { 'domain': certificate_domain, 'certificate': _ssl_base_path + '/' + certificate_domain + '/fullchain.pem', 'key': _ssl_base_path + '/' + certificate_domain + '/privkey.pem' } }) }}"
+    ssl_facts: "{{ ssl_facts | combine({certificate_domain: {'domain': certificate_domain, 'certificate': _ssl_base_path + '/' + certificate_domain + '/fullchain.pem', 'key': _ssl_base_path + '/' + certificate_domain + '/privkey.pem'}}) }}"
   with_items: "{{ _ssl_domains }}"
   loop_control:
     loop_var: certificate_domain

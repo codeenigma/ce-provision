@@ -34,7 +34,7 @@
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-' + aws_rds.aurora_suffix }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name + '-' + aws_rds.aurora_suffix}) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
@@ -54,7 +54,7 @@
     copy_tags_to_snapshot: true
     publicly_accessible: "{{ aws_rds.publicly_accessible }}"
     profile: "{{ aws_rds.aws_profile }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name + '-' + aws_rds.aurora_reader_suffix }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name + '-' + aws_rds.aurora_reader_suffix}) }}"
     allow_major_version_upgrade: false
     apply_immediately: true
     wait: true
@@ -103,7 +103,7 @@
     preferred_maintenance_window: "{{ aws_rds.preferred_maintenance_window | default(omit) }}"
     allow_major_version_upgrade: "{{ aws_rds.allow_major_version_upgrade }}"
     auto_minor_version_upgrade: "{{ aws_rds.auto_minor_version_upgrade | default(omit) }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
     state: "{{ aws_rds.state }}"
     apply_immediately: true
     wait: true
@@ -199,7 +199,7 @@
 
 - name: Add instance info.
   ansible.builtin.set_fact:
-    aws_rds_facts: "{{ aws_rds_facts | combine( {aws_rds.name: _rds_instance_info} ) }}"
+    aws_rds_facts: "{{ aws_rds_facts | combine({aws_rds.name: _rds_instance_info}) }}"
 
 - name: Assign resource to backup plan.
   ansible.builtin.include_role:
