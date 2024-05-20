@@ -1,0 +1,33 @@
+- name: Set action string
+  ansible.builtin.set_fact:
+    _action: "{ {{ _reg_rule.action }}: {} }"
+
+- name: Create regular rule
+  ansible.builtin.set_fact:
+    regular_rule:
+        name: "{{ _reg_rule.name }}"
+        action: "{{ _action | from_yaml }}"
+        visibility_config:
+          sampled_requests_enabled: true
+          cloud_watch_metrics_enabled: true
+          metric_name: "{{ _reg_rule.name }}"
+        statement:
+          byte_match_statement:
+            field_to_match:
+              uri_path: {}
+            positional_constraint: "{{ _reg_rule.position }}"
+            search_string: "{{ _reg_rule.string }}"
+            text_transformations:
+              - type: "NONE"
+                priority: 0
+
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    regular_rule: "{{ regular_rule | combine(_priority_dict) }}"
+
+- name: Add rule to list
+  ansible.builtin.set_fact:
+    _rules: "{{ _rules + [regular_rule] }}"
+
+- name: Increase priority.
+  ansible.builtin.include_tasks: increase_priority.yml

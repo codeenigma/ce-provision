@@ -59,7 +59,7 @@
           action_to_use:
             block: {}
 
-  - name: Define empty action rule list
+  - name: Attach common action rules to list
     ansible.builtin.set_fact:
       _action_rules: "{{ _action_rules | default([]) + _action_rules_common }}"
 
@@ -69,8 +69,8 @@
         - a_w_s_managed_rules_bot_control_rule_set:
             inspection_level: "COMMON"
 
-- name: Define rule actions targeted
-  when: aws_acl.inspection == "TARGETED"
+- name: Define targeted actions rules
+  when: _acl.rules.botControl == "TARGETED"
   block:
     - name: Define targeted actions
       ansible.builtin.set_fact:
@@ -97,7 +97,7 @@
             action_to_use:
               block: {}
 
-    - name: Define empty action rule list
+    - name: Attach targeted action rules to list
       ansible.builtin.set_fact:
         _action_rules: "{{ _action_rules | default([]) + _action_rules_tgt }}"
 
@@ -111,8 +111,7 @@
 - name: Define Bot Control rule.
   ansible.builtin.set_fact:
     bot_control:
-    - name: bot_control
-      priority: 4
+      name: bot_control
 #          action:
 #            block: {}
       override_action:
@@ -128,6 +127,13 @@
           managed_rule_group_configs: "{{ _rule_config }}"
           rule_action_overrides: "{{ _action_rules }}"
 
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    bot_control: "{{ bot_control | combine(_priority_dict) }}"
+
 - name: Add rule to list.
   ansible.builtin.set_fact:
-    _acl_rules: "{{ _acl_rules + bot_control }}"
+    _rules: "{{ _rules + [bot_control] }}"
+
+- name: Increase priority.
+  ansible.builtin.include_tasks: increase_priority.yml
