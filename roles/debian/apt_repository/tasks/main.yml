@@ -81,7 +81,7 @@
 
     - name: Turn the timer string into a dictionary.
       ansible.builtin.set_fact:
-        _apt_repo_timer: "{{ _apt_repo_timer.splitlines()|map('from_yaml')|list }}"
+        _apt_repo_timer: "{{ _apt_repo_timer.splitlines() | map('from_yaml') | list }}"
 
     - name: Set up a systemd timer to refresh APT repository key.
       ansible.builtin.include_role:
