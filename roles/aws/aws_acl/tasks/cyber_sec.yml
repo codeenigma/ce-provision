@@ -1,0 +1,113 @@
+#{
+#  "Name": "CyberSecurityCloudInc-CyberSecurityCloud-HighSecurityOWASPSet-",
+#  "Priority": 7,
+#  "Statement": {
+#    "ManagedRuleGroupStatement": {
+#      "VendorName": "Cyber Security Cloud Inc.",
+#      "Name": "CyberSecurityCloud-HighSecurityOWASPSet-",
+#      "ExcludedRules": [
+#        {
+#          "Name": "bad_useragent-header-001"
+#        },
+#        {
+#          "Name": "cookie-body-001"
+#        },
+#        {
+#          "Name": "cookie-qs-001"
+#        },
+#        {
+#          "Name": "drupal-multi-001"
+#        },
+#        {
+#          "Name": "drupal-multi-002"
+#        },
+#        {
+#          "Name": "joomla-multi-001"
+#        },
+#        {
+#          "Name": "ldapi-url-001"
+#        },
+#        {
+#          "Name": "nosqli-body-001"
+#        },
+#        {
+#          "Name": "nosqli-qs-001"
+#        },
+#        {
+#          "Name": "oracle-multi-001"
+#        },
+#        {
+#          "Name": "oscommandi-body-001"
+#        },
+#        {
+#          "Name": "oscommandi-qs-001"
+#        },
+#        {
+#          "Name": "pathtraversal-body-001"
+#        },
+#        {
+#          "Name": "pathtraversal-qs-001"
+#        },
+#        {
+#          "Name": "pathtraversal-url-001"
+#        },
+#        {
+#          "Name": "rails-header-001"
+#        },
+#        {
+#          "Name": "sqli-body-001"
+#        },
+#        {
+#          "Name": "sqli-body-002"
+#        },
+#        {
+#          "Name": "sqli-qs-001"
+#        },
+#        {
+#          "Name": "sqli-qs-002"
+#        },
+#        {
+#          "Name": "sqli-url-001"
+#        },
+#        {
+#          "Name": "ssrf-multi-001"
+#        },
+#        {
+#          "Name": "struts-multi-001"
+#        },
+#        {
+#          "Name": "struts-multi-002"
+#        },
+#        {
+#          "Name": "struts-multi-003"
+#        },
+#        {
+#          "Name": "suspicious_access-url-001"
+#        },
+#        {
+#          "Name": "tomcat-multi-001"
+#        },
+#        {
+#          "Name": "xss-body-001"
+#        },
+#        {
+#          "Name": "xss-qs-001"
+#        },
+#        {
+#          "Name": "xxe-ssci-body-001"
+#        },
+#        {
+#          "Name": "xxe-ssci-qs-001"
+#        }
+#      ]
+#    }
+#  },
+#  "OverrideAction": {
+#    "None": {}
+#  },
+#  "VisibilityConfig": {
+#    "SampledRequestsEnabled": true,
+#    "CloudWatchMetricsEnabled": true,
+#    "MetricName": "CyberSecurityCloudInc-CyberSecurityCloud-HighSecurityOWASPSet-"
+#  }
+#}
