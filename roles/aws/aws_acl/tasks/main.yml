@@ -1,21 +1,11 @@
-- name: Define and set _acl_list to true.
-  ansible.builtin.set_fact:
-    _acl_list: true
-
-- name: Change _acl_list to false if aws_acl is dict.
-  ansible.builtin.set_fact:
-    _acl_list: false
-  when: aws_acl | type_debug == 'dict'
-
+---
 - name: Create ACLs when list is passed.
   ansible.builtin.include_tasks: create_acl.yml
-  when:
-    - _acl_list
-  loop: "{{ aws_acl }}"
+  when: aws_acl | type_debug == 'list'
+  loop: "{{ aws_acl | list }}"
   loop_control:
     loop_var: _acl
 
 - name: Set ACL to CF/ALB.
   ansible.builtin.include_tasks: set_acl.yml
-  when:
-    - not _acl_list
+  when: aws_acl | type_debug == 'dict'
