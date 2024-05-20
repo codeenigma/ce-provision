@@ -51,7 +51,7 @@
 
 - name: Add nodejs and yarn repositories to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ nodejs.apt_origin_nodejs, nodejs.apt_origin_yarn ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [nodejs.apt_origin_nodejs, nodejs.apt_origin_yarn] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable
