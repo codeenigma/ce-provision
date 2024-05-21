@@ -29,6 +29,8 @@ nginx:
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
     ssl_protocols: "TLSv1.2 TLSv1.3"
+    proxy_host: localhost
+    proxy_port: 8443
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.
@@ -36,7 +38,7 @@ nginx:
   # Main log stream for nginx (Cloudwatch).
   log_stream_name: example # We can only have one backend, due to the way we use "common" templates, moving this per domain means instead having templates per project type.
   # See php.fpm.unix_socket, if true use a socket here:
-  php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.','') }}" # for unix socket use "unix:/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock"
+  php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.', '') }}" # for unix socket use "unix:/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock"
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
   fastcgi_read_timeout: 60
