@@ -57,6 +57,7 @@
     - symfony3_prod
     - symfony4
     - wordpress
+    - blank
 
 - name: Ensure log dir exists.
   ansible.builtin.file:
