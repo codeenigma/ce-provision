@@ -27,7 +27,9 @@ server {
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
     access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
     root "{{ domain.webroot }}";
+{% if server.include_conf is not defined or server.include_conf %}
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
+{% endif %}
     include "/etc/nginx/conf.d/_common";
 {% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' %}
 {% if domain.ssl.web_server | default('standalone') == 'standalone' %}
