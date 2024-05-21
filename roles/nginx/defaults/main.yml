@@ -17,6 +17,8 @@ nginx:
     access_log: /var/log/nginx-access.log
     error_log: /var/log/nginx-error.log
     ssl_protocols: "TLSv1.2 TLSv1.3"
+    proxy_host: localhost
+    proxy_port: 8443
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.
