@@ -67,6 +67,7 @@ nginx:
       log_stream_name: example
       webroot: "/var/www/html"
       project_type: "flat"
+      include_conf: true
       ssl: # @see the 'ssl' role.
         replace_existing: false
         domains:
