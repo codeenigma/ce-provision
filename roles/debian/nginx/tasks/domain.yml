@@ -32,7 +32,7 @@
 
     # Create a basic htauth file if a username is supplied.
     - name: Create basic htauth file.
-      community.general.web_infrastructure.htpasswd:
+      community.general.htpasswd:
         path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
         name: "{{ domain.basic_auth.auth_user }}"
         password: "{{ _nginx_htauth_pass }}"
