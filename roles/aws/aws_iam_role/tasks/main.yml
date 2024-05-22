@@ -12,4 +12,4 @@
 
 - name: Register aws_iam_role results.
   ansible.builtin.set_fact:
-    aws_iam_role: "{{ aws_iam_role | combine({ '_result': {aws_iam_role.name : _aws_iam_role_result}}) }}"
+    aws_iam_role: "{{ aws_iam_role | combine({'_result': {aws_iam_role.name : _aws_iam_role_result}}) }}"

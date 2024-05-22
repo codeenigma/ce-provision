@@ -24,4 +24,4 @@
 
 - name: Register aws_s3_bucket results.
   ansible.builtin.set_fact:
-    aws_s3_bucket: "{{ aws_s3_bucket | combine({'_result': {aws_s3_bucket.name : {'bucket': _aws_s3_bucket_bucket, 'policy': _aws_s3_bucket_bucket_policy}}}) }}"
+    aws_s3_bucket: "{{ aws_s3_bucket | combine({'_result': {aws_s3_bucket.name: {'bucket': _aws_s3_bucket_bucket, 'policy': _aws_s3_bucket_bucket_policy}}}) }}"

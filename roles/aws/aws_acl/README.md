@@ -1,3 +1,12 @@
+# AWS ACL
+Creates an ACL to be attached to a CloudFront distribution or an Application Load Balancer (ALB).
+
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
+```yaml
 ---
 aws_acl:
   - name: example_master_acl
@@ -32,3 +41,7 @@ aws_acl:
           position: "CONTAINS"
 
 #      cyber_sec: #Need to implement task
+
+```
+
+<!--ENDROLEVARS-->

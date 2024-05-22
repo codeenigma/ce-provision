@@ -69,7 +69,11 @@ aws_cloudfront_distribution:
   cache_behaviors: [] # A list of cache behaviors same as default_cache_behavior with additional path_pattern var required.
   enabled: true
   purge_existing: true # Set to false to append entries instead of replacing them.
-
+#  logging:
+#    bucket: "" # URL of S3 bucket to store logs
+#    enabled: false # Set true to allow logging
+#    include_cookies: false # Set true to add cookies in logs
+#    prefix: "" # Prefix for S3 object names
 ```
 
 <!--ENDROLEVARS-->
