@@ -71,7 +71,7 @@
     - domain.basic_auth.auth_pass | length > 0
 
 - name: Create basic htauth files.
-  community.general.web_infrastructure.htpasswd:
+  community.general.htpasswd:
     path: "/etc/nginx/passwords/{{ domain.server_name }}.htpasswd"
     name: "{{ domain.basic_auth.auth_user }}"
     password: "{{ _nginx_htauth_pass }}"
