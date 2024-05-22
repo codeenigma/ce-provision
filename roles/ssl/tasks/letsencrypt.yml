@@ -14,7 +14,7 @@
 - name: Set LetsEncrypt variables.
   ansible.builtin.set_fact:
     _ssl_web_server: "{{ ssl.web_server | default('standalone') }}"
-    _ssl_services: "{{ ssl.services | default ([]) }}"
+    _ssl_services: "{{ ssl.services | default([]) }}"
 
 # @todo - add support for Route 53 DNS plugin
 - name: "Ensure certbot-{{ _ssl_web_server }} plugin is installed."
