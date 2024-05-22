@@ -52,7 +52,7 @@
 
 - name: Add GitLab repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab.apt_origin ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [gitlab.apt_origin] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable
@@ -75,7 +75,7 @@
     name: debian/ssl
   when: gitlab.ssl.enabled
   vars:
-    ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
+    ssl: "{{ gitlab.ssl | combine({'domain': gitlab.server_name}) }}"
 
 - name: Copy Gitlab configuration file.
   ansible.builtin.template:
