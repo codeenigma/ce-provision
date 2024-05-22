@@ -1,0 +1,121 @@
+---
+- name: Define dict for rules.
+  ansible.builtin.set_fact:
+    _rules: []
+
+- name: Set priority counter
+  set_fact:
+    _priority: 0
+    _priority_dict: {}
+
+- name: Increase priority and set dict for 1st rule.
+  ansible.builtin.include_tasks: increase_priority.yml
+
+# Priority is set to 0 here
+- name: Create IP set rules.
+  ansible.builtin.include_tasks: ip_sets.yml
+  when:
+    - _acl.rules.ip_sets is defined
+    - _acl.rules.ip_sets | length > 0
+  loop: "{{ _acl.rules.ip_sets | list }}"
+  loop_control:
+    loop_var: _ip_set
+
+- name: Set country block rule.
+  when:
+    - _acl.rules.cc_block_list is defined
+    - _acl.rules.cc_block_list | length > 0
+  block:
+    - name: Create country block rule
+      ansible.builtin.set_fact:
+        cc_block_rule:
+            name: block_countries
+            action:
+              block: {}
+            visibility_config:
+              sampled_requests_enabled: true
+              cloud_watch_metrics_enabled: true
+              metric_name: block_countries
+            statement:
+              geo_match_statement: # Can't find the actual name, I got this from aws rule JSON formated
+                country_codes: "{{ _acl.rules.cc_block_list }}"
+
+    - name: Append priority to rule.
+      ansible.builtin.set_fact:
+        cc_block_rule: "{{ cc_block_rule | combine(_priority_dict) }}"
+
+    - name: Add rule to list
+      ansible.builtin.set_fact:
+        _rules: "{{ _rules + [cc_block_rule] }}"
+
+    - name: Increase priority.
+      ansible.builtin.include_tasks: increase_priority.yml
+
+# Workaround for rate limit rule in ACL (any variable gets interpreted as string instead of int)
+- name: Set rate limit variable.
+  when:
+    - _acl.rules.rate_limit is defined
+    - _acl.rules.rate_limit > 0
+  block:
+    - name: Set rate based statement from template
+      ansible.builtin.set_fact:
+        _rbs: "{{ lookup('ansible.builtin.template', './rate_limit.j2') | from_yaml }}"
+
+    - name: Define rate rule.
+      ansible.builtin.set_fact:
+        rate_rule:
+          name: Rate_limit
+          action:
+            block: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: rate_limit
+          statement:
+            rate_based_statement: "{{ _rbs }}"
+
+    - name: Append priority to rule.
+      ansible.builtin.set_fact:
+        rate_rule: "{{ rate_rule | combine(_priority_dict) }}"
+
+    - name: Add rule to list.
+      ansible.builtin.set_fact:
+        _rules: "{{ _rules + [rate_rule] }}"
+
+    - name: Increase priority.
+      ansible.builtin.include_tasks: increase_priority.yml
+
+# Priority is set to 4 here
+- name: Create Bot Control rule.
+  when: _acl.rules.botControl is defined
+  ansible.builtin.include_tasks:
+        file: bot_control.yml
+
+# Priority is set to 5 here
+- name: Create regular rules.
+  ansible.builtin.include_tasks: regular_rule.yml
+  when:
+    - _acl.rules.regular_rules is defined
+    - _acl.rules.regular_rules | length > 0
+  loop: "{{ _acl.rules.regular_rules | list }}"
+  loop_control:
+    loop_var: _reg_rule
+
+- name: Create CyberSecurityCloudInc rule.
+  ansible.builtin.include_tasks: cyber_sec.yml
+  when: _acl.rules.cyber_sec is defined
+
+- name: Create web acl.
+  community.aws.wafv2_web_acl:
+    name: "{{ _acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
+    description: "{{ _acl.description }}"
+    scope: "{{ _acl.scope }}"
+    region: "{{ _acl.region }}"
+    default_action: Allow # or "Block"
+    sampled_requests: false
+    cloudwatch_metrics: true # or "false" to disable metrics
+    metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
+    rules: "{{ _rules }}"
+    purge_rules: true
+    tags: "{{ _acl.tags }}"
+    state: present
