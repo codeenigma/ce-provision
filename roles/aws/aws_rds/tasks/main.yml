@@ -110,6 +110,16 @@
   register: _rds_instance_info
   when: "'aurora' not in aws_rds.engine"
 
+- name: Debug for testing
+  ansible.builtin.debug:
+    msg: "{{ _rds_instance_info }}"
+
+- name: Add RDS tag for backup validation
+  amazon.aws.rds_instance:
+    db_instance_identifier: "{{ aws_rds.name }}"
+    tags: "{{ 'RelatedEc2': _aws_resource_name }}"
+  when: "'aurora' not in aws_rds.engine"
+
 - name: Create SNS topic.
   ansible.builtin.include_role:
     name: aws/aws_sns
