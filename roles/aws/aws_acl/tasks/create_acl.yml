@@ -11,7 +11,6 @@
 - name: Increase priority and set dict for 1st rule.
   ansible.builtin.include_tasks: increase_priority.yml
 
-# Priority is set to 0 here
 - name: Create IP set rules.
   ansible.builtin.include_tasks: ip_sets.yml
   when:
@@ -37,7 +36,7 @@
               cloud_watch_metrics_enabled: true
               metric_name: block_countries
             statement:
-              geo_match_statement: # Can't find the actual name, I got this from aws rule JSON formated
+              geo_match_statement:
                 country_codes: "{{ _acl.rules.cc_block_list }}"
 
     - name: Append priority to rule.
@@ -51,7 +50,6 @@
     - name: Increase priority.
       ansible.builtin.include_tasks: increase_priority.yml
 
-# Workaround for rate limit rule in ACL (any variable gets interpreted as string instead of int)
 - name: Set rate limit variable.
   when:
     - _acl.rules.rate_limit is defined
@@ -85,13 +83,11 @@
     - name: Increase priority.
       ansible.builtin.include_tasks: increase_priority.yml
 
-# Priority is set to 4 here
 - name: Create Bot Control rule.
   when: _acl.rules.botControl is defined
   ansible.builtin.include_tasks:
         file: bot_control.yml
 
-# Priority is set to 5 here
 - name: Create regular rules.
   ansible.builtin.include_tasks: regular_rule.yml
   when:
@@ -103,11 +99,13 @@
 
 - name: Create CyberSecurityCloudInc rule.
   ansible.builtin.include_tasks: cyber_sec.yml
-  when: _acl.rules.cyber_sec is defined
+  when:
+    - _acl.rules.cyber_sec is defined
+    - _acl.rules.cyber_sec
 
 - name: Create web acl.
   community.aws.wafv2_web_acl:
-    name: "{{ _acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
+    name: "{{ _acl.name }}"
     description: "{{ _acl.description }}"
     scope: "{{ _acl.scope }}"
     region: "{{ _acl.region }}"
