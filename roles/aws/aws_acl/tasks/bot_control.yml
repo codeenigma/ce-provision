@@ -113,8 +113,6 @@
   ansible.builtin.set_fact:
     bot_control:
       name: bot_control
-#          action:
-#            block: {}
       override_action:
         none: {}
       visibility_config:
