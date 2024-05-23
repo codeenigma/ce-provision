@@ -1,3 +1,31 @@
+---
+# With ASGs the lock behaviour in _init will not work, we need to do it here.
+- name: Check for a ce-deploy lock file.
+  ansible.builtin.stat:
+    path: /tmp/ce-deploy-lock
+  register: _ce_deploy_lock
+  delegate_to: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')][0] }}"
+  when: aws_ec2_autoscale_cluster.type == "ec2"
+
+- name: Abort if ce-deploy lock file exists.
+  when:
+    - _ce_deploy_lock.stat.exists is defined and _ce_deploy_lock.stat.exists
+    - aws_ec2_autoscale_cluster.type == "ec2"
+  block:
+    - name: Abort if ce-deploy lock file is found.
+      ansible.builtin.debug:
+        msg: "ce-deploy lock file discovered, a deployment is in progress! If this is not the case, login to the affected server and delete the file at /tmp/ce-deploy-lock."
+    - ansible.builtin.meta: end_play
+
+- name: Set a lock file on each ASG machine.
+  ansible.builtin.file:
+    path: /tmp/ce-provision-lock
+    state: touch
+    mode: 0644
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')] }}"
+  when: aws_ec2_autoscale_cluster.type == "ec2"
+
 # @todo Do we still need that? Used by AMI and LC,
 # but probably could simply use the base name.
 - name: Define unique name for resources.
@@ -755,3 +783,11 @@
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
+
+- name: Remove the lock file on each ASG machine.
+  ansible.builtin.file:
+    path: /tmp/ce-provision-lock
+    state: absent
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')] }}"
+  when: aws_ec2_autoscale_cluster.type == "ec2"
