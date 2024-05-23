@@ -3,6 +3,7 @@
   ansible.builtin.debug:
     msg: "Using ce-provision {{ _init.ce_provision_version }}"
 
+# See roles/aws/aws_ec2_autoscale_cluster for lock handling in ASGs.
 - name: Check for a ce-deploy lock file.
   ansible.builtin.stat:
     path: /tmp/ce-deploy-lock
