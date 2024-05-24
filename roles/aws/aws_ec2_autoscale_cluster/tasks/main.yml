@@ -1,23 +1,12 @@
 ---
 # With ASGs the lock behaviour in _init will not work, we need to do it here.
-- name: Instantiate an empty list of current servers.
-  ansible.builtin.set_fact:
-    _asg_current_servers: []
-
-- name: Build list of current servers.
-  ansible.builtin.set_fact:
-    _asg_current_servers: "{{ _asg_current_servers + [item] }}"
-  loop: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')] }}"
-  when:
-    - aws_ec2_autoscale_cluster.type == "ec2"
-
 - name: Check for a ce-deploy lock file.
   ansible.builtin.stat:
     path: "{{ _init.deploy_lock_file }}"
   register: _ce_deploy_lock
-  delegate_to: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')][0] }}"
-  when:
-    - _asg_current_servers | length > 0
+  connection: ssh
+  run_once: true
+  when: aws_ec2_autoscale_cluster.type == "ec2"
 
 - name: Abort if ce-deploy lock file exists.
   when:
@@ -33,9 +22,8 @@
     path: "{{ _init.lock_file }}"
     state: touch
     mode: 0644
-  delegate_to: "{{ item }}"
-  loop: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')] }}"
-  when: _asg_current_servers | length > 0
+  connection: ssh
+  when: aws_ec2_autoscale_cluster.type == "ec2"
 
 # @todo Do we still need that? Used by AMI and LC,
 # but probably could simply use the base name.
@@ -799,6 +787,5 @@
   ansible.builtin.file:
     path: "{{ _init.lock_file }}"
     state: absent
-  delegate_to: "{{ item }}"
-  loop: "{{ groups['_' + _aws_resource_name | regex_replace('-', '_')] }}"
-  when: _asg_current_servers | length > 0
+  connection: ssh
+  when: aws_ec2_autoscale_cluster.type == "ec2"
