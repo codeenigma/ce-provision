@@ -17,6 +17,7 @@
         msg: "ce-deploy lock file discovered, a deployment is in progress! If this is not the case, login to the affected server and delete the file at {{ _init.deploy_lock_file }}."
     - ansible.builtin.meta: end_play
 
+# We do not need to remove the lock file as these machines will be automatically replaced.
 - name: Set a lock file on each ASG machine.
   ansible.builtin.file:
     path: "{{ _init.lock_file }}"
@@ -782,10 +783,3 @@
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
-
-- name: Remove the lock file on each ASG machine.
-  ansible.builtin.file:
-    path: "{{ _init.lock_file }}"
-    state: absent
-  connection: ssh
-  when: aws_ec2_autoscale_cluster.type == "ec2"
