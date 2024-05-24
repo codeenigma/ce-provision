@@ -74,3 +74,23 @@ If you want a host that is not tagged with `Ansible: managed` in AWS, or indeed 
 Once you understand this, the `group_vars` directory within your config repository starts to make sense. You can set variables that apply to any group that gets created automatically by the inventory plugin, for example, if you have a test infrastructure called `test` you can have a `hosts/group_vars/_test` folder containing variables which will apply to *every single server* in the `test` infra and take precedence over the defaults, which you can define in `hosts/group_vars/all`. Similarly we might have a `_production` folder containing variables for every server tagged in a `production` environment, regardless of infra.
 
 You can play with tags in your plugin config to create the combinations and groupings you need.
+
+## Connection types
+There are two different patterns for acting on AWS infrastructure. When you are connecting to an existing server and manipulating the standard packages, such as you would with any other server, you can make your playbook start like this for auto-discovery:
+
+```yaml
+- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+  become: true
+```
+
+However, when you are *building* AWS infrastructure and manipulating things via the AWS API, most of your actions need to occur on the controller, because your individual servers do not have the AWS API credentials. To achieve this, while retaining the necessary group variables, we use this pattern:
+
+```yaml
+- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+  connection: local
+  become: false
+```
+
+The last two lines are very important, `connection: local` tells Ansible to stay on the controller and `become: false` tells it to stay as the `controller` user which has the AWS credentials available to it.
+
+If you need to carry out tasks on the remote server(s) during an AWS infrastructure build you will need to set `connection: ssh` on a task level so the action occurs on the intended target.
