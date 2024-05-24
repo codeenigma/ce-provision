@@ -6,7 +6,7 @@
 # See roles/aws/aws_ec2_autoscale_cluster for lock handling in ASGs.
 - name: Check for a ce-deploy lock file.
   ansible.builtin.stat:
-    path: /tmp/ce-deploy-lock
+    path: "{{ _init.deploy_lock_file }}"
   register: _ce_deploy_lock
 
 - name: Abort if ce-deploy lock file exists.
@@ -14,7 +14,7 @@
   block:
     - name: Abort if ce-deploy lock file is found.
       ansible.builtin.debug:
-        msg: "ce-deploy lock file discovered, a deployment is in progress! If this is not the case, login to the affected server and delete the file at /tmp/ce-deploy-lock."
+        msg: "ce-deploy lock file discovered, a deployment is in progress! If this is not the case, login to the affected server and delete the file at {{ _init.deploy_lock_file }}."
     - ansible.builtin.meta: end_play
 
 - name: Check OS family.
@@ -27,7 +27,7 @@
 
 - name: Set a lock file.
   ansible.builtin.file:
-    path: /tmp/ce-provision-lock
+    path: "{{ _init.lock_file }}"
     state: touch
     mode: 0644
 
