@@ -14,4 +14,5 @@ skip_list:
   - template-instead-of-copy # to skip over roles/ssl/tasks/copy.yml errors, temporarily.
   - name[template] # it doesn't like Jinja templates being in the middle of a task name, which seems silly to me.
 exclude_paths:
+  - name[casing] # sometimes included Galaxy roles break linting rules and cause failures
   - roles/debian/wazuh/ # imported role uses yes/no instead of true/false so always fails
