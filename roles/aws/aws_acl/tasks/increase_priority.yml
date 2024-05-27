@@ -1,3 +1,4 @@
+---
 - name: Increase counter
   ansible.builtin.set_fact:
     _priority: "{{ _priority | default(0) | int + 1 }}"
