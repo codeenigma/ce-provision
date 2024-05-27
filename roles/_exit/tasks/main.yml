@@ -18,3 +18,8 @@
   ansible.builtin.apt:
     autoremove: true
   become: true
+
+- name: Delete the lock file.
+  ansible.builtin.file:
+    path: "{{ _init.lock_file }}"
+    state: absent

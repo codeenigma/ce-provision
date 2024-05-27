@@ -1,3 +1,30 @@
+---
+# With ASGs the lock behaviour in _init will not work, we need to do it here.
+- name: Check for a ce-deploy lock file.
+  ansible.builtin.stat:
+    path: "{{ _init.deploy_lock_file }}"
+  register: _ce_deploy_lock
+  connection: ssh
+  run_once: true
+  when: aws_ec2_autoscale_cluster.type == "ec2"
+
+- name: Abort if ce-deploy lock file exists.
+  when:
+    - _ce_deploy_lock.stat.exists is defined and _ce_deploy_lock.stat.exists
+  block:
+    - name: Abort if ce-deploy lock file is found.
+      ansible.builtin.debug:
+        msg: "ce-deploy lock file discovered, a deployment is in progress! If this is not the case, login to the affected server and delete the file at {{ _init.deploy_lock_file }}."
+    - ansible.builtin.meta: end_play
+
+- name: Set a lock file on each ASG machine.
+  ansible.builtin.file:
+    path: "{{ _init.lock_file }}"
+    state: touch
+    mode: 0644
+  connection: ssh
+  when: aws_ec2_autoscale_cluster.type == "ec2"
+
 # @todo Do we still need that? Used by AMI and LC,
 # but probably could simply use the base name.
 - name: Define unique name for resources.
@@ -755,3 +782,13 @@
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
+
+# We only need to remove the lock file if the machines will not be replaced.
+- name: Remove the lock file on each ASG machine.
+  ansible.builtin.file:
+    path: "{{ _init.lock_file }}"
+    state: absent
+  connection: ssh
+  when:
+    - aws_ec2_autoscale_cluster.type == "ec2"
+    - not aws_ec2_autoscale_cluster.asg_refresh
