@@ -1,3 +1,4 @@
+---
 - name: Define empty action rule list
   ansible.builtin.set_fact:
     _action_rules: []
