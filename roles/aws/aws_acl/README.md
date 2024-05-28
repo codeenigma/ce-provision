@@ -5,8 +5,9 @@ Creates an ACL to be attached to a CloudFront distribution or an Application Loa
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-## Default variables
+## Default variables for creation of ACL (pass it as a list)
 ```yaml
+---
 ---
 aws_acl:
   - name: example_master_acl
@@ -40,8 +41,16 @@ aws_acl:
           string: "panels/ajax"
           position: "CONTAINS"
 
-#      cyber_sec: #Need to implement task
+      cyber_sec: false # Need to subscribe first in AWS
+```
 
+## Default variables for assigning ACL to CF or ALB
+```yaml
+---
+aws_acl:
+  name: example_master_acl # Name of the ACL to apply
+  scope: CLOUDFRONT # Can be REGIONAL for ALBs
+  region: "us-east-1"
 ```
 
 <!--ENDROLEVARS-->

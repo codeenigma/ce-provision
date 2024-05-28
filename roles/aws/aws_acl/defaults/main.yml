@@ -28,7 +28,11 @@ aws_acl:
       regular_rules:
         - name: allow_panels
           action: allow
-          string: "panels/ajax"
-          position: "CONTAINS"
+          statements_type: "single" # supported "and", "or" and "not" ("and" and "or" supports multiple statements)
+          statements:
+            - inspect: "UriPath" # Aslo supported: "SingleHeader"
+              position: "CONTAINS"
+              string: "panels/ajax"
+              text_trans: "NONE"
 
-#      cyber_sec: #Need to implement task
+      cyber_sec: false # Need to subscribe first in AWS

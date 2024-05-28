@@ -1,0 +1,7 @@
+- name: Set dict string
+  ansible.builtin.set_fact:
+    _priority_dict_string: "{ priority: {{ _priority }} }"
+
+- name: Set dict
+  ansible.builtin.set_fact:
+    _priority_dict: "{{ _priority_dict_string | from_yaml }}"
