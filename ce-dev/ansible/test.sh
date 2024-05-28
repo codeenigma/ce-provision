@@ -17,8 +17,8 @@ usage(){
 
 # Set defaults
 EXAMPLES="blank gitlab"
-OWN_BRANCH="1.x"
-CONFIG_BRANCH="1.x"
+OWN_BRANCH="2.x"
+CONFIG_BRANCH="2.x"
 NO_REBUILD=false
 NO_PROVISION=false
 VERBOSE=false
