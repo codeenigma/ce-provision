@@ -1,5 +1,4 @@
 ---
----
 aws_acl:
   - name: example_master_acl
     description: "Master ACL for CF"
