@@ -1,0 +1,38 @@
+---
+aws_acl:
+  - name: example_master_acl
+    description: "Master ACL for CF"
+    scope: CLOUDFRONT # Can be REGIONAL for ALBs
+    region: "us-east-1"
+    tags: {}
+    rules:
+      rate_limit: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
+      botControl: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
+
+      ip_sets:
+        - name: "Allowed-ips-example"
+          action: allow
+          list: []
+            #- 1.1.1.1/32 # list of ip ranges
+            #- 2.2.2.2/32
+            #- 3.3.3.3/32
+        - name: "Blocked-ips-example"
+          action: block
+          list: []
+            #- 4.4.4.4/32 # list of ip ranges
+            #- 5.5.5.5/32
+            #- 6.6.6.6/32
+
+      cc_block_list: []
+
+      regular_rules:
+        - name: allow_panels
+          action: allow
+          statements_type: "single" # supported "and", "or" and "not" ("and" and "or" supports multiple statements)
+          statements:
+            - inspect: "UriPath" # Aslo supported: "SingleHeader"
+              position: "CONTAINS"
+              string: "panels/ajax"
+              text_trans: "NONE"
+
+      cyber_sec: false # Need to subscribe first in AWS
