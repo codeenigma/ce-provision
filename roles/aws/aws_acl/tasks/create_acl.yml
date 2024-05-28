@@ -60,9 +60,10 @@
         _rules: "{{ _rules + [rate_rule] }}"
 
 - name: Create Bot Control rule.
-  when: _acl.rules.botControl is defined
-  ansible.builtin.include_tasks:
-    file: bot_control.yml
+  ansible.builtin.include_tasks: bot_control.yml
+  when:
+    - _acl.rules.botControl is defined
+    - _acl.rules.botControl.enabled
 
 - name: Create regular rules.
   ansible.builtin.include_tasks: regular_rule.yml
