@@ -134,10 +134,11 @@ echo "-------------------------------------------------"
 echo "Install Ansible and dependencies."
 echo "-------------------------------------------------"
 su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ansible"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/pip3 install ansible netaddr"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/python3 -m pip install --upgrade pip"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/pip install ansible netaddr python-debian"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/ansible-galaxy collection install ansible.posix --force" 
 if [ "$AWS_SUPPORT" = "true" ]; then
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/pip3 install boto3"
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/pip install boto3"
 fi
 echo "-------------------------------------------------"
 
