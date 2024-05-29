@@ -17,7 +17,7 @@
 
 - name: Encapsulate statement with type
   ansible.builtin.set_fact:
-    _statements: "{ {{ _reg_rule.statements_type }}_statement: { statements: [{{_statements}}] } }"
+    _statements: "{ {{ _reg_rule.statements_type }}_statement: { statements: [{{ _statements }}] } }"
   when: _reg_rule.statements_type != "single"
 
 - name: Create regular rule

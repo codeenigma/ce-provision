@@ -18,7 +18,7 @@
     description: "{{ aws_rds.db_parameter_group_description }}"
     engine: "{{ aws_rds.db_parameter_group_engine }}"
     params: "{{ aws_rds.db_parameters }}"
-    tags: "{{ aws_rds.tags | combine({ 'Name': aws_rds.name }) }}"
+    tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
   when:
     - aws_rds.db_parameters is defined
     - aws_rds.db_parameters | length > 0

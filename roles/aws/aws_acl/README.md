@@ -18,7 +18,6 @@ aws_acl:
       rate_limit:
         value: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
         priority: 2
-
       ip_sets:
         - name: "Allowed-ips"
           action: allow
@@ -34,7 +33,6 @@ aws_acl:
             #- 4.4.4.4/32 # list of ip ranges
             #- 5.5.5.5/32
             #- 6.6.6.6/32
-
       country_codes:
         - name: "allowed-countries"
           action: allow
@@ -48,7 +46,6 @@ aws_acl:
           list:
             - RU
             - CN
-
       regular_rules:
         - name: allow_panels
           action: allow
@@ -76,8 +73,7 @@ aws_acl:
               position: "CONTAINS"
               string: "crawl"
               text_trans: "LOWERCASE"
-
-      # AWS Managed rules (if commented out they won't be applied)
+      # AWS Managed rules
       bot_control:
         target: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
         priority: 3
