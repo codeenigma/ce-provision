@@ -15,7 +15,7 @@ usage(){
   echo '--user: Ansible controller user (default: controller)'
   echo '--config: Git URL to your ce-provision Ansible config repository (default: https://github.com/codeenigma/ce-provision-config-example.git)'
   echo '--config-branch: branch of your Ansible config repository to use (default: 1.x)'
-  echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab URL to install)'
+  echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
   echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
   echo '--aws: enable AWS support'
   echo ''
@@ -133,7 +133,7 @@ echo "-------------------------------------------------"
 # Install Ansible in a Python virtual environment.
 echo "Install Ansible and dependencies."
 echo "-------------------------------------------------"
-su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ansible"
+su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix --force"
@@ -151,7 +151,7 @@ else
   echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
   echo "-------------------------------------------------"
 fi
-# Create playbook.
+# Create playbook for ce-provision.
 /usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
@@ -162,9 +162,6 @@ fi
     - name: Install ce-provision.
       ansible.builtin.import_role:
         name: debian/ce_provision
-    - name: Install iptables firewall.
-      ansible.builtin.import_role:
-        name: debian/firewall_config
 EOL
 # Create vars file.
 /usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
@@ -218,6 +215,23 @@ firewall_config:
     firewall_allowed_tcp_ports:
       - "80"
       - "443"
+EOL
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
+# Create playbook for firewall.
+echo "-------------------------------------------------"
+echo "Install firewall."
+echo "-------------------------------------------------"
+/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+---
+- hosts: "localhost"
+  become: true
+  vars_files:
+    - vars.yml
+  tasks:
+    - name: Install iptables firewall.
+      ansible.builtin.import_role:
+        name: debian/firewall_config
 EOL
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 echo "-------------------------------------------------"
