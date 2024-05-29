@@ -18,9 +18,9 @@ sudo ./install.sh -h # for usage information
 # Default installation (ce-provision only)
 sudo ./install.sh
 # Installation with GitLab CE using a self-signed SSL certificate
-sudo ./install.sh --gitlab https://gitlab.example.com
+sudo ./install.sh --gitlab gitlab.example.com
 # Installation with GitLab CE using a LetsEncrypt SSL certificate (requires DNS to be set up in advance)
-sudo ./install.sh --letsencrypt --gitlab https://gitlab.example.com
+sudo ./install.sh --letsencrypt --gitlab gitlab.example.com
 ```
 
 ## Install with ce-provision
