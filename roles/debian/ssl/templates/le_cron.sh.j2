@@ -30,7 +30,7 @@ for site in ${SITES[@]}; do
 done
 
 # run certbot and capture the output
-certbot_output=$( {{ ssl.certbot_renew_command }} --{{ _ssl_web_server }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING 2>&1 )
+certbot_output=$( {{ _venv_path }}/bin/certbot {{ ssl.certbot_renew_command }} --{{ _ssl_web_server }} --http-01-port {{ ssl.http_01_port }} --expand$SITESSTRING 2>&1 )
 
 # Capture exit code of Certbot command
 certbot_exit_code=$?
