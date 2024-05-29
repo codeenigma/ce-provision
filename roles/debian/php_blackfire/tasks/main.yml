@@ -25,6 +25,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb http://packages.blackfire.io/debian any main"
+      format: deb822
       name: blackfire
       types:
         - deb

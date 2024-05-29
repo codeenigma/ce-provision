@@ -1,0 +1,36 @@
+---
+- name: Get resource group
+  ansible.builtin.command: "aws resource-groups get-group --group-name {{ _aws_resource_name }}_resource_group --region {{ _aws_region }}" # --profile dummy
+  register: _res_group
+  failed_when: "('Cannot find group' not in _res_group.stderr) and (_res_group.stderr != '')"
+
+- name: Create resource group if not existant
+  when: _res_group.stderr != ''
+  block:
+    - name: Remove resource query file
+      ansible.builtin.file:
+        path: /home/controller/res_query.json
+        state: absent
+
+    - name: Create resource query file
+      ansible.builtin.template:
+        src: templates/res_query.j2
+        dest: /home/controller/res_query.json
+
+    - name: Create resource group
+      ansible.builtin.command: >
+        aws resource-groups create-group
+        --name {{ _aws_resource_name }}_resource_group
+        --resource-query file:///home/controller/res_query.json
+        --region {{ _aws_region }}
+        --description "Resource group for {{ _aws_resource_name }}"
+
+- name: Update resource group if it exist
+  when: _res_group.stderr == ''
+  block:
+    - name: Create resource group
+      ansible.builtin.command: >
+        aws resource-groups update-group
+        --group-name {{ _aws_resource_name }}_resource_group
+        --region {{ _aws_region }}
+        --description "Resource group for {{ _aws_resource_name }}"

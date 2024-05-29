@@ -7,6 +7,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb http://repo.mysql.com/apt/debian/ {{ ansible_distribution_release }} {{ mysql_server.apt_repo_version }}"
+      format: deb822
       name: mysql
       types:
         - deb
@@ -32,7 +33,7 @@
 
 - name: Add MySQL repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ mysql_server.apt_origin ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [mysql_server.apt_origin] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable

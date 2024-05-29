@@ -9,6 +9,7 @@ ce_deploy:
   install_username: "{{ _ce_deploy.username }}"
   upgrade_timer_name: upgrade_ce_deploy_ansible
   # Other ce-deploy settings.
+  aws_support: true # installs boto3
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
   key_name: id_rsa.pub # existing users may have a key of a different name
   username: "{{ _ce_deploy.username }}"

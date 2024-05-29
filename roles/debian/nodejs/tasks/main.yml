@@ -5,6 +5,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://deb.nodesource.com/node_{{ nodejs.version }} {{ ansible_distribution_release }} main"
+      format: deb822
       name: nodejs
       types:
         - deb
@@ -25,6 +26,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+      format: deb822
       name: nodejs_yarn
       types:
         - deb
@@ -49,7 +51,7 @@
 
 - name: Add nodejs and yarn repositories to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ nodejs.apt_origin_nodejs, nodejs.apt_origin_yarn ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [nodejs.apt_origin_nodejs, nodejs.apt_origin_yarn] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable

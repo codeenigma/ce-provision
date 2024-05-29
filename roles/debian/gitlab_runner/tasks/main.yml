@@ -5,6 +5,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://packages.gitlab.com/runner/gitlab-runner/debian/ {{ ansible_distribution_release }} main"
+      format: deb822
       name: gitlab_runner
       types:
         - deb
@@ -21,7 +22,7 @@
 
 - name: Add GitLab Runner repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab_runner.apt_origin ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [gitlab_runner.apt_origin] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable

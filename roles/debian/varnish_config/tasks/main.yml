@@ -11,5 +11,5 @@
     - "{{ _ce_provision_base_dir }}/config/files/templates/{{ varnish_config.template_filename }}.j2"
     - "default.vcl.j2"
   notify:
-    - reload systemd
+    - reload systemd # handlers in https://github.com/geerlingguy/ansible-role-varnish/blob/master/handlers/main.yml
     - restart varnish

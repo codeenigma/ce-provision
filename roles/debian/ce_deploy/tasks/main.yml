@@ -46,7 +46,7 @@
   ansible.builtin.git:
     repo: "{{ ce_deploy.own_repository | default('https://github.com/codeenigma/ce-deploy.git') }}"
     dest: "{{ ce_deploy.local_dir }}"
-    version: "{{ ce_deploy.own_repository_branch  | default('master') }}"
+    version: "{{ ce_deploy.own_repository_branch | default('master') }}"
     update: true
     accept_hostkey: true
   become: true
@@ -57,7 +57,7 @@
     repo: "{{ ce_deploy.config_repository }}"
     accept_hostkey: true
     dest: "{{ _ce_provision_build_tmp_dir }}/config"
-    version: "{{ ce_deploy.config_repository_branch  | default('master') }}"
+    version: "{{ ce_deploy.config_repository_branch | default('master') }}"
   become: false
   delegate_to: localhost
   when: ce_deploy.config_repository is defined and ce_deploy.config_repository
@@ -141,6 +141,7 @@
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
+  when: ce_deploy.aws_support
 
 - name: Add Python virtual environment to $PATH.
   ansible.builtin.copy:

@@ -1,0 +1,58 @@
+---
+- name: Create regular rule
+  ansible.builtin.set_fact:
+    cyber_sec_rule:
+        name: "CyberSecurityCloud-HighSecurityOWASPSet"
+        override_action:
+          none: {}
+        visibility_config:
+          sampled_requests_enabled: true
+          cloud_watch_metrics_enabled: true
+          metric_name: "CyberSecurityCloud-HighSecurityOWASPSet"
+        statement:
+          managed_rule_group_statement:
+            vendor_name: "Cyber Security Cloud Inc."
+            name: "CyberSecurityCloud-HighSecurityOWASPSet-"
+            excluded_rules:
+              - name: "bad_useragent-header-001"
+              - name: "cookie-body-001"
+              - name: "cookie-qs-001"
+              - name: "drupal-multi-001"
+              - name: "drupal-multi-002"
+              - name: "joomla-multi-001"
+              - name: "ldapi-url-001"
+              - name: "nosqli-body-001"
+              - name: "nosqli-qs-001"
+              - name: "oracle-multi-001"
+              - name: "oscommandi-body-001"
+              - name: "oscommandi-qs-001"
+              - name: "pathtraversal-body-001"
+              - name: "pathtraversal-qs-001"
+              - name: "pathtraversal-url-001"
+              - name: "rails-header-001"
+              - name: "sqli-body-001"
+              - name: "sqli-body-002"
+              - name: "sqli-qs-001"
+              - name: "sqli-qs-002"
+              - name: "sqli-url-001"
+              - name: "ssrf-multi-001"
+              - name: "struts-multi-001"
+              - name: "struts-multi-002"
+              - name: "struts-multi-003"
+              - name: "suspicious_access-url-001"
+              - name: "tomcat-multi-001"
+              - name: "xss-body-001"
+              - name: "xss-qs-001"
+              - name: "xxe-ssci-body-001"
+              - name: "xxe-ssci-qs-001"
+
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    cyber_sec_rule: "{{ cyber_sec_rule | combine(_priority_dict) }}"
+
+- name: Add rule to list
+  ansible.builtin.set_fact:
+    _rules: "{{ _rules + [cyber_sec_rule] }}"
+
+- name: Increase priority.
+  ansible.builtin.include_tasks: increase_priority.yml
