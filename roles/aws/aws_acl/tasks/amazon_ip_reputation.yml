@@ -1,3 +1,4 @@
+---
 - name: Create amazon ip reputation rule
   ansible.builtin.set_fact:
     amazon_ip_reputation:

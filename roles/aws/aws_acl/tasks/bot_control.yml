@@ -71,7 +71,7 @@
             inspection_level: "COMMON"
 
 - name: Define targeted actions rules
-  when: _acl.rules.bot_control.target == "TARGETED"
+  when: _acl.rules.botControl.target == "TARGETED"
   block:
     - name: Define targeted actions
       ansible.builtin.set_fact:
