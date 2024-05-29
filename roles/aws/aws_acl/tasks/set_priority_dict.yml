@@ -1,3 +1,4 @@
+---
 - name: Set dict string
   ansible.builtin.set_fact:
     _priority_dict_string: "{ priority: {{ _priority }} }"

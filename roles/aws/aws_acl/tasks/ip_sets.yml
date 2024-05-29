@@ -1,3 +1,4 @@
+---
 - name: Create IP set for WAF.
   community.aws.wafv2_ip_set:
     name: "{{ _ip_set.name }}"
