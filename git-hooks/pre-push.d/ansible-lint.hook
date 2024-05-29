@@ -16,7 +16,7 @@ fi
 DOCKER_CMD="$DOCKER_BIN exec --user $DOCKER_USER --workdir $CONTAINER_BASE_PATH -i $PROVISION_CONTAINER"
 
 # Base branch to compare diff.
-BASE_BRANCH="2.x"
+BASE_BRANCH="1.x"
 for file in $(git diff "$1/$BASE_BRANCH" --name-only --staged); do
   if [ -f "$GIT_DIR/$file" ]; then
     for ROLE in $ROLES_LIST; do
