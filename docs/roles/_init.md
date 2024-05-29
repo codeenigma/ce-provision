@@ -10,10 +10,10 @@ This is meant to ALWAYS be included as the first task of a play. If you include 
 ```yaml
 ---
 _ce_provision_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
-_venv_path: "/home/{{ _ce_provision_username }}/ansible"
+_venv_path: "/home/{{ _ce_provision_username }}/ce-python"
 _venv_command: /usr/bin/python3 -m venv
 _venv_install_username: "{{ _ce_provision_username }}"
-_ce_ansible_timer_name: upgrade_ce_provision_ansible
+_ce_ansible_timer_name: upgrade_ansible
 
 # AWS variables - if you are using an AWS account, you can preset certain variables
 # Generally it is recommended to place these in your ce-provision-config repository under hosts/group_vars/all
