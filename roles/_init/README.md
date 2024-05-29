@@ -20,11 +20,6 @@ _ce_ansible_timer_name: upgrade_ansible
 #_aws_profile: example # boto profile name
 #_aws_region: eu-west-1
 
-# AWS variables - if you are using an AWS account, you can preset certain variables
-# Generally it is recommended to place these in your ce-provision-config repository under hosts/group_vars/all
-#_aws_profile: example # boto profile name
-#_aws_region: eu-west-1
-
 _init:
   # A list of var directories to include. We only support .yml extensions.
   # This is used to detect if the playbook must re-run or not.
