@@ -16,13 +16,26 @@
     - pip3
   failed_when: false # don't stop the build if there's no system pip
 
-# Install Python applications.
-- name: Set up Python venv variables.
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
   ansible.builtin.set_fact:
     _venv_path: "{{ ssl.letsencrypt.venv_path }}"
-    _venv_command: "{{ ssl.letsencrypt.venv_command }}"
-    _venv_install_username: "{{ ssl.letsencrypt.install_username }}"
+  when:
+    - ssl.letsencrypt.venv_path is defined
 
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ ssl.letsencrypt.venv_command }}"
+  when:
+    - ssl.letsencrypt.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ ssl.letsencrypt.venv_install_username }}"
+  when:
+    - ssl.letsencrypt.venv_install_username is defined
+
+# Install Python applications.
 - name: Manage required pip packages.
   ansible.builtin.include_role:
     name: debian/python_pip_packages

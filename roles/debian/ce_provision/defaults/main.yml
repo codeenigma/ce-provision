@@ -1,11 +1,12 @@
 ---
 # See roles/_init/defaults/main.yml for Ansible installation, controller user creation and extra variables repo settings.
 ce_provision:
-  # Optional venv overrides - if commented out, values taken from _init defaults.
+  # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
   #venv_path: "/home/{{ _ce_provision_username }}/ansible"
   #venv_command: /usr/bin/python3 -m venv
   #venv_install_username: "{{ _ce_provision_username }}"
   #upgrade_timer_name: upgrade_ce_provision_ansible
+
   # Other ce-provision settings.
   aws_support: true # installs boto3
   new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
