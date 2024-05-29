@@ -1,3 +1,4 @@
+---
 - name: Create known bad inputs rule
   ansible.builtin.set_fact:
     known_bad_inputs:

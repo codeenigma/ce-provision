@@ -94,7 +94,7 @@
 
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
-    _aws_ec2_listeners: "{{ [ _aws_ec2_listeners_http ] }}"
+    _aws_ec2_listeners: "{{ [_aws_ec2_listeners_http] }}"
   when: _ssl_certificate_ARN | length < 1
 
 - name: Add HTTPS Listener.
