@@ -1,9 +1,10 @@
 ---
 duplicity:
-  # Location of Duplicity installation and components.
-  venv_path: "/home/{{ user_provision.username }}/duplicity"
-  venv_command: /usr/bin/python3 -m venv
-  install_username: "{{ user_provision.username }}"
+  # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
+  #venv_path: "/home/{{ user_provision.username }}/duplicity"
+  #venv_command: /usr/bin/python3 -m venv
+  #venv_install_username: "{{ user_provision.username }}"
+
   # Duplicity configuration
   backend: s3 # currently also support b2 for Backblaze
   access_key_id: "somekey"
@@ -31,3 +32,5 @@ duplicity:
   # systemd timer settings
   create_timer: true # sometimes you might want to trigger duplicity some other way than a systemd timer
   on_calendar: "*-*-* 03:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+  create_upgrade_timer: true
+  upgrade_on_calendar: "*-*-* 01:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
