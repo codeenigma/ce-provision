@@ -11,11 +11,12 @@ _ce_deploy:
   username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
 
 ce_deploy:
-  # Location of Ansible installation and components.
-  venv_path: "/home/{{ _ce_deploy.username }}/ansible"
-  venv_command: /usr/bin/python3 -m venv
-  install_username: "{{ _ce_deploy.username }}"
-  upgrade_timer_name: upgrade_ce_deploy_ansible
+  # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
+  #venv_path: "/home/{{ _ce_deploy.username }}/ansible"
+  #venv_command: /usr/bin/python3 -m venv
+  #venv_install_username: "{{ _ce_deploy.username }}"
+  #upgrade_timer_name: upgrade_ce_deploy_ansible
+
   # Other ce-deploy settings.
   aws_support: true # installs boto3
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
