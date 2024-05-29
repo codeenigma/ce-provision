@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 ---
->>>>>>> Redoing-changes-for-aws-acl-role
 - name: Create cyber security rule
   ansible.builtin.set_fact:
     cyber_sec_rule:
