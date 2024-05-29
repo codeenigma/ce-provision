@@ -16,6 +16,7 @@ ce_provision:
   #venv_install_username: "{{ _ce_provision_username }}"
   #upgrade_timer_name: upgrade_ce_provision_ansible
   # Other ce-provision settings.
+  aws_support: true # installs boto3
   new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
   username: "{{ _ce_provision_username }}" # see _init defaults
   #uid: "{{ _init.ce_provision_uid }}" # see _init defaults, optionally hardcode the UID for this user

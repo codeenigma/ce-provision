@@ -199,6 +199,7 @@
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
+  when: ce_provision.aws_support
 
 - name: Ensure dnspython, certifi and pyopenssl are installed.
   ansible.builtin.include_role:
