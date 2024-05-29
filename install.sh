@@ -134,11 +134,11 @@ echo "-------------------------------------------------"
 echo "Install Ansible and dependencies."
 echo "-------------------------------------------------"
 su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ansible"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/python3 -m pip install --upgrade pip"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/pip install ansible netaddr python-debian"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/ansible-galaxy collection install ansible.posix --force" 
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix --force"
 if [ "$AWS_SUPPORT" = "true" ]; then
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/pip install boto3"
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
 fi
 echo "-------------------------------------------------"
 
@@ -172,7 +172,7 @@ _domain_name: ${SERVER_HOSTNAME}
 _ce_provision_data_dir: /home/${CONTROLLER_USER}/ce-provision/data
 _ce_provision_username: ${CONTROLLER_USER}
 ce_provision:
-  venv_path: /home/${CONTROLLER_USER}/ansible
+  venv_path: /home/${CONTROLLER_USER}/ce-python
   venv_command: /usr/bin/python3 -m venv
   venv_install_username: ${CONTROLLER_USER}
   upgrade_timer_name: upgrade_ce_provision_ansible
@@ -198,7 +198,7 @@ ce_provision:
   galaxy_custom_requirements_file: ""
   upgrade_galaxy:
     enabled: true
-    command: "/home/${CONTROLLER_USER}/ansible/bin/ansible-galaxy collection install --force"
+    command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"
     on_calendar: "Mon *-*-* 04:00:00"
 firewall_config:
   purge: true
@@ -219,7 +219,7 @@ firewall_config:
       - "80"
       - "443"
 EOL
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 echo "-------------------------------------------------"
 
 # Install GitLab
@@ -330,7 +330,7 @@ EOT
 EOT
     echo "-------------------------------------------------"
   fi
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ansible/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
   echo "-------------------------------------------------"
 else
   echo "GitLab not requested. Skipping."
