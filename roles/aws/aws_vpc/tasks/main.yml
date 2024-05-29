@@ -33,7 +33,7 @@
     region: "{{ aws_vpc.region }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
     state: present
-    tags: "{{ aws_vpc.tags | combine({ 'Name': aws_vpc.name }) }}"
+    tags: "{{ aws_vpc.tags | combine({'Name': aws_vpc.name}) }}"
   register: _aws_vpc_gateway
 
 - name: Update Main route table.

@@ -5,7 +5,7 @@
 
 - name: Set specific boto3 version to install.
   ansible.builtin.set_fact:
-    _boto3_install_package: "boto3=={{ python_boto.boto3_version}}"
+    _boto3_install_package: "boto3=={{ python_boto.boto3_version }}"
   when:
     - python_boto.boto3_version | length > 0
 

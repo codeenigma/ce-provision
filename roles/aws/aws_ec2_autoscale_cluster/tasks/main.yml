@@ -1,3 +1,4 @@
+---
 # @todo Do we still need that? Used by AMI and LC,
 # but probably could simply use the base name.
 - name: Define unique name for resources.

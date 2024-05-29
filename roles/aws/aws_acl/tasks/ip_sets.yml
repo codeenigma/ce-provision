@@ -1,0 +1,39 @@
+---
+- name: Create IP set for WAF.
+  community.aws.wafv2_ip_set:
+    name: "{{ _ip_set.name }}"
+    state: present
+    description: Set of blocked IPs
+    scope: "{{ _acl.scope }}"
+    region: "{{ _acl.region }}"
+    ip_address_version: IPV4
+    addresses: "{{ _ip_set.list }}"
+  register: _ip_set_info
+
+- name: Set action string
+  ansible.builtin.set_fact:
+    _action: "{ {{ _ip_set.action }}: {} }"
+
+- name: Create IP block rule.
+  ansible.builtin.set_fact:
+    ip_block_rule:
+      name: "{{ _ip_set.name }}"
+      action: "{{ _action | from_yaml }}"
+      visibility_config:
+        sampled_requests_enabled: true
+        cloud_watch_metrics_enabled: true
+        metric_name: "{{ _ip_set.name }}"
+      statement:
+        ip_set_reference_statement:
+          arn: "{{ _ip_set_info.arn }}"
+
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    ip_block_rule: "{{ ip_block_rule | combine(_priority_dict) }}"
+
+- name: Add rule to list.
+  ansible.builtin.set_fact:
+    _rules: "{{ _rules + [ip_block_rule] }}"
+
+- name: Increase priority.
+  ansible.builtin.include_tasks: increase_priority.yml

@@ -3,13 +3,34 @@
   ansible.builtin.debug:
     msg: "Using ce-provision {{ _init.ce_provision_version }}"
 
+# @TODO This cannot work for ASGs.
+# We will need something central for lock files and it cannot be controller servers because they may be containers.
+- name: Check for a ce-deploy lock file.
+  ansible.builtin.stat:
+    path: "{{ _init.deploy_lock_file }}"
+  register: _ce_deploy_lock
+
+- name: Abort if ce-deploy lock file exists.
+  when: _ce_deploy_lock.stat.exists is defined and _ce_deploy_lock.stat.exists
+  block:
+    - name: Abort if ce-deploy lock file is found.
+      ansible.builtin.debug:
+        msg: "ce-deploy lock file discovered, a deployment is in progress! If this is not the case, login to the affected server and delete the file at {{ _init.deploy_lock_file }}."
+    - ansible.builtin.meta: end_play
+
 - name: Check OS family.
   when: ansible_os_family != "Debian"
   block:
     - name: Abort if target is not a Debian server.
       ansible.builtin.debug:
         msg: "ce-provision currently only supports Debian based distributions of Linux."
-    - ansible.builtin.meta: end_host
+    - ansible.builtin.meta: end_play
+
+- name: Set a lock file.
+  ansible.builtin.file:
+    path: "{{ _init.lock_file }}"
+    state: touch
+    mode: 0644
 
 # Load Linux services into ansible_facts.services.
 - name: Populate service facts

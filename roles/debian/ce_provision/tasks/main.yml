@@ -84,7 +84,7 @@
   ansible.builtin.git:
     repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git') }}"
     dest: "{{ ce_provision.local_dir }}"
-    version: "{{ ce_provision.own_repository_branch  | default('master') }}"
+    version: "{{ ce_provision.own_repository_branch | default('master') }}"
     update: true
     accept_hostkey: true #@todo?
   become: true
@@ -97,7 +97,7 @@
     repo: "{{ ce_provision.config_repository }}"
     accept_hostkey: true
     dest: "{{ ce_provision.local_dir }}/config"
-    version: "{{ ce_provision.config_repository_branch  | default('master') }}"
+    version: "{{ ce_provision.config_repository_branch | default('master') }}"
   become: true
   become_user: "{{ ce_provision.username }}"
   when:
@@ -199,6 +199,7 @@
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
+  when: ce_provision.aws_support
 
 - name: Ensure dnspython, certifi and pyopenssl are installed.
   ansible.builtin.include_role:

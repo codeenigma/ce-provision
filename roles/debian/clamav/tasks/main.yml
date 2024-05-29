@@ -23,11 +23,17 @@
     state: directory
     mode: '0755'
 
+- name: Build a dictionary of timers for the systemd timers role.
+  ansible.builtin.set_fact:
+    _clamav_timers: "{{ _clamav_timers | default({}) | combine(item) }}"
+  with_items: "{{ clamav.timers }}"
+  when: clamav.timers | length > 0
+
 - name: Set up a ClamAV systemd timers.
   ansible.builtin.include_role:
     name: contrib/systemd_timers
   vars:
-    timers: "{{ clamav.timers }}"
+    timers: "{{ _clamav_timers }}"
   when: clamav.timers | length > 0
 
 - name: Install clamdscan.

@@ -8,34 +8,40 @@ Creates an ACL to be attached to a CloudFront distribution or an Application Loa
 ## Default variables
 ```yaml
 ---
-rate_limit: 0 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
 aws_acl:
-  name: example_master_acl
-  scope: CLOUDFRONT # Can be REGIONAL for ALBs
-  tags: {}
+  - name: example_master_acl
+    description: "Master ACL for CF"
+    scope: CLOUDFRONT # Can be REGIONAL for ALBs
+    region: "us-east-1"
+    tags: {}
+    rules:
+      rate_limit: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
+      botControl: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
 
-  botControl: true
-  inspection: "COMMON" # or set to TARGETED inspection level
+      ip_sets:
+        - name: "Allowed-ips-example"
+          action: allow
+          list: []
+            #- 1.1.1.1/32 # list of ip ranges
+            #- 2.2.2.2/32
+            #- 3.3.3.3/32
+        - name: "Blocked-ips-example"
+          action: block
+          list: []
+            #- 4.4.4.4/32 # list of ip ranges
+            #- 5.5.5.5/32
+            #- 6.6.6.6/32
 
-  ip_allow:
-    name: "Allowed-ips"
-    list: []
-      #- 1.1.1.1/32 # list of ip ranges
-      #- 2.2.2.2/32
-      #- 3.3.3.3/32
+      cc_block_list: []
 
-  ip_block:
-    name: "Blocked-ips"
-    list: []
-      #- 4.4.4.4/32 # list of ip ranges
-      #- 5.5.5.5/32
-      #- 6.6.6.6/32
+      regular_rules:
+        - name: allow_panels
+          action: allow
+          string: "panels/ajax"
+          position: "CONTAINS"
 
-  cc_block_list: []
-    #- BY # Belarus
-    #- CN # China
-    #- IR # Iran
-    #- SA # Saudi Arabia
+#      cyber_sec: #Need to implement task
+
 ```
 
 <!--ENDROLEVARS-->
