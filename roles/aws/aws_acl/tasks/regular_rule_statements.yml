@@ -1,3 +1,4 @@
+---
 - name: Add comma if _statement already has element
   ansible.builtin.set_fact:
     _statements: "{{ _statements }}, "

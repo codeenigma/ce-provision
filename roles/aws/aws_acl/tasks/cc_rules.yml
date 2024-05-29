@@ -1,3 +1,4 @@
+---
 - name: Set action string
   ansible.builtin.set_fact:
     _action: "{ {{ _cc_set.action }}: {} }"
