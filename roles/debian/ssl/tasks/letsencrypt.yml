@@ -1,8 +1,50 @@
 ---
-- name: Ensure Certbot is installed.
+- name: Ensure system Cerbot is not installed.
   ansible.builtin.apt:
     pkg: certbot
-    state: present
+    state: absent
+
+- name: Ensure Certbot is not installed globally with pip or pip3 on older versions of Debian.
+  ansible.builtin.pip:
+    name:
+      - certbot
+    state: absent
+    executable: "{{ item }}"
+  when: ansible_distribution_major_version | int < 12
+  with_items:
+    - pip
+    - pip3
+  failed_when: false # don't stop the build if there's no system pip
+
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ssl.letsencrypt.venv_path }}"
+  when:
+    - ssl.letsencrypt.venv_path is defined
+
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ ssl.letsencrypt.venv_command }}"
+  when:
+    - ssl.letsencrypt.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ ssl.letsencrypt.venv_install_username }}"
+  when:
+    - ssl.letsencrypt.venv_install_username is defined
+
+# Install Python applications.
+- name: Manage required pip packages.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: pip
+          state: latest
+        - name: certbot
 
 - name: Set LetsEncrypt variables.
   ansible.builtin.set_fact:
@@ -53,7 +95,7 @@
   when: not _letsencrypt_cert.stat.exists
 
 - name: Register certificate bypassing web server if needed.
-  ansible.builtin.command: "{{ ssl.certbot_register_command }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} -m {{ ssl.email }} --{{ _ssl_web_server }}{{ _letsencrypt_domain_string }}"
+  ansible.builtin.command: "{{ _venv_path }}/bin/certbot {{ ssl.certbot_register_command }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} -m {{ ssl.email }} --{{ _ssl_web_server }}{{ _letsencrypt_domain_string }}"
   when:
     - not _letsencrypt_cert.stat.exists
 

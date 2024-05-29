@@ -126,14 +126,32 @@
     owner: "{{ ce_deploy.username }}"
     recurse: true
 
-# Install Python applications.
-- name: Set up Python venv variables.
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
   ansible.builtin.set_fact:
     _venv_path: "{{ ce_deploy.venv_path }}"
-    _venv_command: "{{ ce_deploy.venv_command }}"
-    _venv_install_username: "{{ ce_deploy.install_username }}"
-    _ce_ansible_timer_name: "{{ ce_deploy.upgrade_timer_name }}"
+  when:
+    - ce_deploy.venv_path is defined
 
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ ce_deploy.venv_command }}"
+  when:
+    - ce_deploy.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ ce_deploy.venv_install_username }}"
+  when:
+    - ce_deploy.venv_install_username is defined
+
+- name: Override systemd timer name for Ansible if provided.
+  ansible.builtin.set_fact:
+    _ce_ansible_timer_name: "{{ ce_deploy.upgrade_timer_name }}"
+  when:
+    - ce_deploy.upgrade_timer_name is defined
+
+# Install Python applications.
 - name: Install Ansible.
   ansible.builtin.include_role:
     name: debian/ansible
