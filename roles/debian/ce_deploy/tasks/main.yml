@@ -141,6 +141,7 @@
 - name: Install python_boto.
   ansible.builtin.include_role:
     name: debian/python_boto
+  when: ce_deploy.aws_support
 
 - name: Add Python virtual environment to $PATH.
   ansible.builtin.copy:
