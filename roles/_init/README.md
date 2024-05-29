@@ -15,11 +15,18 @@ _venv_command: /usr/bin/python3 -m venv
 _venv_install_username: "{{ _ce_provision_username }}"
 _ce_ansible_timer_name: upgrade_ce_provision_ansible
 
+# AWS variables - if you are using an AWS account, you can preset certain variables
+# Generally it is recommended to place these in your ce-provision-config repository under hosts/group_vars/all
+#_aws_profile: example # boto profile name
+#_aws_region: eu-west-1
+
 _init:
   # A list of var directories to include. We only support .yml extensions.
   # This is used to detect if the playbook must re-run or not.
   vars_dirs: []
   force_play: false
+  lock_file: /tmp/ce-provision-lock
+  deploy_lock_file: /tmp/ce-deploy-lock # must match lock_file in ce-deploy
   ce_provision_version: 2.x # Outputted by the _init role at the start of plays.
 
   # Although these variables logically belong with ce_provision, the _init role needs to

@@ -1,0 +1,130 @@
+- name: Define dict for rules.
+  ansible.builtin.set_fact:
+    _rules: []
+
+- name: Set priority dict
+  set_fact:
+    _priority_dict: {}
+
+- name: Create IP set rules.
+  ansible.builtin.include_tasks: ip_sets.yml
+  when:
+    - _acl.rules.ip_sets is defined
+    - _acl.rules.ip_sets | length > 0
+  loop: "{{ _acl.rules.ip_sets | list }}"
+  loop_control:
+    loop_var: _ip_set
+
+- name: Create CC rule set.
+  ansible.builtin.include_tasks: cc_rules.yml
+  when:
+    - _acl.rules.country_codes is defined
+    - _acl.rules.country_codes | length > 0
+  loop: "{{ _acl.rules.country_codes | list }}"
+  loop_control:
+    loop_var: _cc_set
+
+- name: Set rate limit variable.
+  when:
+    - _acl.rules.rate_limit is defined
+    - _acl.rules.rate_limit.value > 0
+  block:
+    - name: Set rate based statement from template
+      ansible.builtin.set_fact:
+        _rbs: "{{ lookup('ansible.builtin.template', './rate_limit.j2') | from_yaml }}"
+
+    - name: Define rate rule.
+      ansible.builtin.set_fact:
+        rate_rule:
+          name: Rate_limit
+          action:
+            block: {}
+          visibility_config:
+            sampled_requests_enabled: true
+            cloud_watch_metrics_enabled: true
+            metric_name: rate_limit
+          Statement:
+            rate_based_statement: "{{ _rbs }}"
+
+    - name: Set priority.
+      ansible.builtin.include_tasks: set_priority_dict.yml
+      vars:
+        _priority: "{{ _acl.rules.rate_limit.priority }}"
+
+    - name: Append priority to rule.
+      ansible.builtin.set_fact:
+        rate_rule: "{{ rate_rule | combine(_priority_dict) }}"
+
+    - name: Add rule to list.
+      ansible.builtin.set_fact:
+        _rules: "{{ _rules + [rate_rule] }}"
+
+- name: Create Bot Control rule.
+  ansible.builtin.include_tasks: bot_control.yml
+  when:
+    - _acl.rules.botControl is defined
+    - _acl.rules.botControl.enabled
+
+- name: Create regular rules.
+  ansible.builtin.include_tasks: regular_rule.yml
+  when:
+    - _acl.rules.regular_rules is defined
+    - _acl.rules.regular_rules | length > 0
+  loop: "{{ _acl.rules.regular_rules | list }}"
+  loop_control:
+    loop_var: _reg_rule
+
+- name: Create CyberSecurityCloudInc rule.
+  ansible.builtin.include_tasks: cyber_sec.yml
+  when:
+    - _acl.rules.cyber_sec is defined
+    - _acl.rules.cyber_sec.enabled
+
+- name: Create Amazon IP reputation rule.
+  ansible.builtin.include_tasks: amazon_ip_reputation.yml
+  when:
+    - _acl.rules.amazon_ip_reputation is defined
+    - _acl.rules.amazon_ip_reputation.enabled
+
+- name: Create Common Rule Set rule.
+  ansible.builtin.include_tasks: common_rule_set.yml
+  when:
+    - _acl.rules.common_rule_set is defined
+    - _acl.rules.common_rule_set.enabled
+
+- name: Create PHP Rule Set rule.
+  ansible.builtin.include_tasks: php_rule_set.yml
+  when:
+    - _acl.rules.php_rule_set is defined
+    - _acl.rules.php_rule_set.enabled
+
+- name: Create Known Bad Inputs rule.
+  ansible.builtin.include_tasks: known_bad_inputs.yml
+  when:
+    - _acl.rules.known_bad_inputs is defined
+    - _acl.rules.known_bad_inputs.enabled
+
+- name: Create Anomymous IP List rule.
+  ansible.builtin.include_tasks: anonymous_ip_list.yml
+  when:
+    - _acl.rules.anonymous_ip_list is defined
+    - _acl.rules.anonymous_ip_list.enabled
+
+- name: Print the rules
+  ansible.builtin.debug:
+    msg: "{{ _rules }}"
+
+- name: Create web acl.
+  community.aws.wafv2_web_acl:
+    name: "{{ _acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
+    description: "{{ _acl.description }}"
+    scope: "{{ _acl.scope }}"
+    region: "{{ _acl.region }}"
+    default_action: Allow # or "Block"
+    sampled_requests: false
+    cloudwatch_metrics: true # or "false" to disable metrics
+    metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
+    rules: "{{ _rules }}"
+    purge_rules: true
+    tags: "{{ _acl.tags }}"
+    state: present

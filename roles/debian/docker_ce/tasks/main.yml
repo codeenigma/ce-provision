@@ -15,6 +15,7 @@
   vars:
     apt_repository:
       legacy_repo: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+      format: deb822
       name: docker_ce
       types:
         - deb
@@ -30,7 +31,7 @@
 
 - name: Add Docker repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ docker_ce.apt_origin ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [docker_ce.apt_origin] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable

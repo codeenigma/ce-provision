@@ -1,0 +1,49 @@
+- name: Create IP set for WAF.
+  community.aws.wafv2_ip_set:
+    name: "{{ _ip_set.name }}"
+    state: present
+    description: Set of blocked IPs
+    scope: "{{ _acl.scope }}"
+    region: "{{ _acl.region }}"
+    ip_address_version: IPV4
+    addresses: "{{ _ip_set.list }}"
+  when: _ip_set.list | length > 0
+  register: _ip_set_info
+
+- name: Get IP set for WAF if.
+  community.aws.wafv2_ip_set_info:
+    name: "{{ _ip_set.name }}"
+    scope: "{{ _acl.scope }}"
+    region: "{{ _acl.region }}"
+  when: _ip_set.list | length == 0
+  register: _ip_set_info
+
+- name: Set action string
+  ansible.builtin.set_fact:
+    _action: "{ {{ _ip_set.action }}: {} }"
+
+- name: Create IP set rule.
+  ansible.builtin.set_fact:
+    ip_set_rule:
+      name: "{{ _ip_set.name }}"
+      action: "{{ _action | from_yaml }}"
+      visibility_config:
+        sampled_requests_enabled: true
+        cloud_watch_metrics_enabled: true
+        metric_name: "{{ _ip_set.name }}"
+      statement:
+        ip_set_reference_statement:
+          arn: "{{ _ip_set_info.arn }}"
+
+- name: Set priority.
+  ansible.builtin.include_tasks: set_priority_dict.yml
+  vars:
+    _priority: "{{ _ip_set.priority }}"
+
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    ip_set_rule: "{{ ip_set_rule | combine(_priority_dict) }}"
+
+- name: Add rule to list.
+  ansible.builtin.set_fact:
+    _rules: "{{ _rules + [ip_set_rule] }}"

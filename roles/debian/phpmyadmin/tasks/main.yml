@@ -17,3 +17,8 @@
   ansible.builtin.command:
     cmd: "/usr/local/bin/phpmyadmin.sh -u -v {{ phpmyadmin.version }}"
   when: phpmyadmin.method == 'upgrade'
+
+- name: Install the NGINX web server.
+  ansible.builtin.include_role:
+    name: debian/nginx
+  when: phpmyadmin.install_nginx
