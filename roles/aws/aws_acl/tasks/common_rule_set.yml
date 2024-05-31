@@ -1,3 +1,4 @@
+---
 - name: Create common rule set rule
   ansible.builtin.set_fact:
     common_rule_set:

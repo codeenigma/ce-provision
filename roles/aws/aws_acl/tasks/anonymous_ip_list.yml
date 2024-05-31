@@ -1,3 +1,4 @@
+---
 - name: Create anonymous ip list rule
   ansible.builtin.set_fact:
     anonymous_ip_list:

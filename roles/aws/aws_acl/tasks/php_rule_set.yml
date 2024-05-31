@@ -1,3 +1,4 @@
+---
 - name: Create php rule set rule
   ansible.builtin.set_fact:
     php_rule_set:

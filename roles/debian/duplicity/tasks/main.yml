@@ -16,13 +16,26 @@
     - pip3
   failed_when: false # don't stop the build if there's no system pip
 
-# Install Python applications.
-- name: Set up Python venv variables.
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
   ansible.builtin.set_fact:
     _venv_path: "{{ duplicity.venv_path }}"
-    _venv_command: "{{ duplicity.venv_command }}"
-    _venv_install_username: "{{ duplicity.install_username }}"
+  when:
+    - duplicity.venv_path is defined
 
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ duplicity.venv_command }}"
+  when:
+    - duplicity.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ duplicity.venv_install_username }}"
+  when:
+    - duplicity.venv_install_username is defined
+
+# Install Python applications.
 - name: Manage required pip packages.
   ansible.builtin.include_role:
     name: debian/python_pip_packages
@@ -89,6 +102,16 @@
   when: "dir.rules|length"
   loop_control:
     loop_var: dir
+
+- name: Create systemd timer to upgrade Duplicity.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_duplicity:
+        timer_command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade duplicity"
+        timer_OnCalendar: "{{ duplicity.upgrade_on_calendar }}"
+  when: duplicity.create_upgrade_timer
 
 # @TODO - cannot currently send failure notifications - see https://github.com/codeenigma/ce-provision/issues/1215
 - name: Create systemd timer for Duplicity backup.

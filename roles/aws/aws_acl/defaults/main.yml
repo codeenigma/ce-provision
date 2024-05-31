@@ -6,94 +6,29 @@ aws_acl:
     region: "us-east-1"
     tags: {}
     rules:
-      rate_limit:
-        value: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
-        priority: 2
+      rate_limit: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
+      botControl: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
 
       ip_sets:
-        - name: "Allowed-ips"
+        - name: "Allowed-ips-example"
           action: allow
-          priority: 1
-          list: [] # If the list is empty, ip set won't be recreated
+          list: []
             #- 1.1.1.1/32 # list of ip ranges
             #- 2.2.2.2/32
             #- 3.3.3.3/32
-        - name: "Blocked-ips"
+        - name: "Blocked-ips-example"
           action: block
-          priority: 0
-          list: [] # If the list is empty, ip set won't be recreated
+          list: []
             #- 4.4.4.4/32 # list of ip ranges
             #- 5.5.5.5/32
             #- 6.6.6.6/32
 
-      country_codes:
-        - name: "allowed-countries"
-          action: allow
-          priority: 7
-          list: []
-            - GB
-            - HR
-        - name: "blocked-countries"
-          action: block
-          priority: 8
-          list: []
-            - RU
-            - CN
+      cc_block_list: []
 
       regular_rules:
         - name: allow_panels
           action: allow
-          statements_type: "single" # supported "and", "or" and "not" ("and" and "or" supports multiple statements)
-          priority: 4
-          statements:
-            - inspect: "UriPath" # Aslo supported: "SingleHeader"
-              position: "CONTAINS"
-              string: "panels/ajax"
-              text_trans: "NONE"
-        - name: block_bots
-          action: block
-          statements_type: "or" # supported "and", "or" and "not" ("and" and "or" supports multiple statements)
-          priority: 5
-          statements:
-            - inspect: "SingleHeader" # Aslo supported: "SingleHeader"
-              position: "CONTAINS"
-              string: "spider"
-              text_trans: "LOWERCASE"
-            - inspect: "SingleHeader" # Aslo supported: "SingleHeader"
-              position: "CONTAINS"
-              string: "bot"
-              text_trans: "LOWERCASE"
-            - inspect: "SingleHeader" # Aslo supported: "SingleHeader"
-              position: "CONTAINS"
-              string: "crawl"
-              text_trans: "LOWERCASE"
+          string: "panels/ajax"
+          position: "CONTAINS"
 
-      # AWS Managed rules (if commented out they won't be applied)
-      bot_control:
-        enabled: false
-        target: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
-        priority: 3
-      cyber_sec:
-        enabled: false # Need to subscribe first in AWS
-        rule_list: []
-        priority: 6
-      amazon_ip_reputation:
-        enabled: false
-        rule_list: []
-        priority: 9
-      common_rule_set:
-        enabled: false
-        rule_list: []
-        priority: 10
-      php_rule_set:
-        enabled: false
-        rule_list: []
-        priority: 11
-      known_bad_inputs:
-        enabled: false
-        rule_list: []
-        priority: 12
-      anonymous_ip_list:
-        enabled: false
-        rule_list: []
-        priority: 13
+#      cyber_sec: #Need to implement task
