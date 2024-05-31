@@ -51,8 +51,8 @@ mailpit:
     #services:
     #  - nginx
     #web_server: standalone
-    #certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
-    #certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+    #certbot_register_command: "certonly --agree-tos --preferred-challenges http -n"
+    #certbot_renew_command: "certonly --agree-tos --force-renew"
     #reload_command: restart
     #reload:
     #  - mailpit
