@@ -42,9 +42,7 @@ nginx:
         reload_command: reload
         reload:
           - nginx
-        renewal_minute: "0" # minute to run renewal cron job
-        renewal_hour: "0" # hour to run renewal cron job
-        renewal_weekday: "0" # day of week to run renewal
+        on_calendar: "Mon *-*-* 04:00:00"
 ```
 
 As in the example above, you need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
@@ -91,7 +89,7 @@ ssl:
   autorenew: false # set to true to create a systemd timer to renew LE certs
   certbot_renew_command: "certonly --agree-tos --force-renew" # root of the command used in the systemd timer
   # See systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
-  #on_calendar: "Mon *-*-* 04:00:00"
+  on_calendar: "Mon *-*-* 04:00:00"
   web_server: standalone # values are standalone, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
