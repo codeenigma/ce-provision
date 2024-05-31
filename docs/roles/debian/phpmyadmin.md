@@ -21,14 +21,12 @@ nginx:
         email: sysadm@codeenigma.com
         services: []
         web_server: standalone
-        certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
-        certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+        certbot_register_command: "certonly --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "certonly --agree-tos --force-renew"
         reload_command: reload
         reload:
           - nginx
-        renewal_minute: "0" # minute to run renewal cron job
-        renewal_hour: "0" # hour to run renewal cron job
-        renewal_weekday: "0" # day of week to run renewal
+        on_calendar: "Mon *-*-* 04:00:00"
       ratelimitingcrawlers: true
       is_default: false
       servers:

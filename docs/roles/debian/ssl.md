@@ -36,11 +36,16 @@ nginx:
         autorenew: true
         email: administrator@example.com
         services: []
-        certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
-        certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
+        web_server: standalone
+        certbot_register_command: "certonly --standalone --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "certonly --standalone --agree-tos --force-renew"
+        reload_command: reload
+        reload:
+          - nginx
+        on_calendar: "Mon *-*-* 04:00:00"
 ```
 
-You need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
+As in the example above, you need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
 
 If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
@@ -84,7 +89,7 @@ ssl:
   autorenew: false # set to true to create a systemd timer to renew LE certs
   certbot_renew_command: "certonly --agree-tos --force-renew" # root of the command used in the systemd timer
   # See systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
-  #on_calendar: "Mon *-*-* 04:00:00"
+  on_calendar: "Mon *-*-* 04:00:00"
   web_server: standalone # values are standalone, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.

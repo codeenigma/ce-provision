@@ -53,11 +53,13 @@
 
 # @todo - add support for Route 53 DNS plugin
 - name: "Ensure certbot-{{ _ssl_web_server }} plugin is installed."
-  ansible.builtin.apt:
-    pkg: "python3-certbot-{{ _ssl_web_server }}"
-    state: present
-  when:
-    - _ssl_web_server != 'standalone'
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: "certbot-{{ _ssl_web_server }}"
+  when: _ssl_web_server != "standalone" # there is no certbot-standalone package in PyPi
 
 - name: Define SSL base path.
   ansible.builtin.set_fact:
