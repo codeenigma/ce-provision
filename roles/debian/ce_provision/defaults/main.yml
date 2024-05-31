@@ -1,11 +1,12 @@
 ---
 # See roles/_init/defaults/main.yml for Ansible installation, controller user creation and extra variables repo settings.
 ce_provision:
-  # Optional venv overrides - if commented out, values taken from _init defaults.
+  # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
   #venv_path: "/home/{{ _ce_provision_username }}/ansible"
   #venv_command: /usr/bin/python3 -m venv
   #venv_install_username: "{{ _ce_provision_username }}"
   #upgrade_timer_name: upgrade_ce_provision_ansible
+
   # Other ce-provision settings.
   aws_support: true # installs boto3
   new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
@@ -37,5 +38,5 @@ ce_provision:
   galaxy_custom_requirements_file: "/home/{{ _ce_provision_username }}/ce-provision/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "/home/{{ _ce_provision_username }}/ansible/bin/ansible-galaxy collection install --force" # must match venv_path
+    command: "{{ _venv_path }}/bin/ansible-galaxy collection install --force" # _venv_path in the _init role - must match ce_provision.venv_path if overridden
     on_calendar: "Mon *-*-* 04:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
