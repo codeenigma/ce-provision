@@ -36,11 +36,18 @@ nginx:
         autorenew: true
         email: administrator@example.com
         services: []
-        certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
-        certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
+        web_server: standalone
+        certbot_register_command: "certonly --standalone --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "certonly --standalone --agree-tos --force-renew"
+        reload_command: reload
+        reload:
+          - nginx
+        renewal_minute: "0" # minute to run renewal cron job
+        renewal_hour: "0" # hour to run renewal cron job
+        renewal_weekday: "0" # day of week to run renewal
 ```
 
-You need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
+As in the example above, you need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
 
 If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
