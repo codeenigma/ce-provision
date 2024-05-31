@@ -50,6 +50,7 @@
   ],
   "provisioners": [{
       "type": "ansible",
+      "use_proxy": false,
       "playbook_file": "{{ aws_ami.playbook_file }}",
       "inventory_directory": "{{ _ce_provision_base_dir }}/hosts",
       "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/id_rsa.pub",
@@ -63,7 +64,8 @@
         "ANSIBLE_CONFIG={{ _ce_provision_base_dir }}/ansible.cfg"
       ],
       "extra_arguments": 
-			[ 
+      [
+        "--ssh-extra-args", "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa",
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}
@@ -71,8 +73,8 @@
         "--extra-vars", 
         "{{ _aws_ami_extra_vars }}",
         {% endif %}        
-				"--extra-vars", 
-				"{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true }"
-			 ]
+        "--extra-vars",
+        "{ _ce_provision_base_dir: {{ _ce_provision_base_dir }}, _ce_provision_build_dir: {{ _ce_provision_build_dir }}, _ce_provision_build_tmp_dir: {{ _ce_provision_build_tmp_dir }}, _ce_provision_data_dir: {{ _ce_provision_data_dir }}, _ce_provision_build_id: {{ _ce_provision_build_id }}, _ce_provision_force_play: true }"
+      ]
   }]
 }
