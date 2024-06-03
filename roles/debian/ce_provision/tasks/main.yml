@@ -30,7 +30,8 @@
     generate_ssh_key: true
     home: "/home/{{ ce_provision.username }}"
     password: "*"
-    ssh_key_bits: 4096
+    ssh_key_bits: "{{ ce_provision.ssh_key_bits }}"
+    ssh_key_type: "{{ ce_provision.ssh_key_type }}"
     ssh_key_comment: "{{ ce_provision.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_provision.groups }}"
