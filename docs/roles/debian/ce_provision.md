@@ -21,7 +21,9 @@ ce_provision:
   new_user: "{{ _init.ce_provision_new_user }}" # see _init defaults, set to false if user already exists or is ephemeral, e.g. an LDAP user
   username: "{{ _ce_provision_username }}" # see _init defaults
   #uid: "{{ _init.ce_provision_uid }}" # see _init defaults, optionally hardcode the UID for this user
-  public_key_name: id_rsa.pub # existing users may have a key of a different name
+  ssh_key_bits: "521" # recommended to use 4096 for RSA keys, 521 is the maximum for ECDSA keys
+  ssh_key_type: ecdsa # set to rsa to create an RSA key
+  public_key_name: id_ecdsa.pub # this might be id_rsa.pub for RSA keys, existing users may have a key of a different name
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "master"

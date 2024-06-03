@@ -50,27 +50,25 @@
   ],
   "provisioners": [{
       "type": "ansible",
-      "use_proxy": false,
       "playbook_file": "{{ aws_ami.playbook_file }}",
       "inventory_directory": "{{ _ce_provision_base_dir }}/hosts",
-      "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/id_rsa.pub",
+      "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/{{ aws_ami.public_key_name }}",
       {% if aws_ami.groups is defined and aws_ami.groups | length %}
       "groups": {{ aws_ami.groups | to_json }},
       {% endif %}
       "ansible_env_vars": 
       [ 
-        "ANSIBLE_FORCE_COLOR=True", 
-        "ALLOW_WORLD_READABLE_TMPFILES=True", 
+        "ANSIBLE_FORCE_COLOR=True",
+        "ALLOW_WORLD_READABLE_TMPFILES=True",
         "ANSIBLE_CONFIG={{ _ce_provision_base_dir }}/ansible.cfg"
       ],
       "extra_arguments": 
       [
-        "--ssh-extra-args", "-o IdentitiesOnly=yes -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa",
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}
         {% if _aws_ami_extra_vars is defined and _aws_ami_extra_vars | length %}
-        "--extra-vars", 
+        "--extra-vars",
         "{{ _aws_ami_extra_vars }}",
         {% endif %}        
         "--extra-vars",
