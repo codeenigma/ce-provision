@@ -29,6 +29,7 @@ aws_ami:
   ami_name: "example"
   owner: "136693071363" # Global AWS account ID of owner, defaults to Debian official
   ssh_username: "admin"
+  public_key_name: id_ecdsa.pub # from Debian 12 (Bookworm) onwards RSA keys, i.e. id_rsa.pub, are deprecated
   encrypt_boot: false
   # EBS volume options
   device_name: /dev/xvda # default for Debian AMIs
