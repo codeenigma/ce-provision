@@ -16,7 +16,8 @@
     generate_ssh_key: true
     home: "/home/{{ ce_deploy.username }}"
     password: "*"
-    ssh_key_bits: 4096
+    ssh_key_bits: "{{ ce_deploy.ssh_key_bits }}"
+    ssh_key_type: "{{ ce_deploy.ssh_key_type }}"
     ssh_key_comment: "{{ ce_deploy.username }}@{{ ansible_host }}"
     system: true
     groups: "{{ ce_deploy.groups }}"
@@ -35,7 +36,7 @@
 - name: Place the public key in the ce-provision data directory on the controller server.
   ansible.builtin.fetch:
     dest: "{{ _ce_provision_data_dir }}"
-    src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.key_name }}"
+    src: "/home/{{ ce_deploy.username }}/.ssh/{{ ce_deploy.public_key_name }}"
 
 - name: Ensure Git is installed.
   ansible.builtin.apt:
