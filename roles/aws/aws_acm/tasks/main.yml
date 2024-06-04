@@ -23,6 +23,7 @@
     aws_acm_certificate_arn: ""
     _aws_acm_domain_in_cert_list: false
     _aws_acm_extra_domains_in_cert_list: true
+    aws_acm_certificate: {}
 
 - name: Iterate through the certificate list checking for domain.
   ansible.builtin.set_fact:
