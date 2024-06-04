@@ -75,6 +75,7 @@
     _aws_acm_extra_domains_in_cert_list: false
   with_items: "{{ _acm_san_domains }}"
   when:
+    - aws_acm_certificate | length > 0
     - _acm_san_domains is defined
     - item not in aws_acm_certificate.SubjectAlternativeNameSummaries
     - aws_acm.extra_domains | length > 0
