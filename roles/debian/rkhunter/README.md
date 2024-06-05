@@ -25,7 +25,6 @@ rkhunter:
   scriptwhitelist:
     - /bin/egrep
     - /bin/fgrep
-    - /bin/which
     - /usr/bin/ldd
     # - /usr/bin/lwp-request
     - /usr/sbin/adduser
