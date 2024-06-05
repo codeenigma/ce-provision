@@ -202,7 +202,7 @@
     name: debian/python_boto
   when: ce_provision.aws_support
 
-- name: Ensure dnspython, certifi and pyopenssl are installed.
+- name: Ensure dnspython, certifi, pyopenssl and passlib are installed.
   ansible.builtin.include_role:
     name: debian/python_pip_packages
   vars:
@@ -211,6 +211,7 @@
         - name: dnspython
         - name: certifi
         - name: pyopenssl
+        - name: passlib
 
 - name: Add Python virtual environment to $PATH.
   ansible.builtin.copy:
