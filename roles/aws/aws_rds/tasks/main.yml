@@ -10,7 +10,7 @@
   register: _aws_rds_rds_subnet_group
 
 - name: Create RDS parameter group
-  amazon.aws.rds_param_group:
+  amazon.aws.rds_instance_param_group:
     state: present
     name: "{{ aws_rds.db_parameter_group_name }}"
     profile: "{{ aws_rds.aws_profile }}"
