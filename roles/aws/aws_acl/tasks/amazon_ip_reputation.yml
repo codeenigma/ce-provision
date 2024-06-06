@@ -1,0 +1,32 @@
+---
+- name: Create amazon ip reputation rule
+  ansible.builtin.set_fact:
+    amazon_ip_reputation:
+      name: "AWS-AWSManagedRulesAmazonIpReputationList"
+      override_action:
+        none: {}
+      visibility_config:
+        sampled_requests_enabled: true
+        cloud_watch_metrics_enabled: true
+        metric_name: "AWS-AWSManagedRulesAmazonIpReputationList"
+      statement:
+        managed_rule_group_statement:
+          vendor_name: "AWS"
+          name: "AWSManagedRulesAmazonIpReputationList"
+          rule_action_overrides:
+            - name: "AWSManagedIPDDoSList"
+              action_to_use:
+                challenge: {}
+
+- name: Set priority.
+  ansible.builtin.include_tasks: set_priority_dict.yml
+  vars:
+    _priority: "{{ _acl.rules.amazon_ip_reputation.priority }}"
+
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    amazon_ip_reputation: "{{ amazon_ip_reputation | combine(_priority_dict) }}"
+
+- name: Add rule to list
+  ansible.builtin.set_fact:
+    _rules: "{{ _rules + [amazon_ip_reputation] }}"
