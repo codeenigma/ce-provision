@@ -74,6 +74,25 @@
     apply:
       delegate_to: localhost
       become: false
+  vars:
+    aws_ec2_with_eip:
+      iam_role_name: "{{ _infra_name }}-{{ _env_type }}-ec2-basic"
+      aws_profile: "{{ _aws_profile }}"
+      region: "{{ _aws_region }}"
+      hostname: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+      instance_type: "{{ _instance_type }}"
+      key_name: "{{ aws_provision_ec2_keypair.key_name }}"
+      ami_owner: self
+      vpc_name: "{{ _infra_name }}"
+      vpc_subnet_profile: core
+      vpc_subnet_id: "{{ _subnet | default('') }}"
+      instance_name: "{{ _aws_resource_name }}"
+      ami_name: "{{ _aws_resource_name }}"
+      root_volume_size: "{{ _ebs_root_volume_size }}"
+      tags: "{{ _aws_tags }}"
+      security_groups: "{{ _security_groups }}"
+      autorecover: true
+      backup: "{{ _infra_name }}-{{ _env_type }}"
 
 - name: Include firewall role
   ansible.builtin.include_role:
