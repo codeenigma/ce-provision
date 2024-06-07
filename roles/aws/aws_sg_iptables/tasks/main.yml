@@ -57,9 +57,8 @@
       region: "{{ _aws_region }}"
       name: "{{ _infra_name }}"
       cidr_block: "{{ _aws_vpc_cidr_base }}.0.0/16"
-      # ipv6_cidr: true # uncomment to request an Amazon-provided IPv6 CIDR block with /56 prefix length.
-      tags: {}
-        #Type: "util"
+      ipv6_cidr: "{{ aws_sg_tables.ipv6_cidr | default(omit) }}"
+      tags: "{{ _aws_tags }}"
       state: present
       assign_instances_ipv6: false
       security_groups: "{{ aws_sg_iptables }}"
@@ -89,7 +88,7 @@
       instance_name: "{{ _aws_resource_name }}"
       ami_name: "{{ _aws_resource_name }}"
       root_volume_size: "{{ _ebs_root_volume_size }}"
-      tags: "{{ _aws_tags }}"
+      tags:
       security_groups: "{{ _security_groups }}"
       autorecover: true
       backup: "{{ _infra_name }}-{{ _env_type }}"
