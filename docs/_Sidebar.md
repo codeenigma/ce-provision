@@ -25,6 +25,7 @@
        - [AWS RDS](/roles/aws/aws_rds)
        - [AWS S3 Bucket](/roles/aws/aws_s3_bucket)
        - [AWS Security Groups](/roles/aws/aws_security_groups)
+       - [AWS SG/firewall role](/roles/aws/aws_sg_iptables)
        - [AWS SNS](/roles/aws/aws_sns)
        - [VPC](/roles/aws/aws_vpc)
        - [Update main route for a given VPC](/roles/aws/aws_vpc_route)
