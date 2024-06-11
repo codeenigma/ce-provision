@@ -25,12 +25,12 @@ rkhunter:
   scriptwhitelist:
     - /bin/egrep
     - /bin/fgrep
-    - /bin/which
     - /usr/bin/ldd
     # - /usr/bin/lwp-request
     - /usr/sbin/adduser
     # - /usr/sbin/prelink
     - /usr/sbin/unhide.rb
+    - /usr/bin/which
   allowhiddendir:
     - /etc/.java
     - /tmp/.ce-deploy # see https://github.com/codeenigma/ce-deploy/blob/1.x/roles/database_backup/database_backup-mysql/defaults/main.yml#L7

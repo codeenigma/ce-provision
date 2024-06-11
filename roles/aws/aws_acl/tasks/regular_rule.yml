@@ -3,6 +3,24 @@
   ansible.builtin.set_fact:
     _action: "{ {{ _reg_rule.action }}: {} }"
 
+- name: Set statement string
+  ansible.builtin.set_fact:
+    _statements: ""
+
+- name: Create statements.
+  ansible.builtin.include_tasks: regular_rule_statements.yml
+  when:
+    - _reg_rule.statements is defined
+    - _reg_rule.statements | length > 0
+  loop: "{{ _reg_rule.statements | list }}"
+  loop_control:
+    loop_var: _stat
+
+- name: Encapsulate statement with type
+  ansible.builtin.set_fact:
+    _statements: "{ {{ _reg_rule.statements_type }}_statement: { statements: [{{ _statements }}] } }"
+  when: _reg_rule.statements_type != "single"
+
 - name: Create regular rule
   ansible.builtin.set_fact:
     regular_rule:
@@ -12,15 +30,12 @@
           sampled_requests_enabled: true
           cloud_watch_metrics_enabled: true
           metric_name: "{{ _reg_rule.name }}"
-        statement:
-          byte_match_statement:
-            field_to_match:
-              uri_path: {}
-            positional_constraint: "{{ _reg_rule.position }}"
-            search_string: "{{ _reg_rule.string }}"
-            text_transformations:
-              - type: "NONE"
-                priority: 0
+        statement: "{{ _statements | from_yaml }}"
+
+- name: Set priority.
+  ansible.builtin.include_tasks: set_priority_dict.yml
+  vars:
+    _priority: "{{ _reg_rule.priority }}"
 
 - name: Append priority to rule.
   ansible.builtin.set_fact:
@@ -29,6 +44,3 @@
 - name: Add rule to list
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [regular_rule] }}"
-
-- name: Increase priority.
-  ansible.builtin.include_tasks: increase_priority.yml
