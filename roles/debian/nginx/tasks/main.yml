@@ -5,11 +5,11 @@
     state: present
     update_cache: true
     cache_valid_time: 240
-  register: nginx_installed
+  register: _nginx_installed
 
-- name: Remove default NGINX vhost that could clash with Varnish.
+- name: Remove default NGINX vhost that could clash with other services running on port 80.
   # We only need to do this once when Nginx is installed initially.
-  when: nginx_installed.changed
+  when: _nginx_installed.changed
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
