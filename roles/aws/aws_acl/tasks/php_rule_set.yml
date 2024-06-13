@@ -1,0 +1,28 @@
+---
+- name: Create php rule set rule
+  ansible.builtin.set_fact:
+    php_rule_set:
+      name: "AWS-AWSManagedRulesPHPRuleSet"
+      override_action:
+        none: {}
+      visibility_config:
+        sampled_requests_enabled: true
+        cloud_watch_metrics_enabled: true
+        metric_name: "AWS-AWSManagedRulesPHPRuleSet"
+      statement:
+        managed_rule_group_statement:
+          vendor_name: "AWS"
+          name: "AWSManagedRulesPHPRuleSet"
+
+- name: Set priority.
+  ansible.builtin.include_tasks: set_priority_dict.yml
+  vars:
+    _priority: "{{ _acl.rules.php_rule_set.priority }}"
+
+- name: Append priority to rule.
+  ansible.builtin.set_fact:
+    php_rule_set: "{{ php_rule_set | combine(_priority_dict) }}"
+
+- name: Add rule to list
+  ansible.builtin.set_fact:
+    _rules: "{{ _rules + [php_rule_set] }}"
