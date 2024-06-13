@@ -3,7 +3,7 @@ _user_provision_username: "{% if is_local is defined and is_local %}ce-dev{% els
 user_provision:
   # This sets both username and main group.
   username: "{{ _user_provision_username }}"
-  home: "/home/{{ _user_provision_username }}}"
+  home: "/home/{{ _user_provision_username }}"
   create: true # if you know the user already exists, set this to false to not create the user.
   create_home: true
   # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
