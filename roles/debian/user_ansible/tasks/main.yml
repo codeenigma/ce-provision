@@ -22,10 +22,11 @@
     group: "{{ user_ansible.username }}"
     uid: "{{ user_ansible.uid | default(omit) }}"
     system: true
-    create_home: true
-    home: "/home/{{ user_ansible.username }}"
+    create_home: "{{ user_ansible.create_home }}"
+    home: "{{ user_ansible.home }}"
     password: "*"
     groups: "{{ user_ansible.groups }}"
+  when: user_ansible.create
 
 - name: Add user to sudoers.
   ansible.builtin.include_role:

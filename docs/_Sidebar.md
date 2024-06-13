@@ -87,6 +87,7 @@
        - [SSL](/roles/debian/ssl)
        - [sudo config](/roles/debian/sudo_config)
        - [Swap](/roles/debian/swap)
+       - [User Ansible](/roles/debian/user_ansible)
        - [varnish_config](/roles/debian/varnish_config)
        - [wazuh](/roles/debian/wazuh)
      - [Init role](/roles/_init)
