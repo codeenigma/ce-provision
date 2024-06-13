@@ -5,6 +5,7 @@ user_ansible:
   username: "{{ _user_ansible_username }}"
   home: "/home/{{ _user_ansible_username }}"
   create: true # if you know the user already exists, set this to false to not create the user.
+  create_home: true
   # Optional Linux uid and gid for user
   # uid: 999
   # gid: 999
