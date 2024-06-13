@@ -1,7 +1,10 @@
 ---
+_user_provision_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
 user_provision:
   # This sets both username and main group.
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+  username: "{{ _user_provision_username }}"
+  home: "/home/{{ _user_provision_username }}}"
+  create: true # if you know the user already exists, set this to false to not create the user.
   # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
   # This is shown for documentation, you should do this in your config repo
   # uid: 988

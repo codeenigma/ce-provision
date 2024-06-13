@@ -26,6 +26,7 @@
     home: "/home/{{ user_ansible.username }}"
     password: "*"
     groups: "{{ user_ansible.groups }}"
+  when: user_ansible.create
 
 - name: Add user to sudoers.
   ansible.builtin.include_role:
