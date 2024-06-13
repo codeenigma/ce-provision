@@ -12,7 +12,7 @@ user_provision:
   # gid: 988
   # Local username of the system user.
   utility_host: "localhost"
-  utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+  utility_username: "{{ _user_provision_username }}"
   sudoer: true
   groups: []
   ssh_keys: []
