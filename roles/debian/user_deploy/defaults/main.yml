@@ -1,8 +1,11 @@
 ---
+_user_deploy_username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
 user_deploy:
   # This sets both username and main group.
   # If you are using ce-deploy to deploy code this must match the `deploy_user` variable
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
+  username: "{{ _user_deploy_username }}}"
+  home: "/home/{{ _user_deploy_username }}}"
+  create: true # if you know the user already exists, set this to false to not create the user.
   # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
   # This is shown for documentation, you should do this in your config repo
   # uid: 989

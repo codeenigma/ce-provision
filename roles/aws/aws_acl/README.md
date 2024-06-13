@@ -5,7 +5,7 @@ Creates an ACL to be attached to a CloudFront distribution or an Application Loa
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-## Default variables for creation of ACL (pass it as a list)
+## Default variables
 ```yaml
 ---
 aws_acl:
@@ -15,7 +15,6 @@ aws_acl:
     region: "us-east-1"
     tags: {}
     rules:
-<<<<<<< HEAD
       rate_limit:
         value: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
         priority: 2
@@ -74,72 +73,36 @@ aws_acl:
               position: "CONTAINS"
               string: "crawl"
               text_trans: "LOWERCASE"
-      # AWS Managed rules
+      # Managed rules list
       bot_control:
+        enabled: false
         target: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
         priority: 3
       cyber_sec:
-        enabled: true # Need to subscribe first in AWS
+        enabled: false # Need to subscribe first in AWS
         rule_list: []
         priority: 6
       amazon_ip_reputation:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 9
       common_rule_set:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 10
       php_rule_set:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 11
       known_bad_inputs:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 12
       anonymous_ip_list:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 13
-```
 
-## Default variables for assigning ACL to CF or ALB
-```yaml
----
-aws_acl:
-  name: example_master_acl # Name of the ACL to apply
-  scope: CLOUDFRONT # Can be REGIONAL for ALBs
-  region: "us-east-1"
-=======
-      rate_limit: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
-      botControl: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
-
-      ip_sets:
-        - name: "Allowed-ips-example"
-          action: allow
-          list: []
-            #- 1.1.1.1/32 # list of ip ranges
-            #- 2.2.2.2/32
-            #- 3.3.3.3/32
-        - name: "Blocked-ips-example"
-          action: block
-          list: []
-            #- 4.4.4.4/32 # list of ip ranges
-            #- 5.5.5.5/32
-            #- 6.6.6.6/32
-
-      cc_block_list: []
-
-      regular_rules:
-        - name: allow_panels
-          action: allow
-          string: "panels/ajax"
-          position: "CONTAINS"
-
-#      cyber_sec: #Need to implement task
-
->>>>>>> devel-2.x
 ```
 
 <!--ENDROLEVARS-->
