@@ -64,7 +64,7 @@
       ],
       "extra_arguments": 
       [
-        "--scp-extra-args", "'-O'",
+        {# "--scp-extra-args", "'-O'", #}
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}

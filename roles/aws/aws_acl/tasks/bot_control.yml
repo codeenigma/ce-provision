@@ -71,7 +71,7 @@
             inspection_level: "COMMON"
 
 - name: Define targeted actions rules
-  when: _acl.rules.botControl == "TARGETED"
+  when: _acl.rules.botControl.target == "TARGETED"
   block:
     - name: Define targeted actions
       ansible.builtin.set_fact:
@@ -111,7 +111,7 @@
 
 - name: Define Bot Control rule.
   ansible.builtin.set_fact:
-    bot_control:
+    bot_control_rule:
       name: bot_control
       override_action:
         none: {}
@@ -126,13 +126,15 @@
           managed_rule_group_configs: "{{ _rule_config }}"
           rule_action_overrides: "{{ _action_rules }}"
 
+- name: Set priority.
+  ansible.builtin.include_tasks: set_priority_dict.yml
+  vars:
+    _priority: "{{ bot_control.priority }}"
+
 - name: Append priority to rule.
   ansible.builtin.set_fact:
-    bot_control: "{{ bot_control | combine(_priority_dict) }}"
+    bot_control_rule: "{{ bot_control_rule | combine(_priority_dict) }}"
 
 - name: Add rule to list.
   ansible.builtin.set_fact:
-    _rules: "{{ _rules + [bot_control] }}"
-
-- name: Increase priority.
-  ansible.builtin.include_tasks: increase_priority.yml
+    _rules: "{{ _rules + [bot_control_rule] }}"
