@@ -43,19 +43,15 @@
     name: apt_unattended_upgrades
   when: apt_unattended_upgrades.enable
 
-- name: Remove NodeJS and Yarn.
-  ansible.builtin.apt:
-    pkg:
-    - nodejs
-    - yarn
-    state: absent
-
 - name: Ensure NodeJS and Yarn are installed.
   ansible.builtin.apt:
     pkg:
     - nodejs
     - yarn
-    state: present
+    state: "{{ item }}"
+  with_items:
+    - absent
+    - present
 
 - name: Install global npm packages.
   community.general.npm:
