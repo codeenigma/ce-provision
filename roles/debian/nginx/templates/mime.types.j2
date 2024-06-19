@@ -1,0 +1,6 @@
+# This file is generated from Ansible template
+types {
+{% for mime_type, extensions in nginx.http.mime_types.items() %}
+    {{ mime_type }} {{ extensions | join(" ") }};
+{% endfor %}
+}
