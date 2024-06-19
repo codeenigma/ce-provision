@@ -112,6 +112,14 @@
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
+- name: Update nginx mime.types
+  ansible.builtin.template:
+    src: mime.types.j2
+    dest: /etc/nginx/mime.types
+    owner: root
+    group: root
+    mode: 0644
+
 - name: Generate domain specific configuration.
   ansible.builtin.include_tasks: domain.yml
   with_items: "{{ nginx.domains }}"
