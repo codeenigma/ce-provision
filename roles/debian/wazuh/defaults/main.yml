@@ -83,6 +83,7 @@ wazuh:
     wazuh_manager_email_log_source: alerts.log
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
+    wazuh_manager_globals: 1.1.1.1
     agent_groups: [] # maps to `groups` string in agent config above
     wazuh_manager_extra_emails: [] # list of additional emails to send, e.g.
       #- enable: true
