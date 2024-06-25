@@ -58,7 +58,7 @@
     wazuh_manager_email_log_source: "{{ wazuh.manager.wazuh_manager_email_log_source }}"
     wazuh_manager_log_level: "{{ wazuh.manager.wazuh_manager_log_level }}"
     wazuh_manager_globals: "{{ wazuh.manager.wazuh_manager_globals }}"
-    wazuh_manager_active_responses: "{{ wazuh.manager.wazuh_manager_config.active_responses }}"
+    wazuh_manager_config.active_responses: "{{ wazuh.manager.wazuh_manager_config.active_responses }}"
     wazuh_manager_email_level: "{{ wazuh.manager.wazuh_manager_email_level }}"
     wazuh_manager_extra_emails: "{{ wazuh.manager.wazuh_manager_extra_emails }}"
     wazuh_manager_reports: "{{ wazuh.manager.wazuh_manager_reports }}"
