@@ -72,13 +72,4 @@
     group: root
     mode: 0644
     force: true
-
-- name: Reload systemd units.
-  ansible.builtin.command: /usr/bin/systemctl daemon-reload
-  become: true
-  become_user: root
-
-- name: Enable mattermost systemd service.
-  ansible.builtin.command: /usr/bin/systemctl enable mattermost.service
-  become: true
-  become_user: root
+  notify: Reload systemd units and Restart Mattermost.
