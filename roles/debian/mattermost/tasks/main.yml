@@ -1,0 +1,73 @@
+---
+- name: Create a new database for mattermost.
+  community.postgresql.postgresql_db:
+    name: mattermost
+    comment: Mattermost Database
+  notify: Reload PostgreSQL.
+
+- name: Connect to mattermost database, create mattermost user, and grant access to database.
+  community.postgresql.postgresql_user:
+    db: mattermost
+    name: mmuser
+    password: "{{ _encrypted_mattermost_postgresql_pass }}"
+  notify: Reload PostgreSQL.
+
+- name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost
+  community.postgresql.postgresql_privs:
+    db: postgres
+    privs: ALL
+    type: database
+    obj: mattermost
+    role: mmuser
+  notify: Reload PostgreSQL.
+
+- name: Check if we already have Mattermost installed.
+  ansible.builtin.stat:
+    path: "/opt/mattermost/bin/mattermost"
+  register: mattermost_bin
+
+- name: Check if Mattermost data directory exists.
+  ansible.builtin.stat:
+    path: "/opt/mattermost/data"
+  register: mattermost_data
+
+- name: "Fetch and extract Mattermost team version {{ mattermost.version }}."
+  ansible.builtin.unarchive:
+    src: "https://releases.mattermost.com/{{ mattermost.version }}/mattermost-team-{{ mattermost.version }}-linux-amd64.tar.gz"
+    dest: /opt
+    remote_src: true
+  when:
+    - not mattermost_bin.stat.exists
+
+- name: Create Mattermost data directory.
+  ansible.builtin.file:
+    path: /opt/mattermost/data
+    state: directory
+    mode: '0755'
+  when:
+    - not mattermost_data.stat.exists
+
+- name: Create mattermost user.
+  ansible.builtin.user:
+    name: mattermost
+    group: mattermost
+    system: true
+
+- name: Recursively set ownership of mattermost directory.
+  ansible.builtin.file:
+    path: /opt/mattermost
+    state: directory
+    recurse: true
+    owner: mattermost
+    group: mattermost
+    mode: g+w
+
+- name: Copy Mattermost systemd service def.
+  ansible.builtin.template:
+    src: "mattermost_service.j2"
+    dest: "/lib/systemd/system/mattermost.service"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  notify: Reload systemd units and Restart Mattermost.
