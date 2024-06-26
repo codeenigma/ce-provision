@@ -3,12 +3,14 @@
   community.postgresql.postgresql_db:
     name: mattermost
     comment: Mattermost Database
+  notify: Reload PostgreSQL.
 
 - name: Connect to mattermost database, create mattermost user, and grant access to database.
   community.postgresql.postgresql_user:
     db: mattermost
     name: mmuser
     password: "{{ _encrypted_mattermost_postgresql_pass }}"
+  notify: Reload PostgreSQL.
 
 - name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost
   community.postgresql.postgresql_privs:
@@ -17,11 +19,7 @@
     type: database
     obj: mattermost
     role: mmuser
-
-- name: Reload PostgreSQL.
-  ansible.builtin.command: /usr/bin/systemctl reload postgresql
-  become: true
-  become_user: root
+  notify: Reload PostgreSQL.
 
 - name: Check if we already have Mattermost installed.
   ansible.builtin.stat:
