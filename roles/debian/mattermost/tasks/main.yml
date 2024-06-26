@@ -20,7 +20,7 @@
 
 - name: Reload PostgreSQL.
   ansible.builtin.command: /usr/bin/systemctl reload postgresql
-  become: yes
+  become: true
   become_user: root
 
 - name: Check if we already have Mattermost installed.
@@ -59,7 +59,7 @@
   ansible.builtin.file:
     path: /opt/mattermost
     state: directory
-    recurse: yes
+    recurse: true
     owner: mattermost
     group: mattermost
     mode: g+w
@@ -75,10 +75,10 @@
 
 - name: Reload systemd units.
   ansible.builtin.command: /usr/bin/systemctl daemon-reload
-  become: yes
+  become: true
   become_user: root
 
 - name: Enable mattermost systemd service.
   ansible.builtin.command: /usr/bin/systemctl enable mattermost.service
-  become: yes
+  become: true
   become_user: root
