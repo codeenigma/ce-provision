@@ -1,4 +1,13 @@
 ---
+# Install Python applications.
+- name: Manage required pip packages.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: psycopg2
+
 - name: Create a new database for mattermost.
   community.postgresql.postgresql_db:
     name: mattermost
