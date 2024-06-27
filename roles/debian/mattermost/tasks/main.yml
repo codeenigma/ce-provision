@@ -6,7 +6,7 @@
   vars:
     python_pip_packages:
       packages:
-        - name: psycopg2
+        - name: psycopg2-binary
 
 - name: Create a new database for mattermost.
   community.postgresql.postgresql_db:
