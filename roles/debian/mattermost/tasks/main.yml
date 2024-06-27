@@ -62,6 +62,12 @@
   when:
     - not mattermost_data.stat.exists
 
+- name: Create mattermost group.
+  ansible.builtin.group:
+    name: mattermost
+    system: true
+    state: present
+
 - name: Create mattermost user.
   ansible.builtin.user:
     name: mattermost
