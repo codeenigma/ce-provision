@@ -24,7 +24,6 @@
     password: "{{ _encrypted_mattermost_postgresql_pass }}"
   become_user: postgres
   become: true
-  login_unix_socket: "/var/run/postgresql/.s.PGSQL.5433"
   notify: Reload PostgreSQL.
 
 - name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost
@@ -36,7 +35,6 @@
     role: mmuser
   become_user: postgres
   become: true
-  login_unix_socket: "/var/run/postgresql/.s.PGSQL.5433"
   notify: Reload PostgreSQL.
 
 - name: Check if we already have Mattermost installed.
