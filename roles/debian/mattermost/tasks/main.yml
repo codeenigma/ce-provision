@@ -8,6 +8,34 @@
       packages:
         - name: psycopg2-binary
 
+- name: Create a new database for mattermost.
+  community.postgresql.postgresql_db:
+    name: mattermost
+    comment: Mattermost Database
+  become_user: postgres
+  become: true
+  notify: Reload PostgreSQL.
+
+- name: Connect to mattermost database, create mattermost user, and grant access to database.
+  community.postgresql.postgresql_user:
+    db: mattermost
+    name: mmuser
+    password: "{{ _encrypted_mattermost_postgresql_pass }}"
+  become_user: postgres
+  become: true
+  notify: Reload PostgreSQL.
+
+- name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost
+  community.postgresql.postgresql_privs:
+    db: postgres
+    privs: ALL
+    type: database
+    obj: mattermost
+    role: mmuser
+  become_user: postgres
+  become: true
+  notify: Reload PostgreSQL.
+
 - name: Check if we already have Mattermost installed.
   ansible.builtin.stat:
     path: "/opt/mattermost/bin/mattermost"
