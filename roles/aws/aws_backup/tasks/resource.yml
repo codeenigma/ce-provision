@@ -4,6 +4,11 @@
     aws backup list-backup-plans --region {{ _aws_region }} --query "BackupPlansList[?BackupPlanName=='{{ backup.backup_plan_name }}'] | [0]" --output json
   register: _backup_plan_info
 
+- name: Get restore testing plan info.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ backup.backup_plan_name | replace("-", "_") }}'] | [0]" --output json
+  register: _testing_plan_info
+
 - name: Gather AWS account ID if it isn't already set.
   amazon.aws.aws_caller_info:
     profile: "{{ _aws_profile }}"
@@ -59,3 +64,13 @@
   ansible.builtin.command: >
     aws backup create-backup-selection --backup-plan-id {{ _backup_plan_info.stdout | from_json | json_query('BackupPlanId') }} --backup-selection "{\"SelectionName\":\"{{ backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"Resources\":[\"{{ _resource_arn }}\"]}" --region {{ _aws_region }}
   when: _selection_exists.stdout | length == 0
+
+- name: Check if the restore testing selection exists.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-selections --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --query "RestoreTestingSelections[?RestoreTestingSelectionName=='{{ backup.selection_name }}'].RestoreTestingSelectionName" --output text --region {{ _aws_region }}
+  register: _testing_selection_exists
+
+- name: Assign resource to AWS restore testing plan.
+  ansible.builtin.command: >
+    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"{{ backup.selection_name.split('-')[0] }}\"}" --region {{ _aws_region }}
+  when: _testing_selection_exists.stdout | length == 0
