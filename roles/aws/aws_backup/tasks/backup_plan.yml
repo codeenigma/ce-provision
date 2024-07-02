@@ -43,7 +43,7 @@
 
 - name: Check if the restore testing plan exists.
   ansible.builtin.command: >
-    aws backup get-restore-testing-plan --region {{ _aws_region }} --restore-testing-plan-name "{{ plan.name | replace("-", "_") }}" --output json
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ plan.name | replace("-", "_") }}'] | [0]" --output json
   register: _testing_plan_exists
 
 - name: Create restore testing plan if it doesn't exist.
