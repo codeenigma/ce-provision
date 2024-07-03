@@ -15,7 +15,7 @@ add_header Strict-Transport-Security max-age=15768000;
 # fetch OCSP records from URL in ssl_certificate and cache them
 ssl_stapling on;
 ssl_stapling_verify on;
-add_header X-Early-Data $tls1_3_early_data;
+#add_header X-Early-Data $tls1_3_early_data;
 
 location ~ /api/v[0-9]+/(users/)?websocket$ {
   proxy_set_header Upgrade $http_upgrade;
