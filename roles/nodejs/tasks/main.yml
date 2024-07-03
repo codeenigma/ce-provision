@@ -46,8 +46,8 @@
 - name: Ensure NodeJS and Yarn are installed.
   ansible.builtin.apt:
     pkg:
-    - nodejs
-    - yarn
+      - nodejs
+      - yarn
     state: "{{ item }}"
   with_items:
     - absent
