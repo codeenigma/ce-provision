@@ -48,7 +48,7 @@
 
 - name: Create restore testing plan if it doesn't exist.
   ansible.builtin.command: >
-    aws backup create-restore-testing-plan --restore-testing-plan "RestoreTestingPlanName={{ plan.name | replace('-', '_') }},RecoveryPointSelection={Algorithm=LATEST_WITHIN_WINDOW,RecoveryPointTypes=[\"SNAPSHOT\"],IncludeVaults=[\"{{ _vault_info.BackupVaultArn }}\"]},ScheduleExpression=\"cron(0 0 * * ? *)\"" --region {{ _aws_region }}
+    aws backup create-restore-testing-plan --restore-testing-plan "RestoreTestingPlanName={{ plan.name | replace('-', '_') }},RecoveryPointSelection={Algorithm=LATEST_WITHIN_WINDOW,RecoveryPointTypes=[\"SNAPSHOT\"],IncludeVaults=[\"{{ _vault_info.stdout | from_json | json_query('BackupVaultArn') }}\"]},ScheduleExpression=\"cron(0 0 * * ? *)\"" --region {{ _aws_region }}
   register: _testing_plan_created
   when: _testing_plan_exists.stdout == "null"
 
