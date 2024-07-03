@@ -67,7 +67,7 @@
 
 - name: Check if the restore testing selection exists.
   ansible.builtin.command: >
-    aws backup list-restore-testing-selections --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --query "RestoreTestingSelections[?RestoreTestingSelectionName=='{{ backup.selection_name }}'].RestoreTestingSelectionName" --output text --region {{ _aws_region }}
+    aws backup list-restore-testing-selections --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --query "RestoreTestingSelections[?RestoreTestingSelectionName=='{{ backup.selection_name | replace('-', '_') }}'].RestoreTestingSelectionName" --output text --region {{ _aws_region }}
   register: _testing_selection_exists
 
 - name: Assign resource to AWS restore testing plan.
