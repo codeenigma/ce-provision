@@ -73,4 +73,4 @@
 - name: Assign resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name | replace('-', '_') }}\",\"IamRoleArn\":\"{{ _iam_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"{{ backup.selection_name.split('-')[0] }}\",\"ValidationWindowHours\":1}" --region {{ _aws_region }}
-  when: _testing_selection_exists.stdout | length == 0
+  when: _testing_selection_exists.stdout | length == 0 and _testing_plan_info.stdout | length != 0
