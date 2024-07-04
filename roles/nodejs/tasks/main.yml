@@ -45,8 +45,13 @@
 
 - name: Ensure NodeJS and Yarn are installed.
   ansible.builtin.apt:
-    pkg: ["nodejs", "yarn"]
-    state: present
+    pkg:
+      - nodejs
+      - yarn
+    state: "{{ item }}"
+  with_items:
+    - absent
+    - present
 
 - name: Install global npm packages.
   community.general.npm:
