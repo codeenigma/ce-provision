@@ -66,6 +66,6 @@
     loop_var: plan
   when: aws_backup.plans | length
 
-  - name: Include aws backup validation role.
-    ansible.builtin.include_role:
-      name: aws/aws_backup_validation
+- name: Include aws backup validation role.
+  ansible.builtin.include_role:
+    name: aws/aws_backup_validation
