@@ -65,3 +65,7 @@
   loop_control:
     loop_var: plan
   when: aws_backup.plans | length
+
+  - name: Create ami cleanup function
+    ansible.builtin.include_role:
+      name: aws/aws_backup_validation
