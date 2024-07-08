@@ -1,14 +1,14 @@
 ---
 - name: Define iptables variables for incoming
   ansible.builtin.set_fact:
-    _glob: "{{ aws_sg_iptables | selectattr('rules', 'defined') | map(attribute='rules') | flatten  }}"
+    _glob: "{{ aws_sg_iptables | selectattr('rules', 'defined') | map(attribute='rules') | flatten }}"
     _iptables_list: []
     _iptables_string: ""
     _iptabes_type: "INPUT"
 
 - name: Set list of commands for tcp/udp in
   include_tasks: tcp_udp_string.yml
-  loop: "{{ q( 'ansible.builtin.subelements', _glob, 'ports', { 'skip_missing': True }) }}"
+  loop: "{{ q('ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
 
 - name: Set list of commands for icmp in
   include_tasks: icmp_string.yml
@@ -22,7 +22,7 @@
 
 - name: Set list of commands four tcp/udp out
   include_tasks: tcp_udp_string.yml
-  loop: "{{ q( 'ansible.builtin.subelements', _glob, 'ports', { 'skip_missing': True }) }}"
+  loop: "{{ q( 'ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
 
 - name: Set list of commands for icmp in
   include_tasks: icmp_string.yml
