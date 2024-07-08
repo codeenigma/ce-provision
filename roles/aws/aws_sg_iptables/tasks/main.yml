@@ -22,7 +22,7 @@
 
 - name: Set list of commands four tcp/udp out
   include_tasks: tcp_udp_string.yml
-  loop: "{{ q( 'ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
+  loop: "{{ q('ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
 
 - name: Set list of commands for icmp in
   include_tasks: icmp_string.yml
