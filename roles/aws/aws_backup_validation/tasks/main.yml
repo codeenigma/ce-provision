@@ -1,0 +1,105 @@
+---
+- name: Create a role and attach policies
+  amazon.aws.iam_role:
+    name: LambdaBackupRestoreRole
+    assume_role_policy_document: "{{ lookup('file','trusted_entitites.j2') }}"
+    managed_policies:
+      - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+      - arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy
+      - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+      - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+  register: _created_iam_lambda_role
+
+- name: Create an IAM Managed Policy for passing roles
+  amazon.aws.iam_managed_policy:
+    policy_name: "PassRole"
+    policy:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Action: "iam:PassRole"
+          Resource: "*"
+    state: present
+  register: _pass_role
+
+- name: Update AWSBackupDefaultServiceRole
+  amazon.aws.iam_role:
+    name: AWSBackupDefaultServiceRole
+    assume_role_policy_document: "{{ lookup('file','pass_role_backup.j2') }}"
+    managed_policies:
+      - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
+      - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
+      - "{{ _pass_role.policy.arn }}"
+
+- name: Sleep for 20 seconds for IAM before Lambda creation
+  ansible.builtin.wait_for:
+    timeout: 20
+
+- name: Clean and set python functions
+  block:
+    - name: Check and clean any previous Lambda files
+      ansible.builtin.file:
+        path: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
+        state: absent
+      loop: "{{ aws_backup_validation.resources }}"
+
+    - name: Write Lambda functions
+      ansible.builtin.template:
+        src: "{{ item }}_validation.py.j2"
+        dest: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
+      loop: "{{ aws_backup_validation.resources }}"
+
+    - name: Create a zip archive of Lambda functions
+      community.general.archive:
+        path: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
+        dest: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+        format: zip
+      loop: "{{ aws_backup_validation.resources }}"
+
+- name: Create Lambda functions
+  amazon.aws.lambda:
+    name: "{{ aws_backup_validation.name }}_{{ item }}"
+    description: "{{ aws_backup_validation.description }} {{ item }} new comment to update function"
+    region: "{{ _aws_region }}"
+    timeout: "{{ aws_backup_validation.timeout }}"
+    zip_file: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+    state: present
+    runtime: "{{ aws_backup_validation.runtime }}"
+    role: "{{ _created_iam_lambda_role.iam_role.arn }}"
+    handler: "{{ item }}_validation.{{ aws_backup_validation.handler }}"
+    tags:
+      Name: "{{ item }}_backup_validation"
+  register: _lambda_functions
+  loop: "{{ aws_backup_validation.resources }}"
+
+- name: Remove non UTF-8 item
+  ansible.builtin.set_fact:
+    _lambda_functions: "{{ _lambda_functions | ansible.utils.remove_keys(target=['ZipFile', 'location', 'item.invocation']) }}"
+
+- name: Create EventBridge
+  amazon.aws.cloudwatchevent_rule:
+    name: "{{ item.configuration.function_name }}"
+    description: "{{ item.configuration.description }}"
+    state: present
+    region: "{{ _aws_region }}"
+    event_pattern: '{ "source": ["aws.backup"], "detail-type": ["Restore Job State Change"], "detail": { "resourceType": ["{{ item.item }}"], "status": ["COMPLETED"] } }'
+    targets:
+      - id: "{{ item.configuration.function_name }}"
+        arn: "{{ (item.configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
+  register: _event_bridges
+  loop: "{{ _lambda_functions.results }}"
+
+- name: Generate unique string
+  ansible.builtin.set_fact:
+    _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
+
+- name: Update Lambda policy
+  amazon.aws.lambda_policy:
+    state: present
+    function_name: "{{ item.item.configuration.function_name }}"
+    statement_id: "{{ item.item.configuration.function_name }}_{{ _rand_str }}"
+    action: lambda:InvokeFunction
+    principal: events.amazonaws.com
+    source_arn: "{{ item.rule.arn }}"
+    region: "{{ _aws_region }}"
+  loop: "{{ _event_bridges.results }}"
