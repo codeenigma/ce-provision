@@ -1,0 +1,144 @@
+import json
+import boto3
+import socket
+import time
+
+# Defining Clients
+#s3_cli = boto3.client('s3', region_name='eu-west-2')
+backup_cli = boto3.client('backup', region_name="{{ _aws_region }}")
+ec2_cli = boto3.client("ec2", region_name="{{ _aws_region }}")
+ssm_cli = boto3.client('ssm', region_name="{{ _aws_region }}")
+ses_cli = boto3.client('ses', region_name="{{ _aws_region }}")
+
+# Debugger
+#boto3.set_stream_logger('')
+
+def lambda_handler(event, context):
+
+  mail_title = ""
+  mail_body = ""
+
+  print("Gathering instance id.")
+  ec2_instance_id=event['detail']['createdResourceArn'].split("/",1)[1]
+
+  print("Gathering instance details.")
+  ec2_instances=ec2_cli.describe_instances()
+
+  instance_exist = False
+
+  for reservation in ec2_instances["Reservations"]:
+    for instance in reservation["Instances"]:
+      if ec2_instance_id == instance["InstanceId"]:
+        tags = instance['Tags']
+        instance_type = instance["InstanceType"]
+        private_ip = instance["PrivateIpAddress"]
+        mail_body = mail_body + "Instance is restored!\n"
+        instance_exist = True
+
+  if instance_exist:
+    port = 22
+
+    print("Gathering instance name.")
+    instance_name = ''
+    for tag in tags:
+      if tag['Key'] == 'Name':
+        instance_name = tag['Value']
+
+    print("Testing connection!")
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(5.0)
+    result = sock.connect_ex((private_ip,port))
+
+    print(result)
+
+    # If result was not success
+    if result != 0:
+      mail_body = mail_body + "Connection on " + str(port) + " is not working, this could be caused by firewall not accepting connections.\n"
+    else:
+      mail_body = mail_body + "Connection on " + str(port) + " is working!\n"
+
+    # Check if SSM is set up for instance
+    ssm_status = ssm_cli.get_connection_status(Target=ec2_instance_id)
+
+    if ssm_status['Status'] == 'connected':
+      # Run scripts on EC2
+      print("Creating script!")
+      script = """
+      echo "Server info:"
+      hostnamectl
+      echo "Disk usage:"
+      df -h
+      """
+
+      print("Running command!")
+      command_response = ssm_cli.send_command(
+        DocumentName ='AWS-RunShellScript',
+        Parameters = {'commands': [script]},
+        InstanceIds = [
+          ec2_instance_id
+        ]
+      )
+
+      print("Gathering commands details!")
+      time.sleep(10)
+      c_res = ssm_cli.get_command_invocation(
+        CommandId=command_response['Command']['CommandId'],
+        InstanceId=ec2_instance_id
+      )
+
+      print(c_res['StandardOutputContent'])
+      mail_title = "Success: " + instance_name
+      instance_message = "Instance " + instance_name + " - " + ec2_instance_id + " was restored.\n"
+      mail_body = mail_body + "SSM is working and these are the details of the instance:\n" + c_res['StandardOutputContent']
+
+    else:
+      mail_title = "Warning: " + instance_name
+      mail_body = mail_body + "SSM is not configured or accessible!\n"
+
+    print("Validating Restore job!")
+    backup_cli.put_restore_validation_result(
+      RestoreJobId=event['detail']['restoreJobId'],
+      ValidationStatus="SUCCESSFUL",
+      ValidationStatusMessage=""
+    )
+
+  else:
+    print("Validating Restore job!")
+    backup_cli.put_restore_validation_result(
+      RestoreJobId=event['detail']['restoreJobId'],
+      ValidationStatus="FAILED",
+      ValidationStatusMessage=""
+    )
+
+    mail_title = "Failed!"
+    mail_body = mail_body + "Instance " + ec2_instance_id + " is not running!"
+
+  print("Sending email!")
+  response = ses_cli.send_email(
+  Destination={
+    'BccAddresses': [
+    ],
+    'CcAddresses': [],
+    'ToAddresses': [
+      'sysadm@codeenigma.com'
+    ],
+  },
+  Message={
+    'Body': {
+      'Text': {
+        'Charset': 'UTF-8',
+        'Data': mail_body,
+      },
+    },
+    'Subject': {
+      'Charset': 'UTF-8',
+      'Data': 'Lambda Backup validation: ' + mail_title,
+    },
+  },
+  Source='Lambda Backup Validation <sysadm@codeenigma.com>',
+  )
+
+  return {
+    'statusCode': 200,
+    'body':  event
+  }

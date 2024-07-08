@@ -28,6 +28,11 @@
     - aws_backup.vault.encryption_key != "Default"
     - _vault_exists.stdout == "null"
 
+- name: Get the backup vault info.
+  ansible.builtin.command: >
+    aws backup list-backup-vaults --region {{ _aws_region }} --query "BackupVaultList[?BackupVaultName=='{{ aws_backup.vault.name }}'] | [0]" --output json
+  register: _vault_info
+
 - name: Create off-site backup vault without user-provided KMS key.
   ansible.builtin.command: >
     aws backup create-backup-vault --backup-vault-name {{ aws_backup.copy_vault.name }} --region {{ aws_backup.copy_vault.region }}
@@ -60,3 +65,7 @@
   loop_control:
     loop_var: plan
   when: aws_backup.plans | length
+
+- name: Create ami cleanup function
+  ansible.builtin.include_role:
+    name: aws/aws_backup_validation

@@ -1,0 +1,124 @@
+import json
+import boto3
+import socket
+import time
+
+# Defining Clients
+#s3_cli = boto3.client('s3', region_name='eu-west-2')
+backup_cli = boto3.client('backup', region_name="{{ _aws_region }}")
+ec2_cli = boto3.client("ec2", region_name="{{ _aws_region }}")
+rds_cli = boto3.client("rds", region_name="{{ _aws_region }}")
+ssm_cli = boto3.client('ssm', region_name="{{ _aws_region }}")
+ses_cli = boto3.client('ses', region_name="{{ _aws_region }}")
+
+# Debugger
+#boto3.set_stream_logger('')
+
+def lambda_handler(event, context):
+
+  mail_title = ""
+  mail_body = ""
+
+  print("Gathering instance id.")
+  rds_instance_id=event['detail']['createdResourceArn'].split(":")[-1]
+
+  print(rds_instance_id)
+
+  print("Gathering instance details.")
+  rds_instance=rds_cli.describe_db_instances(
+    DBInstanceIdentifier=rds_instance_id
+  )
+
+  print("Get instance name with access to RDS")
+  for tag in rds_instance['DBInstances'][0]['TagList']:
+    if tag['Key']=='Name':
+      ec2_with_access=tag['Value']
+
+  new_endpoint = rds_instance['DBInstances'][0]['Endpoint']['Address']
+
+  print(ec2_with_access)
+
+  print("Get all instances")
+  ec2_instances=ec2_cli.describe_instances()
+
+  instance_exist = False
+
+  print("Iterate to get id of EC2")
+  for reservation in ec2_instances["Reservations"]:
+    for instance in reservation["Instances"]:
+      for tag in instance['Tags']:
+        if ((tag['Key'] == "Name") and (tag['Value'] == ec2_with_access)):
+          print(tag['Key'] + " - " + tag['Value'] + " - " + instance["InstanceId"])
+          ec2_instance_id = instance["InstanceId"]
+
+  print(ec2_instance_id)
+
+  # Run scripts on EC2
+  print("Creating script!")
+  script = """
+  old_host={{ '$' }}(grep host /home/deploy/.mysql.creds | awk -F= '{print $2}')
+  sed 's,old_host,{new_host},g' /home/deploy/.mysql.creds >> /home/deploy/.mysql.creds.tmp
+  mysql --defaults-file=/home/deploy/.mysql.creds.tmp -e "SELECT table_schema 'DB Name', ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) 'DB Size in MB' FROM information_schema.tables GROUP BY table_schema;"
+  rm /home/deploy/.mysql.creds.tmp
+  """.format(new_host=new_endpoint)
+
+  print("Running command!")
+  command_response = ssm_cli.send_command(
+    DocumentName ='AWS-RunShellScript',
+    Parameters = {'commands': [script]},
+    InstanceIds = [
+      ec2_instance_id
+    ]
+  )
+
+  print("Getting command output.")
+  time.sleep(30)
+  c_res = ssm_cli.get_command_invocation(
+    CommandId=command_response['Command']['CommandId'],
+    InstanceId=ec2_instance_id
+  )
+
+  print(c_res['StandardOutputContent'])
+  mail_title = "Success: " + ec2_with_access
+  instance_message = "RDS instance " + ec2_with_access  + " was restored.\n"
+  conn_message = "Able to get information from " + new_endpoint + ":\n"
+  mail_body=instance_message + conn_message + c_res['StandardOutputContent']
+
+  print("Validating Restore job!")
+  backup_cli.put_restore_validation_result(
+    RestoreJobId=event['detail']['restoreJobId'],
+    ValidationStatus="SUCCESSFUL",
+    ValidationStatusMessage=""
+  )
+
+  print("Sending email!")
+  response = ses_cli.send_email(
+  Destination={
+  'BccAddresses': [
+    ],
+    'CcAddresses': [],
+    'ToAddresses': [
+      'sysadm@codeenigma.com'
+    ],
+  },
+  Message={
+    'Body': {
+      'Text': {
+        'Charset': 'UTF-8',
+        'Data': mail_body,
+      },
+    },
+    'Subject': {
+      'Charset': 'UTF-8',
+      'Data': 'Lambda Backup validation: ' + mail_title,
+    },
+  },
+  Source='Lambda Backup Validation <sysadm@codeenigma.com>',
+  )
+
+  print(json.dumps(event))
+
+  return {
+    'statusCode': 200,
+    'body':  json.dumps(event)
+  }

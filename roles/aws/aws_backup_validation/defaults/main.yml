@@ -1,0 +1,11 @@
+---
+aws_backup_validation:
+  name: 'RestoreValidation'
+  description: 'Restore validation for'
+  timeout: 60
+  runtime: python3.12
+  handler: "lambda_handler"
+  resources:
+    - EC2
+    - RDS
+    #- EFS
