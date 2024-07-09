@@ -2,11 +2,7 @@
 - name: Create a role and attach policies
   amazon.aws.iam_role:
     name: LambdaBackupRestoreRole
-<<<<<<< HEAD
     assume_role_policy_document: "{{ lookup('file', 'trusted_entitites.j2') }}"
-=======
-    assume_role_policy_document: "{{ lookup('file','trusted_entitites.j2') }}"
->>>>>>> Resolving-conflicts
     managed_policies:
       - arn:aws:iam::aws:policy/AmazonEC2FullAccess
       - arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy
