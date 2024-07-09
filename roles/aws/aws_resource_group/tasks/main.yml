@@ -1,7 +1,6 @@
 ---
 - name: Run tasks for environment build
   ansible.builtin.include_tasks: env_resource_group.yml
-  when: _aws_resource_name is not defined
 
 - name: Run tasks for resource build
   ansible.builtin.include_tasks: resource_group.yml
