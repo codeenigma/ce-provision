@@ -92,3 +92,36 @@
     mode: 0644
     force: true
   notify: Reload systemd units and Restart Mattermost.
+
+- name: Check if Mattermost local backups directory exists.
+  ansible.builtin.stat:
+    path: "/home/mattermost/backups"
+  register: mattermost_backups
+
+- name: Create Mattermost local backups directory.
+  ansible.builtin.file:
+    path: /home/mattermost/backups
+    state: directory
+    mode: '0755'
+    owner: mattermost
+    group: mattermost
+  when:
+    - not mattermost_backups.stat.exists
+
+- name: Copy Mattermost local backups script.
+  ansible.builtin.template:
+    src: "mattermost_local_backups.sh.j2"
+    dest: "/usr/local/bin/mattermost_local_backups.sh"
+    owner: root
+    group: root
+    mode: 0755
+    force: true
+
+- name: Create systemd timer for Mattermost local backups.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      mattermost_local_backups:
+        timer_command: /usr/local/bin/mattermost_local_backups.sh
+        timer_OnCalendar: "{{ mattermost.backups.on_calendar }}"
