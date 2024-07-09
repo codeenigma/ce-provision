@@ -10,10 +10,10 @@ Creates AWS Restore testing plan for EC2 and RDS, EventBridge rule that gets tri
 ```yaml
 ---
 aws_backup_validation:
-  name: 'RestoreValidation'
-  description: 'Restore validation for'
+  name: "RestoreValidation"
+  description: "Restore validation for"
   timeout: 60
-  runtime: python3.12
+  runtime: "python3.12"
   handler: "lambda_handler"
   resources:
     - EC2
