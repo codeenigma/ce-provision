@@ -1,7 +1,7 @@
 ---
 - name: Set dict string
   ansible.builtin.set_fact:
-    _priority_multiplied: "{{ (_priority | float) * 10 }}"
+    _priority_multiplied: "{{ ((_priority | float) * 10) | int }}"
 
 - name: Set dict string
   ansible.builtin.set_fact:
