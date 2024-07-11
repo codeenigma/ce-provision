@@ -32,7 +32,7 @@ server {
 {% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' %}
 {% if domain.ssl.web_server | default('standalone') == 'standalone' %}
     # Proxy for certbot (LetsEncrypt)
-    location /.well-known/acme-challenge/ {
+    location ^~/.well-known/acme-challenge/ {
         auth_basic off;
         proxy_pass http://127.0.0.1:{{ domain.ssl.http_01_port }}$request_uri;
     }
