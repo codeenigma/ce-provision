@@ -17,11 +17,19 @@ aws_acl:
     rules:
       rate_limit:
         value: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
+<<<<<<< HEAD
         priority: 2 # can be float with 1 decimal place
       ip_sets:
         - name: "Allowed-ips"
           action: allow
           priority: 1 # can be float with 1 decimal place
+=======
+        priority: 2
+      ip_sets:
+        - name: "Allowed-ips"
+          action: allow
+          priority: 1
+>>>>>>> Adding-aws-acl-to-meta
           list: [] # If the list is empty, ip set won't be recreated
             #- 1.1.1.1/32 # list of ip ranges
             #- 2.2.2.2/32
@@ -36,7 +44,11 @@ aws_acl:
       country_codes:
         - name: "allowed-countries"
           action: allow
+<<<<<<< HEAD
           priority: 0.2
+=======
+          priority: 7
+>>>>>>> Adding-aws-acl-to-meta
           list:
             - GB
             - HR

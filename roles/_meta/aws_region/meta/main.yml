@@ -4,6 +4,7 @@ dependencies:
   - role: aws/aws_vpc
   - role: aws/aws_vpc_subnet
   - role: aws/aws_iam_role
+  - role: aws/aws_acl
   - role: aws/aws_cloudwatch_log_group
   - role: aws/aws_backup
   - role: aws/aws_backup_sns
