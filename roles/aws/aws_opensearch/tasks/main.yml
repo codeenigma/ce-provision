@@ -51,4 +51,4 @@
       maintenance_schedules: "{{ aws_opensearch.auto_tune_maintenance_schedules | default(omit) }}"
     tags: "{{ aws_opensearch.tags }}"
     wait: "{{ aws_opensearch.wait }}"
-    wait_timeout: "{{ aws_opensearch.wait_timeout }}" 
+    wait_timeout: "{{ aws_opensearch.wait_timeout }}"
