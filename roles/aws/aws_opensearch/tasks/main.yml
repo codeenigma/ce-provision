@@ -6,7 +6,7 @@
   vars:
     aws_security_groups:
       profile: "{{ aws_opensearch.aws_profile }}"
-      region: "{{ aws_opensearch.region }}"
+      region: "{{ aws_opensearch.aws_region }}"
       group_names: "{{ aws_opensearch.security_groups }}"
       return_type: ids
   when: aws_opensearch.security_groups | length > 0
