@@ -9,14 +9,12 @@
     ip_address_version: IPV4
     addresses: "{{ _ip_set.list }}"
   when: _ip_set.list | length > 0
-  register: _ip_set_info
 
-- name: Get IP set for WAF if.
+- name: Get IP set details.
   community.aws.wafv2_ip_set_info:
     name: "{{ _ip_set.set_name }}"
     scope: "{{ _acl.scope }}"
     region: "{{ _acl.region }}"
-  when: _ip_set.list | length == 0
   register: _ip_set_info
 
 - name: Set action string
