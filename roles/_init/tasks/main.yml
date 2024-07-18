@@ -125,7 +125,7 @@
 - name: Install Ansible.
   when:
     - ansible_connection == 'ssh'
-    - install_ansible
+    - _init.install_ansible
   block:
     - name: Install ce-provision user.
       ansible.builtin.include_role:
