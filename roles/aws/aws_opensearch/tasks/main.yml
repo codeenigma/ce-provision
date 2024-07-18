@@ -6,7 +6,7 @@
   vars:
     aws_security_groups:
       profile: "{{ aws_opensearch.aws_profile }}"
-      region: "{{ aws_opensearch.region }}"
+      region: "{{ aws_opensearch.aws_region }}"
       group_names: "{{ aws_opensearch.security_groups }}"
       return_type: ids
   when: aws_opensearch.security_groups | length > 0
@@ -50,4 +50,5 @@
       desired_state: "{{ aws_opensearch.auto_tune }}"
       maintenance_schedules: "{{ aws_opensearch.auto_tune_maintenance_schedules | default(omit) }}"
     tags: "{{ aws_opensearch.tags }}"
-    wait: true
+    wait: "{{ aws_opensearch.wait }}"
+    wait_timeout: "{{ aws_opensearch.wait_timeout }}"

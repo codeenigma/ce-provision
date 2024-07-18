@@ -1,0 +1,127 @@
+---
+# Install Python applications.
+- name: Manage required pip packages.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: psycopg2-binary
+
+- name: Create a new database for mattermost.
+  community.postgresql.postgresql_db:
+    name: mattermost
+    comment: Mattermost Database
+  become_user: postgres
+  become: true
+  notify: Reload PostgreSQL.
+
+- name: Connect to mattermost database, create mattermost user, and grant access to database.
+  community.postgresql.postgresql_user:
+    db: mattermost
+    name: mmuser
+    password: "{{ _encrypted_mattermost_postgresql_pass }}"
+  become_user: postgres
+  become: true
+  notify: Reload PostgreSQL.
+
+- name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost
+  community.postgresql.postgresql_privs:
+    db: postgres
+    privs: ALL
+    type: database
+    obj: mattermost
+    role: mmuser
+  become_user: postgres
+  become: true
+  notify: Reload PostgreSQL.
+
+- name: Check if we already have Mattermost installed.
+  ansible.builtin.stat:
+    path: "/opt/mattermost/bin/mattermost"
+  register: mattermost_bin
+
+- name: Check if Mattermost data directory exists.
+  ansible.builtin.stat:
+    path: "/opt/mattermost/data"
+  register: mattermost_data
+
+- name: "Fetch and extract Mattermost team version {{ mattermost.version }}."
+  ansible.builtin.unarchive:
+    src: "https://releases.mattermost.com/{{ mattermost.version }}/mattermost-team-{{ mattermost.version }}-linux-amd64.tar.gz"
+    dest: /opt
+    remote_src: true
+  when:
+    - not mattermost_bin.stat.exists
+
+- name: Create Mattermost data directory.
+  ansible.builtin.file:
+    path: /opt/mattermost/data
+    state: directory
+    mode: '0755'
+  when:
+    - not mattermost_data.stat.exists
+
+- name: Create mattermost group.
+  ansible.builtin.group:
+    name: mattermost
+    system: true
+    state: present
+
+- name: Create mattermost user.
+  ansible.builtin.user:
+    name: mattermost
+    group: mattermost
+    system: true
+
+- name: Recursively set ownership of mattermost directory.
+  ansible.builtin.file:
+    path: /opt/mattermost
+    state: directory
+    recurse: true
+    owner: mattermost
+    group: mattermost
+    mode: g+w
+
+- name: Copy Mattermost systemd service def.
+  ansible.builtin.template:
+    src: "mattermost_service.j2"
+    dest: "/lib/systemd/system/mattermost.service"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  notify: Reload systemd units and Restart Mattermost.
+
+- name: Check if Mattermost local backups directory exists.
+  ansible.builtin.stat:
+    path: "/home/mattermost/backups"
+  register: mattermost_backups
+
+- name: Create Mattermost local backups directory.
+  ansible.builtin.file:
+    path: /home/mattermost/backups
+    state: directory
+    mode: '0755'
+    owner: mattermost
+    group: mattermost
+  when:
+    - not mattermost_backups.stat.exists
+
+- name: Copy Mattermost local backups script.
+  ansible.builtin.template:
+    src: "mattermost_local_backups.sh.j2"
+    dest: "/usr/local/bin/mattermost_local_backups.sh"
+    owner: root
+    group: root
+    mode: 0755
+    force: true
+
+- name: Create systemd timer for Mattermost local backups.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      mattermost_local_backups:
+        timer_command: /usr/local/bin/mattermost_local_backups.sh
+        timer_OnCalendar: "{{ mattermost.backups.on_calendar }}"

@@ -83,6 +83,20 @@ wazuh:
     wazuh_manager_email_log_source: alerts.log
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
+    wazuh_manager_config:
+      active_responses:
+        - command: "firewall-drop"
+          location: "all"
+          rules_id: "31151,5712,104130,101071,101132,101238,101251,103011"
+          repeated_offenders: "30,60,120"
+          timeout: 600
+        - command: "firewall-drop"
+          location: "all"
+          rules_id: "100205"
+          repeated_offenders: "30,60,120"
+          timeout: 3600
+    wazuh_manager_globals:
+      - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above
     wazuh_manager_extra_emails: [] # list of additional emails to send, e.g.
       #- enable: true
