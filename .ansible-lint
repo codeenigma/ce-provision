@@ -15,4 +15,4 @@ skip_list:
   - name[template] # it doesn't like Jinja templates being in the middle of a task name, which seems silly to me.
   - name[casing] # sometimes included Galaxy roles break linting rules and cause failures
 exclude_paths:
-  - roles/debian/wazuh/ # imported role uses yes/no instead of true/false so always fails
+  - roles/contrib/ # we don't control these roles
