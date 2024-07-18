@@ -20,7 +20,7 @@ user_ansible:
   # gid: 999
   # Local username of the deploy user.
   utility_host: "localhost"
-  utility_username: ""
+  utility_username: "{{ _user_ansible_username }}"
   sudoer:
     false
   # List of additional groups to add the user to.
