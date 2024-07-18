@@ -17,7 +17,8 @@ _init:
   force_play: false
   lock_file: /tmp/ce-provision-lock
   deploy_lock_file: /tmp/ce-deploy-lock # must match lock_file in ce-deploy
-  ce_provision_version: 2.x # Outputted by the _init role at the start of plays.
+  ce_provision_version: 2.x # Outputted by the _init role at the start of plays
+  install_ansible: true # set to false to not install Ansible in a venv
 
   # Although these variables logically belong with ce_provision, the _init role needs to
   # gather the extra variables if there are any, so there are _init variables.
