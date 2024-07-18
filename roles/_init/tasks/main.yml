@@ -123,23 +123,26 @@
 # Install Ansible under the controller user for all servers
 # Ensure ansible_connection == 'ssh' (i.e. we are connecting to a server) before executing
 - name: Install Ansible.
-  ansible.builtin.include_role:
-    name: debian/user_provision
-  when: ansible_connection == 'ssh'
+  when:
+    - ansible_connection == 'ssh'
+    - install_ansible
+  block:
+    - name: Install ce-provision user.
+      ansible.builtin.include_role:
+        name: debian/user_provision
 
-- name: Install Ansible.
-  ansible.builtin.include_role:
-    name: debian/ansible
-  vars:
-    ce_ansible:
-      venv_path: "{{ _venv_path }}"
-      venv_command: "{{ _venv_command }}"
-      install_username: "{{ _venv_install_username }}"
-      upgrade:
-        enabled: true
-        command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade ansible"
-        on_calendar: "*-*-* 01:30:00"
-        timer_name: "{{ _ce_ansible_timer_name }}"
-      linters:
-        enabled: false
-  when: ansible_connection == 'ssh'
+    - name: Install Ansible.
+      ansible.builtin.include_role:
+        name: debian/ansible
+      vars:
+        ce_ansible:
+          venv_path: "{{ _venv_path }}"
+          venv_command: "{{ _venv_command }}"
+          install_username: "{{ _venv_install_username }}"
+          upgrade:
+            enabled: true
+            command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade ansible"
+            on_calendar: "*-*-* 01:30:00"
+            timer_name: "{{ _ce_ansible_timer_name }}"
+          linters:
+            enabled: false
