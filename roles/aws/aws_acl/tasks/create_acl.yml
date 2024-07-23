@@ -63,8 +63,8 @@
 - name: Create Bot Control rule.
   ansible.builtin.include_tasks: bot_control.yml
   when:
-    - _acl.rules.botControl is defined
-    - _acl.rules.botControl.enabled
+    - _acl.rules.bot_control is defined
+    - _acl.rules.bot_control.enabled
 
 - name: Create regular rules.
   ansible.builtin.include_tasks: regular_rule.yml
