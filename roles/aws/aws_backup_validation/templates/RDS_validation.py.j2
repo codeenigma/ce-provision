@@ -56,7 +56,7 @@ def lambda_handler(event, context):
   # Run scripts on EC2
   print("Creating script!")
   script = """
-  old_host={{ '$' }}(grep host /home/deploy/.mysql.creds | awk -F= '{print $2}')
+  old_host={{ '$' }}(grep host /home/deploy/.mysql.creds | awk -F= '{{ '{{' }}print $2 {{ '}}' }}')
   sed 's,old_host,{new_host},g' /home/deploy/.mysql.creds >> /home/deploy/.mysql.creds.tmp
   mysql --defaults-file=/home/deploy/.mysql.creds.tmp -e "SELECT table_schema 'DB Name', ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) 'DB Size in MB' FROM information_schema.tables GROUP BY table_schema;"
   rm /home/deploy/.mysql.creds.tmp
