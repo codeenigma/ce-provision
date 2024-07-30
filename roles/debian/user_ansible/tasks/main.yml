@@ -26,6 +26,7 @@
     home: "{{ user_ansible.home }}"
     password: "*"
     groups: "{{ user_ansible.groups }}"
+    update_password: "{{ user_ansible.update_password }}"
   when: user_ansible.create
 
 - name: Add user to sudoers.
