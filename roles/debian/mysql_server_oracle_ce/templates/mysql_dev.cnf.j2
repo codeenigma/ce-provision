@@ -1,12 +1,12 @@
 [mysqld]
 bind-address = 0.0.0.0
-character_set_server = utf8 
+character_set_server = utf8
 collation_server = utf8_general_ci
 log_error_services = 'log_filter_internal; log_sink_syseventlog' # change to log_syslog = 1 for MySQL 5.7 and lower
 slow_query_log = 1
 slow_query_log_file = /var/log/mysql/slow-query.log
 log_slow_admin_statements = 1
-general_log = 1
+general_log = 0
 log_queries_not_using_indexes = 1
 long_query_time = {{ mysql_server.long_query_time }}
 skip-host-cache
