@@ -1,0 +1,21 @@
+---
+- name: Get restore testing plan info.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ backup.backup_plan_name | replace("-", "_") }}'] | [0]" --output json
+  register: _testing_plan_info
+
+- name: Check if the restore testing selection exists.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-selections --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --query "RestoreTestingSelections[?RestoreTestingSelectionName=='{{ backup.selection_name | replace('-', '_') }}'].RestoreTestingSelectionName" --output text --region {{ _aws_region }}
+  register: _testing_selection_exists
+  when: _testing_plan_info.stdout != "null"
+
+- name: Get default backup role arn
+  amazon.aws.iam_role_info:
+    name: AWSBackupDefaultServiceRole
+  register: _default_backup_role_arn
+
+- name: Assign resource to AWS restore testing plan.
+  ansible.builtin.command: >
+    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name | replace('-', '_') }}\",\"IamRoleArn\":\"{{ _default_backup_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"{{ backup.selection_name.split('-')[0] }}\",\"ValidationWindowHours\":1}" --region {{ _aws_region }}
+  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
