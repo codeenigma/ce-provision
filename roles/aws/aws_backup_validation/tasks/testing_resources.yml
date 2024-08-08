@@ -26,7 +26,7 @@
   amazon.aws.ec2_vpc_subnet_info:
     region: "{{ _aws_region }}"
     filters:
-      vpc-id: "{{ _main_vpc_info[0].vpc_id }}"
+      vpc-id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
   register: _main_subnets_info
 
 - name: Create SG for restored instances.
@@ -34,7 +34,7 @@
     name: Restore_testing
     description: This SG is used to allow SSM and SSH access to the server
     region: "{{ _aws_region }}"
-    vpc_id: "{{ _main_vpc_info[0].vpc_id }}"
+    vpc_id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
     rules:
       - proto: tcp
         from_port: 80
@@ -51,5 +51,5 @@
 
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
-    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name | replace('-', '_') }}\",\"IamRoleArn\":\"{{ _default_backup_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"EC2\",\"ValidationWindowHours\":1,\"RestoreMetadataOverrides\":{\"securityGroupIds\":\"[ {{ _main_subnets_info[0].subnet_id }}]\",\"IamInstanceProfileName\":\"UseBackedUpValue\"}}" --region {{ _aws_region }}
+    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name | replace('-', '_') }}\",\"IamRoleArn\":\"{{ _default_backup_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"EC2\",\"ValidationWindowHours\":1,\"RestoreMetadataOverrides\":{\"securityGroupIds\":\"[ {{ _main_subnets_info.subnets[0].subnet_id }}]\",\"IamInstanceProfileName\":\"UseBackedUpValue\"}}" --region {{ _aws_region }}
   when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
