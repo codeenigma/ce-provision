@@ -49,7 +49,17 @@
         to_port: 22
         cidr_ip: 0.0.0.0/0
 
+- name: Remove estore testing query file
+  ansible.builtin.file:
+    path: /home/controller/restore_testing.json
+    state: absent
+
+- name: Create restore testing query file
+  ansible.builtin.template:
+    src: templates/restore_testing.j2
+    dest: /home/controller/restore_testing.json
+
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
-    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query("RestoreTestingPlanName") }} --restore-testing-selection '{"RestoreTestingSelectionName":"{{ backup.selection_name | replace("-", "_") }}","IamRoleArn":"{{ _default_backup_role_arn }}","ProtectedResourceArns":["{{ _resource_arn }}"],"ProtectedResourceType":"EC2","ValidationWindowHours":1,"RestoreMetadataOverrides":{"securityGroupIds":"[\"{{ _main_subnets_info.subnets[0].subnet_id }}\"]","IamInstanceProfileName":"UseBackedUpValue"}}' --region {{ _aws_region }}
+    aws backup create-restore-testing-selection -cli-input-json file:///home/controller/restore_testing.json --region {{ _aws_region }}
   when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
