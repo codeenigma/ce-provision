@@ -15,7 +15,38 @@
     name: AWSBackupDefaultServiceRole
   register: _default_backup_role_arn
 
-- name: Assign resource to AWS restore testing plan.
+- name: Get VPC info
+  amazon.aws.ec2_vpc_net_info:
+    filters:
+      "tag:Name": "{{ aws_vpc.name }}"
+  register: _main_vpc_info
+
+- name: Get subnets info
+  amazon.aws.ec2_vpc_subnet_info:
+    filters:
+      vpc-id: "{{ _main_vpc_info[0].vpc_id }}"
+  register: _main_subnets_info
+
+- name: Create SG for restored instances.
+  amazon.aws.ec2_security_group:
+    name: Restore_testing
+    description: This SG is used to allow SSM and SSH access to the server
+    vpc_id: "{{ _main_vpc_info[0].vpc_id }}"
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+
+- name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
-    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name | replace('-', '_') }}\",\"IamRoleArn\":\"{{ _default_backup_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"{{ backup.selection_name.split('-')[0] }}\",\"ValidationWindowHours\":1}" --region {{ _aws_region }}
+    aws backup create-restore-testing-selection --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --restore-testing-selection "{\"RestoreTestingSelectionName\":\"{{ backup.selection_name | replace('-', '_') }}\",\"IamRoleArn\":\"{{ _default_backup_role_arn }}\",\"ProtectedResourceArns\":[\"{{ _resource_arn }}\"],\"ProtectedResourceType\":\"EC2\",\"ValidationWindowHours\":1,\"RestoreMetadataOverrides\":{\"securityGroupIds\":\"[ {{ _main_subnets_info[0].subnet_id }}]\",\"IamInstanceProfileName\":\"UseBackedUpValue\"}}" --region {{ _aws_region }}
   when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
