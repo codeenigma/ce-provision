@@ -51,13 +51,14 @@
 
 - name: Remove estore testing query file
   ansible.builtin.file:
-    path: /home/deploy/restore_testing.json
+    path: /tmp/restore_testing.json
     state: absent
 
 - name: Create restore testing query file
   ansible.builtin.template:
     src: templates/restore_testing.j2
-    dest: /home/deploy/restore_testing.json
+    dest: /tmp/restore_testing.json
+    force: true
 
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
