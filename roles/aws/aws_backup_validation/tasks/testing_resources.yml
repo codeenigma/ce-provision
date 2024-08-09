@@ -58,7 +58,7 @@
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
-    force: true
+    force: yes
 
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
