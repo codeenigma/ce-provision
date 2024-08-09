@@ -56,7 +56,7 @@
 
 - name: Create restore testing query file
   ansible.builtin.template:
-    src: templates/restore_testing.j2
+    src: restore_testing.j2
     dest: /tmp/restore_testing.json
     force: true
 
