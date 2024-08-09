@@ -60,6 +60,12 @@
     dest: /tmp/restore_testing.json
     force: yes
 
+- name: Touch a file
+  ansible.builtin.file:
+    path: /tmp/test_file.conf
+    state: touch
+    mode: "0644"
+
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
