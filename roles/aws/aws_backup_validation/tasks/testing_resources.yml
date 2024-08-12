@@ -66,6 +66,10 @@
     state: touch
     mode: "0644"
 
+- name: Run command to create file in tmp folder
+  ansible.builtin.command: >
+    echo "This is test" >> /tmp/test_file
+
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
