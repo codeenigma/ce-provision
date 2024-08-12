@@ -58,13 +58,17 @@
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
-    force: yes
+    force: true
 
 - name: Touch a file
   ansible.builtin.file:
     path: /tmp/test_file.conf
     state: touch
     mode: "0644"
+
+- name: Run command to create file in tmp folder
+  ansible.builtin.command: >
+    echo "This is test" >> /tmp/test_file
 
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
