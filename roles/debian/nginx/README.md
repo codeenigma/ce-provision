@@ -142,6 +142,9 @@ nginx:
   fastcgi_read_timeout: 60
   recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml.
   overrides: [] # See the '_overrides' role.
+  # Nginx ships a default vhost config that can clash with other services
+  # running on port 80. Set this to false to remove it after Nginx installation.
+  keep_default_vhost: true
   domains:
     - server_name: "{{ _domain_name }}"
       access_log: "/var/log/nginx/access.log"
