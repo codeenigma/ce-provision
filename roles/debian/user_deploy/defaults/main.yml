@@ -1,21 +1,31 @@
 ---
+_user_deploy_username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
 user_deploy:
   # This sets both username and main group.
   # If you are using ce-deploy to deploy code this must match the `deploy_user` variable
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
+  username: "{{ _user_deploy_username }}"
+  home: "/home/{{ _user_deploy_username }}"
+  create: true # if you know the user already exists, set this to false to not create the user.
+  create_home: true
+  update_password: "always"
   # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
   # This is shown for documentation, you should do this in your config repo
   # uid: 989
   # gid: 989
   # Local username of the deploy user.
   utility_host: "localhost"
-  utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
+  utility_username: "{{ _user_deploy_username }}"
   sudoer: false
   # List of additional groups to add the user to.
   groups:
     - docker # add the docker group so we can do container builds
+  # List of SSH pub keys to authorize. These must be provided as strings (content of the pub key).
   ssh_keys: []
+  # List of SSH private keys to add to server. These must be provided as strings (content of the private key).
+  # Be sure to store securely using SOPS or similar.
   # If you add more than one key here, make sure the original private key of your deploy server is the first.
   ssh_private_keys: []
+  # List of hostnames to add to known_hosts.
   known_hosts: []
+  # Whether or not to hash any provided hosts for known_hosts.
   known_hosts_hash: true

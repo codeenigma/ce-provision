@@ -1,18 +1,29 @@
 ---
+_user_provision_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
 user_provision:
   # This sets both username and main group.
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+  username: "{{ _user_provision_username }}"
+  home: "/home/{{ _user_provision_username }}"
+  create: true # if you know the user already exists, set this to false to not create the user.
+  create_home: true
+  update_password: "always"
   # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
   # This is shown for documentation, you should do this in your config repo
   # uid: 988
   # gid: 988
   # Local username of the system user.
   utility_host: "localhost"
-  utility_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+  utility_username: "{{ _user_provision_username }}"
   sudoer: true
+  # List of additional groups to add the user to.
   groups: []
+  # List of SSH pub keys to authorize. These must be provided as strings (content of the pub key).
   ssh_keys: []
+  # List of SSH private keys to add to server. These must be provided as strings (content of the private key).
+  # Be sure to store securely using SOPS or similar.
   # If you add more than one key here, make sure the original private key of your infra controller server is the first.
   ssh_private_keys: []
+  # List of hostnames to add to known_hosts.
   known_hosts: []
+  # Whether or not to hash any provided hosts for known_hosts.
   known_hosts_hash: true

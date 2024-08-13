@@ -5,7 +5,7 @@ Creates an ACL to be attached to a CloudFront distribution or an Application Loa
 <!--ENDTOC-->
 
 <!--ROLEVARS-->
-## Default variables for creation of ACL (pass it as a list)
+## Default variables
 ```yaml
 ---
 aws_acl:
@@ -17,16 +17,20 @@ aws_acl:
     rules:
       rate_limit:
         value: 200 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
-        priority: 2
+        priority: 2 # can be float with 1 decimal place
       ip_sets:
-        - name: "Allowed-ips"
+        - rule_name: "Allowed-ips"
+          set_name: "Office-IPs"
+          description: "List of IPs from office"
           action: allow
-          priority: 1
+          priority: 1 # can be float with 1 decimal place
           list: [] # If the list is empty, ip set won't be recreated
             #- 1.1.1.1/32 # list of ip ranges
             #- 2.2.2.2/32
             #- 3.3.3.3/32
-        - name: "Blocked-ips"
+        - rule_name: "Blocked-IPs"
+          set_name: "DDOS-list"
+          description: "List of IPs That were ddosing server"
           action: block
           priority: 0
           list: [] # If the list is empty, ip set won't be recreated
@@ -36,7 +40,7 @@ aws_acl:
       country_codes:
         - name: "allowed-countries"
           action: allow
-          priority: 7
+          priority: 0.2
           list:
             - GB
             - HR
@@ -73,43 +77,36 @@ aws_acl:
               position: "CONTAINS"
               string: "crawl"
               text_trans: "LOWERCASE"
-      # AWS Managed rules
+      # Managed rules list
       bot_control:
+        enabled: false
         target: "COMMON" # or set to TARGETED inspection level (comment out to avoid addign rule)
         priority: 3
       cyber_sec:
-        enabled: true # Need to subscribe first in AWS
+        enabled: false # Need to subscribe first in AWS
         rule_list: []
         priority: 6
       amazon_ip_reputation:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 9
       common_rule_set:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 10
       php_rule_set:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 11
       known_bad_inputs:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 12
       anonymous_ip_list:
-        enabled: true
+        enabled: false
         rule_list: []
         priority: 13
-```
 
-## Default variables for assigning ACL to CF or ALB
-```yaml
----
-aws_acl:
-  name: example_master_acl # Name of the ACL to apply
-  scope: CLOUDFRONT # Can be REGIONAL for ALBs
-  region: "us-east-1"
 ```
 
 <!--ENDROLEVARS-->

@@ -94,6 +94,20 @@ wazuh:
     wazuh_manager_email_log_source: alerts.log
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
+    wazuh_manager_config:
+      active_responses:
+        - command: "firewall-drop"
+          location: "all"
+          rules_id: "31151,5712,104130,101071,101132,101238,101251,103011"
+          repeated_offenders: "30,60,120"
+          timeout: 600
+        - command: "firewall-drop"
+          location: "all"
+          rules_id: "100205"
+          repeated_offenders: "30,60,120"
+          timeout: 3600
+    wazuh_manager_globals:
+      - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above
     wazuh_manager_extra_emails: [] # list of additional emails to send, e.g.
       #- enable: true
@@ -120,29 +134,29 @@ wazuh:
     wazuh_manager_api:
       bind_addr: 0.0.0.0
       port: 55000
-      behind_proxy_server: no
-      https: yes
+      behind_proxy_server: "no"
+      https: "yes"
       https_key: "api/configuration/ssl/server.key"
       https_cert: "api/configuration/ssl/server.crt"
-      https_use_ca: False
+      https_use_ca: false
       https_ca: "api/configuration/ssl/ca.crt"
       logging_level: "info"
       logging_path: "logs/api.log"
-      cors: no
+      cors: "no"
       cors_source_route: "*"
       cors_expose_headers: "*"
       cors_allow_headers: "*"
-      cors_allow_credentials: no
-      cache: yes
+      cors_allow_credentials: "no"
+      cache: "yes"
       cache_time: 0.750
       access_max_login_attempts: 5
       access_block_time: 300
       access_max_request_per_minute: 300
-      drop_privileges: yes
-      experimental_features: no
-      remote_commands_localfile: yes
+      drop_privileges: "yes"
+      experimental_features: "no"
+      remote_commands_localfile: "yes"
       remote_commands_localfile_exceptions: []
-      remote_commands_wodle: yes
+      remote_commands_wodle: "yes"
       remote_commands_wodle_exceptions: []
       #wazuh_api_users:
       #  - username: custom-user
@@ -165,6 +179,7 @@ wazuh:
     dashboard_security: true
     dashboard_user: kibanaserver
     dashboard_password: changeme
+
 ```
 
 <!--ENDROLEVARS-->
