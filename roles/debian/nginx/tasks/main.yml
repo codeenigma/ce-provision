@@ -5,6 +5,16 @@
     state: present
     update_cache: true
     cache_valid_time: 240
+  register: _nginx_installed
+
+- name: Remove default NGINX vhost that could clash with other services running on port 80.
+  when:
+    # We only need to do this once when Nginx is installed initially.
+    - _nginx_installed.changed
+    - not nginx.keep_default_vhost
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
 
 - name: Set up Python packages.
   ansible.builtin.include_role:
