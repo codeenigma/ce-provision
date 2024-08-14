@@ -70,7 +70,7 @@
   ansible.builtin.command: >
     echo "This is test" >> /tmp/test_file
 
-- name: Assign EC2 resource to AWS restore testing plan.
-  ansible.builtin.command: >
-    aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
-  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
+#- name: Assign EC2 resource to AWS restore testing plan.
+#  ansible.builtin.command: >
+#    aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
+#  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
