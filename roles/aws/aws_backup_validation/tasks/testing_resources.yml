@@ -58,7 +58,7 @@
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
-    force: yes
+    force: true
 
 - name: Touch a file
   ansible.builtin.file:
