@@ -67,6 +67,7 @@
   ansible.builtin.debug:
     var: "{{ _tmp_file_restore }}"
 
+
 - name: Touch a file
   ansible.builtin.file:
     path: /tmp/test_file.conf
