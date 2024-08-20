@@ -58,7 +58,9 @@
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
-    force: yes
+    owner: controller
+    group: controller
+    mode: '0644'
 
 - name: Touch a file
   ansible.builtin.file:
