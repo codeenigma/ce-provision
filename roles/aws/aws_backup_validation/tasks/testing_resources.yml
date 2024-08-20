@@ -58,7 +58,14 @@
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
-    force: yes
+    owner: controller
+    group: controller
+    mode: '0644'
+  register: _tmp_file_restore
+
+- name: Print file details
+  ansible.builtin.debug:
+    var: "{{ _tmp_file_restore }}"
 
 - name: Touch a file
   ansible.builtin.file:
@@ -70,7 +77,7 @@
   ansible.builtin.command: >
     echo "This is test" >> /tmp/test_file
 
-- name: Assign EC2 resource to AWS restore testing plan.
-  ansible.builtin.command: >
-    aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
-  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
+#- name: Assign EC2 resource to AWS restore testing plan.
+#  ansible.builtin.command: >
+#    aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
+#  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
