@@ -370,6 +370,7 @@
       DefaultActions:
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+      Rules: "{{ aws_ec2_autoscale_cluster.listeners_https.rules }}"
   when: aws_ec2_autoscale_cluster.create_elb
 
 # @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
