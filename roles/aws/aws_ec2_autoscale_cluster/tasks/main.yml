@@ -349,6 +349,7 @@
       DefaultActions:
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+      Rules: "{{ aws_ec2_autoscale_cluster.listeners_http.rules }}"
     _aws_ec2_autoscale_cluster_listeners_redirect:
       Protocol: HTTP
       Port: "{{ aws_ec2_autoscale_cluster.alb_http_port }}"
