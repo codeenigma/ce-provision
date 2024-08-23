@@ -135,7 +135,11 @@ def lambda_handler(event, context):
       'Data': 'Lambda Backup validation: ' + mail_title,
     },
   },
+<<<<<<< HEAD
   Source='Lambda Backup Validation <sysadm@codeenigma.com>',
+=======
+  Source='Lambda Backup Validation <lambda@{{ _verified_domain }}>',
+>>>>>>> devel-2.x
   )
 
   return {

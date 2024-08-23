@@ -41,6 +41,7 @@
   register: _backup_plan_created_info
   when: _backup_plan_created is defined
 
+<<<<<<< HEAD
 - name: Check if the restore testing plan exists.
   ansible.builtin.command: >
     aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ plan.name | replace("-", "_") }}'] | [0]" --output json
@@ -57,6 +58,12 @@
     aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ plan.name | replace("-", "_") }}'] | [0]"
   register: _testing_plan_created_info
   when: _testing_plan_created is defined
+=======
+- name: Create restore testing plan.
+  ansible.builtin.include_role:
+    name: aws/aws_backup_validation
+    tasks_from: restore_testing_plan
+>>>>>>> devel-2.x
 
 - name: Tidy up and remove the yaml input file.
   ansible.builtin.file:
