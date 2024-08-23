@@ -1,0 +1,11 @@
+- name: Get list of identities.
+  ansible.builtin.command: >
+    aws ses list-identities --region {{ _aws_region }} --output json
+  register: _identity_list
+
+- name: Get list of identities.
+  ansible.builtin.command: >
+    aws ses get-identity-verification-attributes --identities item --region {{ _aws_region }}
+  register: _verified_domain
+  loop: _identity_list.Identities
+  until: _verified_domain.VerificationAttributes is search("Success")
