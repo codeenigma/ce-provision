@@ -272,7 +272,21 @@ aws_ec2_autoscale_cluster:
     create_distribution: false
     cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
   listeners_http:
-    rules: []
+    rules:
+      - Conditions:
+          - Field: host-header
+            Values:
+              - "example-redirect.com"
+        Priority: '4'
+        Actions:
+          - Type: redirect
+            RedirectConfig:
+              Host: "codeenigma.com"
+              Port: "#{port}"
+              Protocol: "HTTPS"
+              Path: "/#{path}"
+              Query: "#{query}"
+              StatusCode: "HTTP_301"
   listeners_https:
     rules: []
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
