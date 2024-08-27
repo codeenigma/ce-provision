@@ -111,6 +111,4 @@
       ssl_ciphers: "{{ wazuh.agent.wazuh_agent_enrollment.ssl_ciphers }}"
       wazuh_custom_packages_installation_agent_enabled: false
     ansible_shell_allow_world_readable_temp: true
-    wazuh_agent_sources_installation:
-      enabled: true
   when: wazuh.agent.install and not wazuh_agent_sources_installation.enabled
