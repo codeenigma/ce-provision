@@ -113,7 +113,18 @@
     ansible_shell_allow_world_readable_temp: true
   when: wazuh.agent.install and not wazuh_agent_sources_installation.enabled
 
+- name: Check if Filebeat service exists
+  ansible.builtin.command:
+    cmd: systemctl list-units --type=service --state=running
+  register: _service_list
+  changed_when: false
+
+- name: Set fact if Filebeat is found & present
+  ansible.builtin.set_fact:
+    filebeat_exists: "{{ 'filebeat.service' in _service_list.stdout_lines }}"
+
 - name: Restart filebeat at the end # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
   ansible.builtin.systemd:
     name: filebeat
     state: restarted
+  when: filebeat_exists
