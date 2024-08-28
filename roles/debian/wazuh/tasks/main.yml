@@ -112,3 +112,8 @@
       wazuh_custom_packages_installation_agent_enabled: false
     ansible_shell_allow_world_readable_temp: true
   when: wazuh.agent.install and not wazuh_agent_sources_installation.enabled
+
+- name: Restart filebeat at the end # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
+  ansible.builtin.systemd:
+    name: filebeat
+    state: restarted
