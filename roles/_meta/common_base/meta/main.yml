@@ -24,6 +24,7 @@ dependencies:
       - ntp
       - screen
       - iptraf-ng
+      - gawk
     when: is_local is not defined or not is_local
   - role: debian/locales
   - role: debian/user_root
