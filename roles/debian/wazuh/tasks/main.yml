@@ -121,7 +121,7 @@
 
 - name: Set fact if Filebeat is found & present
   ansible.builtin.set_fact:
-    filebeat_exists: "{{ 'filebeat.service' in _service_list.stdout_lines }}"
+    filebeat_exists: "{{ _service_list.stdout is search('filebeat.service') }}"
 
 - name: Restart filebeat at the end # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
   ansible.builtin.systemd:
