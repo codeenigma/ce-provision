@@ -19,6 +19,24 @@
     autoremove: true
   become: true
 
+- name: Gather host details for motd.
+  ansible.builtin.shell: >
+    set -o pipefail && /usr/bin/hostnamectl | /usr/bin/egrep "hostname|Operating|Kernel|Hardware Model"
+  register: _host_details
+
+- name: Gather datetime details for motd.
+  ansible.builtin.shell: >
+    date
+  register: _last_build
+
+- name: Generate/Update custom vars file.
+  ansible.builtin.template:
+    src: motd.j2
+    dest: "/etc/motd"
+    mode: "0755"
+    owner: root
+    group: root
+
 - name: Delete the lock file.
   ansible.builtin.file:
     path: "{{ _init.lock_file }}"

@@ -58,15 +58,6 @@
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
-    owner: controller
-    group: controller
-    mode: '0644'
-  register: _tmp_file_restore
-
-- name: Print file details
-  ansible.builtin.debug:
-    var: "{{ _tmp_file_restore }}"
-
 
 - name: Touch a file
   ansible.builtin.file:
