@@ -30,6 +30,11 @@
     executable: /bin/bash
   register: _host_details
 
+- name: Gather datetime details for motd.
+  ansible.builtin.shell: >
+    date
+  register: _last_build
+
 - name: Generate/Update custom vars file.
   ansible.builtin.template:
     src: motd.j2
