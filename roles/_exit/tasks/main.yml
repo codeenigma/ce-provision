@@ -35,13 +35,18 @@
     date
   register: _last_build
 
-- name: Generate/Update custom vars file.
+- name: Print inventory_hostname.
+  ansible.builtin.debug:
+    var: inventory_hostname
+
+- name: Generate motd with server info.
   ansible.builtin.template:
     src: motd.j2
     dest: "/etc/motd"
     mode: "0755"
     owner: root
     group: root
+  when: inventory_hostname != "local"
 
 - name: Delete the lock file.
   ansible.builtin.file:
