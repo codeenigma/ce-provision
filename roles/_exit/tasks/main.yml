@@ -46,7 +46,7 @@
     mode: "0755"
     owner: root
     group: root
-  when: inventory_hostname != "local"
+  when: inventory_hostname != "localhost"
 
 - name: Delete the lock file.
   ansible.builtin.file:
