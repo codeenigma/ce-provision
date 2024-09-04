@@ -20,16 +20,15 @@
   become: true
 
 - name: Gather host details for motd.
-  ansible.builtin.shell: >
-    set -o pipefail && /usr/bin/hostnamectl | /usr/bin/awk '/hostname|Operating|Kernel|Hardware Model/'
+  ansible.builtin.shell: |
+    set -o pipefail && \
+    { echo "Static hostname: $(hostname)"; \
+      grep "^NAME=" /etc/os-release | awk -F= '{print "Operating System: " $2}'; \
+      uname -r | awk '{print "Kernel: " $1}'; \
+      lscpu | grep "Model name" | awk -F: '{gsub(/^[ \t]+|[ \t]+$/, "", $2); print "Hardware Model: " $2}'; }
   args:
     executable: /bin/bash
   register: _host_details
-
-- name: Gather datetime details for motd.
-  ansible.builtin.shell: >
-    date
-  register: _last_build
 
 - name: Generate/Update custom vars file.
   ansible.builtin.template:
