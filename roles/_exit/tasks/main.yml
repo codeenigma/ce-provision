@@ -22,6 +22,8 @@
 - name: Gather host details for motd.
   ansible.builtin.shell: >
     set -o pipefail && /usr/bin/hostnamectl | /usr/bin/egrep "hostname|Operating|Kernel|Hardware Model"
+  args:
+    executable: /bin/bash
   register: _host_details
 
 - name: Gather datetime details for motd.
