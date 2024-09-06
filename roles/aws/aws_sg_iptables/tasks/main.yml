@@ -57,9 +57,8 @@
       region: "{{ _aws_region }}"
       name: "{{ _infra_name }}"
       cidr_block: "{{ _aws_vpc_cidr_base }}.0.0/16"
-      # ipv6_cidr: true # uncomment to request an Amazon-provided IPv6 CIDR block with /56 prefix length.
-      tags: {}
-        #Type: "util"
+      ipv6_cidr: "{{ aws_sg_tables.ipv6_cidr | default(omit) }}"
+      tags: "{{ _aws_tags }}"
       state: present
       assign_instances_ipv6: false
       security_groups: "{{ aws_sg_iptables }}"
@@ -74,6 +73,25 @@
     apply:
       delegate_to: localhost
       become: false
+  vars:
+    aws_ec2_with_eip:
+      iam_role_name: "{{ _infra_name }}-{{ _env_type }}-ec2-basic"
+      aws_profile: "{{ _aws_profile }}"
+      region: "{{ _aws_region }}"
+      hostname: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+      instance_type: "{{ _instance_type }}"
+      key_name: "{{ aws_provision_ec2_keypair.key_name }}"
+      ami_owner: self
+      vpc_name: "{{ _infra_name }}"
+      vpc_subnet_profile: core
+      vpc_subnet_id: "{{ _subnet | default('') }}"
+      instance_name: "{{ _aws_resource_name }}"
+      ami_name: "{{ _aws_resource_name }}"
+      root_volume_size: "{{ _ebs_root_volume_size }}"
+      tags:
+      security_groups: "{{ _security_groups }}"
+      autorecover: true
+      backup: "{{ _infra_name }}-{{ _env_type }}"
 
 - name: Include firewall role
   ansible.builtin.include_role:
