@@ -4,6 +4,10 @@
     deb: "https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb"
     force: true
     state: present
+  retries: 3
+  delay: 10
+  until: result is succeeded
+  register: result
 
 - name: Adds cwagent user to adm group for log access.
   ansible.builtin.user:
