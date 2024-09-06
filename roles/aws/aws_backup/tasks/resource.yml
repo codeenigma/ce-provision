@@ -4,6 +4,11 @@
     aws backup list-backup-plans --region {{ _aws_region }} --query "BackupPlansList[?BackupPlanName=='{{ backup.backup_plan_name }}'] | [0]" --output json
   register: _backup_plan_info
 
+- name: Get restore testing plan info.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ backup.backup_plan_name | replace("-", "_") }}'] | [0]" --output json
+  register: _testing_plan_info
+
 - name: Gather AWS account ID if it isn't already set.
   amazon.aws.aws_caller_info:
     profile: "{{ _aws_profile }}"
