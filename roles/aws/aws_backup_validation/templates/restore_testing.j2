@@ -1,5 +1,5 @@
 {
-    "RestoreTestingPlanName":  "{{ _testing_plan_info.stdout | from_json | json_query("RestoreTestingPlanName") }}",
+    "RestoreTestingPlanName": "{{ _testing_plan_info.stdout | from_json | json_query("RestoreTestingPlanName") }}",
     "RestoreTestingSelection": {
         "IamRoleArn": "{{ _default_backup_role_arn.iam_roles[0].arn }}",
         "ProtectedResourceArns": [
@@ -10,7 +10,7 @@
             "securityGroupIds": "[\"{{ _main_subnets_info.subnets[0].subnet_id }}\"]",
             "IamInstanceProfileName": "UseBackedUpValue"
         },
-        "RestoreTestingSelectionName":  "{{ backup.selection_name | replace("-", "_") }}",
+        "RestoreTestingSelectionName": "{{ backup.selection_name | replace("-", "_") }}",
         "ValidationWindowHours": 1
     }
 }
