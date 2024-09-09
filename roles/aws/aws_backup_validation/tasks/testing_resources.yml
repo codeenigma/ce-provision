@@ -60,15 +60,6 @@
     dest: /tmp/restore_testing.json
   register: _restore_testing_query
 
-- name: get contents of a json file.
-  ansible.builtin.command: >
-    cat {{ _restore_testing_query.dest }}
-  register: _json_content
-
-- name: Print contents of a json file.
-  ansible.builtin.debug:
-    var: _json_content.stdout
-
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection --cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
