@@ -49,27 +49,27 @@
         to_port: 22
         cidr_ip: 0.0.0.0/0
 
-- name: Remove restore testing query file
+- name: Remove restore testing query file.
   ansible.builtin.file:
     path: /tmp/restore_testing.json
     state: absent
 
-- name: Create restore testing query file
+- name: Create restore testing query file.
   ansible.builtin.template:
     src: restore_testing.j2
     dest: /tmp/restore_testing.json
+  register: _restore_testing_query
 
-- name: Touch a file
-  ansible.builtin.file:
-    path: /tmp/test_file.conf
-    state: touch
-    mode: "0644"
-
-- name: Run command to create file in tmp folder
+- name: get contents of a json file.
   ansible.builtin.command: >
-    echo "This is test" >> /tmp/test_file
+    cat {{ _restore_testing_query.dest }}
+  register: _json_content
 
-#- name: Assign EC2 resource to AWS restore testing plan.
-#  ansible.builtin.command: >
-#    aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
-#  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
+- name: Print contents of a json file.
+  ansible.builtin.debug:
+    var: _json_content.stdout
+
+- name: Assign EC2 resource to AWS restore testing plan.
+  ansible.builtin.command: >
+    aws backup create-restore-testing-selection -cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
+  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0
