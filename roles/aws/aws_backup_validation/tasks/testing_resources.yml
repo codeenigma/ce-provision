@@ -1,0 +1,66 @@
+---
+- name: Get restore testing plan info.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ backup.backup_plan_name | replace("-", "_") }}'] | [0]" --output json
+  register: _testing_plan_info
+
+- name: Check if the restore testing selection exists.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-selections --restore-testing-plan-name {{ _testing_plan_info.stdout | from_json | json_query('RestoreTestingPlanName') }} --query "RestoreTestingSelections[?RestoreTestingSelectionName=='{{ backup.selection_name | replace('-', '_') }}'].RestoreTestingSelectionName" --output text --region {{ _aws_region }}
+  register: _testing_selection_exists
+  when: _testing_plan_info.stdout != "null"
+
+- name: Get default backup role arn
+  amazon.aws.iam_role_info:
+    name: AWSBackupDefaultServiceRole
+  register: _default_backup_role_arn
+
+- name: Get VPC info
+  amazon.aws.ec2_vpc_net_info:
+    region: "{{ _aws_region }}"
+    filters:
+      "tag:Name": "{{ aws_vpc.name }}"
+  register: _main_vpc_info
+
+- name: Get subnets info
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ _aws_region }}"
+    filters:
+      vpc-id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
+  register: _main_subnets_info
+
+- name: Create SG for restored instances.
+  amazon.aws.ec2_security_group:
+    name: Restore_testing
+    description: This SG is used to allow SSM and SSH access to the server
+    region: "{{ _aws_region }}"
+    vpc_id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: 0.0.0.0/0
+
+- name: Remove restore testing query file.
+  ansible.builtin.file:
+    path: /tmp/restore_testing.json
+    state: absent
+
+- name: Create restore testing query file.
+  ansible.builtin.template:
+    src: restore_testing.j2
+    dest: /tmp/restore_testing.json
+  register: _restore_testing_query
+
+- name: Assign EC2 resource to AWS restore testing plan.
+  ansible.builtin.command: >
+    aws backup create-restore-testing-selection --cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
+  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0

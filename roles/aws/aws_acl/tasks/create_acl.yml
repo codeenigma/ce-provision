@@ -26,45 +26,16 @@
     loop_var: _cc_set
 
 - name: Set rate limit variable.
+  ansible.builtin.include_tasks: rate_limit.yml
   when:
     - _acl.rules.rate_limit is defined
     - _acl.rules.rate_limit.value > 0
-  block:
-    - name: Set rate based statement from template
-      ansible.builtin.set_fact:
-        _rbs: "{{ lookup('ansible.builtin.template', './rate_limit.j2') | from_yaml }}"
-
-    - name: Define rate rule.
-      ansible.builtin.set_fact:
-        rate_rule:
-          name: Rate_limit
-          action:
-            block: {}
-          visibility_config:
-            sampled_requests_enabled: true
-            cloud_watch_metrics_enabled: true
-            metric_name: rate_limit
-          Statement:
-            rate_based_statement: "{{ _rbs }}"
-
-    - name: Set priority.
-      ansible.builtin.include_tasks: set_priority_dict.yml
-      vars:
-        _priority: "{{ _acl.rules.rate_limit.priority }}"
-
-    - name: Append priority to rule.
-      ansible.builtin.set_fact:
-        rate_rule: "{{ rate_rule | combine(_priority_dict) }}"
-
-    - name: Add rule to list.
-      ansible.builtin.set_fact:
-        _rules: "{{ _rules + [rate_rule] }}"
 
 - name: Create Bot Control rule.
   ansible.builtin.include_tasks: bot_control.yml
   when:
-    - _acl.rules.botControl is defined
-    - _acl.rules.botControl.enabled
+    - _acl.rules.bot_control is defined
+    - _acl.rules.bot_control.enabled
 
 - name: Create regular rules.
   ansible.builtin.include_tasks: regular_rule.yml
