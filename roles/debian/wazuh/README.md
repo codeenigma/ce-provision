@@ -10,6 +10,8 @@ Supports standalone managers, scaled out services and agent installation (defaul
 ## Default variables
 ```yaml
 ---
+wazuh_agent_sources_installation:
+  enabled: true
 wazuh:
   path: wazuh
   #roles_directory: "/path/to/roles" # defaults to /home/controller/.ansible/roles/wazuh-ansible
