@@ -40,16 +40,16 @@
         - name: passlib
 
 - name: Backup the whole NGINX config with vhosts.
-  ansible.builtin.command: "tar -czf /home/{{ ce_provision.username }}/nginx_backup.tar.gz /etc/nginx/"
+  ansible.builtin.command: "tar -czf {{ nginx.vhost_backup_location }}/nginx_backup.tar.gz /etc/nginx/"
 
 - name: Test NGINX configuration.
   ansible.builtin.command: nginx -t
-  register: nginx_test_result
+  register: _nginx_test_result
   failed_when: false
 
 - name: Display current NGINX config test result.
   ansible.builtin.debug:
-    msg: "{{ nginx_test_result.stderr }}"
+    msg: "{{ _nginx_test_result.stderr }}"
 
 - name: Copy main NGINX config.
   ansible.builtin.template:
@@ -152,27 +152,27 @@
 
 - name: Test NGINX configuration.
   ansible.builtin.command: nginx -t
-  register: nginx_test_result
+  register: _nginx_test_result
   failed_when: false
 
 - name: Display NGINX test result.
   ansible.builtin.debug:
-    msg: "{{ nginx_test_result.stderr }}"
+    msg: "{{ _nginx_test_result.stderr }}"
 
 - name: Ensure NGINX is restarted.
   ansible.builtin.service:
     name: nginx
     state: restarted
-  when: nginx_test_result.rc == 0
+  when: _nginx_test_result.rc == 0
 
 - name: Restore previous NGINX config from backup if test fails.
   ansible.builtin.unarchive:
-    src: /home/{{ ce_provision.username }}/nginx_backup.tar.gz
+    src: "{{ nginx.vhost_backup_location }}/nginx_backup.tar.gz"
     dest: /
     remote_src: true
-  when: nginx_test_result.rc != 0
+  when: _nginx_test_result.rc != 0
 
 - name: Fail the playbook after restore.
   ansible.builtin.fail:
     msg: "NGINX configuration test failed. Previous configuration was restored. You need to check it manually."
-  when: nginx_test_result.rc != 0
+  when: _nginx_test_result.rc != 0
