@@ -141,6 +141,7 @@ nginx:
   client_max_body_size: "700M"
   fastcgi_read_timeout: 60
   recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml.
+  vhost_backup_location: "/home/{{ _ce_provision_username }}" # see _init for _ce_provision_username
   overrides: [] # See the '_overrides' role.
   # Nginx ships a default vhost config that can clash with other services
   # running on port 80. Set this to false to remove it after Nginx installation.

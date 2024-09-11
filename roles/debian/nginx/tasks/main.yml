@@ -40,7 +40,7 @@
         - name: passlib
 
 - name: Backup the whole NGINX config with vhosts.
-  ansible.builtin.command: "tar -czf /home/{{ ce_provision.username }}/nginx_backup.tar.gz /etc/nginx/"
+  ansible.builtin.command: "tar -czf {{ nginx.vhost_backup_location }}/nginx_backup.tar.gz /etc/nginx/"
 
 - name: Test NGINX configuration.
   ansible.builtin.command: nginx -t
@@ -167,7 +167,7 @@
 
 - name: Restore previous NGINX config from backup if test fails.
   ansible.builtin.unarchive:
-    src: /home/{{ ce_provision.username }}/nginx_backup.tar.gz
+    src: "{{ nginx.vhost_backup_location }}/nginx_backup.tar.gz"
     dest: /
     remote_src: true
   when: _nginx_test_result.rc != 0
