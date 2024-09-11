@@ -538,7 +538,7 @@ slave-priority 100
 # output buffers (but this is not needed if the policy is 'noeviction').
 #
 # maxmemory <bytes>
-{% if redis.maxmemory > 0 %}
+{% if (redis.maxmemory | int) > 0 %}
 maxmemory {{ redis.maxmemory }}
 {% endif %}
 # MAXMEMORY POLICY: how Redis will select what to remove when maxmemory
