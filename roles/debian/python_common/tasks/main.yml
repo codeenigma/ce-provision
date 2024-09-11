@@ -4,9 +4,17 @@
     pkg: "{{ python_common.remove_packages }}"
     state: absent
   when: python_common.cleanup
+  retries: 3
+  delay: 10
+  until: result is succeeded
+  register: result
 
 - name: Ensure commonly required Python packages are installed.
   ansible.builtin.apt:
     pkg: "{{ python_common.install_packages }}"
     state: present
     update_cache: true
+  retries: 3
+  delay: 10
+  until: result is succeeded
+  register: result
