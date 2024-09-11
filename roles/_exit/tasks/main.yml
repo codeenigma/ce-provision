@@ -19,6 +19,36 @@
     autoremove: true
   become: true
 
+- name: Gather host details for motd.
+  ansible.builtin.shell: |
+    set -o pipefail && \
+    { echo "Static hostname: $(hostname)"; \
+      grep "^NAME=" /etc/os-release | awk -F= '{print "Operating System: " $2}'; \
+      uname -r | awk '{print "Kernel: " $1}'; \
+      lscpu | grep "Model name" | awk -F: '{gsub(/^[ \t]+|[ \t]+$/, "", $2); print "Hardware Model: " $2}'; }
+  args:
+    executable: /bin/bash
+  register: _host_details
+
+- name: Gather datetime details for motd.
+  ansible.builtin.shell: >
+    date
+  register: _last_build
+
+- name: Print inventory_hostname.
+  ansible.builtin.debug:
+    var: inventory_hostname
+
+- name: Generate motd with server info.
+  ansible.builtin.template:
+    src: motd.j2
+    dest: "/etc/motd"
+    mode: "0755"
+    owner: root
+    group: root
+  become: true
+  when: inventory_hostname != "localhost"
+
 - name: Delete the lock file.
   ansible.builtin.file:
     path: "{{ _init.lock_file }}"

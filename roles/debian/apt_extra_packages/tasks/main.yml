@@ -24,6 +24,10 @@
     pkg: "{{ apt_list | list }}"
     state: present
     update_cache: true
+  retries: 3
+  delay: 10
+  until: result is succeeded
+  register: result
   when: apt_list | length > 0
 
 - name: Ensure wget is installed.
