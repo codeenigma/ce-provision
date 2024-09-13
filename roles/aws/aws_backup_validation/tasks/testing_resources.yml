@@ -48,6 +48,7 @@
         from_port: 22
         to_port: 22
         cidr_ip: 0.0.0.0/0
+  register: _restore_testing_sg
 
 - name: Remove restore testing query file.
   ansible.builtin.file:
