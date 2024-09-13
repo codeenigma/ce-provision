@@ -7,7 +7,8 @@
         ],
         "ProtectedResourceType": "EC2",
         "RestoreMetadataOverrides": {
-            "securityGroupIds": "[\"{{ _main_subnets_info.subnets[0].subnet_id }}\"]",
+            "subnetId": "{{ _main_subnets_info.subnets[0].subnet_id }}"
+            "securityGroupIds": "[\"{{ _restore_testing_sg.group_id }}\"]",
             "IamInstanceProfileName": "UseBackedUpValue"
         },
         "RestoreTestingSelectionName": "{{ backup.selection_name | replace("-", "_") }}",
