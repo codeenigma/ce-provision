@@ -193,6 +193,7 @@ ce_provision:
       repo: https://github.com/vlcty/ansible-systemd-timers.git
       branch: master
   galaxy_custom_requirements_file: ""
+  galaxy_installation_path: "/home/{{ _ce_provision_username }}/.ansible/collections/ansible_collections"
   upgrade_galaxy:
     enabled: true
     command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"

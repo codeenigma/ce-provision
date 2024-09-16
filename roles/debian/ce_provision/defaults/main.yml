@@ -37,7 +37,9 @@ ce_provision:
       branch: master
   # File containing default roles and collections to install via Ansible Galaxy.
   # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
+  # Collections will be installed to $HOME/.ansible/collections for the provision user. This collections path should also be added to your ansible.cfg file.
   galaxy_custom_requirements_file: "/home/{{ _ce_provision_username }}/ce-provision/config/files/galaxy-requirements.yml"
+  galaxy_installation_path: "/home/{{ _ce_provision_username }}/.ansible/collections/ansible_collections"
   upgrade_galaxy:
     enabled: true
     command: "{{ _venv_path }}/bin/ansible-galaxy collection install --force" # _venv_path in the _init role - must match ce_provision.venv_path if overridden
