@@ -1,4 +1,5 @@
 # Common vars for local development.
+_ce_provision_username: "ce-dev"
 ce_provision:
   username: "ce-dev"
   own_repository: "https://github.com/codeenigma/ce-provision.git"

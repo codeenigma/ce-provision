@@ -136,7 +136,7 @@ echo "-------------------------------------------------"
 su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix --force"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy -p /home/$CONTROLLER_USER/.ansible/collections/ansible_collections collection install ansible.posix --force"
 if [ "$AWS_SUPPORT" = "true" ]; then
   su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
 fi
@@ -193,6 +193,7 @@ ce_provision:
       repo: https://github.com/vlcty/ansible-systemd-timers.git
       branch: master
   galaxy_custom_requirements_file: ""
+  galaxy_installation_path: "/home/{{ _ce_provision_username }}/.ansible/collections/ansible_collections"
   upgrade_galaxy:
     enabled: true
     command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"
