@@ -183,13 +183,13 @@
 
 - name: Install mandatory ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -p {{ ce_deploy.galaxy_installation_path }} -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
   become: true
   become_user: "{{ ce_deploy.username }}"
 
 - name: Install custom ansible-galaxy roles and collections.
   ansible.builtin.command:
-    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -p {{ ce_deploy.galaxy_installation_path }} -r {{ ce_deploy.galaxy_custom_requirements_file }} --force"
+    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.galaxy_custom_requirements_file }} --force"
   become: true
   become_user: "{{ ce_deploy.username }}"
   when: _ce_deploy_custom_galaxy_requirements.stat.exists
@@ -208,7 +208,7 @@
   vars:
     timers:
       upgrade_ce_deploy_ansible_galaxy_mandatory:
-        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -p {{ ce_deploy.galaxy_installation_path }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
+        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
         timer_user: "{{ ce_deploy.username }}"
         timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
   when: ce_deploy.upgrade_galaxy.enabled
@@ -219,7 +219,7 @@
   vars:
     timers:
       upgrade_ce_deploy_ansible_galaxy_custom:
-        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -p {{ ce_deploy.galaxy_installation_path }} -r  {{ ce_deploy.galaxy_custom_requirements_file }}"
+        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.galaxy_custom_requirements_file }}"
         timer_user: "{{ ce_deploy.username }}"
         timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
   when:
