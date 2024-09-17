@@ -3,6 +3,21 @@
   ansible.builtin.set_fact:
     swap_file: "/{{ swap.swap_space }}.swap"
 
+- name: Check if Swap directory exists.
+  ansible.builtin.stat:
+    path: "/var/swap"
+  register: swap_directory
+
+- name: Create Swap directory.
+  ansible.builtin.file:
+    path: /var/swap
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  when:
+    - not swap_directory.stat.exists
+
 - name: Check if swap file exists.
   ansible.builtin.stat:
     path: "{{ swap_file }}"
