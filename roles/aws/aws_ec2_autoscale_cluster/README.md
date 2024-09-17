@@ -290,11 +290,11 @@ aws_ec2_autoscale_cluster:
     create_cert: false
     create_distribution: false
     cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
-  # Add custom rules to http or https listener
+  # Add rules to http or https listener
   listeners_http:
     rules: []
-  # Example of a redirect rule
-  #    rules:
+  # Example of a domain redirect rule
+  #  rules:
   #    - Conditions:
   #        - Field: host-header
   #          Values:
