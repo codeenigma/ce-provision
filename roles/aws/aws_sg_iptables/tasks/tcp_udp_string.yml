@@ -1,0 +1,34 @@
+---
+- name: Set first part of iptables command
+  ansible.builtin.set_fact:
+    _iptables_string: "iptables -A {{ _iptabes_type }} -p {{ item.0.proto }}"
+
+- name: Set port on iptables command
+  ansible.builtin.set_fact:
+    _iptables_string: "{{ _iptables_string }} --dport {{ item.1 |  regex_replace('-', ':') }}"
+  when: item.1 is defined
+
+- name: Set outgoing IP on iptables command
+  ansible.builtin.set_fact:
+    _iptables_string: "{{ _iptables_string }} -d {{ item.0.cidr_ipv6 | default(item.0.cidr_ip) }}"
+  when: >
+    _iptabes_type == "OUTPUT" and
+    (item.0.cidr_ipv6 is defined or
+    item.0.cidr_ip is defined)
+
+- name: Set incoming IP on iptables command
+  ansible.builtin.set_fact:
+    _iptables_string: "{{ _iptables_string }} -s {{ item.0.cidr_ipv6 | default(item.0.cidr_ip) }}"
+  when: >
+    _iptabes_type == "INPUT" and
+    (item.0.cidr_ipv6 is defined or
+    item.0.cidr_ip is defined)
+
+- name: Add last part of command
+  ansible.builtin.set_fact:
+    _iptables_string: "{{ _iptables_string }} -j ACCEPT # {{ item.0.rule_desc }}"
+  when: item.1 is defined
+
+- name: Add string to list
+  ansible.builtin.set_fact:
+    _iptables_list: "{{ _iptables_list + [_iptables_string] }}"

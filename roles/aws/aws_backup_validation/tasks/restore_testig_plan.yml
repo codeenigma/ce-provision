@@ -1,0 +1,17 @@
+---
+- name: Check if the restore testing plan exists.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ plan.name | replace("-", "_") }}'] | [0]" --output json
+  register: _testing_plan_exists
+
+- name: Create restore testing plan if it doesn't exist.
+  ansible.builtin.command: >
+    aws backup create-restore-testing-plan --restore-testing-plan "RestoreTestingPlanName={{ plan.name | replace('-', '_') }},RecoveryPointSelection={Algorithm=LATEST_WITHIN_WINDOW,RecoveryPointTypes=[\"SNAPSHOT\"],IncludeVaults=[\"{{ _vault_info.stdout | from_json | json_query('BackupVaultArn') }}\"]},ScheduleExpression=\"cron(0 0 ? * SUN *)\"" --region {{ _aws_region }}
+  register: _testing_plan_created
+  when: _testing_plan_exists.stdout == "null"
+
+- name: Get info about newly created restore testing plan.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }} --query "RestoreTestingPlans[?RestoreTestingPlanName=='{{ plan.name | replace("-", "_") }}'] | [0]"
+  register: _testing_plan_created_info
+  when: _testing_plan_created is defined
