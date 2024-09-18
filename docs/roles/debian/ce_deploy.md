@@ -33,7 +33,6 @@ ce_deploy:
   # List of additional groups to add the user to.
   groups: []
   # File containing default roles and collections to install via Ansible Galaxy.
-  # Roles will be installed to ./galaxy/roles relative to the application root. This roles path should be added to your ansible.cfg file.
   galaxy_custom_requirements_file: "/home/{{ _ce_deploy.username }}/ce-deploy/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
