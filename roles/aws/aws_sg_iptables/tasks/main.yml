@@ -1,0 +1,98 @@
+---
+- name: Define iptables variables for incoming
+  ansible.builtin.set_fact:
+    _glob: "{{ aws_sg_iptables | selectattr('rules', 'defined') | map(attribute='rules') | flatten }}"
+    _iptables_list: []
+    _iptables_string: ""
+    _iptabes_type: "INPUT"
+
+- name: Set list of commands for tcp/udp in
+  include_tasks: tcp_udp_string.yml
+  loop: "{{ q('ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
+
+- name: Set list of commands for icmp in
+  include_tasks: icmp_string.yml
+  loop: "{{ _glob }}"
+  when: item.proto == "icmp"
+
+- name: Define iptables variables for outgoing
+  ansible.builtin.set_fact:
+    _glob: "{{ aws_sg_iptables | selectattr('rules_egress', 'defined') | map(attribute='rules_egress') | flatten }}"
+    _iptabes_type: "OUTPUT"
+
+- name: Set list of commands four tcp/udp out
+  include_tasks: tcp_udp_string.yml
+  loop: "{{ q('ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
+
+- name: Set list of commands for icmp in
+  include_tasks: icmp_string.yml
+  loop: "{{ _glob }}"
+  when: item.proto == "icmp"
+
+- name: Define bits of iptables command
+  ansible.builtin.set_fact:
+    _iptables_end:
+      - "iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT"
+      - "iptables -A OUTPUT -o lo -j ACCEPT"
+      - "iptables -A OUTPUT -p tcp --dport 1025:65535 -j DROP"
+      - "iptables -A OUTPUT -p udp --dport 1025:65535 -j DROP"
+
+- name: Override firewall_config var
+  ansible.builtin.set_fact:
+    firewall_config:
+      rulesets:
+        - override
+      override:
+        firewall_additional_rules: "{{ _iptables_list + _iptables_end }}"
+
+- name: Ensure Security groups are in place.
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    apply:
+      delegate_to: localhost
+      become: false
+  vars:
+    aws_vpc:
+      aws_profile: "{{ _aws_profile }}"
+      region: "{{ _aws_region }}"
+      name: "{{ _infra_name }}"
+      cidr_block: "{{ _aws_vpc_cidr_base }}.0.0/16"
+      ipv6_cidr: "{{ aws_sg_tables.ipv6_cidr | default(omit) }}"
+      tags: "{{ _aws_tags }}"
+      state: present
+      assign_instances_ipv6: false
+      security_groups: "{{ aws_sg_iptables }}"
+
+- name: Gather and override _security_groups var
+  ansible.builtin.set_fact:
+    _security_groups: "{{ aws_sg_iptables | selectattr('name') | map(attribute='name') | flatten }}"
+
+- name: Add SGs to EC2 Instance # Need to make the same change for AMI
+  ansible.builtin.include_role:
+    name: aws/aws_ec2_with_eip
+    apply:
+      delegate_to: localhost
+      become: false
+  vars:
+    aws_ec2_with_eip:
+      iam_role_name: "{{ _infra_name }}-{{ _env_type }}-ec2-basic"
+      aws_profile: "{{ _aws_profile }}"
+      region: "{{ _aws_region }}"
+      hostname: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+      instance_type: "{{ _instance_type }}"
+      key_name: "{{ aws_provision_ec2_keypair.key_name }}"
+      ami_owner: self
+      vpc_name: "{{ _infra_name }}"
+      vpc_subnet_profile: core
+      vpc_subnet_id: "{{ _subnet | default('') }}"
+      instance_name: "{{ _aws_resource_name }}"
+      ami_name: "{{ _aws_resource_name }}"
+      root_volume_size: "{{ _ebs_root_volume_size }}"
+      tags:
+      security_groups: "{{ _security_groups }}"
+      autorecover: true
+      backup: "{{ _infra_name }}-{{ _env_type }}"
+
+- name: Include firewall role
+  ansible.builtin.include_role:
+    name: debian/firewall_config
