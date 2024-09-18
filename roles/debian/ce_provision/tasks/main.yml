@@ -219,44 +219,29 @@
     content: "PATH=$PATH:{{ _venv_path }}/bin"
     force: true
 
-- name: Check if ansible-galaxy custom requirements file exists.
-  ansible.builtin.stat:
-    path: "{{ ce_provision.galaxy_custom_requirements_file }}"
-  register: _ce_provision_custom_galaxy_requirements
-
-- name: Install mandatory ansible-galaxy roles and collections.
-  ansible.builtin.command:
-    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml --force-with-deps"
-  become: true
-  become_user: "{{ ce_provision.username }}"
-
-- name: Install custom ansible-galaxy roles and collections.
-  ansible.builtin.command:
-    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_provision.galaxy_custom_requirements_file }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
-  when: _ce_provision_custom_galaxy_requirements.stat.exists
-
-- name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
-  ansible.builtin.include_role:
-    name: contrib/systemd_timers
-  vars:
-    timers:
-      upgrade_ce_provision_ansible_galaxy_mandatory:
-        timer_command: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
-        timer_user: "{{ ce_provision.username }}"
-        timer_OnCalendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
+- name: Create systemd timers.
   when: ce_provision.upgrade_galaxy.enabled
+  block:
+    - name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
+      ansible.builtin.include_role:
+        name: debian/ansible_galaxy
+      vars:
+        username: "{{ ce_provision.username }}"
+        extra_params: --force
+        galaxy_requirements_file: "{{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+        upgrade_galaxy:
+          enabled: true
+          name: ce_provision_mandatory
+          on_calendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
 
-- name: Create systemd timer to upgrade custom ansible-galaxy collections.
-  ansible.builtin.include_role:
-    name: contrib/systemd_timers
-  vars:
-    timers:
-      upgrade_ce_provision_ansible_galaxy_custom:
-        timer_command: "{{ ce_provision.upgrade_galaxy.command }} -r {{ ce_provision.galaxy_custom_requirements_file }}"
-        timer_user: "{{ ce_provision.username }}"
-        timer_OnCalendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
-  when:
-    - _ce_provision_custom_galaxy_requirements.stat.exists
-    - ce_provision.upgrade_galaxy.enabled
+    - name: Create systemd timer to upgrade custom ansible-galaxy collections.
+      ansible.builtin.include_role:
+        name: debian/ansible_galaxy
+      vars:
+        username: "{{ ce_provision.username }}"
+        extra_params: --force
+        galaxy_requirements_file: "{{ ce_provision.galaxy_custom_requirements_file }}"
+        upgrade_galaxy:
+          enabled: true
+          name: ce_provision_custom
+          on_calendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"

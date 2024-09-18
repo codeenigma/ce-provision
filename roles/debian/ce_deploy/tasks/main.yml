@@ -168,60 +168,29 @@
     content: "PATH=$PATH:{{ _venv_path }}/bin"
     force: true
 
-- name: Check if ansible-galaxy custom requirements file exists.
-  ansible.builtin.stat:
-    path: "{{ ce_deploy.galaxy_custom_requirements_file }}"
-  register: _ce_deploy_custom_galaxy_requirements
-
-- name: Copy mandatory ansible-galaxy requirements file to deploy server.
-  ansible.builtin.copy:
-    src: "{{ ce_deploy.ce_provision_dir }}/roles/debian/ce_deploy/meta/requirements-{{ ansible_distribution_major_version }}.yml"
-    dest: "{{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
-    owner: "{{ ce_deploy.username }}"
-    group: "{{ ce_deploy.username }}"
-    mode: '0644'
-
-- name: Install mandatory ansible-galaxy roles and collections.
-  ansible.builtin.command:
-    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml --force"
-  become: true
-  become_user: "{{ ce_deploy.username }}"
-
-- name: Install custom ansible-galaxy roles and collections.
-  ansible.builtin.command:
-    cmd: "{{ _venv_path }}/bin/ansible-galaxy install -r {{ ce_deploy.galaxy_custom_requirements_file }} --force"
-  become: true
-  become_user: "{{ ce_deploy.username }}"
-  when: _ce_deploy_custom_galaxy_requirements.stat.exists
-
-- name: Ensure Ansible venv permissions.
-  ansible.builtin.file:
-    path: "{{ _venv_path }}"
-    state: directory
-    recurse: true
-    owner: "{{ ce_deploy.username }}"
-    group: "{{ ce_deploy.username }}"
-
-- name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
-  ansible.builtin.include_role:
-    name: contrib/systemd_timers
-  vars:
-    timers:
-      upgrade_ce_deploy_ansible_galaxy_mandatory:
-        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
-        timer_user: "{{ ce_deploy.username }}"
-        timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
+- name: Create systemd timers.
   when: ce_deploy.upgrade_galaxy.enabled
+  block:
+    - name: Create systemd timer to upgrade mandatory ansible-galaxy collections.
+      ansible.builtin.include_role:
+        name: debian/ansible_galaxy
+      vars:
+        username: "{{ ce_deploy.username }}"
+        extra_params: --force
+        galaxy_requirements_file: "{{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
+        upgrade_galaxy:
+          enabled: true
+          name: ce_deploy_mandatory
+          on_calendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
 
-- name: Create systemd timer to upgrade custom ansible-galaxy collections.
-  ansible.builtin.include_role:
-    name: contrib/systemd_timers
-  vars:
-    timers:
-      upgrade_ce_deploy_ansible_galaxy_custom:
-        timer_command: "{{ ce_deploy.upgrade_galaxy.command }} -r  {{ ce_deploy.galaxy_custom_requirements_file }}"
-        timer_user: "{{ ce_deploy.username }}"
-        timer_OnCalendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
-  when:
-    - _ce_deploy_custom_galaxy_requirements.stat.exists
-    - ce_deploy.upgrade_galaxy.enabled
+    - name: Create systemd timer to upgrade custom ansible-galaxy collections.
+      ansible.builtin.include_role:
+        name: debian/ansible_galaxy
+      vars:
+        username: "{{ ce_deploy.username }}"
+        extra_params: --force
+        galaxy_requirements_file: "{{ ce_deploy.galaxy_custom_requirements_file }}"
+        upgrade_galaxy:
+          enabled: true
+          name: ce_deploy_custom
+          on_calendar: "{{ ce_deploy.upgrade_galaxy.on_calendar }}"
