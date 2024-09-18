@@ -45,7 +45,6 @@ ce_provision:
       repo: https://github.com/vlcty/ansible-systemd-timers.git
       branch: master
   # File containing default roles and collections to install via Ansible Galaxy.
-  # Roles will be installed to ./galaxy/roles relative to the application root. This roles path should be added to your ansible.cfg file.
   galaxy_custom_requirements_file: "/home/{{ _ce_provision_username }}/ce-provision/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
