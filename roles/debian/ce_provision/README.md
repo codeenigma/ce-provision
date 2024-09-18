@@ -11,7 +11,7 @@ Installs Code Enigma's infrastructure management stack on a server. Note, the `_
 # See roles/_init/defaults/main.yml for Ansible installation, controller user creation and extra variables repo settings.
 ce_provision:
   # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
-  #venv_path: "/home/{{ _ce_provision_username }}/ansible"
+  #venv_path: "/home/{{ _ce_provision_username }}/ce-python"
   #venv_command: /usr/bin/python3 -m venv
   #venv_install_username: "{{ _ce_provision_username }}"
   #upgrade_timer_name: upgrade_ce_provision_ansible
@@ -45,11 +45,10 @@ ce_provision:
       repo: https://github.com/vlcty/ansible-systemd-timers.git
       branch: master
   # File containing default roles and collections to install via Ansible Galaxy.
-  # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
+  # Roles will be installed to ./galaxy/roles relative to the application root. This roles path should be added to your ansible.cfg file.
   galaxy_custom_requirements_file: "/home/{{ _ce_provision_username }}/ce-provision/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "{{ _venv_path }}/bin/ansible-galaxy collection install --force" # _venv_path in the _init role - must match ce_provision.venv_path if overridden
     on_calendar: "Mon *-*-* 04:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
 
 ```
