@@ -1,0 +1,48 @@
+---
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ansible_galaxy.venv_path }}"
+  when: ansible_galaxy.venv_path is defined
+
+- name: Check if ansible-galaxy requirements file exists.
+  ansible.builtin.stat:
+    path: "{{ ansible_galaxy.galaxy_requirements_file }}"
+  register: _galaxy_requirements
+
+- name: Install ansible-galaxy roles and/or collections.
+  when: _galaxy_requirements.stat.exists
+  block:
+    - name: Set up the ansible-galaxy command.
+      ansible.builtin.set_fact:
+        _galaxy_command: "install -r {{ ansible_galaxy.galaxy_requirements_file }}"
+
+    - name: Add any extra parameters to the ansible-galaxy command.
+      ansible.builtin.set_fact:
+        _galaxy_command: "{{ _galaxy_command }} {{ ansible_galaxy.extra_params }}"
+      when: ansible_galaxy.extra_params | length > 0
+
+    - name: Install ansible-galaxy roles and/or collections.
+      ansible.builtin.command:
+        cmd: "{{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}"
+      become: true
+      become_user: "{{ ansible_galaxy.username }}"
+
+- name: Install systemd timers to upgrade ansible-galaxy roles and/or collections.
+  when:
+    - ansible_galaxy.upgrade_galaxy.enabled
+    - _galaxy_requirements.stat.exists
+  block:
+    - name: Build timers variable.
+      ansible.builtin.set_fact:
+        _galaxy_upgrade_timer: "{'{{ ansible_galaxy.upgrade_galaxy.name }}_ansible_galaxy_upgrades': { timer_command: '{{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}', timer_OnCalendar: '{{ ansible_galaxy.upgrade_galaxy.on_calendar }}' }}"
+
+    - name: Turn the timer string into a dictionary.
+      ansible.builtin.set_fact:
+        _galaxy_upgrade_timer: "{{ _galaxy_upgrade_timer.splitlines() | map('from_yaml') | list }}"
+
+    - name: Set up a systemd timer to upgrade ansible-galaxy roles and/or collections.
+      ansible.builtin.include_role:
+        name: contrib/systemd_timers
+      vars:
+        timers: "{{ _galaxy_upgrade_timer }}"

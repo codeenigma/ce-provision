@@ -13,7 +13,7 @@ Be sure to match the `count` variable to the `size` variable, the `count` variab
 swap:
   count: 4096
   size: "4G"
-  swap_space: swapfile
+  swap_space: /var/swap/swapfile
 
 ```
 
