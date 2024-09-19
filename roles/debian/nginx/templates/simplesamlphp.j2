@@ -1,3 +1,5 @@
+### {{ ansible_managed }}
+
 location / {
   try_files $uri /index.php$is_args$args;
 }
@@ -12,3 +14,6 @@ location ~ \.php(/|$) {
   #fastcgi_param SIMPLESAMLPHP_CONFIG_DIR "";
   fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;
