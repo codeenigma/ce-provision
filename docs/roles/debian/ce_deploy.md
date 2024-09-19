@@ -12,7 +12,7 @@ _ce_deploy:
 
 ce_deploy:
   # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
-  #venv_path: "/home/{{ _ce_deploy.username }}/ansible"
+  #venv_path: "/home/{{ _ce_deploy.username }}/ce-python"
   #venv_command: /usr/bin/python3 -m venv
   #venv_install_username: "{{ _ce_deploy.username }}"
   #upgrade_timer_name: upgrade_ce_deploy_ansible
@@ -33,11 +33,9 @@ ce_deploy:
   # List of additional groups to add the user to.
   groups: []
   # File containing default roles and collections to install via Ansible Galaxy.
-  # Roles will be installed to $HOME/.ansible/roles for the provision user. This roles path should be added to your ansible.cfg file.
   galaxy_custom_requirements_file: "/home/{{ _ce_deploy.username }}/ce-deploy/config/files/galaxy-requirements.yml"
   upgrade_galaxy:
     enabled: true
-    command: "{{ _venv_path }}/bin/ansible-galaxy collection install --force" # _venv_path in the _init role - must match ce_deploy.venv_path if overridden
     on_calendar: "Mon *-*-* 01:00:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
 
 ```

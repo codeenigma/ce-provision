@@ -17,3 +17,4 @@
 /roles/ce_provision
 !/roles/contrib/README.md
 /docs/roles/contrib/*
+/galaxy
