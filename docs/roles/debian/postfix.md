@@ -22,7 +22,7 @@ postfix:
   networks: "[::1]/128 [::ffff:127.0.0.0]/104 127.0.0.0/8"
   protocols: all
   relayhost: ""
-  transport_maps:
+  transport_maps: # see Postfix manual examples - https://www.postfix.org/transport.5.html
     - "* discard :"
   use_dkim: false
   # AWS SES config - to authenticate with an IAM user see https://docs.aws.amazon.com/ses/latest/dg/smtp-credentials.html
