@@ -17,6 +17,7 @@ clamav:
       name: clamscan_daily
       exclude_directories:
         - /sys/
+        - /var/swap/
       scan_location: /
       log_name: clamav_daily.log
   # scheduled scans, set to an empty list for no timers
