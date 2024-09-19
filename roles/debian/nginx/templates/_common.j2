@@ -1,5 +1,8 @@
 ### {{ ansible_managed }}
 
+# Because Drupal 10.1 onwards sets X-Content-Type-Options in PHP, that header is no longer set here.
+# See project type templates.
+
 gzip on;
 gzip_proxied any;
 gzip_static on;
@@ -20,5 +23,3 @@ client_body_buffer_size {{ nginx.http.client_body_buffer_size }};
 fastcgi_buffer_size     {{ nginx.http.fastcgi_buffer_size }} ;
 fastcgi_buffers         {{ nginx.http.fastcgi_buffers }} ;
 client_max_body_size    {{ nginx.client_max_body_size }} ;
-# Disable content sniffing, since it's an attack vector.
-add_header X-Content-Type-Options nosniff;
