@@ -1,3 +1,5 @@
+### {{ ansible_managed }}
+
 location / {
     try_files $uri /index.php$is_args$args;
 }
@@ -10,3 +12,6 @@ location ~ \.php(/|$) {
   fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
   fastcgi_param DOCUMENT_ROOT $realpath_root;
 }
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;
