@@ -223,22 +223,24 @@
   ansible.builtin.include_role:
     name: debian/ansible_galaxy
   vars:
-    username: "{{ ce_provision.username }}"
-    extra_params: --force
-    galaxy_requirements_file: "{{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
-    upgrade_galaxy:
-      enabled: "{{ ce_provision.upgrade_galaxy.enabled }}"
-      name: ce_provision_mandatory
-      on_calendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
+    ansible_galaxy:
+      username: "{{ ce_provision.username }}"
+      extra_params: --force
+      galaxy_requirements_file: "{{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+      upgrade_galaxy:
+        enabled: "{{ ce_provision.upgrade_galaxy.enabled }}"
+        name: ce_provision_mandatory
+        on_calendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
 
 - name: Install custom ansible-galaxy collections.
   ansible.builtin.include_role:
     name: debian/ansible_galaxy
   vars:
-    username: "{{ ce_provision.username }}"
-    extra_params: --force
-    galaxy_requirements_file: "{{ ce_provision.galaxy_custom_requirements_file }}"
-    upgrade_galaxy:
-      enabled: "{{ ce_provision.upgrade_galaxy.enabled }}"
-      name: ce_provision_custom
-      on_calendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
+    ansible_galaxy:
+      username: "{{ ce_provision.username }}"
+      extra_params: --force
+      galaxy_requirements_file: "{{ ce_provision.galaxy_custom_requirements_file }}"
+      upgrade_galaxy:
+        enabled: "{{ ce_provision.upgrade_galaxy.enabled }}"
+        name: ce_provision_custom
+        on_calendar: "{{ ce_provision.upgrade_galaxy.on_calendar }}"
