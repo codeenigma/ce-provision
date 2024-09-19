@@ -1,6 +1,6 @@
 {{ ansible_hostname }} :
 {% for transport in postfix.transport_maps %}
 {% if transport|length %}
-{{ transport }} :
+{{ transport }}
 {% endif %}
 {% endfor %}
