@@ -1,6 +1,7 @@
 ### {{ ansible_managed }}
 
 ######### Default block.
+# Drupal 10.1 onwards sets X-Content-Type-Options in PHP, see: https://www.drupal.org/node/3334163
 
 # Generic rewrite rule.
 location @rewrite {

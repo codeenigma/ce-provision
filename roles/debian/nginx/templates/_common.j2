@@ -1,7 +1,7 @@
 ### {{ ansible_managed }}
 
-# Because Drupal 10.1 onwards sets X-Content-Type-Options in PHP, that header is no longer set here.
-# See project type templates.
+# Drupal 10.1 onwards sets X-Content-Type-Options in PHP, see: https://www.drupal.org/node/3334163
+# Consequently that header is no longer set here, it has been moved to project type templates as necessary.
 
 gzip on;
 gzip_proxied any;
