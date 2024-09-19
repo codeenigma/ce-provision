@@ -1,4 +1,5 @@
 ### {{ ansible_managed }}
+
 ######### Default block.
 
 # Generic rewrite rule.
@@ -9,13 +10,13 @@ location @rewrite {
 #  PHP fastcgi pass.
 location @phpprocess {
     include fastcgi_params;
-    fastcgi_split_path_info ^(.+\.php)(/.+)$;    
+    fastcgi_split_path_info ^(.+\.php)(/.+)$;
     fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
     fastcgi_param DOCUMENT_ROOT $realpath_root;
     fastcgi_pass {{ nginx.php_fastcgi_backend }};
 }
 
-# Rewrite any request not allowed below, 
+# Rewrite any request not allowed below,
 # so they get processed through the app level (and 404).
 location / {
     try_files @rewrite @rewrite;
@@ -74,3 +75,6 @@ location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|eot|woff2|ttf)$ {
 location = /robots.txt {
     try_files $uri @rewrite;
 }
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;

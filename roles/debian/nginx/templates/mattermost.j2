@@ -1,3 +1,5 @@
+### {{ ansible_managed }}
+
 ## SSL
 ssl_session_timeout 1d;
 # Enable TLS versions (TLSv1.3 is required upcoming HTTP/3 QUIC).
@@ -52,3 +54,6 @@ location / {
   proxy_http_version 1.1;
   proxy_pass http://mattermost;
 }
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;

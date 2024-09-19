@@ -1,3 +1,5 @@
+### {{ ansible_managed }}
+
 ######### Default block.
 
 # Generic rewrite rule.
@@ -6,3 +8,6 @@ location @rewrite {
 }
 
 include "/etc/nginx/conf.d/drupal_common";
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;
