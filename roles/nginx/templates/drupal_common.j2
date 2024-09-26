@@ -116,11 +116,11 @@ location /autodiscover/autodiscover.xml {
 }
 
 # Deny listed requests for security reasons.
-# location ~* (?:delete.+from|insert.+into|select.+from|union.+select|onload|\.php.+src|system\(.+|document\.cookie|\;|\.\.) {
-#   return 403;
-# }
+location ~* (?:delete.+from|insert.+into|select.+from|union.+select|onload|\.php.+src|system\(.+|document\.cookie|\;|\.\.) {
+  return 403;
+}
 
 # Deny listed requests for security reasons.
-# location ~* (/\..*|settings\.php$|settings\.php\..*$|web\.config|composer\..*|\.(?:git|htaccess|engine|inc|info|install|module|profile|pl|po|sh|.*sql|theme|tpl(?:\.php)?|xtmpl)$|^(?:Entries.*|Repository|Root|Tag|Template))$ {
-#   return 403;
-#}
+location ~* (/\..*|settings\.php$|settings\.php\..*$|web\.config|composer\..*|\.(?:git|htaccess|engine|inc|info|install|module|profile|pl|po|sh|.*sql|theme|tpl(?:\.php)?|xtmpl)$|^(?:Entries.*|Repository|Root|Tag|Template))$ {
+  return 403;
+}
