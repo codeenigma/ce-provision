@@ -113,7 +113,7 @@ def lambda_handler(event, context):
       'Data': 'Lambda Backup validation: ' + mail_title,
     },
   },
-#  Source='Lambda Backup Validation <lambda@{{ _verified_domain }}>',
+  # Need to replace "codeenigma.net" with _verified_domain variable
   Source='Lambda Backup Validation <lambda@codeenigma.net>',
   )
 
