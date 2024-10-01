@@ -61,12 +61,12 @@
     dest: /tmp/restore_testing.json
   register: _restore_testing_query
 
-#- name: Check if protected reource exist
-#  ansible.builtin.command: >
-#    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']"
-#  register: _protected_res
+- name: Check if protected reource exist
+  ansible.builtin.command: >
+    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']"
+  register: _protected_res
 
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection --cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
-  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0 # and _protected_res.stdout | length == 0
+  when: _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0 and _protected_res.stdout | length == 0
