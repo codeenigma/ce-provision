@@ -57,17 +57,17 @@
 
 - name: Construct AWS instance type.
   vars:
-    _instance_type:
+    instance_type:
       instance: "EC2"
       file-system: "EFS"
       db: "RDS"
   ansible.builtin.set_fact:
-    _instance_type_restore: "{{ _instance_type[backup.resource_type] }}"
+    _instance_type_restore: "{{ instance_type[backup.resource_type] }}"
   when: backup.resource_type != 'file-system'
 
 - name: Print previous variable
   ansible.builtin.debug:
-    var: _instance_type
+    var: instance_type
 
 - name: Print previous variable
   ansible.builtin.debug:
