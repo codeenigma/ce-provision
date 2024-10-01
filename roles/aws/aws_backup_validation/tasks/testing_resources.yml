@@ -89,6 +89,15 @@
   ansible.builtin.debug:
     var: _protected_res
 
+- name: Check if protected reource exist
+  ansible.builtin.command: >
+    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
+  register: _protected_res
+
+- name: Print previous variable
+  ansible.builtin.debug:
+    var: _protected_res
+
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection --cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
