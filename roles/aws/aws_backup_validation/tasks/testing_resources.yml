@@ -72,11 +72,7 @@
 
 - name: Check if protected reource exist
   ansible.builtin.command: >
-<<<<<<< HEAD
-    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']"
-=======
-    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
->>>>>>> Adding-when-statement-for-assigning-instance
+      aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
   register: _protected_res
 
 - name: Print previous variable
