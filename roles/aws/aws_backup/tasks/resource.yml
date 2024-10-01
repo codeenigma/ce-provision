@@ -69,4 +69,3 @@
   ansible.builtin.include_role:
     name: aws/aws_backup_validation
     tasks_from: testing_resources
-
