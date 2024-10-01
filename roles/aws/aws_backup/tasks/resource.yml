@@ -69,4 +69,4 @@
   ansible.builtin.include_role:
     name: aws/aws_backup_validation
     tasks_from: testing_resources
-  when: _selection_exists.stdout | length == 0
+#  when: _selection_exists.stdout | length == 0
