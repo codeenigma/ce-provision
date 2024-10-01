@@ -63,7 +63,11 @@
 
 - name: Check if protected reource exist
   ansible.builtin.command: >
+<<<<<<< HEAD
     aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']"
+=======
+    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
+>>>>>>> Adding-when-statement-for-assigning-instance
   register: _protected_res
 
 - name: Assign EC2 resource to AWS restore testing plan.
