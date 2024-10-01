@@ -55,6 +55,15 @@
     path: /tmp/restore_testing.json
     state: absent
 
+- name: Construct AWS instance type.
+  vars:
+    _instance_type:
+      instance: "EC2"
+      file-system: "EFS"
+      db: "RDS"
+  ansible.builtin.set_fact:
+    _instance_type_restore: "{{ _instance_type[backup.resource_type] }}"
+
 - name: Create restore testing query file.
   ansible.builtin.template:
     src: restore_testing.j2
