@@ -57,17 +57,17 @@
 
 - name: Construct AWS instance type.
   vars:
-    _instance_type:
+    instance_type:
       instance: "EC2"
       file-system: "EFS"
       db: "RDS"
   ansible.builtin.set_fact:
-    _instance_type_restore: "{{ _instance_type[backup.resource_type] }}"
+    _instance_type_restore: "{{ instance_type[backup.resource_type] }}"
   when: backup.resource_type != 'file-system'
 
 - name: Print previous variable
   ansible.builtin.debug:
-    var: _instance_type
+    var: instance_type
 
 - name: Print previous variable
   ansible.builtin.debug:
@@ -79,15 +79,6 @@
     dest: /tmp/restore_testing.json
   register: _restore_testing_query
   when: _instance_type_restore is defined
-
-- name: Check if protected reource exist
-  ansible.builtin.command: >
-    aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
-  register: _protected_res
-
-- name: Print previous variable
-  ansible.builtin.debug:
-    var: _protected_res
 
 - name: Check if protected reource exist
   ansible.builtin.command: >
