@@ -1,0 +1,18 @@
+#!/home/controller/ansible/bin/python3
+import boto3
+import sys
+from botocore.exceptions import NoCredentialsError
+
+def get_account_id():
+    try:
+        session = boto3.Session()
+        sts_client = session.client('sts')
+        response = sts_client.get_caller_identity()
+        return response['Account']
+    except NoCredentialsError:
+        print("Could not find AWS credentials.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    account_id = get_account_id()
+    print(account_id)
