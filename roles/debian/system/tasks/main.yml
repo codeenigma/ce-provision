@@ -10,3 +10,102 @@
     name: net.ipv6.conf.all.disable_ipv6
     value: "1"
   when: system.noipv6
+
+- name: Identify Hetzner Cloud vServer.
+  ansible.builtin.command:
+    cmd: if [[ `dmidecode | awk '/System Information/{getline;print;getline;print}' | sed 's/[^,:]*://g' | sed 's/^ //g' | tr '\n' ' '` =~ "Hetzner vServer" ]]; then echo "The is a Hetzner Cloud server"; fi
+  register: ishetznercloud
+  when:
+    - system.nohetznerdhcp
+
+- name: Install dhcpcd.
+  ansible.builtin.apt:
+    pkg: dhcpcd5
+    state: present
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Get default NIC.
+  ansible.builtin.command:
+    cmd: ifacecol=`route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}'` && route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}'
+  register: dhcpdefaultnic
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Get IP from DHCP server.
+  ansible.builtin.command:
+    cmd: dhcpcd -T $(ifacecol=`route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}'` && route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}') 2>&1 | grep -oP 'new_ip_address=\K\S+' | sed "s/'//g"
+  register: dhcpipaddressoffer
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Get Netmask from DHCP server.
+  ansible.builtin.command:
+    cmd: dhcpcd -T $(ifacecol=`route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}'` && route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}') 2>&1 | grep -oP 'new_subnet_mask=\K\S+' | sed "s/'//g"
+  register: dhcpnetmaskoffer
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Get GATEWAY from DHCP server.
+  ansible.builtin.command:
+    cmd: dhcpcd -T $(ifacecol=`route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}'` && route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}') 2>&1 | grep -oP 'new_routers=\K\S+' | sed "s/'//g"
+  register: dhcpgatewayoffer
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Get DNS servers from DHCP server.
+  ansible.builtin.command:
+    cmd: dhcpcd -T $(ifacecol=`route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}'` && route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}') 2>&1 | grep -P 'new_domain_name_servers=\K\S+' | sed "s/new_domain_name_servers=//g" | sed "s/'//g"
+  register: dhcpnameserversoffer
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Copy No-DHCP Network Interfaces config.
+  ansible.builtin.template:
+    src: "interfaces-nohetznerdhcp.j2"
+    dest: "/etc/network/interfaces"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Delete Cloud Init script.
+  ansible.builtin.file:
+    path: /etc/network/interfaces.d/50-cloud-init
+    state: absent
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Copy No-DHCP Network Interfaces include config.
+  ansible.builtin.template:
+    src: "50-static-init.j2"
+    dest: "/etc/network/interfaces.d/50-static-init"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
+
+- name: Copy disable cloud init config.
+  ansible.builtin.template:
+    src: "99-disable-network-config.cfg.j2"
+    dest: "/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  when:
+    - system.nohetznerdhcp
+    - system.ishetznercloud
