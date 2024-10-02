@@ -1,0 +1,36 @@
+---
+- name: "Ensure {{ _ses_domain }} domain identity exists"
+  community.aws.ses_identity:
+    profile: "{{ _aws_profile }}"
+    identity: "{{ _ses_domain }}"
+    state: present
+    region: "{{ _aws_region}}"
+
+- name: Gather AWS account ID if it isn't already set.
+  amazon.aws.aws_caller_info:
+    profile: "{{ _aws_profile }}"
+  delegate_to: localhost
+  register: aws_account_id
+
+- name: Add sending authorization policy to domain identity
+  community.aws.ses_identity_policy:
+    identity: "{{ _ses_domain }}"
+    policy_name: AWSses
+    policy: "{{ lookup('template', 'ses.json.j2') }}"
+    state: present
+    region: "{{ _aws_region }}"
+
+- name: Fetch SES domain CNAME
+  ansible.builtin.command: "aws ses verify-domain-dkim --domain {{ _ses_domain }} --region {{ _aws_region }}"
+  register: ses_dkim_attributes
+
+- name: Add a DNS records in Route 53 for validation.
+  amazon.aws.route53:
+    state: present
+    zone: "{{ _ses_domain }}"
+    record: "{{ item }}._domainkey.{{ _ses_domain }}"
+    profile: "core"
+    type: CNAME
+    ttl: 300
+    value: "{{ item }}.dkim.amazonses.com"
+  loop: "{{ ses_dkim_attributes.stdout | from_json | json_query('DkimTokens') }}"
