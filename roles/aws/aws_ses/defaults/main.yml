@@ -1,2 +1,2 @@
 _ses_domain: codeenigma.uk
-region: "{{ _aws_region}}"
+region: "{{ _aws_region }}"
