@@ -69,7 +69,7 @@
 
 - name: Create restore testing query file.
   ansible.builtin.template:
-    src: restore_testing.j2
+    src: "{{ _instance_type_restore }}_restore_testing.j2"
     dest: /tmp/restore_testing.json
   register: _restore_testing_query
   when: _instance_type_restore is defined
