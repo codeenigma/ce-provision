@@ -7,7 +7,8 @@
         ],
         "ProtectedResourceType": "{{ _instance_type_restore }}",
         "RestoreMetadataOverrides": {
-            "vpcSecurityGroupIds": "[\"{{ _restore_testing_sg.group_id }}\"]"
+            "vpcSecurityGroupIds": "[\"{{ _restore_testing_sg.group_id }}\"]",
+            "dbsubnetgroupname": "{{ aws_vpc.name }}"
         },
         "RestoreTestingSelectionName": "{{ backup.selection_name | replace("-", "_") }}",
         "ValidationWindowHours": 1
