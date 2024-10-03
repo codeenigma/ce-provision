@@ -65,6 +65,7 @@
 - name: Set instance type for template.
   ansible.builtin.set_fact:
     _instance_type_restore: "{{ instance_type[backup.resource_type] }}"
+  when: backup.resource_type != 'file-system'
 
 - name: Create restore testing query file.
   ansible.builtin.template:
