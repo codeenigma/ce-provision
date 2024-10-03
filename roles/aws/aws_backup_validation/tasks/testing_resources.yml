@@ -55,15 +55,25 @@
     path: /tmp/restore_testing.json
     state: absent
 
-- name: Construct AWS instance type.
-  vars:
+#- name: Construct AWS instance type.
+#  vars:
+#    instance_type:
+#      instance: "EC2"
+#      file-system: "EFS"
+#      db: "RDS"
+#  ansible.builtin.set_fact:
+#    _instance_type_restore: "{{ instance_type[backup.resource_type] }}"
+
+- name: Construct AWS instance type dict.
+  ansible.builtin.set_fact:
     instance_type:
       instance: "EC2"
       file-system: "EFS"
       db: "RDS"
+
+- name: Set instance type for template.
   ansible.builtin.set_fact:
     _instance_type_restore: "{{ instance_type[backup.resource_type] }}"
-  when: backup.resource_type != 'file-system'
 
 - name: Print previous variable
   ansible.builtin.debug:

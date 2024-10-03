@@ -31,7 +31,7 @@
                   "{{ aws_account_id.account }}"
                 ]
             },
-            "Resource": "arn:aws:ses:{{ _aws_region }}:{{ aws_account_id.account }}:identity/{{ _aws_profile }}.codeenigma.uk"
+            "Resource": "arn:aws:ses:{{ _aws_region }}:{{ aws_account_id.account }}:identity/{{ _ses_domain }}"
         }
     ]
 }

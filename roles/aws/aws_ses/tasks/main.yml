@@ -1,10 +1,10 @@
 ---
-- name: "Ensure {{ _aws_profile }}.codeenigma.uk domain identity exists"
+- name: "Ensure {{ _ses_domain }} domain identity exists"
   community.aws.ses_identity:
     profile: "{{ _aws_profile }}"
-    identity: "{{ _aws_profile }}.codeenigma.uk"
+    identity: "{{ _ses_domain }}"
     state: present
-    region: "{{ _aws_region}}"
+    region: "{{ _aws_region }}"
 
 - name: Gather AWS account ID if it isn't already set.
   amazon.aws.aws_caller_info:
@@ -14,21 +14,21 @@
 
 - name: Add sending authorization policy to domain identity
   community.aws.ses_identity_policy:
-    identity: "{{ _aws_profile }}.codeenigma.uk"
+    identity: "{{ _ses_domain }}"
     policy_name: AWSses
     policy: "{{ lookup('template', 'ses.json.j2') }}"
     state: present
     region: "{{ _aws_region }}"
 
 - name: Fetch SES domain CNAME
-  ansible.builtin.command: "aws ses verify-domain-dkim --domain {{ _aws_profile }}.codeenigma.uk --region {{ _aws_region }}"
+  ansible.builtin.command: "aws ses verify-domain-dkim --domain {{ _ses_domain }} --region {{ _aws_region }}"
   register: ses_dkim_attributes
 
 - name: Add a DNS records in Route 53 for validation.
   amazon.aws.route53:
     state: present
-    zone: codeenigma.uk
-    record: "{{ item }}._domainkey.{{ _aws_profile }}.codeenigma.uk"
+    zone: "{{ _ses_domain }}"
+    record: "{{ item }}._domainkey.{{ _ses_domain }}"
     profile: "core"
     type: CNAME
     ttl: 300
