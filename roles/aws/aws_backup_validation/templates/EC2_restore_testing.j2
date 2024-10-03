@@ -1,0 +1,17 @@
+{
+    "RestoreTestingPlanName": "{{ _testing_plan_info.stdout | from_json | json_query("RestoreTestingPlanName") }}",
+    "RestoreTestingSelection": {
+        "IamRoleArn": "{{ _default_backup_role_arn.iam_roles[0].arn }}",
+        "ProtectedResourceArns": [
+            "{{ _resource_arn }}"
+        ],
+        "ProtectedResourceType": "{{ _instance_type_restore }}",
+        "RestoreMetadataOverrides": {
+            "subnetId": "{{ _main_subnets_info.subnets[0].subnet_id }}",
+            "securityGroupIds": "[\"{{ _restore_testing_sg.group_id }}\"]",
+            "IamInstanceProfileName": "UseBackedUpValue"
+        },
+        "RestoreTestingSelectionName": "{{ backup.selection_name | replace("-", "_") }}",
+        "ValidationWindowHours": 1
+    }
+}
