@@ -55,27 +55,21 @@
     path: /tmp/restore_testing.json
     state: absent
 
-- name: Construct AWS instance type.
-  vars:
+- name: Construct AWS instance type dict.
+  ansible.builtin.set_fact:
     instance_type:
       instance: "EC2"
       file-system: "EFS"
       db: "RDS"
+
+- name: Set instance type for template.
   ansible.builtin.set_fact:
     _instance_type_restore: "{{ instance_type[backup.resource_type] }}"
   when: backup.resource_type != 'file-system'
 
-- name: Print previous variable
-  ansible.builtin.debug:
-    var: instance_type
-
-- name: Print previous variable
-  ansible.builtin.debug:
-    var: _instance_type_restore
-
 - name: Create restore testing query file.
   ansible.builtin.template:
-    src: restore_testing.j2
+    src: "{{ _instance_type_restore }}_restore_testing.j2"
     dest: /tmp/restore_testing.json
   register: _restore_testing_query
   when: _instance_type_restore is defined
@@ -84,10 +78,6 @@
   ansible.builtin.command: >
     aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
   register: _protected_res
-
-- name: Print previous variable
-  ansible.builtin.debug:
-    var: _protected_res
 
 - name: Assign EC2 resource to AWS restore testing plan.
   ansible.builtin.command: >

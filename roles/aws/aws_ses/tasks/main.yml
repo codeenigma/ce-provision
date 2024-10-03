@@ -4,7 +4,7 @@
     profile: "{{ _aws_profile }}"
     identity: "{{ _ses_domain }}"
     state: present
-    region: "{{ _aws_region}}"
+    region: "{{ _aws_region }}"
 
 - name: Gather AWS account ID if it isn't already set.
   amazon.aws.aws_caller_info:
