@@ -22,12 +22,20 @@
       "tag:Name": "{{ aws_vpc.name }}"
   register: _main_vpc_info
 
+- name: Display VPC info variable
+  ansible.builtin.debug:
+    var: _main_vpc_info
+
 - name: Get subnets info
   amazon.aws.ec2_vpc_subnet_info:
     region: "{{ _aws_region }}"
     filters:
       vpc-id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
   register: _main_subnets_info
+
+- name: Display subnets info variable
+  ansible.builtin.debug:
+    var: _main_subnets_info
 
 - name: Create SG for restored instances.
   amazon.aws.ec2_security_group:
@@ -79,7 +87,7 @@
     aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
   register: _protected_res
 
-- name: Assign EC2 resource to AWS restore testing plan.
+- name: Assign {{ _instance_type_restore }} resource to AWS restore testing plan.
   ansible.builtin.command: >
     aws backup create-restore-testing-selection --cli-input-json file:///tmp/restore_testing.json --region {{ _aws_region }}
   when: _instance_type_restore is defined and _testing_plan_info.stdout != "null" and _testing_selection_exists.stdout | length == 0 and _protected_res.stdout | length != 0
