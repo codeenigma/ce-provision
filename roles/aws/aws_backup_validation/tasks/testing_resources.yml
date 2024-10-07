@@ -30,7 +30,7 @@
   amazon.aws.ec2_vpc_subnet_info:
     region: "{{ _aws_region }}"
     filters:
-      "tag:Name": "{{ aws_vpc.name }}"
+      vpc-id: "{{ _main_vpc_info.vpcs[0].vpc_id}}"
   register: _main_subnets_info
 
 - name: Display subnets info variable
@@ -42,7 +42,7 @@
     name: Restore_testing
     description: This SG is used to allow SSM and SSH access to the server
     region: "{{ _aws_region }}"
-    vpc_id: "{{ _main_subnets_info.subnets[0].vpc_id }}"
+    vpc_id: "{{ _main_vpc_info.vpcs[0].vpc_id}}"
     rules:
       - proto: tcp
         from_port: 80
