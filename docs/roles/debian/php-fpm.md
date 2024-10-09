@@ -20,7 +20,10 @@ php:
     pool_group: "{{ user_deploy.username }}" # if using unix socket this should be the web server user
     pm: dynamic # can also be static, see https://tideways.com/profiler/blog/an-introduction-to-php-fpm-tuning
     default_socket_timeout: 60
-    max_children: 5
+    # It is important to scale up processes on bigger servers, so that more
+    # requests can be handled. Double the number of vCPUs is a good default.
+    # Can be between 5 and 64.
+    max_children: "{{ [5, [ansible_facts.processor_vcpus * 2, 64] | min] | max }}"
     start_servers: 2
     min_spare_servers: 1
     max_spare_servers: 3
