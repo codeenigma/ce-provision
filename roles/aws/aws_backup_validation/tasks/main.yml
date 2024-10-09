@@ -5,9 +5,11 @@
     assume_role_policy_document: "{{ lookup('file', 'trusted_entitites.j2') }}"
     managed_policies:
       - arn:aws:iam::aws:policy/AmazonEC2FullAccess
-      - arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy
+      - arn:aws:iam::aws:policy/AWSBackupFullAccess
       - arn:aws:iam::aws:policy/AmazonRDSFullAccess
       - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      - arn:aws:iam::aws:policy/AmazonSESFullAccess
+      - arn:aws:iam::aws:policy/AmazonSSMFullAccess
   register: _created_iam_lambda_role
 
 - name: Create an IAM Managed Policy for passing roles
@@ -34,6 +36,10 @@
 - name: Sleep for 20 seconds for IAM before Lambda creation
   ansible.builtin.wait_for:
     timeout: 20
+
+# Not all clients have verified identity
+#- name: Get verified domain.
+#  ansible.builtin.include_tasks: get_valid_email.yml
 
 - name: Clean and set python functions
   block:

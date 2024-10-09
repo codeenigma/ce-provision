@@ -15,14 +15,15 @@ user_ansible:
   home: "/home/{{ _user_ansible_username }}"
   create: true # if you know the user already exists, set this to false to not create the user.
   create_home: true
-  # Optional Linux uid and gid for user
+  update_password: "always"
+  # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
+  # This is shown for documentation, you should do this in your config repo
   # uid: 999
   # gid: 999
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: "{{ _user_ansible_username }}"
-  sudoer:
-    false
+  sudoer: false
   # List of additional groups to add the user to.
   groups: []
   # List of SSH pub keys to authorize. These must be provided as strings (content of the pub key).

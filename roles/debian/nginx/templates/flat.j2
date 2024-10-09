@@ -1,5 +1,10 @@
+### {{ ansible_managed }}
+
 index index.html index.htm index.nginx-debian.html;
 
 location / {
   try_files $uri $uri/ =404;
 }
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;

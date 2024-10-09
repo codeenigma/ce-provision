@@ -3,6 +3,10 @@
   ansible.builtin.apt:
     deb: "https://s3.{{ aws_ssm_agent.region }}.amazonaws.com/amazon-ssm-{{ aws_ssm_agent.region }}/latest/debian_amd64/amazon-ssm-agent.deb"
     state: present
+  retries: 3
+  delay: 10
+  until: result is succeeded
+  register: result
 
 - name: Start the agent
   ansible.builtin.command: systemctl enable amazon-ssm-agent

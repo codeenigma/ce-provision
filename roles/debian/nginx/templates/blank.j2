@@ -1,3 +1,8 @@
+### {{ ansible_managed }}
+
 #location / {
 #do something here
 #}
+
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;
