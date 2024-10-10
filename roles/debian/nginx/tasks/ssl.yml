@@ -33,7 +33,7 @@
 - name: LetsEncrypt cleanup vhosts.
   when:
     - domain.ssl.handling == 'letsencrypt'
-    - domain.ssl.services | length > 0 # if services[] is defined we can assume we are running certbot on port 80 or 443
+    - (domain.ssl.services | default([])) | length >= 0 # if services[] is defined we can assume we are running certbot on port 80 or 443
   block:
     - name: Delete the link to the vhost for LetsEncrypt.
       ansible.builtin.file:
