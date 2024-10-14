@@ -1238,3 +1238,8 @@ INSTALLDIR=/usr
 #EMPTY_LOGFILES=""
 #MISSING_LOGFILES=""
 
+# Option to ignore false-positive shared memory segment warnings
+{% for item in rkhunter.allowipcproc %}
+ALLOWIPCPROC={{ item }}
+{% endfor %}
+
