@@ -586,9 +586,7 @@ PKGMGR={{ rkhunter.os_package_manager }}
 # The default value is the null string.
 #
 {% for item in rkhunter.scriptwhitelist %}
-{% if os.path.exists('{{ item }}') %}
 SCRIPTWHITELIST={{ item }}
-{% endif %}
 {% endfor %}
 
 #
