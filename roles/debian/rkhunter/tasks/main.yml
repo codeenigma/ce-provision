@@ -12,7 +12,7 @@
     paths: /usr/bin
     file_type: file
     use_regex: yes
-    patterns: ".*{{ rkhunter.scriptwhitelist }}"
+    patterns: ".*/{{ rkhunter.scriptwhitelist }}"
   register: _rkhunter_existing_scripts_to_whitelist
 
 - name: Test debug rkhunter.scriptwhitelist items.
