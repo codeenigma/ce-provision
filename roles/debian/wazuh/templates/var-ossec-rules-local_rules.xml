@@ -1,0 +1,2783 @@
+<!-- @(#) $Id$
+  -  Example of local rules for OSSEC.
+  -
+  -  Copyright (C) 2009 Trend Micro Inc.
+  -  All rights reserved.
+  -
+  -  This program is a free software; you can redistribute it
+  -  and/or modify it under the terms of the GNU General Public
+  -  License (version 2) as published by the FSF - Free Software
+  -  Foundation.
+  -
+  -  License details: http://www.ossec.net/en/licensing.html
+  -->
+
+
+<!-- Modify it at your will. -->
+
+<!-- SYSLOG rules to ignore/trap
+     These start at rule ID 100100
+-->
+
+<group name="local,syslog,">
+
+  <!-- Note that rule id 5711 is defined at the ssh_rules file
+    -  as a ssh failed login. This is just an example
+    -  since ip 1.1.1.1 shouldn't be used anywhere.
+    -  Level 0 means ignore.
+  <rule id="100001" level="0">
+    <if_sid>5711</if_sid>
+    <srcip>1.1.1.1</srcip>
+    <description>Example of rule that will ignore sshd </description>
+    <description>failed logins from IP 1.1.1.1.</description>
+  </rule>
+  -->
+
+
+  <!-- This example will ignore ssh failed logins for the user name XYZABC.
+    -->
+  <!--
+  <rule id="100020" level="0">
+    <if_sid>5711</if_sid>
+    <user>XYZABC</user>
+    <description>Example of rule that will ignore sshd </description>
+    <description>failed logins for user XYZABC.</description>
+  </rule>
+  -->
+
+
+  <!-- Specify here a list of rules to ignore. -->
+  <!--
+  <rule id="100030" level="0">
+    <if_sid>12345, 23456, xyz, abc</if_sid>
+    <description>List of rules to be ignored.</description>
+  </rule>
+  -->
+
+  <rule id="100101" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^pound</program_name>
+    <match>Connection timed out</match>
+    <description>Pound SSL network event ignored</description>
+  </rule>
+
+  <rule id="100102" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^pound</program_name>
+    <match>Connection reset by peer</match>
+    <description>Pound SSL network event ignored</description>
+  </rule>
+
+  <rule id="100103" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^pound</program_name>
+    <match>e500 error copy client cont to</match>
+    <description>Pound SSL network event ignored</description>
+  </rule>
+
+  <rule id="100104" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^pound</program_name>
+    <match>error copy chunk cont</match>
+    <description>Pound SSL network event ignored</description>
+  </rule>
+
+  <rule id="100105" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^pound</program_name>
+    <match>error copy server cont</match>
+    <description>Pound SSL network event ignored</description>
+  </rule>
+
+  <rule id="100106" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^pound</program_name>
+    <match>/misc/message-24-error.png</match>
+    <description>Pound SSL network event ignored</description>
+  </rule>
+
+  <rule id="100107" level="0">
+    <if_sid>1002,31421</if_sid>
+    <match>Call to undefined function</match>
+    <description>PHP bugs</description>
+  </rule>
+
+  <rule id="100108" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>access denied</match>
+    <description>Access denied to parts of gcl website</description>
+  </rule>
+
+  <rule id="100110" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Internal server error for link</match>
+    <description>Broken links on GCL via linkchecker module</description>
+  </rule>
+
+  <rule id="100111" level="0">
+    <if_sid>1002</if_sid>
+    <match>Illegal choice</match>
+    <description>Message we cannot do anything about</description>
+  </rule>
+
+  <rule id="100112" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>XML_ERR_NAME_REQUIRED</match>
+    <description>Feed problems on enigma6 eiu-research</description>
+  </rule>
+
+  <rule id="100113" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>loginticket_login result on fastlogin_init</match>
+    <description>Very large syslog messages tripping up OSSC on gcl-app1</description>
+  </rule>
+
+  <rule id="100114" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Call of SugarCRM function</match>
+    <description>Very large syslog messages tripping up OSSC on gcl-app1</description>
+  </rule>
+
+  <rule id="100115" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Login attempt (using the "notifications" login ticket</match>
+    <description>Failed attempt to login to GCL using notifications tickets</description>
+  </rule>
+
+  <rule id="100116" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>mollom.getImageCaptcha</match>
+    <description>Mollom outages</description>
+  </rule>
+
+  <rule id="100117" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>All servers unavailable</match>
+    <description>Mollom outages</description>
+  </rule>
+
+  <rule id="100118" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>All servers unreachable or returning errors</match>
+    <description>Mollom outages</description>
+  </rule>
+
+  <rule id="100119" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>mollom.getServerList</match>
+    <description>Mollom outages</description>
+  </rule>
+
+  <rule id="100120" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Oracle_Project_Failure_Cover</match>
+    <description>Filename with the word failure</description>
+  </rule>
+
+  <rule id="100121" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^ovpn-openvpn</program_name>
+    <match>PUSH_REPLY</match>
+    <description>Large OpenVPN syslog message, pushing routes to the user</description>
+  </rule>
+
+  <rule id="100122" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>gcl.prod.codeenigma.com:80/sugarcrm</match>
+    <description>Large SugarCRM messsages</description>
+  </rule>
+
+  <rule id="100123" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>www.gamblingcompliance.com/node</match>
+    <description>Large Drupal watchdog messages</description>
+  </rule>
+
+  <rule id="100124" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>www.gamblingcompliance.com/contact</match>
+    <description>Large Drupal watchdog messages</description>
+  </rule>
+
+  <rule id="100125" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>www.gamblingdata.com/contact</match>
+    <description>Large Drupal watchdog messages</description>
+  </rule>
+
+  <rule id="100126" level="0">
+    <if_sid>40101</if_sid>
+    <program_name>^su</program_name>
+    <match>root:nobody</match>
+    <description>Crons from cron.daily</description>
+  </rule>
+
+  <rule id="100127" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>www.gamblingcompliance.com/search/site</match>
+    <description>Large Drupal watchdog messages</description>
+  </rule>
+
+  <rule id="100128" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Searched Site for</match>
+    <description>Large Drupal watchdog messages</description>
+  </rule>
+
+  <rule id="100129" level="0">
+    <if_sid>1002,1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>disallowed Unicode code</match>
+    <description>Unicode errors due to sites that need updating so they work with current PHP versions</description>
+  </rule>
+
+  <rule id="100130" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal|wcc</program_name>
+    <match>Undefined property</match>
+    <description>PHP warnings and errors</description>
+  </rule>
+
+  <rule id="100131" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal|wcc</program_name>
+    <match>Undefined variable</match>
+    <description>PHP warnings and errors</description>
+  </rule>
+
+  <rule id="100132" level="0">
+    <if_sid>1002,1003</if_sid>
+    <program_name>^drupal|wcc</program_name>
+    <match>Trying to get property of non-object</match>
+    <description>PHP warnings and errors</description>
+  </rule>
+
+  <rule id="100133" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal|wcc</program_name>
+    <match>to be array,</match>
+    <description>PHP warnings and errors</description>
+  </rule>
+
+  <rule id="100134" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^/USR/SBIN/CRON</program_name>
+    <match>(CRON) error (grandchild #</match>
+    <description>Failing crontabs</description>
+  </rule>
+
+  <rule id="100135" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^ovpn-openvpn</program_name>
+    <match>Connection refused</match>
+    <description>Disconnecting VPN clients</description>
+  </rule>
+
+  <rule id="100136" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Use of undefined constant</match>
+    <description>PHP bugs in EC sites</description>
+  </rule>
+
+  <rule id="100137" level="0">
+    <if_sid>1002,1003</if_sid>
+    <program_name>^drupal|wcc</program_name>
+    <match>Undefined index</match>
+    <description>PHP bugs in sites</description>
+  </rule>
+
+  <rule id="100138" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^ovpn-openvpn</program_name>
+    <match>TLS Error</match>
+    <description>Disconnecting VPN clients</description>
+  </rule>
+
+  <rule id="100139" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^ovpn-openvpn</program_name>
+    <match>tls-error</match>
+    <description>Disconnecting VPN clients</description>
+  </rule>
+
+  <rule id="100140" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^ovpn-openvpn</program_name>
+    <match>Bad LZO decompression header</match>
+    <description>Disconnecting VPN clients</description>
+  </rule>
+
+  <rule id="100141" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Retrieved new CAPTCHA</match>
+    <description>Verbose Mollom logging</description>
+  </rule>
+
+  <rule id="100142" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Incorrect CAPTCHA</match>
+    <description>Verbose Mollom logging</description>
+  </rule>
+
+  <rule id="100149" level="0">
+     <if_sid>1003</if_sid>
+     <match>rest.mollom.com</match>
+     <description>Mollom messages are often too verbose and trip OSSEC on 1003</description>
+  </rule>
+
+  <rule id="100150" level="0">
+     <if_sid>1002</if_sid>
+     <match>Finished processing scheduled jobs</match>
+     <description>Job Scheduler in Drupal uses the word 'failed' even when 100% success. Ignore</description>
+  </rule>
+
+  <rule id="100154" level="0">
+     <if_sid>1002</if_sid>
+     <match>Preventing ms_DRBD_NFS from re-starting on</match>
+     <description>monitors can't run resources</description>
+  </rule>
+
+  <rule id="100156" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^nslcd</program_name>
+     <match>request denied by validnames option</match>
+     <description>Jenkins Duplicity jobs trigger nslcd verbose message</description>
+  </rule>
+
+  <rule id="100157" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^php</program_name>
+     <match>No buffer to delete in /usr/share/php/pearcmd.php on line 19</match>
+     <description>Ignore buggy pearcmd.php on PHP 5.4</description>
+  </rule>
+
+  <rule id="100160" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>failed with code</match>
+     <description>Buggy feed app</description>
+  </rule>
+
+  <rule id="100161" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Apache Solr</match>
+     <description>Solr comm fail</description>
+  </rule>
+
+  <rule id="100163" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>IDS Detector Details</match>
+     <description>airmic civicrm</description>
+  </rule>
+
+  <rule id="100164" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>apachesolr_search</match>
+     <description>airmic solr</description>
+  </rule>
+
+  <rule id="100165" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>oauth_consumer_key</match>
+     <description>airmic mollom</description>
+  </rule>
+
+  <rule id="100166" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^nagios3</program_name>
+     <match>SOLR Cores</match>
+     <description>Ignore automatic SOLR alerts on midnight</description>
+  </rule>
+
+  <rule id="100167" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>The page you requested is currently unavailable</match>
+     <description>civicrm</description>
+  </rule>
+
+  <rule id="100168" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Terrorism</match>
+     <description>civicrm</description>
+  </rule>
+
+  <rule id="100169" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>DB Error: already exists</match>
+     <description>civicrm</description>
+  </rule>
+
+  <rule id="100170" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Could not find valid value for id</match>
+     <description>civicrm</description>
+  </rule>
+
+  <rule id="100171" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>backTrace</match>
+     <description>civicrm</description>
+  </rule>
+
+  <rule id="100180" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>civicrm</match>
+     <description>Airmic CiviCRM</description>
+  </rule>
+
+  <rule id="100184" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>We can't load the requested web page</match>
+     <description>Airmic CiviCRM</description>
+  </rule>
+
+  <rule id="100186" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>You do not have permission to access this page</match>
+     <description>Airmic CiviCRM</description>
+  </rule>
+
+  <rule id="100187" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>has answered your question</match>
+     <description>Airmic CiviCRM</description>
+  </rule>
+
+  <rule id="100188" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>ERROR_CONTACT</match>
+     <description>Airmic CiviCRM</description>
+  </rule>
+
+  <rule id="100189" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^nslcd</program_name>
+     <match>Can't contact LDAP server</match>
+     <description>Occasional connection closures on LDAP lookups from remote locations</description>
+  </rule>
+
+  <rule id="100190" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^rngd</program_name>
+     <match>FIPS 140-2 failures</match>
+     <description>rngd-tools</description>
+  </rule>
+
+  <rule id="100194" level="0">
+     <if_sid>1002,1003</if_sid>
+     <program_name>^drupal|wcc</program_name>
+     <match>Invalid argument supplied for foreach</match>
+     <description>Bug in site</description>
+  </rule>
+
+  <rule id="100196" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>SearchApiSolrConnection</match>
+     <description>Badly configured Solr</description>
+  </rule>
+
+  <rule id="100199" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Solr</match>
+     <description>Badly configured Solr</description>
+  </rule>
+
+  <rule id="100201" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>seems to be broken</match>
+     <description>Bad feeds</description>
+  </rule>
+
+  <rule id="100202" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>swf.swf</match>
+     <description>Bad URL</description>
+  </rule>
+
+  <rule id="100203" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.com|wt-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>SearchApiSolrConnection</match>
+     <description>Bad Solr config</description>
+  </rule>
+
+  <rule id="100205" level="10">
+    <match>DatabaseConnection->escapeLike</match>
+    <description>SQL attempt in form</description>
+  </rule>
+
+  <rule id="100206" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>failed with code 410</match>
+     <description>Bad twitter feed</description>
+  </rule>
+
+  <rule id="100208" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>foreach</match>
+     <description>Bad code</description>
+  </rule>
+
+  <rule id="100209" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>aspxerrorpath</match>
+     <description>Bad URL</description>
+  </rule>
+
+  <rule id="100210" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>stat failed</match>
+     <description>Missing files</description>
+  </rule>
+
+  <rule id="100214" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>redactive-dev2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>SearchApiException while optimizing Solr server</match>
+     <description>Missing solr</description>
+  </rule>
+
+  <rule id="100218" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>seems to be broken</match>
+     <description>Bad feeds</description>
+  </rule>
+
+  <rule id="100219" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Bad RequestApache</match>
+     <description>Bad solr</description>
+  </rule>
+
+  <rule id="100220" level="0">
+    <if_sid>1002,1003</if_sid>
+    <match>terror|error.asp</match>
+    <description>The word terror is not considered a hacking attack</description>
+  </rule>
+
+  <rule id="100221" level="0">
+    <if_sid>1002</if_sid>
+    <match>bad|attack</match>
+    <description>These words are harmless</description>
+  </rule>
+
+  <rule id="100224" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^systemd</program_name>
+    <match>Failed to read PID from file</match>
+    <description>Harmless bug</description>
+  </rule>
+
+  <rule id="100225" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>swift-app1.codeenigma.net|myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-dev5.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+    <match>Compilation failed</match>
+    <description>Harmless bug</description>
+  </rule>
+
+  <rule id="100226" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>monitor3.codeenigma.net|monitor2.codeenigma.com</hostname>
+    <program_name>^nagios3</program_name>
+    <match>SERVICE</match>
+    <description>Noisy Nagios will alert us itself if there is a real problem</description>
+  </rule>
+
+  <rule id="100227" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^kernel</program_name>
+    <match>floppy: error -5 while reading block 0</match>
+    <description>Noise</description>
+  </rule>
+
+  <rule id="100228" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^systemd</program_name>
+    <match>Failed to reset devices.list on /system.slice</match>
+    <description>Noise</description>
+  </rule>
+
+  <rule id="100229" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <match>check the manual that corresponds to your MySQL server version for the right syntax to use near</match>
+    <description>Buggy code</description>
+  </rule>
+
+  <rule id="100231" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal|cricknet</program_name>
+     <match>Connection refused in SearchApiSolrConnection</match>
+     <description>Ignore harmless solr error</description>
+  </rule>
+
+  <rule id="100232" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>monitor3.codeenigma.net</hostname>
+     <program_name>^ntop</program_name>
+     <match>rrd_update</match>
+     <description>Ignore nTop messages</description>
+  </rule>
+
+  <rule id="100239" level="0">
+     <if_sid>1002</if_sid>
+     <match>Illegal string offset</match>
+     <description>Noisy PHP bug</description>
+  </rule>
+
+  <rule id="100246" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>401 Unauthorized</match>
+     <description>Noisy stage sites</description>
+  </rule>
+
+  <rule id="100249" level="10">
+     <if_sid>1002</if_sid>
+     <hostname>monitor3.codeenigma.net</hostname>
+     <program_name>^ovpn-openvpn</program_name>
+     <match>AUTH_FAILED|TLS Auth Error|PLUGIN_AUTH_USER_PASS_VERIFY failed|SSL3_GET_CLIENT_CERTIFICATE</match>
+     <description>Failed attempt to login to OpenVPN</description>
+  </rule>
+
+  <rule id="100250" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Error sending e-mail</match>
+     <description>failed email send</description>
+  </rule>
+
+  <rule id="100255" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>jenkins2.codeenigma.net</hostname>
+     <program_name>^openvpn</program_name>
+     <match>fail</match>
+     <description>Ignore failing VPN</description>
+  </rule>
+
+  <rule id="100256" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>monitor3.codeenigma.net</hostname>
+    <program_name>^ovpn-openvpn</program_name>
+    <match>bad packet ID</match>
+    <description>Flaky OpenVPN clients</description>
+  </rule>
+
+  <rule id="100258" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>The file upload failed</match>
+     <description>Buggy client code or some other app issue</description>
+  </rule>
+
+  <rule id="100260" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <match>mapping-ISOLatin1Accent.txt</match>
+     <description>Solr noise</description>
+  </rule>
+
+  <rule id="100261" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <match>Internal Server Error: Internal Server Error in apachesolr_cron</match>
+     <description>Solr noise</description>
+  </rule>
+
+  <rule id="100264" level="0">
+     <if_sid>1002</if_sid>
+     <match>Feed processing failed</match>
+     <description>App noise</description>
+  </rule>
+
+
+  <rule id="100266" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <match>The configuration file {/var/www/piwik/config/config.ini.php} has not been found or could not be read</match>
+     <description>Piwik not installed</description>
+  </rule>
+
+  <rule id="100267" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <match>An unexpected website was found in the request</match>
+     <description>Piwik fail</description>
+  </rule>
+
+  <rule id="100268" level="0">
+    <if_sid>1003</if_sid>
+    <program_name>^drupal</program_name>
+    <match>Reacting on event</match>
+    <description>Large syslog messages on aps</description>
+  </rule>
+
+  <rule id="100270" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>nycc-app3.codeenigma.net|nycc-dev2.codeenigma.net</hostname>
+     <match>Connection refused</match>
+     <description>Solr error</description>
+  </rule>
+
+  <rule id="100271" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net|wt-stage2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Invalid view mode</match>
+     <description>Bad code</description>
+  </rule>
+
+  <rule id="100272" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^freshclam</program_name>
+     <match>Can't find or parse configuration file /etc/clamav/clamd.conf</match>
+     <description>Jessie upgrade</description>
+  </rule>
+
+  <rule id="100275" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>nycc-dev2.codeenigma.net|nycc-app3.codeenigma.net</hostname>
+     <match>unknown field</match>
+     <description>Noisy syslog message</description>
+  </rule>
+
+  <rule id="100276" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>nycc-app3.codeenigma.net|nycc-dev2.codeenigma.net</hostname>
+     <match>Name or service not known</match>
+     <description>Noisy syslog message</description>
+  </rule>
+
+  <rule id="100279" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>nycc-app3.codeenigma.net|nycc-dev2.codeenigma.net</hostname>
+     <match>A fast 404 test</match>
+     <description>Noisy syslog message</description>
+  </rule>
+
+  <rule id="100281" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>/usr/bin/filebeat</program_name>
+     <match>SSL client failed to connect</match>
+     <description>Ignore noisy disconnections</description>
+  </rule>
+
+  <rule id="100283" level="0">
+     <if_sid>31421</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <match>planer_three_region.inc</match>
+     <description>Ignore noisy bug on WT stage</description>
+  </rule>
+
+  <rule id="100285" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>freshclam</program_name>
+     <match>Can't download</match>
+     <description>Ignore clamav outage</description>
+  </rule>
+
+  <rule id="100286" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>freshclam</program_name>
+     <match>Connection refused</match>
+     <description>Ignore clamav outage</description>
+  </rule>
+
+  <rule id="100287" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>drupal</program_name>
+     <hostname>redactive-app3.codeenigma.net</hostname>
+     <match>Undefined offset</match>
+     <description>Ignore buggy code</description>
+  </rule>
+
+  <rule id="100295" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>monitor3.codeenigma.net|monitor2.codeenigma.com</hostname>
+     <program_name>^nagios3</program_name>
+     <match>API returned error</match>
+     <description>Buggy Pingdom or Statuscake</description>
+  </rule>
+
+  <rule id="100297" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-stage2.codeenigma.net|wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Can't contact LDAP server</match>
+     <description>Ignore LDAP alerts in Drupal</description>
+  </rule>
+
+  <rule id="100299" level="0">
+     <if_sid>1002,1003</if_sid>
+     <match>Illegal offset type</match>
+     <description>Buggy code</description>
+  </rule>
+
+  <rule id="100308" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <match>cron running apachesolr_nodeapi_mass_delete</match>
+     <description>Harmless message</description>
+  </rule>
+
+  <rule id="100309" level="0">
+     <if_sid>1002,1003</if_sid>
+     <match>Data too long for column</match>
+     <description>Noisy MySQL exception</description>
+  </rule>
+
+  <rule id="100310" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <match>swf.swf</match>
+     <description>More awful coding by apparent professionals</description>
+  </rule>
+
+  <rule id="100317" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>TotalRequests Limit exceeded</match>
+     <description>salesforce issue</description>
+  </rule>
+
+  <rule id="100318" level="0">
+     <if_sid>3330</if_sid>
+     <program_name>^postfix</program_name>
+     <match>451 Internal resource temporarily unavailable</match>
+     <description>greylisting</description>
+  </rule>
+
+  <rule id="100319" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>is not of the type Positive</match>
+     <description>civicrm issue</description>
+  </rule>
+
+  <rule id="100322" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>bytes in _dmemcache_get_pieces()</match>
+     <description>Bug in memcache module in distributed setups</description>
+  </rule>
+
+  <rule id="100323" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>failed to load destination URL</match>
+     <description>ads issue</description>
+  </rule>
+
+  <rule id="100326" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>error404</match>
+     <description>false positive</description>
+  </rule>
+
+  <rule id="100327" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>chain</match>
+     <description>false positive</description>
+  </rule>
+
+  <rule id="100332" level="0">
+     <if_sid>1003</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>nycc-app3.codeenigma.net|nycc-dev2.codeenigma.net</hostname>
+     <match>.asp</match>
+     <description>Bot noise</description>
+  </rule>
+
+  <rule id="100335" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>VCL_MET_BACKEND_ERROR</match>
+     <description>Normal Varnish reload</description>
+  </rule>
+
+  <rule id="100336" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>backend_error</match>
+     <description>Normal Varnish reload</description>
+  </rule>
+
+  <rule id="100337" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>synth+error</match>
+     <description>Normal Varnish reload</description>
+  </rule>
+
+  <rule id="100338" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>Return error code 405</match>
+     <description>Normal Varnish reload</description>
+  </rule>
+
+  <rule id="100339" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>h1</match>
+     <description>Normal Varnish reload</description>
+  </rule>
+
+  <rule id="100340" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>invisibly</match>
+     <description>Normal Varnish reload</description>
+  </rule>
+
+  <rule id="100341" level="0">
+     <if_sid>1002,1003</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Missing bundle property on entity of type</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100345" level="14">
+     <decoded_as>drupal</decoded_as>
+     <match>php module enabled</match>
+     <description>PHP module has been enabled on this Drupal site</description>
+  </rule>
+
+  <rule id="100346" level="0">
+     <if_sid>1002,1003</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Data truncated for column</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100347" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>EntityStructureWrapper</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100349" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>swift-app1.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>doubleclick</match>
+     <description>False positive</description>
+  </rule>
+
+  <rule id="100351" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-dev5.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>from no-reply@stem.org.uk|Failed sending email</match>
+     <description>Bad mail attempts</description>
+  </rule>
+
+  <rule id="100352" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>govwales-app3.codeenigma.net|govwales-app4.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Request failed: Connection refused</match>
+     <description>Bad solr</description>
+  </rule>
+
+  <rule id="100353" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>field_organisation_target_id</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100355" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>swift-app1.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>flashtalking</match>
+     <description>Big referer</description>
+  </rule>
+
+  <rule id="100356" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal|wcc</program_name>
+     <match>as the parent data structure is not set</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100357" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <program_name>^snmpd</program_name>
+     <match>get_errorcounters</match>
+     <description>SNMP message</description>
+  </rule>
+
+  <rule id="100358" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Recieved</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100359" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Authentication to server failed</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100360" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Socket error</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100361" level="0">
+     <if_sid>40111</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^varnishd</program_name>
+     <match>CLI Authentication failure from telnet</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100362" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Request failed</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100364" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <match>CLI telnet</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100365" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Expiration was executed</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100367" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Rd ban req.http.host</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100373" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Unable to render media</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100374" level="0">
+     <if_sid>31412,31421,1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <match>adserve.inc on line 274</match>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="100375" level="0">
+     <if_sid>1003</if_sid>
+     <program_name>^varnishd</program_name>
+     <match>CLI telnet 127.0.0.1</match>
+     <description>Varnish noise</description>
+  </rule>
+
+  <rule id="100378" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>redactive-app3.codeenigma.com</hostname>
+     <program_name>^drupal</program_name>
+     <match>Unexpected error the MTL API</match>
+     <description>3rd party service down</description>
+  </rule>
+
+  <rule id="100380" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>puppet3.codeenigma.net</hostname>
+     <match>failedbackupscheck</match>
+     <description>Harmless script name</description>
+  </rule>
+
+  <rule id="100383" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <match>500-unexpected-error-occured</match>
+     <description>Noisy 404s</description>
+  </rule>
+
+  <rule id="100386" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^dockerd</program_name>
+     <match>be forced</match>
+     <description>Noisy docker cleanup</description>
+  </rule>
+
+  <rule id="100390" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>monitor3.codeenigma.net|monitor2.codeenigma.com</hostname>
+     <program_name>^nagios3</program_name>
+     <match>A TLS packet with unexpected length was received</match>
+     <description>Flaky network</description>
+  </rule>
+
+  <rule id="100391" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>monitor3.codeenigma.net|monitor2.codeenigma.com</hostname>
+     <program_name>^nagios3</program_name>
+     <match>Empty reply from server</match>
+     <description>Flaky network</description>
+  </rule>
+
+  <rule id="100394" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>failed to open file handle</match>
+     <description>Buggy code</description>
+  </rule>
+
+  <rule id="100395" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>swift-app1.codeenigma.net</hostname>
+     <program_name>^drupal-exacom</program_name>
+     <match>exa_rules</match>
+     <description>Noisy code</description>
+  </rule>
+
+  <rule id="100396" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>swift-app1.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Attempting to re-run cron while it is already running</match>
+     <description>cron collision</description>
+  </rule>
+
+  <rule id="100397" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^sshd</program_name>
+     <match>no matching cipher found</match>
+     <description>crawler</description>
+  </rule>
+
+  <rule id="100398" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>monitor3.codeenigma.net|monitor2.codeenigma.com</hostname>
+     <program_name>^nagios3</program_name>
+     <match>Was both Username and API Key provided</match>
+     <description>crawler</description>
+  </rule>
+
+  <rule id="100399" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>PEAR_ErrorStack::singleton</match>
+     <description>deprecated code</description>
+  </rule>
+
+  <rule id="100400" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>rbipdebug</match>
+     <description>debug code</description>
+  </rule>
+
+  <rule id="100401" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <match>__clone method called on non-object in</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100402" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>SearchApiException while</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100403" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <program_name>^simplesamlphp</program_name>
+     <match>Use of undefined constant AIRMIC_SIMPLESAMLPHP_SAML20_IDP_REMOTE</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100404" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>airmic-app2.codeenigma.net|hlt-app1.codeenigma.net|rcpch-dev2.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <program_name>^simplesamlphp|SimpleSAMLphp</program_name>
+     <match>Error|Headers|errors</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100406" level="0">
+     <if_sid>1002</if_sid>
+     <match>The following module is missing from the file system</match>
+     <description>Noisy code</description>
+  </rule>
+
+  <rule id="100407" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>METADATANOTFOUND</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100410" level="13">
+     <if_sid>1003</if_sid>
+     <options>no_email_alert</options>
+     <description>Silence the 1003 alerts</description>
+  </rule>
+
+  <rule id="100411" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Broken pipe in _clamav_scan_via_daemon</match>
+     <description>Not a security issue</description>
+  </rule>
+
+  <rule id="100412" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal|wcc</program_name>
+     <match>SMTP error: Could not authenticate</match>
+     <description>Not a security issue</description>
+  </rule>
+
+  <rule id="100413" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>swift-app1.codeenigma.net</hostname>
+     <program_name>^drupal|wcc</program_name>
+     <match>Lost connection to MySQL server during query</match>
+     <description>MySQL crash or slow queries need optimising</description>
+  </rule>
+
+  <rule id="100414" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>Revert</match>
+     <description>False positive</description>
+  </rule>
+
+  <rule id="100415" level="0">
+     <if_sid>31421</if_sid>
+     <program_name>^php</program_name>
+     <match>Call to undefined function apc_clear_cache</match>
+     <description>False positive</description>
+  </rule>
+
+  <rule id="100416" level="0">
+     <if_sid>1002</if_sid>
+     <match>Failed opening</match>
+     <description>Buggy code</description>
+  </rule>
+
+  <rule id="100417" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>occurred when trying to fetch</match>
+     <description>stage_file_proxy error</description>
+  </rule>
+
+  <rule id="100420" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^dnsmasq</program_name>
+     <hostname>monitor3.codeenigma.net</hostname>
+     <match>Operation not permitted</match>
+     <description>caused by someone in the VPN</description>
+  </rule>
+
+  <rule id="100422" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Error fetching data from</match>
+     <description>3rd party service</description>
+  </rule>
+
+  <rule id="100432" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Unknown error</match>
+     <description>Noise</description>
+  </rule>
+
+  <rule id="100433" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>airmic-app2.codeenigma.net</hostname>
+     <match>link.vars.php</match>
+     <description>Noise</description>
+  </rule>
+
+  <rule id="100435" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+    <match>Connection refused</match>
+    <description>Noise</description>
+  </rule>
+
+  <rule id="100436" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>airmic-app2.codeenigma.net</hostname>
+    <match>Duplicate entry</match>
+    <description>Noise</description>
+  </rule>
+
+  <rule id="100438" level="0">
+    <if_sid>1002</if_sid>
+    <program_name>^drupal</program_name>
+    <hostname>redactive-dev2.codeenigma.net</hostname>
+    <match>Connection refused</match>
+    <description>Noise</description>
+  </rule>
+
+  <rule id="100439" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <match>Do_not_worry_about_it</match>
+     <description>Noise</description>
+  </rule>
+
+  <rule id="100440" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^rrdcached</program_name>
+     <hostname>monitor3.codeenigma.net</hostname>
+     <match>found extra data on update argument</match>
+     <description>Bug in rrdcached</description>
+  </rule>
+
+  <rule id="100441" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^rrdcached</program_name>
+     <hostname>monitor3.codeenigma.net</hostname>
+     <match>failed with status</match>
+     <description>Bug in rrdcached</description>
+  </rule>
+
+  <rule id="100442" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>nycc-app3.codeenigma.net</hostname>
+     <match>libssh2.so</match>
+     <description>php bug</description>
+  </rule>
+
+  <rule id="100448" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-dev3.codeenigma.net|myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>API call to </match>
+     <description>Ignore Stem API errors</description>
+  </rule>
+
+  <rule id="100449" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>User account creation error</match>
+     <description>Ignore Stem API errors</description>
+  </rule>
+
+  <rule id="100450" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Wrong return data for</match>
+     <description>Ignore Stem API errors</description>
+  </rule>
+
+  <rule id="100453" level="0">
+     <if_sid>1002,1003</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-dev3.codeenigma.net|myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Base table or view not found</match>
+     <description>Ignore Stem errors</description>
+  </rule>
+
+  <rule id="100454" level="0">
+     <if_sid>1002,1003</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-dev3.codeenigma.net|myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Error creating/updating Achiever contact</match>
+     <description>Ignore Stem errors</description>
+  </rule>
+
+  <rule id="100455" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>hlt-app1.codeenigma.net</hostname>
+     <match>Validation with key</match>
+     <description>Ignore SimpleSAML errors</description>
+  </rule>
+
+  <rule id="100456" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>airmic-app2.codeenigma.net</hostname>
+    <match>Cannot redeclare class</match>
+    <description>PHP site bug</description>
+  </rule>
+
+  <rule id="100463" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>redactive-app3.codeenigma.net</hostname>
+    <match>Error opening socket</match>
+    <description>false positives</description>
+  </rule>
+
+  <rule id="100464" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+    <match>Login denied from</match>
+    <description>noisy alert</description>
+  </rule>
+
+  <rule id="100466" level="14">
+    <decoded_as>drupal</decoded_as>
+    <match>Potentially unsafe keys</match>
+    <description>Potentially unsafe keys found in request parameters</description>
+  </rule>
+
+  <rule id="100468" level="0">
+     <if_sid>1002</if_sid>
+     <match>AcquiaSearchService</match>
+     <description>Noisy solr bug</description>
+  </rule>
+
+  <rule id="100469" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net</hostname>
+     <match>doc.rtl</match>
+     <description>Noisy site bug</description>
+  </rule>
+
+  <rule id="100470" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Unknown error</match>
+     <description>Drupal noise</description>
+  </rule>
+
+  <rule id="100471" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^CRON</program_name>
+     <match>Cron error</match>
+     <description>Epiqo cronjob noise</description>
+  </rule>
+
+  <rule id="100474" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net|govwales-ldn-app6.codeenigma.net</hostname>
+     <match>The resource owner or authorization server denied the request</match>
+     <description>Noisy</description>
+  </rule>
+
+  <rule id="100475" level="0">
+     <if_sid>1002</if_sid>
+     <match>SimpleSAML_Error|NOSTATE|UNHANDLEDEXCEPTION</match>
+     <description>Noise</description>
+  </rule>
+
+  <rule id="100476" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>HTTPRedirect</match>
+     <description>Noise</description>
+  </rule>
+
+  <rule id="100480" level="0">
+     <if_sid>1002,1003</if_sid>
+     <match>Headers already sent</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100481" level="0">
+     <if_sid>1002</if_sid>
+     <match>access-denied|ShowErrors|failedattempt|User_error|AH00036|AH02032|display_errors|valid-user|RequireAny|FailedURI|user_refused|i2cerrors|aspxerrorpath|No such file or directory|trial-and-error|AH01991|AH00687|Failure.ppt|advagg|fatal-fire|failure.jpg|on_error|judging-our-errors|20fail|locationError|permissiondenied|AH01996|SSL23_GET_CLIENT_HELLO|supermarket-refused|moodle_exception|ERROR_CONTACT_SUPPRESSED|failed=1|_refused|errors-|error-404|error_|-error|98failure|error.png|fatale|_error</match>
+     <description>normal 403s</description>
+  </rule>
+
+  <rule id="100482" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>fci-dev2.codeenigma.net</hostname>
+     <program_name>^cricknet</program_name>
+     <match>Unable to get a data value</match>
+     <description>buggy code</description>
+  </rule>
+
+  <rule id="100485" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^ovpn</program_name>
+     <match>TLS key negotiation failed|TLS handshake failed</match>
+     <description>port-scanning VPN servers is noisy</description>
+  </rule>
+
+  <rule id="100486" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <match>Failed to push json to s3</match>
+     <description>Site bug</description>
+  </rule>
+
+  <rule id="100489" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app4.codeenigma.net</hostname>
+     <match>Call to a member function getCompanyNo</match>
+     <description>Noisy site bug</description>
+  </rule>
+
+  <rule id="100490" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^cron-nsfailover</program_name>
+     <match>Operation not permitted</match>
+     <description>Noisy stretch alert</description>
+  </rule>
+
+  <rule id="100491" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^agent</program_name>
+     <match>jmxfetch</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100492" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Queue size</match>
+     <description>Noisy Drupal alert</description>
+  </rule>
+
+  <rule id="100495" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^puppet-agent</program_name>
+     <match>Composer</match>
+     <description>Noisy Puppet alert</description>
+  </rule>
+
+  <rule id="100496" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^dockerd</program_name>
+     <match>cgroup path for memory not found</match>
+     <description>Noisy Docker alert</description>
+  </rule>
+
+  <rule id="100499" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^puppet-agent</program_name>
+     <match>ffaker</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100500" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>myscience-dev3.codeenigma.net|myscience-dev4.codeenigma.net|myscience-dev5.codeenigma.net|myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app5.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Argument 1 passed to</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100501" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^drupal</program_name>
+     <match>Could not connect to Mailchimp</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100503" level="0">
+     <if_sid>5501,5502</if_sid>
+     <hostname>git2.codeenigma.net|jenkins2.codeenigma.net|iaea-utilities2.codeenigma.net|govwales-utility2.codeenigma.net|nycc-utility2.codeenigma.net|myscience-utility1.codeenigma.net|airmic-utility2.codeenigma.net</hostname>
+     <program_name>^sshd</program_name>
+     <match>for user git</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100504" level="0">
+     <if_sid>5715</if_sid>
+     <hostname>git2.codeenigma.net|jenkins2.codeenigma.net|iaea-utilities2.codeenigma.net|govwales-utility2.codeenigma.net|nycc-utility2.codeenigma.net|myscience-utility1.codeenigma.net|airmic-utility2.codeenigma.net</hostname>
+     <program_name>^sshd</program_name>
+     <match>Accepted publickey for git</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100505" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>govwales-ldn-dev2.codeenigma.net|govwales-ldn-app3.codeenigma.net|govwales-ldn-app4.codeenigma.net</hostname>
+     <match>ShieldMiddleware</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100508" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>myscience-dev3.codeenigma.net|myscience-dev4.codeenigma.net|myscience-dev5.codeenigma.net|myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-app5.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <match>Problem processing JSON</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100511" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^awslogs</program_name>
+     <match>is not running</match>
+     <description>Noisy alert</description>
+  </rule>
+
+  <rule id="100512" level="0">
+     <if_sid>1002</if_sid>
+     <program_name>^amazon-ssm-agent</program_name>
+     <match>AccessDeniedException|Failed|error</match>
+     <description>Noisy alert</description>
+  </rule>
+
+
+  <!-- ADD MORE syslog RULES ABOVE THIS LINE -->
+
+
+<!--
+
+        DRUPAL RULES
+        (use custom drupal decoder)
+        Taken from http://www.madirish.net/428 and http://www.ossec.net/doc/rules/rules/50_drupal_rules.xml.html
+
+	These rules start at ID 104110
+-->
+
+  <rule id="104110" level="3">
+    <decoded_as>drupal</decoded_as>
+    <match>Drupal</match>
+    <description>Drupal syslog message</description>
+  </rule>
+
+  <rule id="104120" level="2">
+    <if_sid>104110,1002</if_sid>
+    <match>Login attempt failed</match>
+    <description>Drupal failed login!</description>
+  </rule>
+
+  <rule id="104225" level="11">
+    <if_sid>104120</if_sid>
+    <!-- Note "admin" should be changed to whatever your uid 1 account is -->
+    <match>Login attempt failed for admin.</match>
+    <description>Drupal failed attempt to log in as admin!</description>
+  </rule>
+
+  <rule id="104130" level="10" frequency="8" timeframe="360">
+    <if_matched_sid>104120</if_matched_sid>
+    <description>Possible Drupal brute force attack </description>
+    <description>(high number of logins).</description>
+    <same_source_ip />
+  </rule>
+
+  <rule id="104140" level="10">
+    <if_sid>104110</if_sid>
+    <match>Illegal choice</match>
+    <description>Drupal possible input injection (XSS/XSRF) attack!</description>
+  </rule>
+
+  <rule id="104150" level="3">
+    <if_sid>104110,1002</if_sid>
+    <match>Access denied</match>
+    <description>Drupal access denied error (permissions rejected).</description>
+  </rule>
+
+  <rule id="104160" level="10">
+    <if_sid>104150</if_sid>
+    <match>admin/</match>
+    <description>Drupal access denied to admin screen.</description>
+  </rule>
+
+<!-- End of DRUPAL RULES -->
+</group> <!-- SYSLOG,LOCAL -->
+
+
+<!-- Apache log rules to ignore
+     These start at rule ID 101000
+-->
+<group name="apache,">
+  <rule id="101001" level="1">
+     <if_sid>31122</if_sid>
+     <match>GET /sites/default/files/styles</match>
+     <description>Unable to generate derived image in Drupal - ignored</description>
+  </rule>
+
+  <rule id="101002" level="0">
+     <if_sid>1002</if_sid>
+     <match>markets-and-market-failure</match>
+     <description>False positive due to name of URL</description>
+  </rule>
+
+  <rule id="101003" level="0">
+     <if_sid>31151</if_sid>
+     <match>iepngfix.htc</match>
+     <description>Missing image on thorogood site</description>
+  </rule>
+
+  <rule id="101004" level="0">
+     <if_sid>31151,31115</if_sid>
+     <match>flashtalking/ftlocal.html</match>
+     <description>Broken ads on revisionworld.co.uk</description>
+  </rule>
+
+  <rule id="101005" level="0">
+     <if_sid>31122</if_sid>
+     <match>POST /node/add/study_calendar</match>
+     <description>Broken app on revisionworld.co.uk</description>
+  </rule>
+
+  <rule id="101006" level="0">
+     <if_sid>31151</if_sid>
+     <match>Preloader10.swf</match>
+     <description>Broken app on revisionworld.co.uk</description>
+  </rule>
+
+  <rule id="101007" level="0">
+     <if_sid>31151,31115</if_sid>
+     <match>DARTIframe</match>
+     <description>Broken app on revisionworld.co.uk</description>
+  </rule>
+
+  <rule id="101008" level="0">
+     <if_sid>31151</if_sid>
+     <match>wmode=transparent</match>
+     <description>Broken app on revisionworld.co.uk</description>
+  </rule>
+
+  <rule id="101009" level="0">
+     <if_sid>1003</if_sid>
+     <match>GET /production/catalog</match>
+     <description>Puppet check-ins create a large syslog message, ignore it</description>
+  </rule>
+
+  <rule id="101010" level="0">
+     <if_sid>1003</if_sid>
+     <match>GET /stage/catalog</match>
+     <description>Puppet check-ins create a large syslog message, ignore it</description>
+  </rule>
+
+  <rule id="101011" level="0">
+     <if_sid>1003</if_sid>
+     <match>GET /dev/catalog</match>
+     <description>Puppet check-ins create a large syslog message, ignore it</description>
+  </rule>
+
+  <rule id="101012" level="0">
+     <if_sid>31122</if_sid>
+     <match>500 5 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)</match>
+     <description>Googlebot 500 errors (on GCL site)</description>
+  </rule>
+
+  <rule id="101013" level="0">
+     <if_sid>1002</if_sid>
+     <match>LookupIdVisitor</match>
+     <description>EC Asia errors seen in nginx log</description>
+  </rule>
+
+  <rule id="101014" level="0">
+     <if_sid>1003</if_sid>
+     <match>GET /issues/context_menu</match>
+     <description>Large redmine apache access logs</description>
+  </rule>
+
+  <rule id="101015" level="0">
+     <if_sid>1003</if_sid>
+     <match>GET /projects/gcl</match>
+     <description>Large redmine apache access logs</description>
+  </rule>
+
+  <rule id="101016" level="0">
+     <if_sid>31151</if_sid>
+     <match>FlipboardProxy</match>
+     <description>FlipboardProxy logs 499 error code particularly on GCL</description>
+  </rule>
+
+  <rule id="101017" level="0">
+     <if_sid>31153</if_sid>
+     <match>trusted-sources</match>
+     <description>googlebot going bananas on paginated parts of the variantperception site</description>
+  </rule>
+
+  <rule id="101019" level="0">
+     <if_sid>31151</if_sid>
+     <match>atlas_js_shared.js</match>
+     <description>Missing javascript file triggering 404 active response</description>
+  </rule>
+
+  <rule id="101021" level="0">
+     <if_sid>31122</if_sid>
+     <match>GET /en/sites/default/files/styles</match>
+     <description>imagecache from bots on codeenigma site</description>
+  </rule>
+
+  <rule id="101022" level="0">
+     <if_sid>31122</if_sid>
+     <match>GET /fr/sites/default/files/styles</match>
+     <description>imagecache from bots on codeenigma site</description>
+  </rule>
+
+  <rule id="101023" level="0">
+     <if_sid>31122</if_sid>
+     <match>"POST /user/register HTTP/1.1" 500 5 "http://www.gambling</match>
+     <description>bots on GCL site</description>
+  </rule>
+
+  <rule id="101030" level="0">
+     <if_sid>31152</if_sid>
+     <hostname>enigma3.codeenigma.net</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>photos-for-sale</match>
+     <description>Strange Thorogood URLs interpreted as SQL injection attacks</description>
+  </rule>
+
+  <rule id="101032" level="0">
+     <if_sid>31123</if_sid>
+     <hostname>/var/log/nginx/access-support.prod.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>"GET / HTTP/1.1" 503</match>
+     <description>Googlebot hitting a site that is offline</description>
+  </rule>
+
+  <rule id="101039" level="0">
+     <if_sid>31123</if_sid>
+     <hostname>/var/log/nginx/access-the-planner.prod.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>HTTP/1.1" 503</match>
+     <description>Site is in maintenance mode</description>
+  </rule>
+
+  <rule id="101040" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/nginx/access-spring.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>500</match>
+     <description>Internal server error on this site</description>
+  </rule>
+
+  <rule id="101041" level="0">
+     <if_sid>31151</if_sid>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>GET /sites/default/files/styles</match>
+     <description>Common location for 403 or 401 codes on Drupal imagecache</description>
+  </rule>
+
+  <rule id="101042" level="0">
+     <if_sid>31122</if_sid>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>++++++++++++++++++++++++++++Result</match>
+     <description>Spambots</description>
+  </rule>
+
+  <rule id="101043" level="10">
+    <if_sid>31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-sm.prod.log</hostname>
+    <match>feed</match>
+    <description>RSS crawling bot</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <!-- disabled, see r18971
+  <rule id="101044" level="2">
+    <if_sid>31100,31108</if_sid>
+    <hostname>/var/log/nginx/access-veepeeone.prod.log</hostname>
+    <decoded_as>web-accesslog</decoded_as>
+    <regex>"GET /get-report/\S+</regex>
+    <description>Fetched a PDF</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101045" level="10" frequency="8" timeframe="9999">
+    <if_matched_sid>101044</if_matched_sid>
+    <same_source_ip />
+    <description>Possible excessive download of PDFs</description>
+  </rule>
+  -->
+
+  <rule id="101046" level="0">
+    <if_sid>31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-sm.prod.log</hostname>
+    <match>getresource.axd</match>
+    <description>Broken ad 404ing probably trips OSSEC and user access</description>
+  </rule>
+
+  <rule id="101047" level="0">
+    <if_sid>31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-airmic.prod.log</hostname>
+    <match>CRM_Contact_Page</match>
+    <description>Client doing something with ajax in civicrm that throws spurious 499 codes</description>
+  </rule>
+
+  <rule id="101048" level="0">
+    <if_sid>31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-airmic.prod.log</hostname>
+    <match>boost-gzip-cookie-test.html</match>
+    <description>Client doing something with ajax in civicrm that throws spurious 499 codes</description>
+  </rule>
+
+  <rule id="101050" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>/var/log/apache2/access-tcs-intranet.log</hostname>
+    <match>itok</match>
+    <description>Requesting various assets seems to result in a 403 at least temporarily, trips OSSEC and likely blocks users</description>
+  </rule>
+
+  <rule id="101052" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+    <match>admanmedia</match>
+    <description>Residual 404s on WT due to re-used IP on loadbalancer from a previous customer</description>
+  </rule>
+
+  <rule id="101053" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>/var/log/nginx/access-bigpicture.prod.log</hostname>
+    <match>eot</match>
+    <description>404s on Big Picture site</description>
+  </rule>
+
+  <rule id="101054" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>/var/log/nginx/access-bigpicture.prod.log</hostname>
+    <match>fast_facts/json/all</match>
+    <description>403s on Big Picture site</description>
+  </rule>
+
+  <rule id="101055" level="0">
+    <if_sid>31101</if_sid>
+    <match>Microsoft Office Protocol Discovery</match>
+    <description>Probably an OPTIONS request from Microsoft Office Protocol Discovery user-agent</description>
+  </rule>
+
+  <rule id="101056" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+    <match>admanmedia</match>
+    <description>Residual 404s on WT due to re-used IP on loadbalancer from a previous customer</description>
+  </rule>
+
+  <rule id="101057" level="0">
+    <if_sid>31153</if_sid>
+    <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+    <match>admanmedia</match>
+    <description>Residual 404s on WT due to re-used IP on loadbalancer from a previous customer</description>
+  </rule>
+
+  <rule id="101058" level="0">
+    <if_sid>31122</if_sid>
+    <hostname>/var/log/nginx/access-sm.prod.log</hostname>
+    <match>HTTP/1.1" 500</match>
+    <description>500s on Supply Management site</description>
+  </rule>
+
+  <rule id="101059" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+    <match>message-24-error.png</match>
+    <description>harmless jpeg</description>
+  </rule>
+
+  <rule id="101060" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>/var/log/nginx/access.org.log|/var/log/nginx/access-actionaid.org.log</hostname>
+    <match>aaidonazione/confirmDonation.do?codeTransaction</match>
+    <description>404s every 30 min or so on ActionAid from Italy to some donation page</description>
+  </rule>
+
+  <rule id="101061" level="0">
+    <if_sid>31151</if_sid>
+    <match>OPTIONS /system</match>
+    <description>Microsoft silliness</description>
+  </rule>
+
+  <rule id="101062" level="0">
+    <if_sid>31151,31122</if_sid>
+    <match>PROPFIND /system</match>
+    <description>Microsoft silliness</description>
+  </rule>
+
+  <rule id="101064" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>chsoc-app2.codeenigma.net</hostname>
+    <match>/user/login/sso</match>
+    <description>SSO component on CHSOC sites</description>
+  </rule>
+
+  <rule id="101065" level="0">
+    <if_sid>31151</if_sid>
+    <hostname>chsoc-app2.codeenigma.net</hostname>
+    <match>OPTIONS</match>
+    <description>Misbehaving browsers on chsoc</description>
+  </rule>
+
+  <rule id="101070" level="0">
+     <if_sid>1002</if_sid>
+     <match>Method has been changed to GET</match>
+     <description>Ignore broken links in linkchecker module reporting to watchdog</description>
+  </rule>
+
+  <rule id="101071" level="10">
+    <if_sid>31101</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <match>/bin/bash</match>
+    <description>Shellshock attempt</description>
+  </rule>
+
+  <rule id="101080" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>redactive-app3.codeenigma.net</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>bkg-header.png</match>
+     <description>404s</description>
+  </rule>
+
+  <rule id="101082" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>/var/log/nginx/access-ecg.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>medmastery.com</match>
+     <description>403s</description>
+  </rule>
+
+  <rule id="101083" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>/var/log/nginx/access-ecg.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>course</match>
+     <description>403s</description>
+  </rule>
+
+  <rule id="101095" level="0">
+     <if_sid>1003</if_sid>
+     <match>gclid</match>
+     <description>Ignore large weblog with big Referer (google ad?)</description>
+  </rule>
+
+  <rule id="101096" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>redactive-app3.codeenigma.net</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>GET /news-feed.rss</match>
+     <description>ignore 404</description>
+  </rule>
+
+  <rule id="101098" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>redactive-app3.codeenigma.net</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>GET /newsrss.rss</match>
+     <description>ignore 404</description>
+  </rule>
+
+  <rule id="101100" level="7">
+    <if_sid>31530,31108</if_sid>
+    <regex>] "POST \S+.php\.+HTTP/1.\." 200</regex>
+    <description>POST request to a file ending in .php extension</description>
+  </rule>
+
+  <rule id="101101" level="7">
+    <if_sid>31530,31108</if_sid>
+    <regex>] "POST \S+.html</regex>
+    <description>POST request to a file ending in .html extension</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101102" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>redactive-app3.codeenigma.net</hostname>
+     <regex>\\x</regex>
+     <description>500 errors with strange characters in the URLs, seems to recur on occasion</description>
+  </rule>
+
+  <rule id="101105" level="0">
+    <if_sid>101100,1002</if_sid>
+    <match>jstats|kibana|geocoding</match>
+    <description>Stats</description>
+  </rule>
+
+  <rule id="101106" level="0">
+    <if_sid>101100</if_sid>
+    <match>statistics.php</match>
+    <description>Stats</description>
+  </rule>
+
+  <rule id="101108" level="0">
+    <if_sid>101100</if_sid>
+    <match>wp-admin</match>
+    <description>Normal Wordpress activity</description>
+  </rule>
+
+  <rule id="101112" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>redactive-app3.codeenigma.net</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <srcip>85.232.51.149</srcip>
+     <match>GET /opinion/header</match>
+     <description>404s</description>
+  </rule>
+
+  <rule id="101114" level="0">
+    <if_sid>31122,1002</if_sid>
+    <hostname>/var/log/nginx/access-mapmeo.log|/var/log/nginx/access-www.meinestelle.de.log|/var/log/nginx/access-empla.log|/var/log/nginx/access-unicum.log</hostname>
+    <match>hybridauth</match>
+    <description>Broken Epiqo app</description>
+  </rule>
+
+  <rule id="101115" level="0">
+    <if_sid>1002,1003,31123</if_sid>
+    <match>terror|bad|attack|error.asp|errordetail1|Error.aspx|error.svg|planning-error|failures|error500|failed_uli|channelling-failure|Error%20|-failure|-failed|-illegal|search-error|failure-</match>
+    <description>The word terror is not considered a hacking attack</description>
+  </rule>
+
+  <rule id="101116" level="0">
+    <if_sid>101100</if_sid>
+    <hostname>redactive-app3.codeenigma.net|redactive-dev2.codeenigma.net</hostname>
+    <match>emit.php</match>
+    <description>Stats</description>
+  </rule>
+
+  <rule id="101119" level="0">
+     <if_sid>31101</if_sid>
+     <hostname>redactive-dev2.codeenigma.net|redactive-app3.codeenigma.net</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>feed</match>
+     <description>ignore 404</description>
+  </rule>
+
+  <rule id="101122" level="10">
+    <if_sid>30101</if_sid>
+    <hostname>/var/log/apache2/error.log</hostname>
+    <match>server reached MaxClients setting, consider raising the MaxClients setting</match>
+    <description>MaxClients threshold reached</description>
+  </rule>
+
+  <rule id="101129" level="0">
+    <if_sid>31122</if_sid>
+    <hostname>/var/log/nginx/access-revisionworld.log</hostname>
+    <description>Buggy revisionworld</description>
+  </rule>
+
+  <rule id="101131" level="0">
+    <hostname>/var/log/nginx/access-scambs-drupal.prod.log</hostname>
+    <match>POST /user</match>
+    <options>no_email_alert</options>
+    <description>Ignore user post</description>
+  </rule>
+
+  <rule id="101132" level="10" frequency="3" timeframe="600">
+    <if_matched_sid>101131</if_matched_sid>
+    <description>Possible Drupal brute force attack </description>
+    <description>(high number of requests to /user).</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101134" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>/var/log/nginx/access-actionaid.org.log</hostname>
+    <match>abad|ebad</match>
+    <description>Ignore URL</description>
+  </rule>
+
+  <rule id="101135" level="0">
+    <if_sid>101100</if_sid>
+    <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+    <match>machform</match>
+    <description>Machform is OK to POST to</description>
+  </rule>
+
+  <rule id="101136" level="0">
+    <if_sid>31122</if_sid>
+    <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+    <match>piwik.php</match>
+    <description>Piwik broken or not installed</description>
+  </rule>
+
+  <rule id="101142" level="0">
+     <if_sid>1003</if_sid>
+     <match>search.yahoo.com</match>
+     <description>Big referer</description>
+  </rule>
+
+  <rule id="101147" level="0">
+    <if_sid>101055</if_sid>
+    <match>OPTIONS</match>
+    <description>OPTIONS request from Microsoft Office Protocol Discovery user-agent</description>
+  </rule>
+
+  <rule id="101148" level="0">
+    <if_sid>101100</if_sid>
+    <hostname>airmic-app2.codeenigma.net|enigma3.codeenigma.net</hostname>
+    <match>xmlrpc</match>
+    <description>POST to apparently OK script</description>
+  </rule>
+
+  <rule id="101151" level="0">
+    <if_sid>1003</if_sid>
+    <match>jsredir</match>
+    <description>Noisy Yandex</description>
+  </rule>
+
+  <rule id="101154" level="0">
+    <if_sid>1002</if_sid>
+    <match>/misc/message-24-error.png</match>
+    <description>false positive word</description>
+  </rule>
+
+  <rule id="101157" level="0">
+     <if_sid>31533</if_sid>
+     <match>POST /batch?</match>
+     <description>Normal to see high rate of POSTs to batch pages in Drupal</description>
+  </rule>
+
+  <rule id="101162" level="0">
+    <if_sid>31122</if_sid>
+    <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+    <match>mwt_republish/nojs</match>
+    <description>Buggy code</description>
+  </rule>
+
+  <rule id="101163" level="0">
+     <if_sid>31151</if_sid>
+     <hostname>/var/log/nginx/access-corporate.prod.log</hostname>
+     <description>Ignore 404s on newly launched site for now</description>
+  </rule>
+
+  <rule id="101165" level="0">
+     <if_sid>101100</if_sid>
+     <hostname>jdi-dev1.codeenigma.net|jdi-app2.codeenigma.net|jdi-app3.codeenigma.net|jdi-app4.codeenigma.net</hostname>
+     <match>limesurvey</match>
+     <description>Normal POST request</description>
+  </rule>
+
+  <rule id="101166" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>/var/log/apache2/error-iaea.master.log</hostname>
+     <match>from remote server</match>
+     <description>Bugs with IAEA remote legacy app</description>
+  </rule>
+
+  <rule id="101167" level="0">
+     <if_sid>1003</if_sid>
+     <hostname>/var/log/nginx/access-unitedway.log</hostname>
+     <match>job_geo_location</match>
+     <description>Large nginx log messages</description>
+  </rule>
+
+  <rule id="101168" level="0">
+     <if_sid>31161</if_sid>
+     <hostname>swift-app1.codeenigma.net</hostname>
+     <match>sites/revisionworld.com/files</match>
+     <description>Deliberate 501 code on revisionworld.com</description>
+  </rule>
+
+  <rule id="101171" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>wt-app3.codeenigma.net|wt-app4.codeenigma.net</hostname>
+     <match>mwt-republish-img</match>
+     <description>Noisy referer</description>
+  </rule>
+
+  <rule id="101173" level="0">
+    <if_sid>31533</if_sid>
+    <hostname>/var/log/nginx/access-stem.prod.log</hostname>
+    <match>js/shs/json</match>
+    <description>Normal high rate of POSTs to Stem site</description>
+  </rule>
+
+  <rule id="101174" level="0">
+    <if_sid>31122</if_sid>
+    <hostname>/var/log/nginx/access-stem.prod.log</hostname>
+    <match>system/ajax</match>
+    <description>Buggy site</description>
+  </rule>
+
+  <rule id="101176" level="0">
+     <if_sid>101100</if_sid>
+     <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>idp</match>
+     <description>Big IDP request</description>
+  </rule>
+
+  <rule id="101177" level="0">
+     <if_sid>1002,1003</if_sid>
+     <hostname>redactive-dev2.codeenigma.net</hostname>
+     <program_name>^drupal</program_name>
+     <match>401 Unauthorized</match>
+     <description>Noisy stage sites</description>
+  </rule>
+
+  <rule id="101183" level="0">
+     <if_sid>31151,31101</if_sid>
+     <hostname>/var/log/nginx/access-smartsolutions.prod.log</hostname>
+     <description>Ignore 40X in logs on nycc-app1 smartsolution site, there are too many 401s/404s due to site rebuild</description>
+  </rule>
+
+  <rule id="101184" level="0">
+    <if_sid>101100</if_sid>
+    <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+    <match>drupalauth</match>
+    <description>SAML auth</description>
+  </rule>
+
+  <rule id="101187" level="10">
+    <if_sid>31151,31152,31153,31154</if_sid>
+    <match>OpenVAS</match>
+    <srcip>127.0.0.1</srcip>
+    <options>no_email_alert</options>
+    <description>Too noisy</description>
+  </rule>
+
+  <rule id="101188" level="0">
+    <if_sid>1003</if_sid>
+    <hostname>myscience-app3.codeenigma.net|myscience-app4.codeenigma.net|myscience-dev3.codeenigma.net|myscience-app6.codeenigma.net</hostname>
+    <match>SSOService.php</match>
+    <description>SAML auth</description>
+  </rule>
+
+  <rule id="101191" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>/var/log/nginx/access-govwalesd7.master.log</hostname>
+     <match>care-and-support-business-failure-wales-regulations-2015-and-care-and-support</match>
+     <description>False positive</description>
+  </rule>
+
+  <rule id="101192" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>/var/log/nginx/access-sono.log</hostname>
+     <match>abdominal</match>
+     <description>False positive</description>
+  </rule>
+
+  <rule id="101194" level="0">
+     <if_sid>31533</if_sid>
+     <hostname>/var/log/nginx/access-bookworks.log</hostname>
+     <match>publishing</match>
+     <description>Frequent high rate of POSTs</description>
+  </rule>
+
+  <rule id="101195" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/nginx/access-hosting-dashboard.prod.log</hostname>
+     <match>StatusCake</match>
+     <description>bad deploy</description>
+  </rule>
+
+  <rule id="101198" level="0">
+     <if_sid>31123</if_sid>
+     <hostname>/var/log/nginx/access-ai.prod.log|/var/log/apache2/access-cwh.prod.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <description>maint mode</description>
+  </rule>
+
+  <rule id="101201" level="0">
+     <if_sid>31123</if_sid>
+     <hostname>/var/log/nginx/access-stem.amb_dev.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <description>maint mode</description>
+  </rule>
+
+  <rule id="101202" level="10">
+    <if_sid>31101,31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-recruiter.prod.log</hostname>
+    <match>rss</match>
+    <description>RSS crawling bot</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101203" level="10">
+    <if_sid>31101,31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-recruiter.prod.log</hostname>
+    <match>national-news.xml</match>
+    <description>RSS crawling bot</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101204" level="0">
+    <if_sid>31101,31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-thorogood.prod.log</hostname>
+    <match>leaflet</match>
+    <description>Buggy</description>
+  </rule>
+
+  <rule id="101205" level="0">
+    <if_sid>31122</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/apache2/access-festival_micro.prod.log</hostname>
+    <description>Buggy</description>
+  </rule>
+
+  <rule id="101206" level="0">
+    <if_sid>31101,31151</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-wcc.ce-prod.log</hostname>
+    <match>panels|planning|guide</match>
+    <description>Buggy</description>
+  </rule>
+
+  <rule id="101209" level="0">
+    <if_sid>31122</if_sid>
+    <decoded_as>web-accesslog</decoded_as>
+    <hostname>/var/log/nginx/access-bookworks.log</hostname>
+    <match>imagecache</match>
+    <description>Meh</description>
+  </rule>
+
+  <rule id="101211" level="0">
+     <if_sid>31533</if_sid>
+     <hostname>/var/log/nginx/access-rcm.prod.log</hostname>
+     <match>POST /cas/login</match>
+     <description>Normal to see high rate of POSTs to /cas/login pages</description>
+  </rule>
+
+  <rule id="101212" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/nginx/access-hosting-dashboard.prod.log</hostname>
+     <match>favicon.png</match>
+     <description>Buggy code</description>
+  </rule>
+
+  <rule id="101213" level="0">
+     <if_sid>31533</if_sid>
+     <hostname>/var/log/nginx/access-stem.prod.log</hostname>
+     <match>POST /plupload-handle-uploads</match>
+     <description>Normal to see high rate of POSTs to /plupload-handle-uploads pages</description>
+  </rule>
+
+  <rule id="101215" level="0">
+     <if_sid>31123</if_sid>
+     <hostname>/var/log/nginx/access-hav-j150709.prod.log|/var/log/nginx/access-pri-j150281.prod.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <description>site offline</description>
+  </rule>
+
+  <rule id="101216" level="0">
+     <if_sid>1002</if_sid>
+     <hostname>/var/log/nginx/access-the-planner.prod.log</hostname>
+     <match>failure|error|refused|denied|illegal</match>
+     <description>false positive</description>
+  </rule>
+
+  <rule id="101217" level="0">
+     <if_sid>1002</if_sid>
+     <match>message-16-error.png</match>
+     <description>false positive in omega theme</description>
+  </rule>
+
+  <rule id="101218" level="0">
+     <if_sid>1002,31122</if_sid>
+     <hostname>/var/log/nginx/access-mapmeo.log</hostname>
+     <match>jserror</match>
+     <description>false positive</description>
+  </rule>
+
+  <rule id="101219" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/apache2/access-cwh.prod.log</hostname>
+     <match>major-works</match>
+     <description>site bug</description>
+  </rule>
+
+  <rule id="101220" level="0">
+    <if_sid>101100</if_sid>
+    <hostname>enigma3.codeenigma.net</hostname>
+    <match>wp-cron.php</match>
+    <description>Wordpress</description>
+  </rule>
+
+  <rule id="101221" level="10">
+     <if_sid>31151</if_sid>
+     <match>Jorgee</match>
+     <options>no_email_alert</options>
+     <description>Noisy scanner</description>
+  </rule>
+
+  <rule id="101224" level="0">
+    <if_sid>31122,1002</if_sid>
+    <hostname>/var/log/nginx/access-unicum.log</hostname>
+    <match>inhalt</match>
+    <description>False positive</description>
+  </rule>
+
+  <rule id="101225" level="0">
+    <if_sid>31122,1002</if_sid>
+    <hostname>/var/log/nginx/access-platform-prod.log</hostname>
+    <match>api</match>
+    <description>Noise I cannot do anything about</description>
+  </rule>
+
+  <rule id="101226" level="0">
+    <if_sid>31122,1002</if_sid>
+    <hostname>/var/log/nginx/access-rcm.prod.log</hostname>
+    <match>print|news-views-and-analysis|rss</match>
+    <description>Noise I cannot do anything about</description>
+  </rule>
+
+  <rule id="101227" level="0">
+    <if_sid>31122,1002</if_sid>
+    <hostname>/var/log/nginx/access-platform-prod.log</hostname>
+    <match>platform</match>
+    <description>Noise I cannot do anything about</description>
+  </rule>
+
+  <rule id="101228" level="0">
+     <if_sid>31151,31101</if_sid>
+     <hostname>/var/log/nginx/access-platform-prod.log</hostname>
+     <description>Ignore 40X on STEM platform</description>
+  </rule>
+
+  <rule id="101233" level="0">
+    <if_sid>31123</if_sid>
+    <hostname>/var/log/nginx/access-actionaid.org.log|/var/log/nginx/access.org.log</hostname>
+    <description>Ignore 503s on AAI (bots being rate-limited)</description>
+  </rule>
+
+  <rule id="101234" level="0">
+    <if_sid>31122,1002</if_sid>
+    <hostname>/var/log/nginx/access-ecgstage.log</hostname>
+    <match>chargebee</match>
+    <description>bug on ECG stage site</description>
+  </rule>
+
+  <rule id="101235" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>/var/log/nginx/access-govwalesd8.master.log</hostname>
+    <match>common-errors</match>
+    <description>false positive</description>
+  </rule>
+
+  <rule id="101237" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>/var/log/nginx/access-cambridge.gov.uk.prod.log</hostname>
+    <match>BuildFailureDetector</match>
+    <description>False positive</description>
+  </rule>
+
+  <rule id="101238" level="14">
+     <if_sid>31108,31101</if_sid>
+     <match>23value|23default_value|23markup|element_parents=%23</match>
+     <decoded_as>web-accesslog</decoded_as>
+     <description>RCE attempt maybe</description>
+     <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101240" level="1">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/apache2/access-rcm.prod.log</hostname>
+     <match>rss.xml</match>
+     <description>Site bug</description>
+  </rule>
+
+  <rule id="101241" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>myscience-dev4.codeenigma.net</hostname>
+     <description>Site bug</description>
+  </rule>
+
+  <rule id="101242" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/nginx/access-jpoesen.com.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <match>comment/reply</match>
+     <description>Internal server error on this site</description>
+  </rule>
+
+  <rule id="101246" level="0">
+     <if_sid>31122</if_sid>
+     <hostname>/var/log/apache2/access-iaea.master.log|/var/log/apache2/access-iaea.drupal-direct.log</hostname>
+     <description>Buggy site</description>
+  </rule>
+
+  <rule id="101248" level="2">
+    <if_sid>1002</if_sid>
+    <match>client denied by server configuration</match>
+    <description>403d response</description>
+    <options>no_email_alert</options>
+  </rule>
+
+  <rule id="101249" level="0">
+    <if_sid>1002</if_sid>
+    <hostname>2fa.codeenigma.net</hostname>
+    <match>wsgi:error</match>
+    <description>Bugs in LinOTP</description>
+  </rule>
+
+  <rule id="101251" level="14" frequency="5" timeframe="60">
+    <if_matched_sid>31530</if_matched_sid>
+    <hostname>/var/log/nginx/access-corporate.prod.log</hostname>
+    <match>general-enquiry</match>
+    <description>Possible spamming of WT corporate contact form</description>
+    <same_source_ip />
+  </rule>
+
+  <rule id="101252" level="0">
+     <if_sid>1002</if_sid>
+     <match>access-denied|ShowErrors|failedattempt|User_error|AH00036|AH02032|display_errors|valid-user|RequireAny|FailedURI|user_refused|i2cerrors|aspxerrorpath|No such file or directory|trial-and-error|AH01991|AH00687|AH01276|Failure.ppt|advagg|fatal-fire|failure.jpg|on_error|judging-our-errors|20fail|locationError|permissiondenied|AH01996|SSL23_GET_CLIENT_HELLO|supermarket-refused|moodle_exception|ERROR_CONTACT_SUPPRESSED|failed=1|_refused|errors-|error-404|error_|-error|98failure|error.png|fatale|_error</match>
+     <description>normal 403s</description>
+  </rule>
+
+  <rule id="101253" level="0">
+    <hostname>/var/log/apache2/access-cwh.prod.log</hostname>
+    <description>Ignore 404s on cwh for now to avoid blocking users being proxied from HAproxy</description>
+  </rule>
+
+  <rule id="101254" level="0">
+    <hostname>/var/log/apache2/access-wcc.ce-prod.log</hostname>
+    <if_sid>31101,31151,1002</if_sid>
+    <match>fa-solid-900</match>
+    <description>Ignore missing font files on new WCC site</description>
+  </rule>
+
+  <rule id="101256" level="0">
+    <if_sid>101100</if_sid>
+    <hostname>/var/log/nginx/access-wcc.ce-prod.log|/var/log/nginx/access-johnthorogood.prod.log</hostname>
+    <match>wp-login.php</match>
+    <description>False positive</description>
+  </rule>
+
+  <rule id="101257" level="0">
+    <if_sid>31101,31151,1002</if_sid>
+    <hostname>/var/log/nginx/access-tephinet.master.log|/var/log/nginx/access-tephinet.staging.log</hostname>
+    <match>GET /sites/tephinet/files/styles</match>
+    <description>Ignore missing style files on Mantaray Tephinet site</description>
+  </rule>
+
+  <rule id="101258" level="0">
+     <if_sid>31151,31101</if_sid>
+     <hostname>wt-stage2.codeenigma.net</hostname>
+     <description>Ignore 40X in logs on wt-stage2, there are too many 401s/404s due to misbehaving apps</description>
+  </rule>
+
+  <!-- ADD MORE apache/nginx RULES ABOVE THIS LINE -->
+</group>
+
+<!-- extra rule to catch 502s, for some reason not in OSSEC proper -->
+<group name="web,accesslog,">
+  <rule id="31124" level="4">
+    <if_sid>31120</if_sid>
+    <id>^502</id>
+    <description>Web server 502 error code (Bad gateway).</description>
+  </rule>
+
+  <rule id="103001" level="0">
+     <if_sid>31124</if_sid>
+     <hostname>/var/log/nginx/access-actelion.log</hostname>
+     <decoded_as>web-accesslog</decoded_as>
+     <description>Ignore 502s that we can't be responsible for (legacy sites)</description>
+  </rule>
+
+  <rule id="103006" level="0">
+    <if_sid>31123</if_sid>
+    <hostname>/var/log/nginx/access-nycc.prod.log</hostname>
+    <description>Strange 503s</description>
+  </rule>
+
+</group>
+
+<group name="whitelist,">
+  <rule id="100100" level="0">
+    <if_sid>521</if_sid>
+    <match>scantem</match>
+    <description>Whitelist alerts containing 'scantem' in the title.</description>
+    <options>no_full_log</options>
+  </rule>
+</group>
+<!-- EOF -->
