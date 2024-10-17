@@ -9,9 +9,9 @@
 
 - name: Check paths for script existence.
   ansible.builtin.find:
-    paths: /
+    paths: "{{ rkhunter.scriptwhitelist }}"
     file_type: file
-    patterns: "{{ rkhunter.scriptwhitelist }}"
+    patterns: "*"
   register: _rkhunter_existing_scripts_to_whitelist
 
 - name: Test debug script paths.
