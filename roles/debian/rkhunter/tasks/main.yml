@@ -16,7 +16,7 @@
 
 - name: Test debug script paths.
   ansible.builtin.debug:
-    msg: "{{ _rkhunter_existing_scripts_to_whitelist.patterns }}"
+    msg: "{{ _rkhunter_existing_scripts_to_whitelist }}"
 
 - name: Test debug rkhunter.scriptwhitelist items.
   ansible.builtin.debug:
