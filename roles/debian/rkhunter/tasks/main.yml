@@ -22,7 +22,7 @@
 
 - name: Test output path only should be fgrep path.
   ansible.builtin.debug:
-    msg: "{{ _rkhunter_existing_scripts_to_whitelist.path }}"
+    msg: "{{ _rkhunter_existing_scripts_to_whitelist.stat.path }}"
   when: "{{ _rkhunter_existing_scripts_to_whitelist.stat.exists }}"
 
 - name: Copy rkhunter configuration.
