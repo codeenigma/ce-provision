@@ -20,6 +20,11 @@
   ansible.builtin.debug:
     msg: "{{ rkhunter.scriptwhitelist }}"
 
+- name: Test output path only should be fgrep path.
+  ansible.builtin.debug:
+    msg: "{{ _rkhunter_existing_scripts_to_whitelist.path }}"
+  when: "{{ _rkhunter_existing_scripts_to_whitelist.exists }}"
+
 - name: Copy rkhunter configuration.
   ansible.builtin.template:
     src: rkhunter.conf.j2
