@@ -9,7 +9,7 @@
 
 - name: Check paths for script existence.
   ansible.builtin.stat:
-    path: "/usr/bin/fgrep"
+    path: "{{ rkhunter.scriptwhitelist }}"
   register: _rkhunter_existing_scripts_to_whitelist
 
 - name: Test debug script paths.
