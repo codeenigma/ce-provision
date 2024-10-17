@@ -8,10 +8,8 @@
   notify: Update rkhunter
 
 - name: Check paths for script existence.
-  ansible.builtin.find:
-    paths: "{{ rkhunter.scriptwhitelist }}"
-    file_type: file
-    patterns: "*"
+  ansible.builtin.stat:
+    path: "{{ rkhunter.scriptwhitelist }}"
   register: _rkhunter_existing_scripts_to_whitelist
 
 - name: Test debug script paths.
