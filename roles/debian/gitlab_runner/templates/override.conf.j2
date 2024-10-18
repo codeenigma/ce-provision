@@ -1,3 +1,4 @@
 [Service]
 ExecStart=
-ExecStart=/usr/bin/gitlab-runner "run" "--working-directory" "{{ gitlab_runner.runner_workingdir }}" "--config" "{{ gitlab_runner.runner_config }}" "--service" "gitlab-runner" "--user" "{{ gitlab_runner.username }}" 
+ExecStart=/usr/bin/gitlab-runner "run" "--working-directory" "{{ gitlab_runner.runner_workingdir }}" "--config" "{{ gitlab_runner.runner_config }}" "--service" "gitlab-runner" "--user" "{{ gitlab_runner.username }}"
+Environment="HOME=/home/gitlab-runner"
