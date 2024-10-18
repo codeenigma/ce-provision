@@ -11,7 +11,6 @@
   ansible.builtin.find:
     paths: /
     file_type: file
-    use_regex: yes
     patterns: "/usr/bin/egrep"
   register: _rkhunter_existing_scripts_to_whitelist
 
