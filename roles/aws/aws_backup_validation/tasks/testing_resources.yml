@@ -26,7 +26,7 @@
   amazon.aws.ec2_vpc_subnet_info:
     region: "{{ _aws_region }}"
     filters:
-      vpc-id: "{{ _main_vpc_info.vpcs[0].vpc_id}}"
+      vpc-id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
   register: _main_subnets_info
 
 - name: Create SG for restored instances.
