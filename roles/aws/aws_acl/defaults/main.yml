@@ -18,7 +18,6 @@ aws_acl:
           list:
             - 3.11.82.252/32 # main VPN
             - 159.100.242.248/32 # backup VPN, bastion2
-            - 3.8.9.162/32 # guest VPN
       country_codes:
         - name: "allowed-countries"
           action: allow
