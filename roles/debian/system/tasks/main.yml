@@ -47,6 +47,8 @@
     set -o pipefail
     ifacecol=$(route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}')
     route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}'
+  args:
+    executable: /bin/bash
   register: dhcpdefaultnic
   when:
     - system.nohetznerdhcp
@@ -56,6 +58,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -oP 'new_ip_address=\K\S+' | sed "s/'//g"
+  args:
+    executable: /bin/bash
   register: dhcpipaddressoffer
   when:
     - system.nohetznerdhcp
@@ -65,6 +69,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -oP 'new_subnet_mask=\K\S+' | sed "s/'//g"
+  args:
+    executable: /bin/bash
   register: dhcpnetmaskoffer
   when:
     - system.nohetznerdhcp
@@ -74,6 +80,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -oP 'new_routers=\K\S+' | sed "s/'//g"
+  args:
+    executable: /bin/bash
   register: dhcpgatewayoffer
   when:
     - system.nohetznerdhcp
@@ -83,6 +91,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -P 'new_domain_name_servers=\K\S+' | sed "s/new_domain_name_servers=//g" | sed "s/'//g"
+  args:
+    executable: /bin/bash
   register: dhcpnameserversoffer
   when:
     - system.nohetznerdhcp
