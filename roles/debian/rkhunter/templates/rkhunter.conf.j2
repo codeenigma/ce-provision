@@ -935,6 +935,9 @@ SUSPSCAN_THRESH={{ rkhunter.supscan_threshold }}
 #
 #PORT_WHITELIST=""
 #PORT_PATH_WHITELIST=""
+{% for item in rkhunter.portpathwhitelist %}
+PORT_PATH_WHITELIST={{ item }}
+{% endfor %}
 
 #
 # The following option can be used to tell rkhunter where the operating system
