@@ -20,6 +20,7 @@
 
 - name: Check if the system is a Hetzner Cloud server.
   ansible.builtin.shell: |
+    set -o pipefail
     dmidecode | awk '/System Information/{getline;print;getline;print}' | sed 's/[^,:]*://g' | sed 's/^ //g' | tr '\n' ' ' | grep -q "Hetzner vServer"
   args:
     executable: /bin/bash
@@ -43,6 +44,7 @@
 
 - name: Get default NIC.
   ansible.builtin.shell: |
+    set -o pipefail
     ifacecol=$(route | awk -v b="Iface" '{for (i=1;i<=NF;i++) { if ($i == b) { print i } }}')
     route | awk -v ifacecol="$ifacecol" '$1 == "default" {print $ifacecol}'
   register: dhcpdefaultnic
@@ -52,6 +54,7 @@
 
 - name: Get IP from DHCP server.
   ansible.builtin.shell: |
+    set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -oP 'new_ip_address=\K\S+' | sed "s/'//g"
   register: dhcpipaddressoffer
   when:
@@ -60,6 +63,7 @@
 
 - name: Get Netmask from DHCP server.
   ansible.builtin.shell: |
+    set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -oP 'new_subnet_mask=\K\S+' | sed "s/'//g"
   register: dhcpnetmaskoffer
   when:
@@ -68,6 +72,7 @@
 
 - name: Get GATEWAY from DHCP server.
   ansible.builtin.shell: |
+    set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -oP 'new_routers=\K\S+' | sed "s/'//g"
   register: dhcpgatewayoffer
   when:
@@ -76,6 +81,7 @@
 
 - name: Get DNS servers from DHCP server.
   ansible.builtin.shell: |
+    set -o pipefail
     dhcpcd -T {{ dhcpdefaultnic.stdout }} 2>&1 | grep -P 'new_domain_name_servers=\K\S+' | sed "s/new_domain_name_servers=//g" | sed "s/'//g"
   register: dhcpnameserversoffer
   when:
