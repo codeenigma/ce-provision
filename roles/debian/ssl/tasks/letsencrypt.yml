@@ -59,7 +59,7 @@
     python_pip_packages:
       packages:
         - name: "certbot-{{ _ssl_web_server }}"
-  when: _ssl_web_server != "standalone" # there is no certbot-standalone package in PyPi
+  when: not (_ssl_web_server == "standalone" or _ssl_web_server == "webroot")
 
 - name: Define SSL base path.
   ansible.builtin.set_fact:
@@ -88,6 +88,10 @@
     - not _letsencrypt_cert.stat.exists
     - _ssl_services | length > 0
 
+- name: Clean up _letsencrypt_domain_string variable .
+  ansible.builtin.set_fact:
+    _letsencrypt_domain_string: ""
+
 - name: Build certificate domains string.
   ansible.builtin.set_fact:
     _letsencrypt_domain_string: "{{ _letsencrypt_domain_string | default('') + ' -d ' + certificate_domain }}"
@@ -96,10 +100,17 @@
     loop_var: certificate_domain
   when: not _letsencrypt_cert.stat.exists
 
-- name: Register certificate bypassing web server if needed.
+- name: Register certificate bypassing web server if needed - standalone.
   ansible.builtin.command: "{{ _venv_path }}/bin/certbot {{ ssl.certbot_register_command }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} --http-01-port {{ ssl.http_01_port }} -m {{ ssl.email }} --{{ _ssl_web_server }}{{ _letsencrypt_domain_string }}"
   when:
     - not _letsencrypt_cert.stat.exists
+    - ssl.web_server == "standalone"
+
+- name: Register certificate bypassing web server if needed - webroot.
+  ansible.builtin.command: "{{ _venv_path }}/bin/certbot certonly --webroot -w {{ domain.webroot }} --cert-name {{ ssl_facts[_ssl_domains[0]].domain }} {{ _letsencrypt_domain_string }}"
+  when:
+    - not _letsencrypt_cert.stat.exists
+    - ssl.web_server == "webroot"
 
 - name: Restart services.
   ansible.builtin.service:
@@ -112,11 +123,10 @@
     - not _letsencrypt_cert.stat.exists
     - _ssl_services | length > 0
 
-# Because of the scripted command each SSL implementation needs it's own uniquely named cron script.
 - name: Create the certbot renewal script.
   ansible.builtin.template:
     src: le_cron.sh.j2
-    dest: "/usr/local/bin/le_cron_{{ ssl_facts[_ssl_domains[0]].domain | regex_replace('\\.', '_') }}.sh"
+    dest: "/usr/local/bin/le_cron.sh"
     owner: root
     group: root
     mode: 0755
