@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Function to send email notification
 send_email_notification() {
@@ -16,18 +16,6 @@ send_email_notification() {
 
 # Give Nginx more time to stop before certbot
 sleep 5
-
-# build bash array of domains
-SITES=()
-{% for domain in _ssl_domains %}
-SITES+=("{{ domain }}")
-{% endfor %}
-
-# turn array into certbot compatible sites string
-SITESSTRING=""
-for site in ${SITES[@]}; do
-  SITESSTRING+=" -d $site"
-done
 
 # run certbot and capture the output
 certbot_output=$( {{ _venv_path }}/bin/certbot renew 2>&1 )
