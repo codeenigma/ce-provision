@@ -1,4 +1,3 @@
-root@monitor1:/var/ossec/etc/rules# cat local_rules.xml
 <!-- Local rules -->
 
 <!-- Modify it at your will. -->
