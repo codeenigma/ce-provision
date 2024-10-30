@@ -100,7 +100,7 @@ wazuh:
           repeated_offenders: "30,60,120"
           timeout: 3600
       authd:
-        enabled: true
+        enabled: false
     wazuh_manager_globals:
       - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above
