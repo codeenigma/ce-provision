@@ -9,7 +9,6 @@
       name: nodejs
       types:
         - deb
-        - deb-src
       uris:
         - "https://deb.nodesource.com/node_{{ nodejs.version }}"
       signed_by: "{{ nodejs.apt_signed_by_nodejs }}"
