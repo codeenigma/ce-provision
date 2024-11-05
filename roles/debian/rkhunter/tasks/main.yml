@@ -7,6 +7,18 @@
     cache_valid_time: 240
   notify: Update rkhunter
 
+- name: Check paths for script existence
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  register: _rkhunter_existing_scripts_to_whitelist
+  loop: "{{ rkhunter.scriptwhitelist }}"
+
+- name: Filter existing scripts
+  set_fact:
+    existing_scripts: "{{ existing_scripts | default([]) + [item.item] }}"
+  when: item.stat.exists
+  loop: "{{ _rkhunter_existing_scripts_to_whitelist.results }}"
+
 - name: Copy rkhunter configuration.
   ansible.builtin.template:
     src: rkhunter.conf.j2
