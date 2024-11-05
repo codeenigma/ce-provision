@@ -585,9 +585,11 @@ PKGMGR={{ rkhunter.os_package_manager }}
 #
 # The default value is the null string.
 #
-{% for item in rkhunter.scriptwhitelist %}
+{% if existing_scripts is defined and existing_scripts | length > 0 %}
+{% for item in existing_scripts %}
 SCRIPTWHITELIST={{ item }}
 {% endfor %}
+{% endif %}
 
 #
 # Allow the specified file to have the immutable attribute set.
