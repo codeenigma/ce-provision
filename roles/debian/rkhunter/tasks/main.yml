@@ -21,7 +21,7 @@
 
 - name: Check paths for portpath existence
   ansible.builtin.stat:
-    path: "{{ item }} | cut -d ':' -f 1"
+    path: "{{ item.split(':')[0] }}"
   register: _rkhunter_existing_portpaths_to_whitelist
   loop: "{{ rkhunter.portpathwhitelist }}"
 
