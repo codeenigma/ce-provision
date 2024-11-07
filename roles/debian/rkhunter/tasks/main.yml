@@ -19,6 +19,18 @@
   when: item.stat.exists
   loop: "{{ _rkhunter_existing_scripts_to_whitelist.results }}"
 
+- name: Check paths for portpath existence
+  ansible.builtin.stat:
+    path: "{{ item.split(':')[0] }}"
+  register: _rkhunter_existing_portpaths_to_whitelist
+  loop: "{{ rkhunter.portpathwhitelist }}"
+
+- name: Filter existing portpath
+  set_fact:
+    existing_portpaths: "{{ existing_portpaths | default([]) + [item.item] }}"
+  when: item.stat.exists
+  loop: "{{ _rkhunter_existing_portpaths_to_whitelist.results }}"
+
 - name: Copy rkhunter configuration.
   ansible.builtin.template:
     src: rkhunter.conf.j2
