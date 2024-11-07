@@ -32,7 +32,7 @@
 - name: Print if Hetzner Cloud server is detected.
   debug:
     msg: "This is a Hetzner Cloud server"
-  when: hetznercloudcheck.rc == 0
+  when: hetznercloudcheck is defined and hetznercloudcheck.rc == 0
 
 - name: Install dhcpcd.
   ansible.builtin.apt:
