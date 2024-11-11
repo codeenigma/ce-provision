@@ -411,6 +411,10 @@
     - aws_ec2_autoscale_cluster.alb_security_groups | length > 0
     - aws_ec2_autoscale_cluster.create_elb
 
+- name: Debug listeners
+  ansible.builtin.debug:
+    var: _aws_ec2_autoscale_cluster_listeners
+
 - name: Create the ALB.
   amazon.aws.elb_application_lb:
     name: "{{ aws_ec2_autoscale_cluster.name }}"
