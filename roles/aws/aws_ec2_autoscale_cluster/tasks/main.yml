@@ -348,7 +348,7 @@
       Port: "{{ aws_ec2_autoscale_cluster.alb_http_port }}"
       DefaultActions:
         - Type: forward
-          TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+          TargetGroupArn: "{{ _aws_ec2_target_group_created.target_group_arn }}"
       Rules: "{{ aws_ec2_autoscale_cluster.listeners_http.rules }}"
     _aws_ec2_autoscale_cluster_listeners_redirect:
       Protocol: HTTP
@@ -370,7 +370,7 @@
         - CertificateArn: "{{ _ssl_certificate_ARN }}"
       DefaultActions:
         - Type: forward
-          TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+          TargetGroupArn: "{{ _aws_ec2_target_group_created.target_group_arn }}"
       Rules: "{{ aws_ec2_autoscale_cluster.listeners_https.rules }}"
   when: aws_ec2_autoscale_cluster.create_elb
 
