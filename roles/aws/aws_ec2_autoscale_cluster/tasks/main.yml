@@ -348,7 +348,7 @@
       Port: "{{ aws_ec2_autoscale_cluster.alb_http_port }}"
       DefaultActions:
         - Type: forward
-          TargetGroupArn: "{{ _aws_ec2_target_group_created.target_group_arn }}"
+          TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
       Rules: "{{ aws_ec2_autoscale_cluster.listeners_http.rules }}"
     _aws_ec2_autoscale_cluster_listeners_redirect:
       Protocol: HTTP
@@ -370,7 +370,7 @@
         - CertificateArn: "{{ _ssl_certificate_ARN }}"
       DefaultActions:
         - Type: forward
-          TargetGroupArn: "{{ _aws_ec2_target_group_created.target_group_arn }}"
+          TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
       Rules: "{{ aws_ec2_autoscale_cluster.listeners_https.rules }}"
   when: aws_ec2_autoscale_cluster.create_elb
 
@@ -410,10 +410,6 @@
   when:
     - aws_ec2_autoscale_cluster.alb_security_groups | length > 0
     - aws_ec2_autoscale_cluster.create_elb
-
-- name: Debug listeners
-  ansible.builtin.debug:
-    var: _aws_ec2_autoscale_cluster_listeners
 
 - name: Create the ALB.
   amazon.aws.elb_application_lb:
