@@ -50,6 +50,7 @@
   when: inventory_hostname != "localhost"
 
 - name: Save server info on our infra.
+  delegate_to: localhost
   block:
     - name: Make sure path exist.
       ansible.builtin.file:
@@ -65,7 +66,6 @@
       mode: "0755"
       owner: controller
       group: controller
-  delegate_to: localhost
 
 - name: Delete the lock file.
   ansible.builtin.file:
