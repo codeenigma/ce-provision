@@ -8,7 +8,7 @@ collections:
   - name: community.general
   - name: community.postgresql
   - name: amazon.aws
-    version: "8.0.1"  # ELB plugin broken since June
+    version: "8.2.1" # ELB plugin is broken in 9.0.0
 
 roles:
   - name: geerlingguy.varnish
