@@ -58,6 +58,7 @@
         recurse: true
         state: directory
         mode: 0644
+        become: true
 
     - name: Copy server details into clients folder.
       ansible.builtin.template:
@@ -66,6 +67,7 @@
         mode: "0755"
         owner: controller
         group: controller
+        become: true
 
 - name: Delete the lock file.
   ansible.builtin.file:
