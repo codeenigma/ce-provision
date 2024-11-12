@@ -49,6 +49,25 @@
   become: true
   when: inventory_hostname != "localhost"
 
+- name: Make sure path exist.
+  ansible.builtin.file:
+    path: "/home/controller/build/clients/{{ _aws_profile }}"
+    recurse: true
+    state: directory
+    mode: 0644
+  become: true
+  delegate_to: localhost
+
+- name: Copy server details into clients folder.
+  ansible.builtin.template:
+    src: server_details.j2
+    dest: "/home/controller/build/clients/{{ _aws_profile }}/{{ _aws_resource_name }}"
+    mode: "0755"
+    owner: controller
+    group: controller
+  become: true
+  delegate_to: localhost
+
 - name: Delete the lock file.
   ansible.builtin.file:
     path: "{{ _init.lock_file }}"
