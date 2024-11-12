@@ -61,11 +61,11 @@
 
     - name: Copy server details into clients folder.
       ansible.builtin.template:
-      src: server_details.j2
-      dest: "/home/controller/build/clients/{{ _aws_profile }}/{{ _aws_resource_name }}"
-      mode: "0755"
-      owner: controller
-      group: controller
+        src: server_details.j2
+        dest: "/home/controller/build/clients/{{ _aws_profile }}/{{ _aws_resource_name }}"
+        mode: "0755"
+        owner: controller
+        group: controller
 
 - name: Delete the lock file.
   ansible.builtin.file:
