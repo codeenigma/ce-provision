@@ -30,13 +30,14 @@ server {
     include "/etc/nginx/conf.d/{{ domain.project_type }}";
     include "/etc/nginx/conf.d/_common";
 {% if domain.ssl is defined and domain.ssl.handling == 'letsencrypt' %}
-{% if domain.ssl.web_server | default('standalone') == 'standalone' %}
+
     # Proxy for certbot (LetsEncrypt)
     location ^~/.well-known/acme-challenge/ {
         auth_basic off;
+        {% if domain.ssl.web_server | default('standalone') == 'standalone' %}
         proxy_pass http://127.0.0.1:{{ domain.ssl.http_01_port }}$request_uri;
+        {% endif %}
     }
-{% endif %}
 {% endif %}
 
 {% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}

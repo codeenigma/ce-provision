@@ -31,6 +31,7 @@ rkhunter:
     - /etc/.etckeeper
   allowdevfile:
     - /dev/shm/network/ifstate
+  allowipcproc: []
   allow_system_remote_logging: "0"
   supscan_directories: "/tmp /var/tmp"
   supscan_maxsize: "10240000"
