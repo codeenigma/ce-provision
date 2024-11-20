@@ -97,6 +97,8 @@ wazuh:
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
     wazuh_manager_config:
+      decoder_dir: "ruleset/decoders"
+      rule_dir: "ruleset/rules"
       active_responses:
         - command: "firewall-drop"
           location: "all"
@@ -108,6 +110,8 @@ wazuh:
           rules_id: "100205"
           repeated_offenders: "30,60,120"
           timeout: 3600
+      authd:
+        enabled: false
     wazuh_manager_globals:
       - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above

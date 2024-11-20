@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 ---
 - name: Set first part of iptables command
   ansible.builtin.set_fact:
     _iptables_string: "iptables -A {{ _iptabes_type }} -p {{ item.proto }}"
+=======
+- name: Set first part of iptables command
+  ansible.builtin.set_fact:
+    _iptables_string: "iptables -I {{ _iptabes_type }} -p {{ item.proto }}"
+>>>>>>> New-role-SG-iptables-rules-with-priority
 
 - name: Set outgoing IP on iptables command
   ansible.builtin.set_fact:
@@ -19,7 +25,11 @@
     (item.cidr_ipv6 is defined or
     item.cidr_ip is defined)
 
+<<<<<<< HEAD
 - name: Add ICMP part of command for outgoing
+=======
+- name: Sdd ICMP part of command for outgoing
+>>>>>>> New-role-SG-iptables-rules-with-priority
   ansible.builtin.set_fact:
     _iptables_string: "{{ _iptables_string }} --icmp-type {{ item.from_port }} -m state --state ESTABLISHED,RELATED"
   when: _iptabes_type == "OUTPUT"
@@ -29,7 +39,11 @@
     _iptables_string: "{{ _iptables_string }} --icmp-type {{ item.from_port }} -m state --state NEW,ESTABLISHED,RELATED"
   when: _iptabes_type == "INPUT"
 
+<<<<<<< HEAD
 - name: Add last part of command
+=======
+- name: add last part of command
+>>>>>>> New-role-SG-iptables-rules-with-priority
   ansible.builtin.set_fact:
     _iptables_string: "{{ _iptables_string }} -j ACCEPT # {{ item.rule_desc }}"
 

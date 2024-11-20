@@ -1,20 +1,38 @@
 ---
 aws_sg_iptables:
-  - description: Security group for open ssh and icmp
-    name: ssh-icmp-open
-    purge_rules: false # Set this to true to override existing incoming rules for SG with same name
-    purge_rules_egress: false # Set this to true to override existing outgoing rules for SG with same name
+  - description: Test rule for new role
+    name: Test rule
     rules:
     - cidr_ip: 0.0.0.0/0
       from_port: 8
       proto: icmp
       rule_desc: Allow ICMP IPv4 ping
       to_port: -1
-    - cidr_ip: 0.0.0.0/16
+      priority: 1  # Priority will be used to set rules in order (Highest priority will become first rule)
+    - cidr_ipv6: ::/0
+      from_port: 128
+      proto: icmp
+      rule_desc: Allow ICMP IPv6 ping
+      to_port: -1
+      priority: 5
+    - cidr_ip: 0.0.0.0/0
       ports:
       - 22
       proto: tcp
-      rule_desc: Allow all tcp traffic on port 22
+      rule_desc: Allow all tcp traffic on SSH
+      priority: 4
+    - cidr_ip: 0.0.0.0/0
+      ports:
+      - 80
+      proto: tcp
+      rule_desc: Allow all tcp traffic on HTTP
+      priority: 3
+    - cidr_ip: 0.0.0.0/0
+      ports:
+      - 443
+      proto: tcp
+      rule_desc: Allow all tcp traffic on HTTPS
+      priority: 2
     rules_egress:
     - cidr_ip: 0.0.0.0/0
       ports:
@@ -22,3 +40,4 @@ aws_sg_iptables:
       - 2049
       proto: tcp
       rule_desc: Allow ports 1-1024 and 2049 for NFS as standard
+      priority: 1
