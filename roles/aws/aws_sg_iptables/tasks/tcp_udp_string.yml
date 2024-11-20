@@ -23,7 +23,7 @@
     (item.0.cidr_ipv6 is defined or
     item.0.cidr_ip is defined)
 
-- name: add last part of command
+- name: Add last part of command
   ansible.builtin.set_fact:
     _iptables_string: "{{ _iptables_string }} -j ACCEPT # {{ item.0.rule_desc }}"
   when: item.1 is defined
