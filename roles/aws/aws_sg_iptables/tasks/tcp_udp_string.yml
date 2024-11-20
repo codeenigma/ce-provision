@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 ---
 - name: Set first part of iptables command
   ansible.builtin.set_fact:
     _iptables_string: "iptables -A {{ _iptabes_type }} -p {{ item.0.proto }}"
-=======
-- name: Set first part of iptables command
-  ansible.builtin.set_fact:
-    _iptables_string: "iptables -I {{ _iptabes_type }} -p {{ item.0.proto }}"
->>>>>>> New-role-SG-iptables-rules-with-priority
 
 - name: Set port on iptables command
   ansible.builtin.set_fact:
@@ -30,11 +24,7 @@
     (item.0.cidr_ipv6 is defined or
     item.0.cidr_ip is defined)
 
-<<<<<<< HEAD
 - name: Add last part of command
-=======
-- name: add last part of command
->>>>>>> New-role-SG-iptables-rules-with-priority
   ansible.builtin.set_fact:
     _iptables_string: "{{ _iptables_string }} -j ACCEPT # {{ item.0.rule_desc }}"
   when: item.1 is defined
