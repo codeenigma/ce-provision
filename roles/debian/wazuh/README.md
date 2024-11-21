@@ -97,11 +97,8 @@ wazuh:
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
     wazuh_manager_config:
-<<<<<<< HEAD
       decoder_dir: "ruleset/decoders"
       rule_dir: "ruleset/rules"
-=======
->>>>>>> Turning-off-ami-cleanup-task
       active_responses:
         - command: "firewall-drop"
           location: "all"
@@ -113,11 +110,8 @@ wazuh:
           rules_id: "100205"
           repeated_offenders: "30,60,120"
           timeout: 3600
-<<<<<<< HEAD
       authd:
         enabled: false
-=======
->>>>>>> Turning-off-ami-cleanup-task
     wazuh_manager_globals:
       - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above
