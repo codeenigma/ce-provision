@@ -46,7 +46,11 @@ _mount_state: present
 aws_efs_client:
   aws_profile: example # AWS boto profile name - can be substituted for "{{ _aws_profile }}" if set
   region: eu-west-1 # AWS region name - can be substituted for "{{ _aws_region }}" if set
+<<<<<<< HEAD
   version: 2.1.0 # version of AWS EFS utils to use
+=======
+  version: 1.35.0 # version of AWS EFS utils to use
+>>>>>>> Turning-off-ami-cleanup-task
   build_suffix: "-1_all" # sometimes there is a suffix appended to the package name, e.g. `amazon-efs-utils-1.35.0-1_all.deb`
   deb_url: "" # provide an alternative location for the .deb package
   # See https://docs.ansible.com/ansible/latest/modules/mount_module.html

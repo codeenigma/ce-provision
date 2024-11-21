@@ -14,8 +14,16 @@ Currently, the following entities can be managed with the role:
 ---
 system:
   noipv6: false
+<<<<<<< HEAD
   nohetznerdhcp: false
+=======
+  nohetznerchdp: false
+>>>>>>> Turning-off-ami-cleanup-task
 
 ```
 
 <!--ENDROLEVARS-->
+<<<<<<< HEAD
+=======
+
+>>>>>>> Turning-off-ami-cleanup-task
