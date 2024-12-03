@@ -14,9 +14,8 @@ Currently, the following entities can be managed with the role:
 ---
 system:
   noipv6: false
-  nohetznerchdp: false
+  nohetznerdhcp: false
 
 ```
 
 <!--ENDROLEVARS-->
-
