@@ -2,12 +2,13 @@
 collections:
   - name: ansible.posix
   - name: ansible.utils
-  - name: ansible.windows # required by Wazuh roles
+  - name: ansible.windows  # required by Wazuh roles
   - name: community.sops
   - name: community.aws
   - name: community.general
   - name: community.postgresql
   - name: amazon.aws
+    version: "8.0.1" # ELB plugin broken since June
 
 roles:
   - name: geerlingguy.varnish

@@ -585,9 +585,11 @@ PKGMGR={{ rkhunter.os_package_manager }}
 #
 # The default value is the null string.
 #
-{% for item in rkhunter.scriptwhitelist %}
+{% if existing_scripts is defined and existing_scripts | length > 0 %}
+{% for item in existing_scripts %}
 SCRIPTWHITELIST={{ item }}
 {% endfor %}
+{% endif %}
 
 #
 # Allow the specified file to have the immutable attribute set.
@@ -935,6 +937,11 @@ SUSPSCAN_THRESH={{ rkhunter.supscan_threshold }}
 #
 #PORT_WHITELIST=""
 #PORT_PATH_WHITELIST=""
+{% if existing_portpaths is defined and existing_portpaths | length > 0 %}
+{% for item in existing_portpaths %}
+PORT_PATH_WHITELIST={{ item }}
+{% endfor %}
+{% endif %}
 
 #
 # The following option can be used to tell rkhunter where the operating system
@@ -1237,4 +1244,9 @@ INSTALLDIR=/usr
 #
 #EMPTY_LOGFILES=""
 #MISSING_LOGFILES=""
+
+# Option to ignore false-positive shared memory segment warnings
+{% for item in rkhunter.allowipcproc %}
+ALLOWIPCPROC={{ item }}
+{% endfor %}
 

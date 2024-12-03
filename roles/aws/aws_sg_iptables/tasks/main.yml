@@ -1,14 +1,17 @@
----
 - name: Define iptables variables for incoming
   ansible.builtin.set_fact:
-    _glob: "{{ aws_sg_iptables | selectattr('rules', 'defined') | map(attribute='rules') | flatten }}"
+    _glob: "{{ aws_sg_iptables | selectattr('rules', 'defined') | map(attribute='rules') | flatten | sort(attribute='priority') }}"
     _iptables_list: []
     _iptables_string: ""
     _iptabes_type: "INPUT"
 
 - name: Set list of commands for tcp/udp in
   include_tasks: tcp_udp_string.yml
-  loop: "{{ q('ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
+  loop: "{{ q( 'ansible.builtin.subelements', _glob, 'ports', { 'skip_missing': True }) }}"
+
+- name: Remove priority element from dict.
+  ansible.builtin.set_fact:
+    _glob: "{{ _glob | ansible.utils.remove_keys(target=['priority']) }}"
 
 - name: Set list of commands for icmp in
   include_tasks: icmp_string.yml
@@ -20,9 +23,13 @@
     _glob: "{{ aws_sg_iptables | selectattr('rules_egress', 'defined') | map(attribute='rules_egress') | flatten }}"
     _iptabes_type: "OUTPUT"
 
+- name: Remove priority element from dict.
+  ansible.builtin.set_fact:
+    _glob: "{{ _glob | ansible.utils.remove_keys(target=['priority']) }}"
+
 - name: Set list of commands four tcp/udp out
   include_tasks: tcp_udp_string.yml
-  loop: "{{ q('ansible.builtin.subelements', _glob, 'ports', {'skip_missing': True}) }}"
+  loop: "{{ q( 'ansible.builtin.subelements', _glob, 'ports', { 'skip_missing': True }) }}"
 
 - name: Set list of commands for icmp in
   include_tasks: icmp_string.yml
@@ -32,8 +39,8 @@
 - name: Define bits of iptables command
   ansible.builtin.set_fact:
     _iptables_end:
-      - "iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT"
-      - "iptables -A OUTPUT -o lo -j ACCEPT"
+      - "iptables -I OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT"
+      - "iptables -I OUTPUT -o lo -j ACCEPT"
       - "iptables -A OUTPUT -p tcp --dport 1025:65535 -j DROP"
       - "iptables -A OUTPUT -p udp --dport 1025:65535 -j DROP"
 
@@ -44,6 +51,10 @@
         - override
       override:
         firewall_additional_rules: "{{ _iptables_list + _iptables_end }}"
+
+- name: Remove priority element from dict.
+  ansible.builtin.set_fact:
+    aws_sg_iptables: "{{ aws_sg_iptables | ansible.utils.remove_keys(target=['priority']) }}"
 
 - name: Ensure Security groups are in place.
   ansible.builtin.include_role:
@@ -74,6 +85,10 @@
     apply:
       delegate_to: localhost
       become: false
+
+- name: Override firewall_config var
+  ansible.builtin.set_fact:
+    firewall_additional_rules: "{{ firewall_additional_rules | sort(reverse=true) }}"
 
 - name: Include firewall role
   ansible.builtin.include_role:

@@ -6,3 +6,4 @@ collections:
   - name: community.aws
   - name: ansible.posix
   - name: amazon.aws
+    version: "8.0.1" # ELB plugin broken since June

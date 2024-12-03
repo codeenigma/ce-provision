@@ -41,3 +41,8 @@
   loop: "{{ wget_list }}"
   loop_control:
     loop_var: wget_item
+
+- name: Remove gawk.csh from /etc/profile.d
+  ansible.builtin.file:
+    path: /etc/profile.d/gawk.csh
+    state: absent
