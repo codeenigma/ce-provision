@@ -37,8 +37,9 @@
   ansible.builtin.wait_for:
     timeout: 20
 
-- name: Get verified domain.
-  ansible.builtin.include_tasks: get_valid_email.yml
+# Not all clients have verified identity
+#- name: Get verified domain.
+#  ansible.builtin.include_tasks: get_valid_email.yml
 
 - name: Clean and set python functions
   block:
