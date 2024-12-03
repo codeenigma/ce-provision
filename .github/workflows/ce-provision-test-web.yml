@@ -31,7 +31,7 @@ jobs:
           sudo mv ./mkcert /usr/local/bin && cd ../
           sudo chmod +x /usr/local/bin/mkcert
           rm -Rf mkcert
-          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/${{ github.event.pull_request.base.ref }}/install.sh | /bin/sh -s -- --platform linux
 
       # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
