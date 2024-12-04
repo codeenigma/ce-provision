@@ -94,7 +94,6 @@
   register: _lambda_functions
   loop: "{{ aws_backup_validation.resources }}"
 
-
 - name: Create validation report functions
   amazon.aws.lambda:
     name: "validation_report"
@@ -126,10 +125,12 @@
   register: _event_bridges
   loop: "{{ _lambda_functions.results }}"
 
-- amazon.aws.cloudwatchevent_rule:
+- name: Create schedule for validation reports
+  amazon.aws.cloudwatchevent_rule:
     name: validation_report
     schedule_expression: "cron(0 0 ? * MON *)"
     description: Run validation reporting
+    region: "{{ _aws_region }}"
     targets:
       - id: validation_report
         arn: "{{ _validation_report.configuration.function_arn }}"
