@@ -105,7 +105,7 @@
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
-    handler: "{{ item }}_validation.{{ aws_backup_validation.handler }}"
+    handler: "validation_report.{{ aws_backup_validation.handler }}"
   register: _validation_report
 
 - name: Remove non UTF-8 item
