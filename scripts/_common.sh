@@ -154,14 +154,25 @@ cleanup_build_tmp_dir(){
     rm -rf "$BUILD_TMP_DIR"
   fi
 }
+
 # Trigger actual Ansible job.
 ansible_play(){
   if [ -z "$ANSIBLE_PATH" ]; then
     if [ "$LINT" = "yes" ]; then
       # apt repo installed
-      ANSIBLE_BIN=$(command -v ansible-lint)
+      if ! command -v ansible-lint; then
+        echo "### Could not find ansible-lint - Exiting! ###"
+        exit 1
+      else
+        ANSIBLE_BIN=$(command -v ansible-lint)
+      fi
     else
-      ANSIBLE_BIN=$(command -v ansible-playbook)
+      if ! command -v ansible-playbook; then
+        echo "### Could not find ansible-playbook - Exiting! ###"
+        exit 1
+      else
+        ANSIBLE_BIN=$(command -v ansible-playbook)
+      fi
     fi
   else
     if [ "$LINT" = "yes" ]; then

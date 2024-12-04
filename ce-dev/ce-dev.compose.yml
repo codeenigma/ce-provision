@@ -11,6 +11,8 @@ services:
     x-ce_dev: {}
     volumes:
       - ../:/home/ce-dev/ce-provision
+    platform: linux/amd64
+    cgroup: host
   target:
     image: codeenigma/ce-dev-1.x:devel
     x-ce_dev:
@@ -21,6 +23,8 @@ services:
       - 443
     cap_add:
       - NET_ADMIN
+    platform: linux/amd64
+    cgroup: host
   privileged:
     image: codeenigma/ce-dev-1.x:devel
     x-ce_dev:
@@ -32,3 +36,5 @@ services:
       - 443
     cap_add:
       - NET_ADMIN
+    platform: linux/amd64
+    cgroup: host

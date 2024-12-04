@@ -10,7 +10,7 @@ jobs:
     # Name the Job
     name: Run tests against Ansible code base
     # Set the type of machine to run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
@@ -31,12 +31,12 @@ jobs:
           sudo mv ./mkcert /usr/local/bin && cd ../
           sudo chmod +x /usr/local/bin/mkcert
           rm -Rf mkcert
-          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
+          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/${{ github.event.pull_request.base.ref }}/install.sh | /bin/sh -s -- --platform linux
 
       # Uses the ce-dev stack to run a test provision
       - name: Run a test provision
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          git clone --branch 1.x https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          /bin/bash ce-dev/ansible/test.sh --examples web --own-branch ${{ github.event.pull_request.base.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
+          git clone --branch ${{ github.event.pull_request.base.ref }} https://github.com/codeenigma/ce-dev-ce-provision-config.git config
+          /bin/bash ce-dev/ansible/test.sh --examples web --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
         shell: bash
