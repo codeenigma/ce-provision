@@ -16,7 +16,6 @@ ses_cli = boto3.client('ses', region_name="{{ _aws_region }}")
 
 def lambda_handler(event, context):
 
-  mail_title = ""
   mail_body = ""
 
   print("Gathering instance id.")
@@ -79,7 +78,6 @@ def lambda_handler(event, context):
   )
 
   print(c_res['StandardOutputContent'])
-  mail_title = "Success: " + ec2_with_access
   instance_message = "RDS instance " + ec2_with_access  + " was restored.\n"
   conn_message = "Able to get information from " + new_endpoint + ":\n"
   mail_body=instance_message + conn_message + c_res['StandardOutputContent']
@@ -91,33 +89,7 @@ def lambda_handler(event, context):
     ValidationStatusMessage=""
   )
 
-  print("Sending email!")
-  response = ses_cli.send_email(
-  Destination={
-  'BccAddresses': [
-    ],
-    'CcAddresses': [],
-    'ToAddresses': [
-      'sysadm@codeenigma.com'
-    ],
-  },
-  Message={
-    'Body': {
-      'Text': {
-        'Charset': 'UTF-8',
-        'Data': mail_body,
-      },
-    },
-    'Subject': {
-      'Charset': 'UTF-8',
-      'Data': 'Lambda Backup validation: ' + mail_title,
-    },
-  },
-  # Need to replace "codeenigma.net" with _verified_domain variable
-  Source='Lambda Backup Validation <lambda@codeenigma.uk>',
-  )
-
-  print(json.dumps(event))
+  print(mail_body)
 
   return {
     'statusCode': 200,
