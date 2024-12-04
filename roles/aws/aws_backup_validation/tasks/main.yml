@@ -133,8 +133,7 @@
     region: "{{ _aws_region }}"
     targets:
       - id: validation_report
-        arn: "{{ _validation_report.configuration.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
-  register: _validation_event
+        arn: "{{ (_validation_report.configuration.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
 
 - name: Generate unique string
   ansible.builtin.set_fact:
