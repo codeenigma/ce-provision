@@ -1,3 +1,5 @@
 php:
   version:
     - 8.1
+  fpm:
+    max_children: 5
