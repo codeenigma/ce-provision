@@ -43,11 +43,16 @@
 
 - name: Clean and set python functions
   block:
-    - name: Check and clean any previous Lambda files
+    - name: Check and clean any previous backup validation files
       ansible.builtin.file:
         path: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
         state: absent
       loop: "{{ aws_backup_validation.resources }}"
+
+    - name: Check and clean any previous validation report files
+      ansible.builtin.file:
+        path: "{{ _ce_provision_build_dir }}/validation_report.py"
+        state: absent
 
     - name: Write Lambda functions
       ansible.builtin.template:
@@ -55,12 +60,23 @@
         dest: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
       loop: "{{ aws_backup_validation.resources }}"
 
+    - name: Write validation report functions
+      ansible.builtin.template:
+        src: "validation_report.j2"
+        dest: "{{ _ce_provision_build_dir }}/validation_report.py"
+
     - name: Create a zip archive of Lambda functions
       community.general.archive:
         path: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
         dest: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
         format: zip
       loop: "{{ aws_backup_validation.resources }}"
+
+    - name: Create a zip archive of validation report
+      community.general.archive:
+        path: "{{ _ce_provision_build_dir }}/validation_report.py"
+        dest: "{{ _ce_provision_build_dir }}/validation_report.zip"
+        format: zip
 
 - name: Create Lambda functions
   amazon.aws.lambda:
@@ -78,11 +94,26 @@
   register: _lambda_functions
   loop: "{{ aws_backup_validation.resources }}"
 
+
+- name: Create validation report functions
+  amazon.aws.lambda:
+    name: "validation_report"
+    description: "Function that will send report about previous validations"
+    region: "{{ _aws_region }}"
+    timeout: 30
+    zip_file: "{{ _ce_provision_build_dir }}/validation_report.zip"
+    state: present
+    runtime: "{{ aws_backup_validation.runtime }}"
+    role: "{{ _created_iam_lambda_role.iam_role.arn }}"
+    handler: "{{ item }}_validation.{{ aws_backup_validation.handler }}"
+  register: _validation_report
+
 - name: Remove non UTF-8 item
   ansible.builtin.set_fact:
     _lambda_functions: "{{ _lambda_functions | ansible.utils.remove_keys(target=['ZipFile', 'location', 'item.invocation']) }}"
+    _validation_report: "{{ _validation_report | ansible.utils.remove_keys(target=['ZipFile', 'location', 'item.invocation']) }}"
 
-- name: Create EventBridge
+- name: Create EventBridge for validations
   amazon.aws.cloudwatchevent_rule:
     name: "{{ item.configuration.function_name }}"
     description: "{{ item.configuration.description }}"
@@ -94,6 +125,15 @@
         arn: "{{ (item.configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _event_bridges
   loop: "{{ _lambda_functions.results }}"
+
+- amazon.aws.cloudwatchevent_rule:
+    name: validation_report
+    schedule_expression: "cron(0 0 ? * MON *)"
+    description: Run validation reporting
+    targets:
+      - id: validation_report
+        arn: "{{ _validation_report.configuration.function_arn }}"
+  register: _validation_event
 
 - name: Generate unique string
   ansible.builtin.set_fact:
@@ -109,3 +149,13 @@
     source_arn: "{{ item.rule.arn }}"
     region: "{{ _aws_region }}"
   loop: "{{ _event_bridges.results }}"
+
+- name: Update lambda validation report policy
+  amazon.aws.lambda_policy:
+    state: present
+    function_name: "validation_report"
+    statement_id: "{{ _validation_report.configuration.function_name }}_{{ _rand_str }}"
+    action: lambda:InvokeFunction
+    principal: events.amazonaws.com
+    source_arn: "{{ _validation_event.rule.arn }}"
+    region: "{{ _aws_region }}"

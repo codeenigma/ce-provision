@@ -305,7 +305,6 @@
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
 
-
 - name: Create ami cleanup function
   ansible.builtin.include_role:
     name: aws/aws_ami_asg_cleanup
