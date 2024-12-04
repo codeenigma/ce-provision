@@ -93,16 +93,20 @@ provision-controller
 provision-target
 provision-privileged
 EOT
-  PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh --python-interpreter /home/ce-dev/ce-python/bin/python3"
-  echo "# Executing $1 project"
-  PROVISION_CMD="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/$1/$1.yml --own-branch $2 --config-branch $3 --force"
+  PROVISION_CMD="/bin/sh /home/ce-dev/ce-provision/scripts/provision.sh"
   if [ $VERBOSE = true ]; then
     echo "# In verbose mode"
     PROVISION_CMD="$PROVISION_CMD --verbose"
   fi
-  echo "# Running command: $PROVISION_CMD"
+  echo "# Executing $1 project"
+  PROVISION_EXEC="$PROVISION_CMD --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/_common/setup.yml --own-branch $2 --config-branch $3 --force"
+  echo "# Installing Ansible in a venv: $PROVISION_EXEC"
   # shellcheck disable=SC2086
-  sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_CMD
+  sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_EXEC
+  PROVISION_EXEC="$PROVISION_CMD --python-interpreter /home/ce-dev/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/ce-dev/ce-provision/ce-dev/ansible --playbook plays/$1/$1.yml --own-branch $2 --config-branch $3 --force"
+  echo "# Running command: $PROVISION_EXEC"
+  # shellcheck disable=SC2086
+  sudo docker exec -t --workdir /home/ce-dev/ce-provision --user ce-dev provision-controller $PROVISION_EXEC
   echo "### $1 project completed ###"
 }
 
