@@ -134,7 +134,6 @@
     targets:
       - id: validation_report
         arn: "{{ (_validation_report.configuration.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
-  register: _validation_event
 
 - name: Generate unique string
   ansible.builtin.set_fact:
