@@ -94,7 +94,6 @@
   register: _lambda_functions
   loop: "{{ aws_backup_validation.resources }}"
 
-
 - name: Create validation report functions
   amazon.aws.lambda:
     name: "validation_report"
@@ -105,7 +104,7 @@
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
-    handler: "{{ item }}_validation.{{ aws_backup_validation.handler }}"
+    handler: "validation_report.{{ aws_backup_validation.handler }}"
   register: _validation_report
 
 - name: Remove non UTF-8 item
@@ -126,13 +125,15 @@
   register: _event_bridges
   loop: "{{ _lambda_functions.results }}"
 
-- amazon.aws.cloudwatchevent_rule:
+- name: Create schedule for validation reports
+  amazon.aws.cloudwatchevent_rule:
     name: validation_report
     schedule_expression: "cron(0 0 ? * MON *)"
     description: Run validation reporting
+    region: "{{ _aws_region }}"
     targets:
       - id: validation_report
-        arn: "{{ _validation_report.configuration.function_arn }}"
+        arn: "{{ _validation_report.configuration.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _validation_event
 
 - name: Generate unique string
