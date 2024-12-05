@@ -6,6 +6,6 @@
   loop_control:
     loop_var: _acl
 
-- name: Set ACL to CF/ALB.
+- name: Set ACL to CF/ALB if dict is passed.
   ansible.builtin.include_tasks: set_acl.yml
   when: aws_acl | type_debug == 'dict'
