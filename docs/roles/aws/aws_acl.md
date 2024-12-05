@@ -21,12 +21,12 @@ aws_acl:
       ip_sets:
         - rule_name: "Allowed-IPs-rule"
           set_name: "Allowed-IPs-set"
-          description: "List of IPs from our VPNs - Ansible managed"
+          description: "List of IPs to whitelist - Ansible managed"
           action: allow
           priority: 1
           list:
-            - 3.11.82.252/32 # main VPN
-            - 159.100.242.248/32 # backup VPN, bastion2
+            - 1.1.1.1/32
+            - 2.2.2.2/32
       country_codes:
         - name: "allowed-countries"
           action: allow
