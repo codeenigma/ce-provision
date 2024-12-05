@@ -14,7 +14,7 @@ aws_acl:
     scope: CLOUDFRONT # Can be REGIONAL for ALBs
     region: "us-east-1"
     tags: "{{ _aws_tags }}"
-    recreate: true # set to true to avoid creating the ACL
+    recreate: false # set to true to creating the ACL
     rules:
       rate_limit:
         value: 600 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
