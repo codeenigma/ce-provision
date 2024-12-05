@@ -129,7 +129,7 @@
 - name: Set priority.
   ansible.builtin.include_tasks: set_priority_dict.yml
   vars:
-    _priority: "{{ bot_control.priority }}"
+    _priority: "{{ _acl.rules.bot_control.priority }}"
 
 - name: Append priority to rule.
   ansible.builtin.set_fact:
