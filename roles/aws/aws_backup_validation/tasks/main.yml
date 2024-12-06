@@ -45,8 +45,8 @@
   block:
     - name: Create S3 bucket for lambda functions
       amazon.aws.s3_bucket:
-      name: "ce-{{ _aws_profile }}-lambda-functions"
-      state: present
+        name: "ce-{{ _aws_profile }}-lambda-functions"
+        state: present
 
     - name: Check and clean any previous backup validation files
       ansible.builtin.file:
