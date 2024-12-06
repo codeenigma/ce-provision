@@ -96,7 +96,6 @@
         bucket: "ce-{{ _aws_profile }}-lambda-functions"
         object: "validation_report.zip"
         src: "{{ _ce_provision_build_dir }}/validation_report.zip"
-        mode: "create"
         region: "{{ _aws_region }}"
         mode: put
       loop: "{{ aws_backup_validation.resources }}"
