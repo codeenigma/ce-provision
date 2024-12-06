@@ -83,7 +83,7 @@ if [ "$(id -u)" -ne 0 ]
   then echo "Please run this script as root or using sudo!"
   exit
 fi
- 
+
 # Check we are using a compatible Linux distribution.
 if [ "$ID" != "debian" ]; then
   if [ "$ID_LIKE" != "debian" ]; then
@@ -136,7 +136,7 @@ echo "-------------------------------------------------"
 su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy -p /home/$CONTROLLER_USER/.ansible/collections/ansible_collections collection install ansible.posix --force"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix -p /home/$CONTROLLER_USER/.ansible/collections/ansible_collections --force"
 if [ "$AWS_SUPPORT" = "true" ]; then
   su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
 fi
@@ -152,7 +152,7 @@ else
   echo "-------------------------------------------------"
 fi
 # Create playbook for ce-provision.
-/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
   become: true
@@ -164,7 +164,7 @@ fi
         name: debian/ce_provision
 EOL
 # Create vars file.
-/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
+/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
 _domain_name: ${SERVER_HOSTNAME}
 _ce_provision_data_dir: /home/${CONTROLLER_USER}/ce-provision/data
 _ce_provision_username: ${CONTROLLER_USER}
@@ -176,6 +176,8 @@ ce_provision:
   aws_support: ${AWS_SUPPORT}
   new_user: ${CONTROLLER_USER}
   username: ${CONTROLLER_USER}
+  ssh_key_bits: "521"
+  ssh_key_type: ecdsa
   public_key_name: id_rsa.pub
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "${VERSION}"
@@ -222,7 +224,7 @@ rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 echo "-------------------------------------------------"
 echo "Install firewall."
 echo "-------------------------------------------------"
-/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
   become: true
@@ -233,7 +235,7 @@ echo "-------------------------------------------------"
       ansible.builtin.import_role:
         name: debian/firewall_config
 EOL
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 echo "-------------------------------------------------"
 
 # Install GitLab
@@ -241,7 +243,7 @@ if [ "$GITLAB_URL" != "no" ]; then
   echo "Install GitLab."
   echo "-------------------------------------------------"
   # Create playbook.
-  /usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+  /bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
   become: true
@@ -256,7 +258,7 @@ if [ "$GITLAB_URL" != "no" ]; then
         name: debian/gitlab
 EOL
   # Create vars file.
-  /usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
+  /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
 gitlab_runner:
   apt_origin: "origin=packages.gitlab.com/runner/gitlab-runner,codename=\${distro_codename},label=gitlab-runner" # used by apt_unattended_upgrades
   apt_signed_by: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
@@ -344,7 +346,7 @@ EOT
 EOT
     echo "-------------------------------------------------"
   fi
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
   echo "-------------------------------------------------"
 else
   echo "GitLab not requested. Skipping."
