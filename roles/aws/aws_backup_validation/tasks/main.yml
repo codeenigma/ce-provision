@@ -44,7 +44,7 @@
 - name: Clean and set python functions
   block:
     - name: Create S3 bucket for lambda functions
-    - amazon.aws.s3_bucket:
+      amazon.aws.s3_bucket:
       name: "ce-{{ _aws_profile }}-lambda-functions"
       state: present
 
