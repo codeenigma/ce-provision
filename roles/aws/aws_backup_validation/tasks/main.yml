@@ -43,6 +43,11 @@
 
 - name: Clean and set python functions
   block:
+    - name: Create S3 bucket for lambda functions
+    - amazon.aws.s3_bucket:
+      name: "ce-{{ _aws_profile }}-lambda-functions"
+      state: present
+
     - name: Check and clean any previous backup validation files
       ansible.builtin.file:
         path: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
@@ -78,13 +83,32 @@
         dest: "{{ _ce_provision_build_dir }}/validation_report.zip"
         format: zip
 
+    - name: Place backup validation functions in S3 bucket
+      amazon.aws.s3_object:
+        bucket: "ce-{{ _aws_profile }}-lambda-functions"
+        object: "{{ item }}}_validation.zip"
+        src: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+        mode: "create"
+        region: "{{ _aws_region }}"
+      loop: "{{ aws_backup_validation.resources }}"
+
+    - name: Place report function in S3 bucket
+      amazon.aws.s3_object:
+        bucket: "ce-{{ _aws_profile }}-lambda-functions"
+        object: "validation_report.zip"
+        src: "{{ _ce_provision_build_dir }}/validation_report.zip"
+        mode: "create"
+        region: "{{ _aws_region }}"
+      loop: "{{ aws_backup_validation.resources }}"
+
 - name: Create Lambda functions
   amazon.aws.lambda:
     name: "{{ aws_backup_validation.name }}_{{ item }}"
     description: "{{ aws_backup_validation.description }} {{ item }} new comment to update function"
     region: "{{ _aws_region }}"
     timeout: "{{ aws_backup_validation.timeout }}"
-    zip_file: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+    s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+    s3_key: "{{ item }}}_validation.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
@@ -101,7 +125,8 @@
     description: "Function that will send report about previous validations"
     region: "{{ _aws_region }}"
     timeout: 30
-    zip_file: "{{ _ce_provision_build_dir }}/validation_report.zip"
+    s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+    s3_key: "{{ item }}}_validation.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
