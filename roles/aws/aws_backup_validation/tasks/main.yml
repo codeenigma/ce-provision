@@ -88,6 +88,7 @@
         bucket: "codeenigma-{{ _aws_profile }}-lambda-functions-storage"
         object: "{{ item }}}_validation.zip"
         src: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+        mode: put
       loop: "{{ aws_backup_validation.resources }}"
 
     - name: Place report function in S3 bucket
@@ -97,6 +98,7 @@
         src: "{{ _ce_provision_build_dir }}/validation_report.zip"
         mode: "create"
         region: "{{ _aws_region }}"
+        mode: put
       loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create Lambda functions
