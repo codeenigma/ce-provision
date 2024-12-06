@@ -22,7 +22,7 @@ jobs:
       - name: Install ce-provision
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.base.ref }}/install.sh
+          curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
           chmod +x ./install.sh
           sudo ./install.sh --user ce-dev --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
 
