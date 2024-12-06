@@ -5,6 +5,7 @@ aws_acl:
     scope: CLOUDFRONT # Can be REGIONAL for ALBs
     region: "us-east-1"
     tags: "{{ _aws_tags }}"
+    recreate: false # set to true to creating the ACL
     rules:
       rate_limit:
         value: 600 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
@@ -12,12 +13,12 @@ aws_acl:
       ip_sets:
         - rule_name: "Allowed-IPs-rule"
           set_name: "Allowed-IPs-set"
-          description: "List of IPs from our VPNs - Ansible managed"
+          description: "List of IPs to whitelist - Ansible managed"
           action: allow
           priority: 1
           list:
-            - 3.11.82.252/32 # main VPN
-            - 159.100.242.248/32 # backup VPN, bastion2
+            - 1.1.1.1/32
+            - 2.2.2.2/32
       country_codes:
         - name: "allowed-countries"
           action: allow
