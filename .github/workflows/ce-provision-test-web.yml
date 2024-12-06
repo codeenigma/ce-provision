@@ -12,6 +12,10 @@ jobs:
     # Set the type of machine to run on
     runs-on: ubuntu-latest
 
+    # Use our ce-dev Debian base container
+    container:
+      image: codeenigma/ce-dev:2.x
+
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       #- name: Checkout code
