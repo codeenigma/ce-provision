@@ -114,7 +114,6 @@
     tags:
       Name: "{{ item }}_backup_validation"
   register: _lambda_functions
-  failed_when: _lambda_functions.rc != 0
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create validation report functions
@@ -130,7 +129,6 @@
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
     handler: "validation_report.{{ aws_backup_validation.handler }}"
   register: _validation_report
-  failed_when: _validation_report.rc != 0
 
 - name: Remove non UTF-8 item
   ansible.builtin.set_fact:
