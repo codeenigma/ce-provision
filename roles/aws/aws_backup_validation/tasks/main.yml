@@ -105,7 +105,7 @@
     description: "{{ aws_backup_validation.description }} {{ item }} new comment to update function"
     region: "{{ _aws_region }}"
     timeout: "{{ aws_backup_validation.timeout }}"
-    s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+    s3_bucket: "codeenigma-{{ _aws_profile }}-lambda-functions-storage"
     s3_key: "{{ item }}}_validation.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
@@ -122,7 +122,7 @@
     description: "Function that will send report about previous validations"
     region: "{{ _aws_region }}"
     timeout: 30
-    s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+    s3_bucket: "codeenigma-{{ _aws_profile }}-lambda-functions-storage"
     s3_key: "{{ item }}}_validation.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
