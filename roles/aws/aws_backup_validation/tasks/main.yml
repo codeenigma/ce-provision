@@ -114,7 +114,7 @@
     tags:
       Name: "{{ item }}_backup_validation"
   register: _lambda_functions
-  failed_when: _lambda_functions.rc != 0
+  failed_when: _lambda_functions.rc | int != 0
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create validation report functions
