@@ -78,6 +78,22 @@
         dest: "{{ _ce_provision_build_dir }}/validation_report.zip"
         format: zip
 
+- name: Debug variables to check for non-UTF-8 characters
+  debug:
+    msg:
+      - "Name: {{ aws_backup_validation.name }}"
+      - "Description: {{ aws_backup_validation.description }}"
+      - "Handler: {{ aws_backup_validation.handler }}"
+      - "Tags Name: {{ item }}_backup_validation"
+
+- name: Check for non-UTF-8 characters in variables
+  debug:
+    msg:
+      - "Name contains non-UTF-8 characters: {{ (aws_backup_validation.name | string | regex_search('[^\x00-\x7F]')) }}"
+      - "Description contains non-UTF-8 characters: {{ (aws_backup_validation.description | string | regex_search('[^\x00-\x7F]')) }}"
+      - "Handler contains non-UTF-8 characters: {{ (aws_backup_validation.handler | string | regex_search('[^\x00-\x7F]')) }}"
+      - "Tags Name contains non-UTF-8 characters: {{ (item | string | regex_search('[^\x00-\x7F]')) }}"
+
 - name: Create Lambda functions
   amazon.aws.lambda:
     name: "{{ aws_backup_validation.name }}_{{ item }}"
@@ -92,7 +108,7 @@
     tags:
       Name: "{{ item }}_backup_validation"
   register: _lambda_functions
-  failed_when: _lambda_functions.rc | int != 0
+  failed_when: "{{ (_lambda_functions.changed | default(false) | bool) == false }}"
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create validation report functions
