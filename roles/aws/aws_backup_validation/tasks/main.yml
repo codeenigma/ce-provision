@@ -33,16 +33,22 @@
       - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
       - "{{ _pass_role.policy.arn }}"
 
-- name: Sleep for 20 seconds for IAM before Lambda creation
+- name: Sleep for 10 seconds for IAM before Lambda creation
   ansible.builtin.wait_for:
-    timeout: 20
+    timeout: 10
 
-# Not all clients have verified identity
+# TODO: Not all clients have verified identity
 #- name: Get verified domain.
 #  ansible.builtin.include_tasks: get_valid_email.yml
 
 - name: Clean and set python functions
   block:
+    - name: Create S3 bucket for lambda functions
+      amazon.aws.s3_bucket:
+        name: "{{ aws_backup_validation.s3_bucket }}"
+        region: "{{ _aws_region }}"
+        state: present
+
     - name: Check and clean any previous backup validation files
       ansible.builtin.file:
         path: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
@@ -78,29 +84,30 @@
         dest: "{{ _ce_provision_build_dir }}/validation_report.zip"
         format: zip
 
-- name: Debug variables to check for non-UTF-8 characters
-  debug:
-    msg:
-      - "Name: {{ aws_backup_validation.name }}"
-      - "Description: {{ aws_backup_validation.description }}"
-      - "Handler: {{ aws_backup_validation.handler }}"
-      - "Tags Name: {{ item }}_backup_validation"
+    - name: Place backup validation functions in S3 bucket
+      amazon.aws.s3_object:
+        bucket: "{{ aws_backup_validation.s3_bucket }}"
+        object: "lambda-functions/{{ item }}_validation.zip"
+        src: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+        mode: put
+      loop: "{{ aws_backup_validation.resources }}"
 
-- name: Check for non-UTF-8 characters in variables
-  debug:
-    msg:
-      - "Name contains non-UTF-8 characters: {{ (aws_backup_validation.name | string | regex_search('[^\x00-\x7F]')) }}"
-      - "Description contains non-UTF-8 characters: {{ (aws_backup_validation.description | string | regex_search('[^\x00-\x7F]')) }}"
-      - "Handler contains non-UTF-8 characters: {{ (aws_backup_validation.handler | string | regex_search('[^\x00-\x7F]')) }}"
-      - "Tags Name contains non-UTF-8 characters: {{ (item | string | regex_search('[^\x00-\x7F]')) }}"
+    - name: Place report function in S3 bucket
+      amazon.aws.s3_object:
+        bucket: "{{ aws_backup_validation.s3_bucket }}"
+        object: "lambda-functions/validation_report.zip"
+        src: "{{ _ce_provision_build_dir }}/validation_report.zip"
+        mode: put
+      loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create Lambda functions
   amazon.aws.lambda:
     name: "{{ aws_backup_validation.name }}_{{ item }}"
-    description: "{{ aws_backup_validation.description }} {{ item }} new comment to update function"
+    description: "{{ aws_backup_validation.description }}"
     region: "{{ _aws_region }}"
     timeout: "{{ aws_backup_validation.timeout }}"
-    zip_file: "{{ _ce_provision_build_dir }}/{{ item }}_validation.zip"
+    s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
+    s3_key: "lambda-functions/{{ item }}_validation.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
@@ -108,22 +115,21 @@
     tags:
       Name: "{{ item }}_backup_validation"
   register: _lambda_functions
-  failed_when: "{{ (_lambda_functions.changed | default(false) | bool) == false }}"
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create validation report functions
   amazon.aws.lambda:
     name: "validation_report"
-    description: "Function that will send report about previous validations"
+    description: "{{ aws_backup_validation.description }}"
     region: "{{ _aws_region }}"
     timeout: 30
-    zip_file: "{{ _ce_provision_build_dir }}/validation_report.zip"
+    s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
+    s3_key: "lambda-functions/validation_report.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
     handler: "validation_report.{{ aws_backup_validation.handler }}"
   register: _validation_report
-  failed_when: _validation_report.rc != 0
 
 - name: Remove non UTF-8 item
   ansible.builtin.set_fact:
