@@ -106,7 +106,7 @@
     region: "{{ _aws_region }}"
     timeout: "{{ aws_backup_validation.timeout }}"
     s3_bucket: "s3://codeenigma-{{ _aws_profile }}-lambda-functions-storage"
-    s3_key: "{{ item }}}_validation.zip"
+    s3_key: "{{ item }}_validation.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
@@ -123,7 +123,7 @@
     region: "{{ _aws_region }}"
     timeout: 30
     s3_bucket: "s3://codeenigma-{{ _aws_profile }}-lambda-functions-storage"
-    s3_key: "{{ item }}}_validation.zip"
+    s3_key: "validation_report.zip"
     state: present
     runtime: "{{ aws_backup_validation.runtime }}"
     role: "{{ _created_iam_lambda_role.iam_role.arn }}"
