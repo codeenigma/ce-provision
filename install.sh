@@ -18,6 +18,7 @@ usage(){
   echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
   echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
   echo '--aws: enable AWS support'
+  echo '--docker: script is running in a Docker container'
   echo ''
 }
 
@@ -51,6 +52,9 @@ parse_options(){
       "--aws")
           AWS_SUPPORT="true"
         ;;
+      "--docker")
+          IS_LOCAL="true"
+        ;;
         *)
         usage
         exit 1
@@ -68,6 +72,7 @@ CONFIG_REPO_BRANCH="1.x"
 GITLAB_URL="no"
 LE_SUPPORT="no"
 AWS_SUPPORT="false"
+IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
 
 # Parse options.
@@ -218,7 +223,12 @@ firewall_config:
       - "80"
       - "443"
 EOL
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+# Tell Ansible this is a Docker container
+if [ "$IS_LOCAL" = "true" ]; then
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml --extra-vars {is_local: $IS_LOCAL}"
+else
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+fi
 rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 # Create playbook for firewall.
 echo "-------------------------------------------------"
