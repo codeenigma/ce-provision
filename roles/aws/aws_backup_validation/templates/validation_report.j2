@@ -116,7 +116,7 @@ def lambda_handler(event, context):
     },
     'Subject': {
       'Charset': 'UTF-8',
-      'Data': 'Lambda Backup validation: ' + mail_title,
+      'Data': 'Restore testing - {{ _aws_profile }}: ' + mail_title,
     },
   },
   Source='Lambda Backup Validation <lambda@codeenigma.uk>',
