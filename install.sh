@@ -225,7 +225,7 @@ firewall_config:
 EOL
 # Tell Ansible this is a Docker container
 if [ "$IS_LOCAL" = "true" ]; then
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml --extra-vars {is_local: $IS_LOCAL}"
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml -e {is_local: $IS_LOCAL}"
 else
   su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
