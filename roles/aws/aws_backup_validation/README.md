@@ -10,8 +10,9 @@ Creates AWS Restore testing plan for EC2 and RDS, EventBridge rule that gets tri
 ```yaml
 ---
 aws_backup_validation:
+  s3_bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
   name: "RestoreValidation"
-  description: "Restore validation for"
+  description: "Restore validation is running every Sunday at 00:00AM, and validation reporting is triggered on Monday 00:00AM"
   timeout: 60
   runtime: "python3.12"
   handler: "lambda_handler"
