@@ -388,6 +388,9 @@ else
   /usr/bin/echo "GitLab not requested. Skipping."
   /usr/bin/echo "-------------------------------------------------"
 fi
-/usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/vars.yml"
-/usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
+# Tidy up if not a container
+if [ "$IS_LOCAL" = "true" ]; then
+  /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/vars.yml"
+  /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
+fi
 /usr/bin/echo "DONE."
