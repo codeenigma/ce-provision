@@ -214,12 +214,12 @@ ce_provision:
     command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"
     on_calendar: "Mon *-*-* 04:00:00"
 user_provision:
-  username: ${CONTROLLER_USER}
-  home: /home/${CONTROLLER_USER}
+  username: "${CONTROLLER_USER}"
+  home: "/home/${CONTROLLER_USER}"
   create: false
   create_home: false
   update_password: always
-  utility_username: ${CONTROLLER_USER}
+  utility_username: "${CONTROLLER_USER}"
   utility_host: localhost
   sudoer: true
   groups:
