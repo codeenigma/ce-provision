@@ -232,12 +232,12 @@ fi
 rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 # TEST
 echo "-------------------------------------------------"
-echo "### system python"
-su - "$CONTROLLER_USER" -c "ansible-galaxy collection list"
-su - "$CONTROLLER_USER" -c "ansible-galaxy role list"
 echo "### ce-python"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection list"
 su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy role list"
+echo "### system python"
+su - "$CONTROLLER_USER" -c "ansible-galaxy collection list"
+su - "$CONTROLLER_USER" -c "ansible-galaxy role list"
 # Create playbook for firewall.
 echo "-------------------------------------------------"
 echo "Install firewall."
