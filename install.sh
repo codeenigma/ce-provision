@@ -225,7 +225,7 @@ firewall_config:
 EOL
 # Tell Ansible this is a Docker container
 if [ "$IS_LOCAL" = "true" ]; then
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL, ansible_galaxy.extra_params: \"--force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles\"}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL, ansible_galaxy.extra_params: '--force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles'}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 else
   su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{ansible_galaxy.extra_params: '--force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles'}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
