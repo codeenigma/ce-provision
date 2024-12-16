@@ -34,7 +34,7 @@ jobs:
       - name: Provision a test web server
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          /bin/sh /home/runner/ce-provision/scripts/provision.sh --python-interpreter /home/runner/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/runner/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force
+          /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force
 
       # Installs the ce-dev stack
       #- name: Install ce-dev
