@@ -28,7 +28,7 @@ jobs:
         run: |
           curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
           chmod +x ./install.sh
-          sudo ./install.sh --user runner --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker
+          sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker
 
       # Run a web server provision
       - name: Provision a test web server
