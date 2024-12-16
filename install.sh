@@ -400,7 +400,7 @@ else
   /usr/bin/echo "-------------------------------------------------"
 fi
 # Tidy up if not a container
-if [ "$IS_LOCAL" = "true" ]; then
+if [ "$IS_LOCAL" = "false" ]; then
   /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/vars.yml"
   /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
