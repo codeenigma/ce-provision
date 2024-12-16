@@ -79,7 +79,9 @@
     dest: "/etc/profile.d/ansible-path.sh"
 
 - name: Install systemd timer.
-  when: ce_ansible.upgrade.enabled
+  when:
+    - ce_ansible.upgrade.enabled
+    - not is_local
   block:
     - name: Build systemd timer variables string.
       ansible.builtin.set_fact:
