@@ -15,7 +15,7 @@ usage(){
   /usr/bin/echo '--user: Ansible controller user (default: controller)'
   /usr/bin/echo '--config: Git URL to your ce-provision Ansible config repository (default: https://github.com/codeenigma/ce-provision-config-example.git)'
   /usr/bin/echo '--config-branch: branch of your Ansible config repository to use (default: 1.x)'
-  /usr/bin/echo '--firewall: install and configure iptables with ports 22, 80 and 443 open'
+  /usr/bin/echo '--no-firewall: skip installing iptables with ports 22, 80 and 443 open'
   /usr/bin/echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
   /usr/bin/echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
   /usr/bin/echo '--aws: enable AWS support'
