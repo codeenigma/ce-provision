@@ -156,6 +156,7 @@ else
   echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
   echo "-------------------------------------------------"
 fi
+mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
 # Create playbook for ce-provision.
 /bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
