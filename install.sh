@@ -179,6 +179,7 @@ fi
 EOL
 # Create vars file.
 /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
+---
 _domain_name: ${SERVER_HOSTNAME}
 _ce_provision_data_dir: /home/${CONTROLLER_USER}/ce-provision/data
 _ce_provision_username: ${CONTROLLER_USER}
@@ -303,6 +304,8 @@ if [ "$GITLAB_URL" != "no" ]; then
 EOL
   # Create vars file.
   /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
+---
+_domain_name: ${SERVER_HOSTNAME}
 gitlab_runner:
   apt_origin: "origin=packages.gitlab.com/runner/gitlab-runner,codename=\${distro_codename},label=gitlab-runner" # used by apt_unattended_upgrades
   apt_signed_by: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
