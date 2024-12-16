@@ -227,9 +227,17 @@ EOL
 if [ "$IS_LOCAL" = "true" ]; then
   su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL, ansible_galaxy.extra_params: --force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 else
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{ansible_galaxy.extra_params: '--force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles'}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{ansible_galaxy.extra_params: --force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
 rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
+# TEST
+echo "-------------------------------------------------"
+echo "### system python"
+su - "$CONTROLLER_USER" -c "ansible-galaxy collection list"
+su - "$CONTROLLER_USER" -c "ansible-galaxy role list"
+echo "### ce-python"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection list"
+su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy role list"
 # Create playbook for firewall.
 echo "-------------------------------------------------"
 echo "Install firewall."
