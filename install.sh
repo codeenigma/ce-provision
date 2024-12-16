@@ -214,13 +214,20 @@ ce_provision:
     command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"
     on_calendar: "Mon *-*-* 04:00:00"
 user_provision:
-  username: controller
-  utility_username: controller
+  username: ${CONTROLLER_USER}
+  home: /home/${CONTROLLER_USER}
+  create: false
+  create_home: false
+  update_password: always
+  utility_username: ${CONTROLLER_USER}
   utility_host: localhost
   groups:
     - bypass2fa
   ssh_keys:
     - "{{ lookup('file', '/home/${CONTROLLER_USER}/ce-provision/data/localhost/home/${CONTROLLER_USER}/.ssh/id_ecdsa.pub') }}"
+  ssh_private_keys: []
+  known_hosts: []
+  known_hosts_hash: true
 firewall_config:
   purge: true
   firewall_state: started
