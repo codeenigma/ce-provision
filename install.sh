@@ -231,14 +231,6 @@ else
   /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{ansible_galaxy.extra_params: --force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
-# TEST
-/usr/bin/echo "-------------------------------------------------"
-/usr/bin/echo "### ce-python"
-/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection list"
-/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy role list --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles"
-/usr/bin/echo "### system python"
-/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && ansible-galaxy collection list"
-/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && ansible-galaxy role list"
 # Create playbook for firewall.
 /usr/bin/echo "-------------------------------------------------"
 /usr/bin/echo "Install firewall."
