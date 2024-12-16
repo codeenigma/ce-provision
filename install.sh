@@ -173,6 +173,9 @@ fi
     - name: Install ce-provision.
       ansible.builtin.import_role:
         name: debian/ce_provision
+    - name: Configure controller user.
+      ansible.builtin.import_role:
+        name: debian/user_provision
 EOL
 # Create vars file.
 /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
@@ -210,6 +213,14 @@ ce_provision:
     enabled: true
     command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"
     on_calendar: "Mon *-*-* 04:00:00"
+user_provision:
+  username: controller
+  utility_username: controller
+  utility_host: localhost
+  groups:
+    - bypass2fa
+  ssh_keys:
+    - "{{ lookup('file', '/home/${CONTROLLER_USER}/ce-provision/data/localhost/home/${CONTROLLER_USER}/.ssh/id_ecdsa.pub') }}"
 firewall_config:
   purge: true
   firewall_state: started
