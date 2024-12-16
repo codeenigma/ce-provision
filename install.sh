@@ -95,6 +95,7 @@ if [ "$(id -u)" -ne 0 ]
 fi
 
 # Check we are using a compatible Linux distribution.
+/usr/bin/echo "-------------------------------------------------"
 if [ "$ID" != "debian" ]; then
   if [ "$ID_LIKE" != "debian" ]; then
     /usr/bin/echo "ce-provision only supports Debian Linux and derivatives."
