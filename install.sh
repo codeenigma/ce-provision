@@ -221,6 +221,7 @@ user_provision:
   update_password: always
   utility_username: ${CONTROLLER_USER}
   utility_host: localhost
+  sudoer: true
   groups:
     - bypass2fa
   ssh_keys:
