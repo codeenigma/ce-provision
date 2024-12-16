@@ -178,7 +178,7 @@ ce_provision:
   username: ${CONTROLLER_USER}
   ssh_key_bits: "521"
   ssh_key_type: ecdsa
-  public_key_name: id_rsa.pub
+  public_key_name: id_ecdsa.pub
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "${VERSION}"
   own_repository_skip_checkout: false
