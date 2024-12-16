@@ -6,19 +6,20 @@ set -e
 . /etc/os-release
 
 usage(){
-  echo 'install.sh [OPTIONS]'
-  echo 'Install the latest ce-provision version, or the version specified as option.'
-  echo 'Please ensure you are using Debian Linux or similar and at least Bullseye (11) or higher.'
-  echo ''
-  echo 'Available options:'
-  echo '--version: ce-provision version to use (default: 2.x)'
-  echo '--user: Ansible controller user (default: controller)'
-  echo '--config: Git URL to your ce-provision Ansible config repository (default: https://github.com/codeenigma/ce-provision-config-example.git)'
-  echo '--config-branch: branch of your Ansible config repository to use (default: 1.x)'
-  echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
-  echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
-  echo '--aws: enable AWS support'
-  echo ''
+  /usr/bin/echo 'install.sh [OPTIONS]'
+  /usr/bin/echo 'Install the latest ce-provision version, or the version specified as option.'
+  /usr/bin/echo 'Please ensure you are using Debian Linux or similar and at least Bullseye (11) or higher.'
+  /usr/bin/echo ''
+  /usr/bin/echo 'Available options:'
+  /usr/bin/echo '--version: ce-provision version to use (default: 2.x)'
+  /usr/bin/echo '--user: Ansible controller user (default: controller)'
+  /usr/bin/echo '--config: Git URL to your ce-provision Ansible config repository (default: https://github.com/codeenigma/ce-provision-config-example.git)'
+  /usr/bin/echo '--config-branch: branch of your Ansible config repository to use (default: 1.x)'
+  /usr/bin/echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
+  /usr/bin/echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
+  /usr/bin/echo '--aws: enable AWS support'
+  /usr/bin/echo '--docker: script is running in a Docker container'
+  /usr/bin/echo ''
 }
 
 # Parse options arguments.
@@ -51,6 +52,9 @@ parse_options(){
       "--aws")
           AWS_SUPPORT="true"
         ;;
+      "--docker")
+          IS_LOCAL="true"
+        ;;
         *)
         usage
         exit 1
@@ -68,6 +72,7 @@ CONFIG_REPO_BRANCH="1.x"
 GITLAB_URL="no"
 LE_SUPPORT="no"
 AWS_SUPPORT="false"
+IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
 
 # Parse options.
@@ -83,44 +88,44 @@ if [ "$(id -u)" -ne 0 ]
   then echo "Please run this script as root or using sudo!"
   exit
 fi
- 
+
 # Check we are using a compatible Linux distribution.
 if [ "$ID" != "debian" ]; then
   if [ "$ID_LIKE" != "debian" ]; then
-    echo "ce-provision only supports Debian Linux and derivatives."
+    /usr/bin/echo "ce-provision only supports Debian Linux and derivatives."
     exit 0
   else
-    echo "ce-provision works best with Debian Linux, it may work with this distro but no promises!"
-    echo "-------------------------------------------------"
-    echo "Carrying on regardless..."
-    echo "-------------------------------------------------"
+    /usr/bin/echo "ce-provision works best with Debian Linux, it may work with this distro but no promises!"
+    /usr/bin/echo "-------------------------------------------------"
+    /usr/bin/echo "Carrying on regardless..."
+    /usr/bin/echo "-------------------------------------------------"
   fi
 fi
 
-echo "Beginning ce-provision installation."
-echo "-------------------------------------------------"
+/usr/bin/echo "Beginning ce-provision installation."
+/usr/bin/echo "-------------------------------------------------"
 
 # Create required user.
-echo "Check if user named $CONTROLLER_USER exists."
+/usr/bin/echo "Check if user named $CONTROLLER_USER exists."
 # Check if user exists
-if id "$CONTROLLER_USER" >/dev/null 2>&1; then
-  echo "The user named $CONTROLLER_USER already exists. Skipping."
+if /usr/bin/id "$CONTROLLER_USER" >/dev/null 2>&1; then
+  /usr/bin/echo "The user named $CONTROLLER_USER already exists. Skipping."
 else
   # User not found so let's create them.
-  echo "Create user named $CONTROLLER_USER."
+  /usr/bin/echo "Create user named $CONTROLLER_USER."
   /usr/sbin/useradd -s /bin/bash "$CONTROLLER_USER"
-  echo "$CONTROLLER_USER":"$CONTROLLER_USER" | chpasswd -m
-  install -m 755 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"
-  install -m 700 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh
-  echo root:"$CONTROLLER_USER" | chpasswd -m
-  echo "$CONTROLLER_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$CONTROLLER_USER"
-  chmod 0440 /etc/sudoers.d/"$CONTROLLER_USER"
+  /usr/bin/echo "$CONTROLLER_USER":"$CONTROLLER_USER" | chpasswd -m
+  /usr/bin/install -m 755 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"
+  /usr/bin/install -m 700 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh
+  /usr/bin/echo root:"$CONTROLLER_USER" | chpasswd -m
+  /usr/bin/echo "$CONTROLLER_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$CONTROLLER_USER"
+  /usr/bin/chmod 0440 /etc/sudoers.d/"$CONTROLLER_USER"
 fi
-echo "-------------------------------------------------"
+/usr/bin/echo "-------------------------------------------------"
 
 # Install APT packages.
-echo "Install required packages."
-echo "-------------------------------------------------"
+/usr/bin/echo "Install required packages."
+/usr/bin/echo "-------------------------------------------------"
 /usr/bin/apt-get update
 /usr/bin/apt-get dist-upgrade -y -o Dpkg::Options::="--force-confnew"
 /usr/bin/apt-get install -y -o Dpkg::Options::="--force-confnew" \
@@ -128,31 +133,32 @@ echo "-------------------------------------------------"
   openssh-client nfs-common stunnel4 \
   python3-venv python3-debian \
   zip unzip gzip tar dnsutils
-echo "-------------------------------------------------"
+/usr/bin/echo "-------------------------------------------------"
 
 # Install Ansible in a Python virtual environment.
-echo "Install Ansible and dependencies."
-echo "-------------------------------------------------"
-su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy -p /home/$CONTROLLER_USER/.ansible/collections/ansible_collections collection install ansible.posix --force"
+/usr/bin/echo "Install Ansible and dependencies."
+/usr/bin/echo "-------------------------------------------------"
+/usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
+/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
+/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
+/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix -p /home/$CONTROLLER_USER/.ansible/collections/ansible_collections --force"
 if [ "$AWS_SUPPORT" = "true" ]; then
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
+  /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
 fi
-echo "-------------------------------------------------"
+/usr/bin/echo "-------------------------------------------------"
 
 # Install ce-provision.
-echo "Install ce-provision."
-echo "-------------------------------------------------"
+/usr/bin/echo "Install ce-provision."
+/usr/bin/echo "-------------------------------------------------"
 if [ ! -d "/home/$CONTROLLER_USER/ce-provision" ]; then
-  su - "$CONTROLLER_USER" -c "git clone --branch $VERSION https://github.com/codeenigma/ce-provision.git /home/$CONTROLLER_USER/ce-provision"
+  /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $VERSION https://github.com/codeenigma/ce-provision.git /home/$CONTROLLER_USER/ce-provision"
 else
-  echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
-  echo "-------------------------------------------------"
+  /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
+  /usr/bin/echo "-------------------------------------------------"
 fi
+/usr/bin/mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
 # Create playbook for ce-provision.
-/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
   become: true
@@ -164,7 +170,7 @@ fi
         name: debian/ce_provision
 EOL
 # Create vars file.
-/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
+/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
 _domain_name: ${SERVER_HOSTNAME}
 _ce_provision_data_dir: /home/${CONTROLLER_USER}/ce-provision/data
 _ce_provision_username: ${CONTROLLER_USER}
@@ -176,7 +182,9 @@ ce_provision:
   aws_support: ${AWS_SUPPORT}
   new_user: ${CONTROLLER_USER}
   username: ${CONTROLLER_USER}
-  public_key_name: id_rsa.pub
+  ssh_key_bits: "521"
+  ssh_key_type: ecdsa
+  public_key_name: id_ecdsa.pub
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "${VERSION}"
   own_repository_skip_checkout: false
@@ -216,13 +224,18 @@ firewall_config:
       - "80"
       - "443"
 EOL
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
-rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
+# Tell Ansible this is a Docker container
+if [ "$IS_LOCAL" = "true" ]; then
+  /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL, ansible_galaxy.extra_params: --force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
+else
+  /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{ansible_galaxy.extra_params: --force --roles-path /home/$CONTROLLER_USER/ce-provision/galaxy/roles}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
+fi
+/usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 # Create playbook for firewall.
-echo "-------------------------------------------------"
-echo "Install firewall."
-echo "-------------------------------------------------"
-/usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+/usr/bin/echo "-------------------------------------------------"
+/usr/bin/echo "Install firewall."
+/usr/bin/echo "-------------------------------------------------"
+/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
   become: true
@@ -233,15 +246,15 @@ echo "-------------------------------------------------"
       ansible.builtin.import_role:
         name: debian/firewall_config
 EOL
-su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
-echo "-------------------------------------------------"
+/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+/usr/bin/echo "-------------------------------------------------"
 
 # Install GitLab
 if [ "$GITLAB_URL" != "no" ]; then
-  echo "Install GitLab."
-  echo "-------------------------------------------------"
+  /usr/bin/echo "Install GitLab."
+  /usr/bin/echo "-------------------------------------------------"
   # Create playbook.
-  /usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
+  /bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
 - hosts: "localhost"
   become: true
@@ -256,7 +269,7 @@ if [ "$GITLAB_URL" != "no" ]; then
         name: debian/gitlab
 EOL
   # Create vars file.
-  /usr/bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
+  /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
 gitlab_runner:
   apt_origin: "origin=packages.gitlab.com/runner/gitlab-runner,codename=\${distro_codename},label=gitlab-runner" # used by apt_unattended_upgrades
   apt_signed_by: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
@@ -309,47 +322,47 @@ gitlab:
     custom_nginx_config: ""
 EOL
   if [ "$LE_SUPPORT" = "yes" ]; then
-    echo "Will try to create an SSL certificate with LetsEncrypt."
-    echo "*** THIS STEP WILL FAIL IF YOUR DNS IS NOT CORRECT! ***"
+    /usr/bin/echo "Will try to create an SSL certificate with LetsEncrypt."
+    /usr/bin/echo "*** THIS STEP WILL FAIL IF YOUR DNS IS NOT CORRECT! ***"
     if [ -n "$(dig +short "$GITLAB_URL".)" ]; then
-      echo "DNS record found, attempting LetsEncrypt request..."
+      /usr/bin/echo "DNS record found, attempting LetsEncrypt request..."
       # Write GitLab vars with LE for SSL
-      cat <<EOT >> "/home/$CONTROLLER_USER/ce-provision/vars.yml"
+      /bin/cat <<EOT >> "/home/$CONTROLLER_USER/ce-provision/vars.yml"
   letsencrypt: "true"
   ssl:
     enabled: false
 EOT
-      echo "-------------------------------------------------"
+      /usr/bin/echo "-------------------------------------------------"
     else
-      echo "No DNS found for provided URL, will create a self-signed certificate instead."
+      /usr/bin/echo "No DNS found for provided URL, will create a self-signed certificate instead."
       # Write GitLab vars with self-signed SSL
-      cat <<EOT >> "/home/$CONTROLLER_USER/ce-provision/vars.yml"
+      /bin/cat <<EOT >> "/home/$CONTROLLER_USER/ce-provision/vars.yml"
   letsencrypt: "false"
   ssl:
     enabled: true
     handling: selfsigned
     replace_existing: false
 EOT
-      echo "-------------------------------------------------"
+      /usr/bin/echo "-------------------------------------------------"
     fi
   else
     # Write GitLab vars with self-signed SSL
-    echo "Create a self-signed SSL certificate."
-    cat <<EOT >> "/home/$CONTROLLER_USER/ce-provision/vars.yml"
+    /usr/bin/echo "Create a self-signed SSL certificate."
+    /bin/cat <<EOT >> "/home/$CONTROLLER_USER/ce-provision/vars.yml"
   letsencrypt: "false"
   ssl:
     enabled: true
     handling: selfsigned
     replace_existing: false
 EOT
-    echo "-------------------------------------------------"
+    /usr/bin/echo "-------------------------------------------------"
   fi
-  su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
-  echo "-------------------------------------------------"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  /usr/bin/echo "-------------------------------------------------"
 else
-  echo "GitLab not requested. Skipping."
-  echo "-------------------------------------------------"
+  /usr/bin/echo "GitLab not requested. Skipping."
+  /usr/bin/echo "-------------------------------------------------"
 fi
-rm "/home/$CONTROLLER_USER/ce-provision/vars.yml"
-rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
-echo "DONE."
+/usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/vars.yml"
+/usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
+/usr/bin/echo "DONE."
