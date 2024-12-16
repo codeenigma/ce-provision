@@ -36,6 +36,7 @@ jobs:
         run: |
           chown -Rf controller:controller /home/controller/ce-provision
           git config --global --add safe.directory /home/controller/ce-provision
+          git config --global --add safe.directory /home/controller/ce-provision/config
           /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force
 
       # Installs the ce-dev stack
