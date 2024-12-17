@@ -139,7 +139,7 @@ fi
   git ca-certificates git-lfs \
   openssh-client nfs-common stunnel4 \
   python3-venv python3-debian \
-  zip unzip gzip tar dnsutils
+  zip unzip gzip tar dnsutils openssh-server
 /usr/bin/echo "-------------------------------------------------"
 
 # Install Ansible in a Python virtual environment.
@@ -259,7 +259,8 @@ else
   ANSIBLE_COMMAND="ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
 /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
-ls -la /home/$CONTROLLER_USER/ce-provision/data
+ls -la "/home/$CONTROLLER_USER/ce-provision/data"
+ls -la "/home/$CONTROLLER_USER/.ssh"
 # Run a second time to install Ansible Galaxy roles in the right place
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
