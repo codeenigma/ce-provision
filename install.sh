@@ -130,6 +130,10 @@ else
 fi
 /usr/bin/echo "-------------------------------------------------"
 
+# Debug
+sudo iptables -L INPUT
+telnet localhost 22
+
 # Install APT packages.
 /usr/bin/echo "Install required packages."
 /usr/bin/echo "-------------------------------------------------"
