@@ -22,19 +22,19 @@ jobs:
       - name: Install ce-provision
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
-          chmod +x ./install.sh
-          sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
+          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
+          /usr/bin/chmod +x ./install.sh
+          /usr/bin/sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
 
       # Run a web server provision
       - name: Prepare Git repos on disk
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          git config --global --add safe.directory /home/controller/ce-provision
-          git config --global --add safe.directory /home/controller/ce-provision/config
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
 
       - name: Provision a test web server
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
-          su - controller -c "cd /home/controller/ce-provision && /home/controller/ce-python/bin/ansible-galaxy role list"
-          su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
+          /usr/bin/sshd&
+          /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
