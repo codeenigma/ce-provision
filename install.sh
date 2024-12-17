@@ -267,6 +267,7 @@ fi
 ls -la "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
 /usr/bin/echo "-------------------------------------------------"
 /usr/bin/echo "Search for missing roles"
+cat "/home/$CONTROLLER_USER/ce-provision/roles/debian/ce_provision/meta/requirements-12.yml"
 find / -name 'geerlingguy.*'
 /usr/bin/echo "-------------------------------------------------"
 
