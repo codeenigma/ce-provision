@@ -142,9 +142,6 @@ fi
   zip unzip gzip tar dnsutils net-tools
 /usr/bin/echo "-------------------------------------------------"
 
-/usr/bin/echo "Listening apps"
-/usr/bin/netstat -tulpn | grep LISTEN
-
 # Install Ansible in a Python virtual environment.
 /usr/bin/echo "Install Ansible and dependencies."
 /usr/bin/echo "-------------------------------------------------"
