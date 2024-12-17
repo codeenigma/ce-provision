@@ -29,7 +29,6 @@ jobs:
         run: |
           ls -la /home/controller
           ls -la /home/controller/ce-provision
-          ls -la /home/runner
 
       # Installs ce-provision
       - name: Install ce-provision
@@ -43,7 +42,6 @@ jobs:
         run: |
           ls -la /home/controller
           ls -la /home/controller/ce-provision
-          ls -la /home/runner
 
       # Run a web server provision
       - name: Prepare Git repos on disk
