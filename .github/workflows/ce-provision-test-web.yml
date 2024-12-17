@@ -17,12 +17,19 @@ jobs:
       image: codeenigma/ce-dev:2.x
       volumes:
         - /home/controller
+        - ${{ github.workspace }}:/home/controller/ce-provision
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       #- name: Checkout code
       #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
       #  uses: actions/checkout@v2
+
+      - name: Check volumes.
+        run: |
+          ls -la /home/controller
+          ls -la /home/controller/ce-provision
+          ls -la /home/runner
 
       # Installs ce-provision
       - name: Install ce-provision
@@ -32,6 +39,12 @@ jobs:
           chmod +x ./install.sh
           sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
 
+      - name: Check volumes.
+        run: |
+          ls -la /home/controller
+          ls -la /home/controller/ce-provision
+          ls -la /home/runner
+
       # Run a web server provision
       - name: Prepare Git repos on disk
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
@@ -39,9 +52,9 @@ jobs:
           git config --global --add safe.directory /home/controller/ce-provision
           git config --global --add safe.directory /home/controller/ce-provision/config
 
-      - name: Provision a test web server
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-        run: su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
+      #- name: Provision a test web server
+      #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+      #  run: su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
 
       # Installs the ce-dev stack
       #- name: Install ce-dev
