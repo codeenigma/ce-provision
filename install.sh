@@ -265,6 +265,9 @@ fi
 ls -la "/home/$CONTROLLER_USER/ce-provision/data"
 ls -la "/home/$CONTROLLER_USER/.ssh"
 # Run a second time to install Ansible Galaxy roles in the right place
+/usr/bin/systemctl start sshd
+/usr/bin/echo "Listening apps"
+/usr/bin/netstat -tulpn | grep LISTEN
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
