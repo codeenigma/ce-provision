@@ -265,6 +265,8 @@ else
 fi
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
 ls -la "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
+find /home/controller/ -name 'geerlingguy.*'
+
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER"
 /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy role list"
 /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection list"
