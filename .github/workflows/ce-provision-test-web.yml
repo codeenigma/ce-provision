@@ -21,9 +21,9 @@ jobs:
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
-      #- name: Checkout code
-      #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-      #  uses: actions/checkout@v2
+      - name: Checkout code
+        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+        uses: actions/checkout@v2
 
       - name: Check volumes.
         run: |
