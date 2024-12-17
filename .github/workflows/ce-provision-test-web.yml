@@ -16,19 +16,17 @@ jobs:
     container:
       image: codeenigma/ce-dev:2.x
       volumes:
-        - /home/controller
-        - ${{ github.workspace }}:/home/controller/ce-provision
+        - ${{ github.workspace }}:/home/controller
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
-      - name: Checkout code
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-        uses: actions/checkout@v2
+      #- name: Checkout code
+      #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+      #  uses: actions/checkout@v2
 
       - name: Check volumes.
         run: |
           ls -la /home/controller
-          ls -la /home/controller/ce-provision
 
       # Installs ce-provision
       - name: Install ce-provision
