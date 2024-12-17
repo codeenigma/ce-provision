@@ -162,6 +162,8 @@ fi
 /usr/bin/echo "-------------------------------------------------"
 if [ ! -d "/home/$CONTROLLER_USER/ce-provision" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $VERSION https://github.com/codeenigma/ce-provision.git /home/$CONTROLLER_USER/ce-provision"
+  /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $CONFIG_REPO_BRANCH $CONFIG_REPO /home/$CONTROLLER_USER/ce-provision/config"
+  /usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/ln -s /home/$CONTROLLER_USER/ce-provision/config/ansible.cfg /home/$CONTROLLER_USER/ce-provision/ansible.cfg"
 else
   /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
   /usr/bin/echo "-------------------------------------------------"
@@ -261,14 +263,8 @@ if [ "$IS_LOCAL" = "true" ]; then
 else
   ANSIBLE_COMMAND="ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
-/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
-ls -la "/home/$CONTROLLER_USER/ce-provision/data"
-ls -la "/home/$CONTROLLER_USER/.ssh"
-# Run a second time to install Ansible Galaxy roles in the right place
-/usr/sbin/sshd&
-/usr/bin/echo "Listening apps"
-/usr/bin/netstat -tulpn | grep LISTEN
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
+ls -la "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
 # Install firewall
