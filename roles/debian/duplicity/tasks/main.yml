@@ -101,7 +101,7 @@
 - name: Copy include-exclude filelist.
   ansible.builtin.template:
     src: include-exclude-filelist.j2
-    dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-filelist"
+    dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-exclude-filelist"
     owner: root
     group: root
     mode: 0644
