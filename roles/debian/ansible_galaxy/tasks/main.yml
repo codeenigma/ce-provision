@@ -13,7 +13,6 @@
 - name: Install ansible-galaxy roles and/or collections.
   when:
     - _galaxy_requirements.stat.exists
-    - not is_local
   block:
     - name: Set up the ansible-galaxy command.
       ansible.builtin.set_fact:

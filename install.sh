@@ -79,6 +79,7 @@ FIREWALL="true"
 AWS_SUPPORT="false"
 IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
+ANSIBLE_COMMAND=""
 
 # Parse options.
 parse_options "$@"
@@ -138,7 +139,7 @@ fi
   git ca-certificates git-lfs \
   openssh-client nfs-common stunnel4 \
   python3-venv python3-debian \
-  zip unzip gzip tar dnsutils
+  zip unzip gzip tar dnsutils net-tools
 /usr/bin/echo "-------------------------------------------------"
 
 # Install Ansible in a Python virtual environment.
@@ -158,6 +159,8 @@ fi
 /usr/bin/echo "-------------------------------------------------"
 if [ ! -d "/home/$CONTROLLER_USER/ce-provision" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $VERSION https://github.com/codeenigma/ce-provision.git /home/$CONTROLLER_USER/ce-provision"
+  /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $CONFIG_REPO_BRANCH $CONFIG_REPO /home/$CONTROLLER_USER/ce-provision/config"
+  /usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/ln -s /home/$CONTROLLER_USER/ce-provision/config/ansible.cfg /home/$CONTROLLER_USER/ce-provision/ansible.cfg"
 else
   /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
   /usr/bin/echo "-------------------------------------------------"
@@ -253,10 +256,12 @@ EOL
 
 # Tell Ansible this is a Docker container
 if [ "$IS_LOCAL" = "true" ]; then
-  /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  ANSIBLE_COMMAND="ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 else
-  /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  ANSIBLE_COMMAND="ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
+# Configure ce-provision
+/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
 # Install firewall
