@@ -33,9 +33,9 @@ jobs:
           /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
           /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
 
-      - name: Install SSHD
+      - name: Start SSHD
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-        run: /usr/bin/apt-get install -y -o Dpkg::Options::="--force-confnew" openssh-server
+        run: /usr/sbin/sshd&
 
       - name: Provision a test web server
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
