@@ -1,7 +1,10 @@
 name: Run web server test build
 
-# Run this workflow every time a new commit pushed to your repository
-on: pull_request
+# Run this workflow nightly and every time a new commit pushed to your repository
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  pull_request:
 
 jobs:
   # Set the job key. The key is displayed as the job name

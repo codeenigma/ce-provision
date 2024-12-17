@@ -25,6 +25,7 @@ gitlab:
   ssl: # @see the 'ssl' role. Note that domain is autopopulated from server_name above.
     enabled: false # manual SSL handling disabled by default
     handling: selfsigned
+    replace_existing: false
   # Linux setup
   linux_user: git
   linux_group: git
