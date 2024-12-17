@@ -8,7 +8,7 @@ jobs:
   # when a job name is not provided
   test-web:
     # Name the Job
-    name: Run tests against Ansible code base
+    name: Build a web server with ce-provision
     # Set the type of machine to run on
     runs-on: ubuntu-latest
 
@@ -36,5 +36,6 @@ jobs:
       - name: Provision a test web server
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
+          /usr/bin/apt-get install -y -o Dpkg::Options::="--force-confnew" openssh-server
           /usr/bin/sshd&
           /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
