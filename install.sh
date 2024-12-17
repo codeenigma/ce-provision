@@ -130,10 +130,6 @@ else
 fi
 /usr/bin/echo "-------------------------------------------------"
 
-# Debug
-sudo iptables -L INPUT
-telnet localhost 22
-
 # Install APT packages.
 /usr/bin/echo "Install required packages."
 /usr/bin/echo "-------------------------------------------------"
@@ -143,8 +139,11 @@ telnet localhost 22
   git ca-certificates git-lfs \
   openssh-client nfs-common stunnel4 \
   python3-venv python3-debian \
-  zip unzip gzip tar dnsutils openssh-server
+  zip unzip gzip tar dnsutils net-tools
 /usr/bin/echo "-------------------------------------------------"
+
+/usr/bin/echo "Listening apps"
+/usr/bin/netstat -tulpn | grep LISTEN
 
 # Install Ansible in a Python virtual environment.
 /usr/bin/echo "Install Ansible and dependencies."
