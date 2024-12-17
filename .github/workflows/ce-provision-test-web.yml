@@ -19,27 +19,12 @@ jobs:
         - ${{ github.workspace }}:/home/controller
 
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
-      #- name: Checkout code
-      #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-      #  uses: actions/checkout@v2
-
-      - name: Check volumes.
-        run: |
-          ls -la /home/controller
-
-      # Installs ce-provision
       - name: Install ce-provision
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
           chmod +x ./install.sh
           sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
-
-      - name: Check volumes.
-        run: |
-          ls -la /home/controller
-          ls -la /home/controller/ce-provision
 
       # Run a web server provision
       - name: Prepare Git repos on disk
@@ -53,28 +38,5 @@ jobs:
         run: |
           ls -la /home/controller/ce-provision
           ls -la /home/controller/ce-provision/galaxy
-          cd /home/controller/ce-provision && /home/controller/ce-python/bin/ansible-galaxy role list
+          cd /home/controller/ce-provision && su - controller -c "/home/controller/ce-python/bin/ansible-galaxy role list"
           su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
-
-      # Installs the ce-dev stack
-      #- name: Install ce-dev
-      #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-      #  run: |
-      #    cd /tmp
-      #    wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
-      #    sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
-      #    export PATH=$PATH:/usr/local/go/bin
-      #    git clone https://github.com/FiloSottile/mkcert && cd mkcert
-      #    go build -ldflags "-X main.Version=$(git describe --tags)"
-      #    sudo mv ./mkcert /usr/local/bin && cd ../
-      #    sudo chmod +x /usr/local/bin/mkcert
-      #    rm -Rf mkcert
-      #    curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/${{ github.event.pull_request.base.ref }}/install.sh | /bin/sh -s -- --platform linux
-
-      # Uses the ce-dev stack to run a test provision
-      #- name: Run a test provision
-      #  if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-      #  run: |
-      #    git clone --branch ${{ github.event.pull_request.base.ref }} https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-      #    /bin/bash ce-dev/ansible/test.sh --examples web --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
-      #  shell: bash
