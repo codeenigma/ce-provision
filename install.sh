@@ -254,8 +254,12 @@ EOL
 # Tell Ansible this is a Docker container
 if [ "$IS_LOCAL" = "true" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  # Run a second time to install Ansible Galaxy roles in the right place
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 else
   /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  # Run a second time to install Ansible Galaxy roles in the right place
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
