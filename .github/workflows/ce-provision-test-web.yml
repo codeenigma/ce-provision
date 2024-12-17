@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     # Use our ce-dev Debian base container
-    #container:
-    #  image: codeenigma/ce-dev:2.x
+    container:
+      image: codeenigma/ce-dev:2.x
+      volumes:
+        - /home/controller
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
@@ -39,7 +41,7 @@ jobs:
 
       - name: Provision a test web server
         if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-        run: sudo su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
+        run: su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/web.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
 
       # Installs the ce-dev stack
       #- name: Install ce-dev
