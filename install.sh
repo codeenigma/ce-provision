@@ -260,17 +260,8 @@ if [ "$IS_LOCAL" = "true" ]; then
 else
   ANSIBLE_COMMAND="ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
 fi
+# Configure ce-provision
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
-ls -la "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
-/usr/bin/echo "-------------------------------------------------"
-/usr/bin/echo "Search for missing roles"
-cat "/home/$CONTROLLER_USER/ce-provision/roles/debian/ce_provision/meta/requirements-12.yml"
-find / -name 'geerlingguy.*'
-/usr/bin/echo "-------------------------------------------------"
-
-/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER"
-/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy role list"
-/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection list"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
 # Install firewall
