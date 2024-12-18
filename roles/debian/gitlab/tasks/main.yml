@@ -97,12 +97,12 @@
 - name: Stop Gitlab.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
 
-- name: Start runit properly to avoid freezes in containers.
-  ansible.builtin.command: /opt/gitlab/embedded/bin/runsvdir-start
-  when: is_local
+#- name: Start runit properly to avoid freezes in containers.
+#  ansible.builtin.command: /opt/gitlab/embedded/bin/runsvdir-start
+#  when: is_local
 
-- name: Reconfigure Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
+#- name: Reconfigure Gitlab.
+#  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
 
 - name: Copy startup script in place.
   ansible.builtin.template:
