@@ -1,42 +1,42 @@
 name: Run GitLab server test build
 
-# Run this workflow every time a new commit pushed to your repository
-on: pull_request
+# Run this workflow nightly and every time a new commit pushed to your repository
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  pull_request:
 
 jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
   test-gitlab:
+    if: ${{ github.event.pull_request.head.ref != 'documentation' }}
     # Name the Job
-    name: Run tests against Ansible code base
+    name: Build a GitLab server with ce-provision
     # Set the type of machine to run on
     runs-on: ubuntu-latest
 
+    # Use our ce-dev Debian base container
+    container:
+      image: codeenigma/ce-dev:2.x
+      volumes:
+        - ${{ github.workspace }}:/home/controller
+
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
-      - name: Checkout code
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
-        uses: actions/checkout@v2
-
-      # Installs the ce-dev stack
-      - name: Install ce-dev
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+      - name: Install ce-provision
         run: |
-          cd /tmp
-          wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
-          sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
-          export PATH=$PATH:/usr/local/go/bin
-          git clone https://github.com/FiloSottile/mkcert && cd mkcert
-          go build -ldflags "-X main.Version=$(git describe --tags)"
-          sudo mv ./mkcert /usr/local/bin && cd ../
-          sudo chmod +x /usr/local/bin/mkcert
-          rm -Rf mkcert
-          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/${{ github.event.pull_request.base.ref }}/install.sh | /bin/sh -s -- --platform linux
+          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
+          /usr/bin/chmod +x ./install.sh
+          /usr/bin/sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
 
-      # Uses the ce-dev stack to run a test provision
-      - name: Run a test provision
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+      # Run a GitLab server provision
+      - name: Prepare Git repos on disk
         run: |
-          git clone --branch ${{ github.event.pull_request.base.ref }} https://github.com/codeenigma/ce-dev-ce-provision-config.git config
-          /bin/bash ce-dev/ansible/test.sh --examples gitlab --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }}
-        shell: bash
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
+
+      - name: Start SSHD
+        run: /usr/sbin/sshd&
+
+      - name: Provision a test GitLab server
+        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"

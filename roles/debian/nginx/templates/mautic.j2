@@ -60,7 +60,7 @@ location ~ /(addons|plugins)/.*/Assets/ {
 }
 
 # Allow index_dev/upgrade for local stack.
-{% if is_local is defined and is_local %}
+{% if is_local %}
 location ~ ^/(index_dev|upgrade)\.php$ {
     try_files @phpprocess @phpprocess;
 }
