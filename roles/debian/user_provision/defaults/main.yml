@@ -1,5 +1,5 @@
 ---
-_user_provision_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+_user_provision_username: "{% if is_local %}ce-dev{% else %}controller{% endif %}"
 user_provision:
   # This sets both username and main group.
   username: "{{ _user_provision_username }}"

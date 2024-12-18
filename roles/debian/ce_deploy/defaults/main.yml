@@ -1,6 +1,6 @@
 ---
 _ce_deploy:
-  username: "{% if is_local is defined and is_local %}ce-dev{% else %}deploy{% endif %}"
+  username: "{% if is_local %}ce-dev{% else %}deploy{% endif %}"
 
 ce_deploy:
   # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.

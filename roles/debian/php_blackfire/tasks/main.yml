@@ -67,13 +67,13 @@
 - name: Generate agent CLI configuration.
   ansible.builtin.template:
     src: blackfire.ini.j2
-    dest: "/home/vagrant/.blackfire.ini"
-    owner: vagrant
-    group: vagrant
+    dest: "{{ blackfire.agent_cli_config_path }}"
+    owner: "{{ blackfire.agent_cli_config_owner }}"
+    group: "{{ blackfire.agent_cli_config_owner }}"
     mode: 0644
   when:
     - blackfire.enable
-    - is_local is defined and is_local
+    - is_local
 
 - name: Trigger overrides
   ansible.builtin.include_role:

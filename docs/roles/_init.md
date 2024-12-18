@@ -9,7 +9,10 @@ This is meant to ALWAYS be included as the first task of a play. If you include 
 ## Default variables
 ```yaml
 ---
-_ce_provision_username: "{% if is_local is defined and is_local %}ce-dev{% else %}controller{% endif %}"
+# Set this variable to true to tell ce-provision it is running in a container.
+is_local: false
+
+_ce_provision_username: "{% if is_local %}ce-dev{% else %}controller{% endif %}"
 _venv_path: "/home/{{ _ce_provision_username }}/ce-python"
 _venv_command: /usr/bin/python3 -m venv
 _venv_install_username: "{{ _ce_provision_username }}"
@@ -25,8 +28,8 @@ _init:
   # This is used to detect if the playbook must re-run or not.
   vars_dirs: []
   force_play: false
-  lock_file: /tmp/ce-provision-lock
-  deploy_lock_file: /tmp/ce-deploy-lock # must match lock_file in ce-deploy
+  lock_file: /tmp/ce-provision-lock # set to an empty string to disable locking behaviour
+  deploy_lock_file: /tmp/ce-deploy-lock # must match lock_file in ce-deploy, set to an empty string to disable locking behaviour
   ce_provision_version: 2.x # Outputted by the _init role at the start of plays
   install_ansible: true # set to false to not install Ansible in a venv
 

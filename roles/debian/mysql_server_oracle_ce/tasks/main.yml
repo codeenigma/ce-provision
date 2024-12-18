@@ -77,12 +77,12 @@
 - name: Update MySQL root password.
   ansible.builtin.shell: >
     mysql -NBe 'GRANT ALL ON *.* TO "root"@"%" IDENTIFIED BY "root" WITH GRANT OPTION;'
-  when: is_local is defined and is_local
+  when: is_local
 
 - name: Update MySQL ce-dev password.
   ansible.builtin.shell: >
     mysql -NBe 'GRANT ALL ON *.* TO "ce-dev"@"%" IDENTIFIED BY "ce-dev" WITH GRANT OPTION;'
-  when: is_local is defined and is_local
+  when: is_local
 
 - name: Ensure MySQL can write data.
   ansible.builtin.file:
