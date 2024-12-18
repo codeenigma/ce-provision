@@ -130,4 +130,3 @@
 # @TODO - this task fails in CI with
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
-  when: not is_local
