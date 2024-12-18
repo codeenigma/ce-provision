@@ -1,0 +1,2 @@
+gitlab_runner:
+  restart: false # no systemd in CI containers
