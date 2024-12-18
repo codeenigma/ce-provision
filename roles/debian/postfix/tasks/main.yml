@@ -99,7 +99,6 @@
     state: directory
   when:
     - postfix.ce_dev_delivery_mode == "host"
-    - is_local is defined
     - is_local
 
 - name: Configure procmail to NULL.
@@ -110,9 +109,7 @@
     group: root
     mode: "0644"
     force: true
-  when:
-    - is_local is defined
-    - is_local
+  when: is_local
 
 - name: Configure procmail to host directory.
   ansible.builtin.template:
@@ -124,7 +121,6 @@
     force: true
   when:
     - postfix.ce_dev_delivery_mode == "host"
-    - is_local is defined
     - is_local
 
 - name: Configure procmail to local.
@@ -133,7 +129,6 @@
     state: absent
   when:
     - postfix.ce_dev_delivery_mode == "local"
-    - is_local is defined
     - is_local
 
 # Needed for Docker.

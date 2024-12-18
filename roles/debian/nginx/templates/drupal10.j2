@@ -81,7 +81,7 @@ location ~ ^/(index|cron|modules\/statistics\/statistics|core\/modules\/statisti
     try_files @phpprocess @phpprocess;
 }
 # Allow install/update for local stack.
-{% if is_local is defined and is_local %}
+{% if is_local %}
 location ~ ^/(install|update)\.php$ {
     try_files @phpprocess @phpprocess;
 }
