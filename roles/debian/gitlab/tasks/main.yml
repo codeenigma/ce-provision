@@ -127,6 +127,7 @@
 - name: Ensure GitLab is started.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
 
-# @TODO - this task fails in CI with
+# @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
+  when: not is_local
