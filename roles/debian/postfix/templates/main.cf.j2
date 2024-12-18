@@ -52,7 +52,7 @@ smtpd_tls_key_file = {{ postfix.ssl.smtp_tls_key_file }}
 smtpd_tls_CApath = {{ postfix.ssl.smtp_tls_CApath }}
 smtpd_tls_CAfile = {{ postfix.ssl.smtp_tls_CAfile }}
 {% endif %}
-{% if (is_local is defined) and is_local %}
+{% if is_local %}
 # Force all mail to ce-dev user.
 virtual_alias_domains = ""
 virtual_alias_maps = static:ce-dev
