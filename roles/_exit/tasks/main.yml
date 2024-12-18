@@ -53,3 +53,4 @@
   ansible.builtin.file:
     path: "{{ _init.lock_file }}"
     state: absent
+  when: _init.lock_file | length > 0

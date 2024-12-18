@@ -8,10 +8,13 @@
 - name: Check for a ce-deploy lock file.
   ansible.builtin.stat:
     path: "{{ _init.deploy_lock_file }}"
+  when: _init.deploy_lock_file | length > 0
   register: _ce_deploy_lock
 
 - name: Abort if ce-deploy lock file exists.
-  when: _ce_deploy_lock.stat.exists is defined and _ce_deploy_lock.stat.exists
+  when:
+    - _init.deploy_lock_file | length > 0
+    - _ce_deploy_lock.stat.exists is defined and _ce_deploy_lock.stat.exists
   block:
     - name: Abort if ce-deploy lock file is found.
       ansible.builtin.debug:
@@ -31,6 +34,7 @@
     path: "{{ _init.lock_file }}"
     state: touch
     mode: 0644
+  when: _init.lock_file | length > 0
 
 # Load Linux services into ansible_facts.services.
 - name: Populate service facts
