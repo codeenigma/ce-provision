@@ -1,9 +1,6 @@
 # Disable DSA keys
 ApplicationSetting.last.update(dsa_key_restriction: -1)
 
-# Disable ECDSA keys
-ApplicationSetting.last.update(ecdsa_key_restriction: -1)
-
 # Enforce at least 2048 bits for RSA keys
 ApplicationSetting.last.update(rsa_key_restriction: 2048)
 
@@ -24,4 +21,3 @@ ApplicationSetting.last.update(signup_enabled: false)
 # Disable standard sign-in dialogue
 Gitlab::CurrentSettings.update!(password_authentication_enabled_for_web: false)
 {% endif %}
-

@@ -34,6 +34,4 @@
     - ansible.builtin.import_role:
         name: debian/gpg_key
     - ansible.builtin.import_role:
-        name: debian/firewall_config
-    - ansible.builtin.import_role:
         name: _exit

@@ -10,6 +10,7 @@ jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
   test-gitlab:
+    if: ${{ github.event.pull_request.head.ref != 'documentation' }}
     # Name the Job
     name: Build a GitLab server with ce-provision
     # Set the type of machine to run on
@@ -23,7 +24,6 @@ jobs:
 
     steps:
       - name: Install ce-provision
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
           /usr/bin/chmod +x ./install.sh
@@ -31,15 +31,12 @@ jobs:
 
       # Run a GitLab server provision
       - name: Prepare Git repos on disk
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: |
           /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
           /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
 
       - name: Start SSHD
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: /usr/sbin/sshd&
 
       - name: Provision a test GitLab server
-        if: ${{ github.event.pull_request.head.ref != 'documentation' }}
         run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
