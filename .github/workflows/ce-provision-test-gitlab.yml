@@ -42,4 +42,6 @@ jobs:
         run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
 
       - name: Run configuration script
-        run: /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
+        run: |
+          /usr/bin/cat /var/log/gitlab/postgresql/current
+          /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
