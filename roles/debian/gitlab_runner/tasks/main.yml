@@ -138,7 +138,7 @@
   become: true
 
 - name: Restart gitlab-runner service.
-  ansible.builtin.service:
+  ansible.builtin.systemd_service:
     name: gitlab-runner
     state: restarted
     daemon_reload: true

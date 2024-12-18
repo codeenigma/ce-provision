@@ -66,6 +66,7 @@
     - apt_repository.signed_by is defined
     - apt_repository.signed_by | length > 0
     - apt_repository.signed_by is url # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/url_test.html
+    - not is_local
   block:
     - name: Create script to refresh APT repository key.
       ansible.builtin.template:

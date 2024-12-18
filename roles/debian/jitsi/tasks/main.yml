@@ -27,7 +27,7 @@
       DefaultTasksMax=65000
 
 - name: Force systemd to reread configs.
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     daemon_reload: true
 
 - name: Write interactive hostname value for automated installation.
