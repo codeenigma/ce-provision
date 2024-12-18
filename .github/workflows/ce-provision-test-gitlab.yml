@@ -44,4 +44,4 @@ jobs:
       - name: Run configuration script
         run: |
           /usr/bin/cat /var/log/gitlab/postgresql/current
-          /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
+          #/opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
