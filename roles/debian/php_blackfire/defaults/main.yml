@@ -6,5 +6,5 @@ blackfire:
   agent_server_token: ""
   agent_client_id: ""
   agent_client_token: ""
-  agent_cli_config_path: /home/controller/.blackfire.ini
-  agent_cli_config_owner: controller
+  agent_cli_config_path: /home/ce-dev/.blackfire.ini
+  agent_cli_config_owner: ce-dev
