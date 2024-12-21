@@ -14,7 +14,7 @@ usage(){
   /usr/bin/echo '--version: ce-provision version to use (default: 2.x)'
   /usr/bin/echo '--user: Ansible controller user (default: controller)'
   /usr/bin/echo '--config: Git URL to your ce-provision Ansible config repository (default: https://github.com/codeenigma/ce-provision-config-example.git)'
-  /usr/bin/echo '--config-branch: branch of your Ansible config repository to use (default: 1.x)'
+  /usr/bin/echo '--config-branch: branch of your Ansible config repository to use (default: 2.x)'
   /usr/bin/echo '--no-firewall: skip installing iptables with ports 22, 80 and 443 open'
   /usr/bin/echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
   /usr/bin/echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
@@ -72,7 +72,7 @@ parse_options(){
 VERSION="2.x"
 CONTROLLER_USER="controller"
 CONFIG_REPO="https://github.com/codeenigma/ce-provision-config-example.git"
-CONFIG_REPO_BRANCH="1.x"
+CONFIG_REPO_BRANCH="2.x"
 GITLAB_URL="no"
 LE_SUPPORT="no"
 FIREWALL="true"
