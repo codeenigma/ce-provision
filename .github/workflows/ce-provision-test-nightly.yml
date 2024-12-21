@@ -25,7 +25,7 @@ jobs:
         run: |
           /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/2.x/install.sh
           /usr/bin/chmod +x ./install.sh
-          /usr/bin/sudo ./install.sh --config-branch 2.x --docker --no-firewall
+          /usr/bin/sudo ./install.sh --docker --no-firewall
 
       # Run a web server provision
       - name: Prepare Git repos on disk
