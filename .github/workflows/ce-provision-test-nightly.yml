@@ -9,7 +9,6 @@ jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
   test-nightly:
-    if: ${{ github.event.pull_request.head.ref != 'documentation' }}
     # Name the Job
     name: Build server with ce-provision
     # Set the type of machine to run on
@@ -24,9 +23,9 @@ jobs:
     steps:
       - name: Install ce-provision
         run: |
-          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
+          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/2.x/install.sh
           /usr/bin/chmod +x ./install.sh
-          /usr/bin/sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
+          /usr/bin/sudo ./install.sh --config-branch 2.x --docker --no-firewall
 
       # Run a web server provision
       - name: Prepare Git repos on disk
@@ -38,7 +37,7 @@ jobs:
         run: /usr/sbin/sshd&
 
       - name: Provision a test web server
-        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
+        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch 2.x --config-branch 2.x --force"
 
       - name: Provision a test GitLab server
-        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
+        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch 2.x --config-branch 2.x --force"
