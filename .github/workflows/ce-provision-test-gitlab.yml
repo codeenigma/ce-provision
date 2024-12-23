@@ -1,7 +1,14 @@
 name: Run GitLab server test build
 
+<<<<<<< HEAD
 # Run this workflow every time a new commit is pushed to your repository
 on:
+=======
+# Run this workflow nightly and every time a new commit pushed to your repository
+on:
+  schedule:
+    - cron: '30 4 * * *'
+>>>>>>> devel-2.x
   pull_request:
 
 jobs:
