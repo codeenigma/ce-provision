@@ -1,5 +1,48 @@
 name: Run GitLab server test build
 
+# Run this workflow nightly and every time a new commit pushed to your repository
+on:
+  schedule:
+    - cron: '30 4 * * *'
+  pull_request:
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  test-gitlab:
+    if: ${{ github.event.pull_request.head.ref != 'documentation' }}
+    # Name the Job
+    name: Build a GitLab server with ce-provision
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+
+    # Use our ce-dev Debian base container
+    container:
+      image: codeenigma/ce-dev:2.x
+      volumes:
+        - ${{ github.workspace }}:/home/controller
+
+    steps:
+      - name: Install ce-provision
+        run: |
+          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
+          /usr/bin/chmod +x ./install.sh
+          /usr/bin/sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
+
+      # Run a GitLab server provision
+      - name: Prepare Git repos on disk
+        run: |
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
+
+      - name: Start SSHD
+        run: /usr/sbin/sshd&
+
+      - name: Provision a test GitLab server
+        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --force"
+
+name: Run GitLab server test build
+
 # Run this workflow every time a new commit is pushed to your repository
 on:
   pull_request:
