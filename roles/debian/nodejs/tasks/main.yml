@@ -4,15 +4,20 @@
     name: debian/apt_repository
   vars:
     apt_repository:
-      legacy_repo: "deb https://deb.nodesource.com/node_{{ nodejs.version }} nodistro main"
+      legacy_repo: >-
+        deb https://deb.nodesource.com/node_{{ nodejs.version }}
+        {{ "nodistro" if nodejs.version != "10.x" else ansible_distribution_release }} main
       format: deb822
       name: nodejs
-      types:
-        - deb
+      types: >-
+        [
+          "deb",
+          {{ "'deb-src'" if nodejs.version == "10.x" else "" | trim }}
+        ]
       uris:
         - "https://deb.nodesource.com/node_{{ nodejs.version }}"
       signed_by: "{{ nodejs.apt_signed_by_nodejs }}"
-      suites: "nodistro"
+      suites: "{{ 'nodistro' if nodejs.version != '10.x' else ansible_distribution_release }}"
       components:
         - main
       state: present
