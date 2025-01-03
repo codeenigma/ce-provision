@@ -29,6 +29,7 @@ jobs:
         run: |
           mkdir -p /home/ce-dev/ansible/bin/hosts
           echo "wikis2pages-hugo ansible_host=127.0.0.1" > /home/ce-dev/ansible/bin/hosts/hosts
+          echo "StrictHostKeyChecking=no" > /home/ce-dev/.ssh/config
 
       - name: Start SSHD
         run: /usr/sbin/sshd&
@@ -37,7 +38,7 @@ jobs:
         run: |
           cd wikis2pages
           /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev
-          /usr/bin/su - ce-dev -c "/home/ce-dev/ansible/bin/ansible-playbook -e ANSIBLE_HOST_KEY_CHECKING=False -i /home/ce-dev/ansible/bin/hosts /__w/ce-provision/ce-provision/wikis2pages/ce-dev/ansible/provision.yml"
+          /usr/bin/su - ce-dev -c "/home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /__w/ce-provision/ce-provision/wikis2pages/ce-dev/ansible/provision.yml"
           /bin/sh set-current.sh ce-provision-2.x --no-ce-dev
           /home/ce-dev/ansible/bin/ansible-playbook -i  /home/ce-dev/ansible/bin/hosts ce-dev/ansible/deploy.yml
           ls -la public/
