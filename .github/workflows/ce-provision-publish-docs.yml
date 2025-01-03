@@ -22,8 +22,8 @@ jobs:
         - ${{ github.workspace }}:/home/ce-dev/wiki2pages
 
     steps:
-      - name: Set permissions
-        run: chown -Rf ce-dev:ce-dev /home/ce-dev/build
+      #- name: Set permissions
+      #  run: chown -Rf ce-dev:ce-dev /home/ce-dev/build
 
       - name: Install wiki2pages
         run: /usr/bin/su - ce-dev -c "/usr/bin/git clone https://github.com/codeenigma/wikis2pages.git /home/ce-dev/build/wiki2pages"
