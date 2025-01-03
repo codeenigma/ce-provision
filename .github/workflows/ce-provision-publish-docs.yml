@@ -19,14 +19,14 @@ jobs:
     container:
       image: codeenigma/ce-dev-controller:2.x
       volumes:
-        - ${{ github.workspace }}:/home/ce-dev
+        - ${{ github.workspace }}:/home/ce-dev/wiki2pages
 
     steps:
       - name: Set permissions
-        run: chown -Rf ce-dev:ce-dev /home/ce-dev
+        run: chown -Rf ce-dev:ce-dev /home/ce-dev/build
 
       - name: Install wiki2pages
-        run: /usr/bin/su - ce-dev -c "/usr/bin/git clone https://github.com/codeenigma/wikis2pages.git /home/ce-dev/wiki2pages"
+        run: /usr/bin/su - ce-dev -c "/usr/bin/git clone https://github.com/codeenigma/wikis2pages.git /home/ce-dev/build/wiki2pages"
 
       - name: Set up Ansible hosts file
         run: |
@@ -42,11 +42,11 @@ jobs:
 
       - name: Initialise wiki2pages for ce-provision 2.x
         run: |
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
-          ls -l /home/ce-dev/wiki2pages/
-          ls -l /home/ce-dev/wiki2pages/ce-dev/
-          ls -l /home/ce-dev/wiki2pages/ce-dev/ansible/
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/wikis2pages/ce-dev/ansible/provision.yml"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
+          ls -l /home/ce-dev/build/wiki2pages/
+          ls -l /home/ce-dev/build/wiki2pages/ce-dev/
+          ls -l /home/ce-dev/build/wiki2pages/ce-dev/ansible/
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wikis2pages/ce-dev/ansible/provision.yml"
           /bin/sh set-current.sh ce-provision-2.x --no-ce-dev
           /home/ce-dev/ansible/bin/ansible-playbook -i  /home/ce-dev/ansible/bin/hosts ce-dev/ansible/deploy.yml
           ls -la public/
