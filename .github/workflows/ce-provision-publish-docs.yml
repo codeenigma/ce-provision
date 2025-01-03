@@ -30,8 +30,11 @@ jobs:
           mkdir -p /home/ce-dev/ansible/bin/hosts
           echo "wikis2pages-hugo ansible_host=127.0.0.1" > /home/ce-dev/ansible/bin/hosts/hosts
           echo "StrictHostKeyChecking=no" > /home/ce-dev/.ssh/config
+          cat /home/ce-dev/.ssh/id_rsa.pub > /home/ce-dev/.ssh/authorized_keys
           chown ce-dev:ce-dev /home/ce-dev/.ssh/config
           chmod 700 /home/ce-dev/.ssh/config
+          chown ce-dev:ce-dev /home/ce-dev/.ssh/authorized_keys
+          chmod 700 /home/ce-dev/.ssh/authorized_keys
 
       - name: Start SSHD
         run: /usr/sbin/sshd&
