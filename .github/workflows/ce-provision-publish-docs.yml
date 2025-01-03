@@ -29,7 +29,6 @@ jobs:
         run: |
           mkdir -p /home/ce-dev/ansible/bin/hosts
           echo "wikis2pages-hugo ansible_host=127.0.0.1" > /home/ce-dev/ansible/bin/hosts/hosts
-          ls -la /home/ce-dev/
           echo "StrictHostKeyChecking=no" > /home/ce-dev/.ssh/config
           chown ce-dev:ce-dev /home/ce-dev/.ssh/config
           chmod 700 /home/ce-dev/.ssh/config
@@ -40,8 +39,8 @@ jobs:
       - name: Initialise wiki2pages for ce-provision 2.x
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
-          cat /home/ce-dev/ansible/bin/hosts/hosts
-          cat /home/ce-dev/.ssh/config
+          ls -la /home/ce-dev/.ssh
+          cat /home/ce-dev/.ssh/authorized_keys
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/provision.yml"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh set-current.sh --project ce-provision-2.x --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml"
