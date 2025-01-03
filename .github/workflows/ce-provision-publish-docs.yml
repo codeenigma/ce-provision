@@ -49,5 +49,7 @@ jobs:
           cat /home/ce-dev/deploy/live.local/set-current.sh
           /usr/bin/su - ce-dev -c "/bin/sh /home/ce-dev/deploy/live.local/set-current.sh --project ce-provision-2.x --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml"
-          ls -la public/
-          ls -la public/ce-provision-2.x/
+          ls -la /home/ce-dev/deploy/live.local/public/
+          ls -la /home/ce-dev/deploy/live.local/public/ce-provision-2.x/
+          ls -la /home/ce-dev/deploy/live.local/content/
+          ls -la /home/ce-dev/deploy/live.local/content/ce-provision-2.x/
