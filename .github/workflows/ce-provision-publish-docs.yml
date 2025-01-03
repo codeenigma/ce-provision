@@ -21,10 +21,14 @@ jobs:
 
     steps:
       - name: Install wiki2pages
-        run: |
-          /usr/bin/git clone https://github.com/codeenigma/wikis2pages.git
+        run: /usr/bin/git clone https://github.com/codeenigma/wikis2pages.git
 
-      - name: Run wiki2pages against ce-provision 2.x
+      - name: Set up Ansible hosts file
+        run: |
+          mkdir -p /home/ce-dev/ansible/bin/hosts
+          echo "wikis2pages-hugo ansible_host=127.0.0.1" > /home/ce-dev/ansible/bin/hosts/hosts
+
+      - name: Initialise wiki2pages for ce-provision 2.x
         run: |
           cd wikis2pages
           /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev
