@@ -1,60 +1,35 @@
-name: Build docs
-
-# Run this workflow when a PR to 1.x gets merged
+# Run this workflow on demand and every time a new commit pushed to your repository
 on:
   pull_request:
-    types: [closed]
-    branches:
-      - 1.x
+  workflow_dispatch:
 
 jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
-  build-docs:
+  public-docs:
+    if: ${{ github.event.pull_request.head.ref != 'documentation' }}
     # Name the Job
-    name: Build the documentation
+    name: Publish the ce-provision docs to GitHub
     # Set the type of machine to run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+
+    # Use our ce-dev Debian base container
+    container:
+      image: codeenigma/ce-dev-controller:2.x
+      volumes:
+        - ${{ github.workspace }}:/home/controller
 
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      # Configures global Git variables for committing
-      - name: Configure Git
+      - name: Install wiki2pages
         run: |
-          git config --global user.email "sysadm@codeenigma.com"
-          git config --global user.name "Code Enigma CI"
-          git config --global pull.rebase false
+          /usr/bin/git clone https://github.com/codeenigma/wikis2pages.git
 
-      # Installs the ce-dev stack
-      - name: Install ce-dev
+      - name: Run wiki2pages against ce-provision 2.x
         run: |
-          cd /tmp
-          wget https://golang.org/dl/go1.15.8.linux-amd64.tar.gz
-          sudo tar -C /usr/local -xzf go1.15.8.linux-amd64.tar.gz
-          export PATH=$PATH:/usr/local/go/bin
-          git clone https://github.com/FiloSottile/mkcert && cd mkcert
-          go build -ldflags "-X main.Version=$(git describe --tags)"
-          sudo mv ./mkcert /usr/local/bin && cd ../
-          sudo chmod +x /usr/local/bin/mkcert
-          rm -Rf mkcert
-          curl -sL https://raw.githubusercontent.com/codeenigma/ce-dev/1.x/install.sh | /bin/sh -s -- linux
-
-      # Uses the ce-dev stack to run Hugo to format and deploy the docs
-      - name: Publish documentation
-        run: |
-          cd
-          git clone https://github.com/codeenigma/wikis2pages.git
           cd wikis2pages
-          /bin/bash init.sh https://${{ secrets.GITHUB_TOKEN }}@github.com/codeenigma/ce-provision.git 1.x
-          /bin/sh set-current.sh ce-provision-1.x
-          docker exec --user ce-dev --workdir /home/ce-dev/deploy/live.local wikis2pages-hugo hugo
-          /bin/sh .github-actions-push.sh
-          cd /home/runner/wikis2pages/public/ce-provision-1.x
-          git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git
-          git push ci master
-        shell: bash
+          /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev
+          /home/ce-dev/ansible/bin/ansible-playbook ce-dev/ansible/provision.yml
+          /bin/sh set-current.sh ce-provision-2.x --no-ce-dev
+          /home/ce-dev/ansible/bin/ansible-playbook ce-dev/ansible/deploy.yml
+          ls -la public/
+          ls -la public/ce-provision-2.x/

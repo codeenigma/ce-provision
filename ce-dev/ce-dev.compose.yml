@@ -1,4 +1,3 @@
-version: "3.7"
 x-ce_dev:
   version: 1.x
   registry: localhost:5000
