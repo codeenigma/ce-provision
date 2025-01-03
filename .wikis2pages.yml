@@ -1,10 +1,10 @@
-ce-provision-1.x:
+ce-provision-2.x:
   src: https://github.com/codeenigma/ce-provision.git
-  src_branch: 1.x
+  src_branch: 2.x
   src_subdir: 'docs'
   dest: https://github.com/codeenigma/ce-provision-docs.git # remote and token for pushing added in GitHub Actions directly
   dest_branch: master
-  dest_subdir: 1.x
+  dest_subdir: 2.x
   title: ce-provision
   type: doc
-  base_url: https://codeenigma.github.io/ce-provision-docs/1.x
+  base_url: https://codeenigma.github.io/ce-provision-docs/2.x
