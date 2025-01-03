@@ -38,8 +38,8 @@ jobs:
 
       - name: Initialise wiki2pages for ce-provision 2.x
         run: |
-          /usr/bin/su - ce-dev -c "cd wikis2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
-          /usr/bin/su - ce-dev -c "cd wikis2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/wikis2pages/ce-dev/ansible/provision.yml"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/wikis2pages/ce-dev/ansible/provision.yml"
           /bin/sh set-current.sh ce-provision-2.x --no-ce-dev
           /home/ce-dev/ansible/bin/ansible-playbook -i  /home/ce-dev/ansible/bin/hosts ce-dev/ansible/deploy.yml
           ls -la public/
