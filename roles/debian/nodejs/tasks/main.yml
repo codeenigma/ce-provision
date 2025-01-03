@@ -7,9 +7,7 @@
       legacy_repo: "deb https://deb.nodesource.com/node_{{ nodejs.version }} {% if nodejs.version != '10.x' %}nodistro{% else %}{{ ansible_distribution_release }}{% endif %} main"
       format: deb822
       name: nodejs
-      types:
-        - deb
-        "{{ nodejs.version == '10.x' | ternary('- deb-src', '') }}"
+      types: "{% if nodejs.version == '10.x' %}['deb', 'deb-src']{% else %}['deb']{% endif %}"
       uris:
         - "https://deb.nodesource.com/node_{{ nodejs.version }}"
       signed_by: "{{ nodejs.apt_signed_by_nodejs }}"
