@@ -19,7 +19,7 @@ jobs:
     container:
       image: codeenigma/ce-dev-controller:2.x
       volumes:
-        - ${{ github.workspace }}:/home/controller
+        - ${{ github.workspace }}:/home/ce-dev
 
     steps:
       - name: Install wiki2pages
