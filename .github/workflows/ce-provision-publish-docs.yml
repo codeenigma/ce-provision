@@ -28,12 +28,15 @@ jobs:
           mkdir -p /home/ce-dev/ansible/bin/hosts
           echo "wikis2pages-hugo ansible_host=127.0.0.1" > /home/ce-dev/ansible/bin/hosts/hosts
 
+      - name: Start SSHD
+        run: /usr/sbin/sshd&
+
       - name: Initialise wiki2pages for ce-provision 2.x
         run: |
           cd wikis2pages
           /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev
-          /home/ce-dev/ansible/bin/ansible-playbook -i localhost ce-dev/ansible/provision.yml
+          /home/ce-dev/ansible/bin/ansible-playbook -i "wikis2pages-hugo ansible_ssh_host=127.0.0.1" ce-dev/ansible/provision.yml
           /bin/sh set-current.sh ce-provision-2.x --no-ce-dev
-          /home/ce-dev/ansible/bin/ansible-playbook -i localhost ce-dev/ansible/deploy.yml
+          /home/ce-dev/ansible/bin/ansible-playbook -i "wikis2pages-hugo ansible_ssh_host=127.0.0.1" ce-dev/ansible/deploy.yml
           ls -la public/
           ls -la public/ce-provision-2.x/
