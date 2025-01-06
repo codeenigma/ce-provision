@@ -3,13 +3,15 @@ name: Publish docs
 # Run this workflow on demand and every time a new commit pushed to your repository
 on:
   pull_request:
+#    branches:
+#      - 1.x
+#      - 2.x
   workflow_dispatch:
 
 jobs:
   # Set the job key. The key is displayed as the job name
   # when a job name is not provided
   public-docs:
-    if: ${{ github.event.pull_request.head.ref != 'documentation' }}
     # Name the Job
     name: Publish the ce-provision docs to GitHub
     # Set the type of machine to run on
@@ -44,10 +46,15 @@ jobs:
 
       - name: Initialise wiki2pages for ce-provision 2.x
         run: |
+          grep -r "1\.x" /home/ce-dev/
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
+          cat /home/ce-dev/build/wiki2pages/ce-dev/ansible/wikis/ce-provision-2.x.yml
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/provision.yml"
+          cat /opt/hugo-daemon.sh
+          cat /home/ce-dev/build/wiki2pages/set-current.sh
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh set-current.sh --project ce-provision-2.x --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml"
+          grep -r "1\.x" /home/ce-dev/
           ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-2.x/
 
       - name: Publish documentation
