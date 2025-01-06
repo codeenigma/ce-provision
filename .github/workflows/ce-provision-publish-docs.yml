@@ -53,3 +53,10 @@ jobs:
           ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-2.x/
           ls -la /home/ce-dev/build/wiki2pages/content/
           ls -la /home/ce-dev/build/wiki2pages/content/ce-provision-2.x/
+
+      - name: Publish documentation
+        run: |
+          /usr/bin/su - ce-dev -c "/bin/sh /home/ce-dev/build/wiki2pages/.github-actions-push.sh"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages/content/ce-provision-2.x/"
+          /usr/bin/su - ce-dev -c "/usr/bin/git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git"
+          /usr/bin/su - ce-dev -c "/usr/bin/git push ci master"
