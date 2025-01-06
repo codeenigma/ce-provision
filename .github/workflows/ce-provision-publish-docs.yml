@@ -24,9 +24,6 @@ jobs:
         - ${{ github.workspace }}:/home/controller
 
     steps:
-      - name: Where do we start?
-        run: pwd -P
-
       - name: Install wiki2pages
         run: /usr/bin/su - ce-dev -c "/usr/bin/git clone https://github.com/codeenigma/wikis2pages.git /home/ce-dev/build/wiki2pages"
 
@@ -34,7 +31,6 @@ jobs:
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-provision && /usr/bin/git pull origin 2.x"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-deploy && /usr/bin/git pull origin 1.x"
-          cat /home/ce-dev/ce-provision/.wikis2pages.yml
 
       - name: Set up Ansible hosts file
         run: |
@@ -58,7 +54,7 @@ jobs:
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/provision.yml"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh set-current.sh --project ce-provision-2.x --no-ce-dev"
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml --verbose"
           ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-2.x/
 
       - name: Publish documentation
