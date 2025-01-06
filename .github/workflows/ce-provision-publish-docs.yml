@@ -24,6 +24,9 @@ jobs:
         - ${{ github.workspace }}:/home/controller
 
     steps:
+      - name: Where do we start?
+        run: pwd -P
+
       - name: Install wiki2pages
         run: /usr/bin/su - ce-dev -c "/usr/bin/git clone https://github.com/codeenigma/wikis2pages.git /home/ce-dev/build/wiki2pages"
 
@@ -31,6 +34,7 @@ jobs:
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-provision && /usr/bin/git pull origin 2.x"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-deploy && /usr/bin/git pull origin 1.x"
+          cat /home/ce-dev/ce-provision/.wikis2pages.yml
 
       - name: Set up Ansible hosts file
         run: |
