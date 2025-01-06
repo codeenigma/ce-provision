@@ -50,10 +50,10 @@ jobs:
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
           cat /home/ce-dev/build/wiki2pages/ce-dev/ansible/wikis/ce-provision-2.x.yml
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/provision.yml"
-          cat /opt/hugo-daemon.sh
           cat /home/ce-dev/build/wiki2pages/set-current.sh
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh set-current.sh --project ce-provision-2.x --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml"
+          cat /opt/hugo-daemon.sh
           grep -r "1\.x" /home/ce-dev/
           ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-2.x/
 
