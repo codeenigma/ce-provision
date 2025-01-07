@@ -3,9 +3,9 @@ name: Publish docs
 # Run this workflow on demand and every time a new commit pushed to your repository
 on:
   pull_request:
-#    branches:
-#      - 1.x
-#      - 2.x
+    branches:
+      - 1.x
+      - 2.x
   workflow_dispatch:
 
 jobs:
@@ -49,20 +49,20 @@ jobs:
       - name: Start SSHD
         run: /usr/sbin/sshd&
 
-      - name: Initialise wiki2pages for ce-provision 2.x
+      - name: Initialise wiki2pages for ce-provision ${{ github.event.pull_request.base.ref }}
         run: |
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch 2.x --no-ce-dev"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch ${{ github.event.pull_request.base.ref }} --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/provision.yml"
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh set-current.sh --project ce-provision-2.x --no-ce-dev"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh set-current.sh --project ce-provision-${{ github.event.pull_request.base.ref }} --no-ce-dev"
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /home/ce-dev/ansible/bin/ansible-playbook -e 'wiki2pages_build_path=/home/ce-dev/build/wiki2pages launch_hugo_server=false' -i /home/ce-dev/ansible/bin/hosts /home/ce-dev/build/wiki2pages/ce-dev/ansible/deploy.yml"
 
       - name: Run Hugo
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && hugo"
-          ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-2.x/
+          ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-${{ github.event.pull_request.base.ref }}/
 
       - name: Publish documentation
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh /home/ce-dev/build/wiki2pages/.github-actions-push.sh"
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages/public/ce-provision-2.x && /usr/bin/git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git"
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages/public/ce-provision-2.x && /usr/bin/git push ci master"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages/public/ce-provision-${{ github.event.pull_request.base.ref }} && /usr/bin/git remote add ci https://${{ secrets.DOCS_GITHUB_TOKEN }}@github.com/codeenigma/ce-provision-docs.git"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages/public/ce-provision-${{ github.event.pull_request.base.ref }} && /usr/bin/git push ci master"
