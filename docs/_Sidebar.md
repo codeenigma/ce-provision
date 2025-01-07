@@ -1,7 +1,7 @@
 &nbsp;
-- [Home](/)
-  - [Install](/install)
-  - [Usage](/scripts)
+- [Home]()
+  - [Install](install)
+  - [Usage](scripts)
   - [Roles](roles)
      - [AWS Infrastructure](roles/aws)
        - [AWS ACL](roles/aws/aws_acl)
