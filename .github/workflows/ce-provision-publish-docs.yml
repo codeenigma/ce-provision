@@ -1,8 +1,9 @@
 name: Publish docs
 
-# Run this workflow on demand and every time a new commit pushed to your repository
+# Run this workflow on demand or every time a PR is accepted to a main branch
 on:
   pull_request:
+    types: [closed]
     branches:
       - 1.x
       - 2.x
