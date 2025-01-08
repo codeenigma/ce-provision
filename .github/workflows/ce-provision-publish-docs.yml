@@ -27,11 +27,10 @@ jobs:
           echo "docs_branch=${{ env.docs_branch }}" >> $GITHUB_OUTPUT
 
   publish-docs:
-    # Only run the job if it is not coming from a documentation branch
-    if: ${{ github.event.pull_request.head.ref != needs.set-docs-branch.outputs.docs_branch }}
-    # Name the Job
     name: Publish the ce-provision docs to GitHub
-    # Set the type of machine to run on
+    # Only run the job if it is not coming from a documentation branch
+    needs: set-docs-branch
+    if: ${{ github.event.pull_request.head.ref != needs.set-docs-branch.outputs.docs_branch }}
     runs-on: ubuntu-latest
 
     # Use our ce-dev Debian base container
