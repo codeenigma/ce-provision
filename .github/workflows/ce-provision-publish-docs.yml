@@ -36,12 +36,15 @@ jobs:
       # Configures global Git variables for committing
       - name: Configure Git
         run: |
-          git config --global user.email "sysadm@codeenigma.com"
-          git config --global user.name "Code Enigma CI"
-          git config --global pull.rebase false
+          /usr/bin/git config --global user.email "sysadm@codeenigma.com"
+          /usr/bin/git config --global user.name "Code Enigma CI"
+          /usr/bin/git config --global pull.rebase false
 
       - name: Commit new table of contents back to the repo
-        run: git push
+        run: |
+          /usr/bin/git add docs/.
+          /usr/bin/git commit -m "GitHub Actions - updating markdown docs - ${{ steps.date.outputs.date }}"
+          /usr/bin/git push
 
       # Now build and publish the version of the docs
       - name: Install wiki2pages
