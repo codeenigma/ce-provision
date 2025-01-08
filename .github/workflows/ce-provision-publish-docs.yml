@@ -29,26 +29,24 @@ jobs:
         with:
           ref: docs-${{ github.event.pull_request.base.ref }}
 
-      # Configures global Git variables for committing
-      - name: Configure Git
+      # Configure environment
+      - name: Prepare Git, GitHub CLI and installed CE tools
         run: |
           /usr/bin/git config --global user.email "sysadm@codeenigma.com"
           /usr/bin/git config --global user.name "Code Enigma CI"
           /usr/bin/git config --global pull.rebase false
           /usr/bin/git config --global --add safe.directory /__w/ce-provision/ce-provision
+          (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) && sudo mkdir -p -m 755 /etc/apt/keyrings && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && sudo apt update && sudo apt install gh -y
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-provision && /usr/bin/git pull origin 2.x"
+          /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-deploy && /usr/bin/git pull origin 1.x"
 
       # First build and publish the markdown docs
-      - name: Build the table of contents
-        run: /bin/sh contribute/toc.sh
-
-      - name: Commit new table of contents back to the repo
+      - name: Build and commit table of contents and README files back to the repo
         run: |
-          /usr/bin/git add docs/.
-          /usr/bin/git commit -m "GitHub Actions - updating markdown docs - ${{ steps.date.outputs.date }}"
+          /bin/sh contribute/toc.sh
+          /usr/bin/find . -name "*.md" | xargs git add
+          /usr/bin/git diff --quiet && git diff --staged --quiet || git commit -am "GitHub Actions - updating markdown docs - ${{ steps.date.outputs.date }}"
           /usr/bin/git push
-
-      - name: Install GitHub CLI
-        run: (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) && sudo mkdir -p -m 755 /etc/apt/keyrings && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && sudo apt update && sudo apt install gh -y
 
       # Create docs pull request
       - name: Create a documentation pull request
@@ -61,27 +59,17 @@ jobs:
       - name: Install wiki2pages
         run: /usr/bin/su - ce-dev -c "/usr/bin/git clone https://github.com/codeenigma/wikis2pages.git /home/ce-dev/build/wiki2pages"
 
-      - name: Update local applications
-        run: |
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-provision && /usr/bin/git pull origin 2.x"
-          /usr/bin/su - ce-dev -c "cd /home/ce-dev/ce-deploy && /usr/bin/git pull origin 1.x"
-
-      - name: Set up Ansible hosts file
+      - name: Set up Ansible and SSH
         run: |
           mkdir -p /home/ce-dev/ansible/bin/hosts
           echo "wikis2pages-hugo ansible_host=127.0.0.1" > /home/ce-dev/ansible/bin/hosts/hosts
-
-      - name: Set up SSH config
-        run: |
           echo "StrictHostKeyChecking=no" > /home/ce-dev/.ssh/config
           cat /home/ce-dev/.ssh/id_rsa.pub > /home/ce-dev/.ssh/authorized_keys
           chown ce-dev:ce-dev /home/ce-dev/.ssh/config
           chmod 700 /home/ce-dev/.ssh/config
           chown ce-dev:ce-dev /home/ce-dev/.ssh/authorized_keys
           chmod 700 /home/ce-dev/.ssh/authorized_keys
-
-      - name: Start SSHD
-        run: /usr/sbin/sshd&
+          /usr/sbin/sshd&
 
       - name: Initialise wiki2pages for ce-provision ${{ github.event.pull_request.base.ref }}
         run: |
