@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: docs-${{ github.event.pull_request.base.ref }}
 
       # Configures global Git variables for committing
       - name: Configure Git
@@ -46,6 +46,17 @@ jobs:
           /usr/bin/git add docs/.
           /usr/bin/git commit -m "GitHub Actions - updating markdown docs - ${{ steps.date.outputs.date }}"
           /usr/bin/git push
+
+      # Create docs pull request
+      - name: Create a documentation pull request
+        if: ${{ github.event.pull_request.head.ref != 'docs-${{ github.event.pull_request.base.ref }}' }}
+        uses: repo-sync/pull-request@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: docs-${{ github.event.pull_request.base.ref }}
+          destination_branch: ${{ github.event.pull_request.base.ref }}
+          pr_title: Documentation update.
+          pr_body: "**Automated pull request** created by GitHub Actions because of a documentation update."
 
       # Now build and publish the version of the docs
       - name: Install wiki2pages
