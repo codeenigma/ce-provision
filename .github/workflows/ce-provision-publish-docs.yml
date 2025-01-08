@@ -29,16 +29,17 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.ref }}
 
-      # First build and publish the markdown docs
-      - name: Build the table of contents
-        run: /bin/sh contribute/toc.sh
-
       # Configures global Git variables for committing
       - name: Configure Git
         run: |
           /usr/bin/git config --global user.email "sysadm@codeenigma.com"
           /usr/bin/git config --global user.name "Code Enigma CI"
           /usr/bin/git config --global pull.rebase false
+          /usr/bin/git config --global --add safe.directory /__w/ce-provision/ce-provision
+
+      # First build and publish the markdown docs
+      - name: Build the table of contents
+        run: /bin/sh contribute/toc.sh
 
       - name: Commit new table of contents back to the repo
         run: |
