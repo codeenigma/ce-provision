@@ -79,7 +79,6 @@ FIREWALL="true"
 AWS_SUPPORT="false"
 IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
-ANSIBLE_COMMAND=""
 
 # Parse options.
 parse_options "$@"
@@ -254,14 +253,8 @@ firewall_config:
       - "443"
 EOL
 
-# Tell Ansible this is a Docker container
-if [ "$IS_LOCAL" = "true" ]; then
-  ANSIBLE_COMMAND="ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
-else
-  ANSIBLE_COMMAND="ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
-fi
 # Configure ce-provision
-/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
+/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
 # Install firewall
@@ -281,7 +274,7 @@ if [ "$FIREWALL" = "true" ]; then
       ansible.builtin.import_role:
         name: debian/firewall_config
 EOL
-  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
   /usr/bin/echo "-------------------------------------------------"
 else
   /usr/bin/echo "-------------------------------------------------"
@@ -399,7 +392,7 @@ EOT
 EOT
     /usr/bin/echo "-------------------------------------------------"
   fi
-  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
   /usr/bin/echo "-------------------------------------------------"
 else
   /usr/bin/echo "GitLab not requested. Skipping."
