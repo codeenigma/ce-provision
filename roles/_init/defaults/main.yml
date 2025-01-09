@@ -13,6 +13,12 @@ _ce_ansible_timer_name: upgrade_ansible
 #_aws_profile: example # boto profile name
 #_aws_region: eu-west-1
 
+# AWS tags
+_aws_resource_name: "" # Name
+# _profile: web_server # Profile
+# _env_type: dev # Env
+# _infra_name: acme # Infra
+
 _init:
   # A list of var directories to include. We only support .yml extensions.
   # This is used to detect if the playbook must re-run or not.

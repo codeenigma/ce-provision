@@ -1,0 +1,56 @@
+---
+# Create an RDS instance.
+- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+  connection: local
+  become: false
+
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+        - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+
+    # Automate subnet fetching
+    - name: Create empty var to hold subnet IDs.
+      ansible.builtin.set_fact:
+        _aws_rds_vpc_subnet_ids: []
+
+    - name: Gather VPC information.
+      amazon.aws.ec2_vpc_net_info:
+        profile: "{{ aws_rds.aws_profile }}"
+        region: "{{ aws_rds.region }}"
+        filters:
+          "tag:Name": "{{ _infra_name }}"
+      register: _aws_rds_vpc
+
+    - name: Set the VPC id from name.
+      ansible.builtin.set_fact:
+        _aws_rds_vpc_id: "{{ _aws_rds_vpc.vpcs[0].vpc_id }}"
+
+    - name: Gather public subnet information.
+      amazon.aws.ec2_vpc_subnet_info:
+        profile: "{{ aws_rds.aws_profile }}"
+        region: "{{ aws_rds.region }}"
+        filters:
+          vpc-id: "{{ _aws_rds_vpc_id }}"
+          tag:Env: "{{ _env_type }}"
+          tag:Profile: "core"
+      register: _aws_rds_vpc_subnets
+
+    - name: Place subnet IDs in a list.
+      ansible.builtin.set_fact:
+        _aws_rds_vpc_subnet_ids: "{{ _aws_rds_vpc_subnet_ids + [item.subnet_id] }}"
+      loop: "{{ _aws_rds_vpc_subnets.subnets }}"
+
+    # Build the RDS instance.
+    - ansible.builtin.import_role:
+        name: aws/aws_rds
+
+    - ansible.builtin.import_role:
+        name: _exit

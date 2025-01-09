@@ -1,0 +1,38 @@
+---
+# Prepare the ground for a new EC2 machine
+- hosts: localhost
+  connection: local
+  become: false
+
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+        - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
+    # copied from aws_ami.yml in group_vars/all because we do not want to load aws_ami vars yet
+    ami_groups:
+      - "all"
+      - "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+      - "_{{ _infra_name | regex_replace('-', '_') }}"
+      - "_{{ _env_type | regex_replace('-', '_') }}"
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - name: Blank the _aws_hostname variable.
+      ansible.builtin.set_fact:
+        _aws_hostname: ""
+    - name: Check to see if an Ansible host exists.
+      ansible.builtin.set_fact:
+        _aws_hostname: "{{ item }}"
+      with_inventory_hostnames:
+        - "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+    - name: If an Ansible host is not found, create it so we can execute EC2 orchestration.
+      ansible.builtin.add_host:
+        name: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+        groups: "{{ ami_groups }}"
+      when: _aws_hostname | length == 0
+    - ansible.builtin.import_role:
+        name: _exit
