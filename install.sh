@@ -178,6 +178,7 @@ fi
     - name: Configure system hosts file.
       ansible.builtin.import_role:
         name: debian/hosts
+      when: not is_local
     - name: Install ce-provision.
       ansible.builtin.import_role:
         name: debian/ce_provision
@@ -306,6 +307,7 @@ if [ "$GITLAB_URL" != "no" ]; then
     - name: Configure system hosts file.
       ansible.builtin.import_role:
         name: debian/hosts
+      when: not is_local
     - name: Install GitLab Runner.
       ansible.builtin.import_role:
         name: debian/gitlab_runner
