@@ -161,7 +161,9 @@ if [ ! -d "/home/$CONTROLLER_USER/ce-provision" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $CONFIG_REPO_BRANCH $CONFIG_REPO /home/$CONTROLLER_USER/ce-provision/config"
   /usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/ln -s /home/$CONTROLLER_USER/ce-provision/config/ansible.cfg /home/$CONTROLLER_USER/ce-provision/ansible.cfg"
 else
-  /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
+  /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Updating."
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && git pull origin $VERSION"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision/config && git pull origin $CONFIG_REPO_BRANCH"
   /usr/bin/echo "-------------------------------------------------"
 fi
 /usr/bin/mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
