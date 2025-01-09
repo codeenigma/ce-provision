@@ -23,6 +23,7 @@ jobs:
     steps:
       - name: Install ce-provision
         run: |
+          /usr/bin/apt-get update
           /usr/bin/apt-get install iproute2 -y
           /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
           /usr/bin/chmod +x ./install.sh
