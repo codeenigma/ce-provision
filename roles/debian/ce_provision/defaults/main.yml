@@ -13,7 +13,7 @@ ce_provision:
   username: "{{ _ce_provision_username }}" # see _init defaults
   #uid: "{{ _init.ce_provision_uid }}" # see _init defaults, optionally hardcode the UID for this user
   ssh_key_bits: "521" # ignored for ED25519 keys, recommended to use 4096 for RSA keys, 521 is the maximum for ECDSA keys
-  ssh_key_type: ed25519 # set to rsa to create an RSA key or ecdsa to set an ECDSA key
+  ssh_key_type: ed25519 # set to rsa to create an RSA key or ecdsa to create an ECDSA key
   public_key_name: id_ed25519.pub # this might be id_rsa.pub for RSA keys or id_ecdsa.pub for ECDSA keys, existing users may have a key of a different name
   # Main repo.
   own_repository: "https://github.com/codeenigma/ce-provision.git"
