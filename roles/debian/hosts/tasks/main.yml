@@ -23,8 +23,7 @@
     path: "{{ cloud_init_file.stat.path }}"
     regexp: "manage_etc_hosts: true"
     line: "manage_etc_hosts: false"
-  when:
-    - cloud_init_file.stat.exists
+  when: cloud_init_file.stat.exists
 
 - name: Set system hostname.
   ansible.builtin.hostname:
