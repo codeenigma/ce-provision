@@ -8,16 +8,29 @@ on:
       - 1.x
       - 2.x
   workflow_dispatch:
+# Set target docs branch name
+env:
+  docs_branch: docs-${{ github.event.pull_request.base.ref }}
 
 jobs:
-  # Set the job key. The key is displayed as the job name
-  # when a job name is not provided
-  public-docs:
-    # Only run the job if it is not coming from a documentation branch
-    if: ${{ github.event.pull_request.head.ref != 'docs-${{ github.event.pull_request.base.ref }}' }}
-    # Name the Job
+  # See https://stackoverflow.com/a/74378072
+  set-docs-branch:
+    name: Make docs branch name available to publish-docs job
+    runs-on: ubuntu-latest
+    outputs:
+      docs_branch: ${{ steps.init.outputs.docs_branch }}
+
+    steps:
+      - name: Make environment variables global
+        id: init
+        run: |
+          echo "docs_branch=${{ env.docs_branch }}" >> $GITHUB_OUTPUT
+
+  publish-docs:
     name: Publish the ce-provision docs to GitHub
-    # Set the type of machine to run on
+    # Only run the job if it is not coming from a documentation branch
+    needs: set-docs-branch
+    if: ${{ github.event.pull_request.head.ref != needs.set-docs-branch.outputs.docs_branch }}
     runs-on: ubuntu-latest
 
     # Use our ce-dev Debian base container
@@ -47,8 +60,8 @@ jobs:
         run: |
           /bin/sh contribute/toc.sh
           /usr/bin/find . -name "*.md" | xargs git add
-          /usr/bin/git diff --quiet && git diff --staged --quiet || git commit -am "GitHub Actions - updating markdown docs - ${{ steps.date.outputs.date }}"
-          /usr/bin/git push
+          /usr/bin/git diff --staged --quiet || /usr/bin/git commit -am "GitHub Actions - updating markdown docs - ${{ github.event.repository.updated_at }}"
+          /usr/bin/git push origin docs-${{ github.event.pull_request.base.ref }}
 
       # Create docs pull request
       - name: Create documentation pull requests

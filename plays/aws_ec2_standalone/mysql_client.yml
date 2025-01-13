@@ -1,0 +1,32 @@
+---
+- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+  become: true
+
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+        - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: debian/user_deploy
+    # Look up RDS hostname
+    - name: Get information about an instance
+      community.aws.rds_instance_info:
+        region: "{{ _aws_region }}"
+        profile: "{{ _aws_profile }}"
+        db_instance_identifier: "{{ _aws_resource_name }}"
+      become: true
+      become_user: "{{ user_provision.username }}"
+      delegate_to: localhost # needs to run on controller
+      register: _database_info
+    # Install MySQL client
+    - ansible.builtin.import_role:
+        name: debian/mysql_client
+    - ansible.builtin.import_role:
+        name: _exit
