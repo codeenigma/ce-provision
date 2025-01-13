@@ -239,7 +239,7 @@ user_provision:
   groups:
     - bypass2fa
   ssh_keys:
-    - "{{ lookup('file', '/home/${CONTROLLER_USER}/ce-provision/data/localhost/home/${CONTROLLER_USER}/.ssh/id_ed25519.pub') }}"
+    - "{{ lookup('file', '/home/${CONTROLLER_USER}/ce-provision/data/localhost/home/${CONTROLLER_USER}/.ssh/' + public_key_name) }}"
   ssh_private_keys: []
   known_hosts: []
   known_hosts_hash: true
