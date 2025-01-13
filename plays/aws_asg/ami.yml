@@ -1,0 +1,35 @@
+---
+# This is the provisioning for the AMI and will run inside a temporary instance using Packer.
+- hosts: default
+  become: true
+
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+        - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
+    _profile: asg
+
+  tasks:
+    - name: Upgrade the system and update cache
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: _meta/aws_client_instance
+    - ansible.builtin.import_role:
+        name: _meta/webserver
+    - ansible.builtin.import_role:
+        name: debian/aws_efs_client
+    - ansible.builtin.import_role:
+        name: debian/squashfs
+    - ansible.builtin.import_role:
+        name: debian/mount_sync
+    - ansible.builtin.import_role:
+        name: debian/swap
+    - ansible.builtin.import_role:
+        name: _exit
