@@ -1,0 +1,11 @@
+# Prepares a host entry so the ec2.yml play succeeds.
+- ansible.builtin.import_playbook: "{{ _ce_provision_base_dir }}/plays/aws_ec2_standalone/launch.yml"
+# Spins up the instance.
+# We use the central _deploy role to provision the EC2 instance to avoid duplication.
+- ansible.builtin.import_playbook: "{{ _ce_provision_base_dir }}/plays/aws_ec2_standalone/ec2.yml"
+# Actual provisioning
+- ansible.builtin.import_playbook: provision.yml
+# RDS instance
+#- ansible.builtin.import_playbook: "{{ _ce_provision_base_dir }}/plays/aws_ec2_standalone/rds.yml"
+# MySQL client - needs to happen after RDS instance is created
+#- ansible.builtin.import_playbook: "{{ _ce_provision_base_dir }}/plays/aws_ec2_standalone/mysql_client.yml"
