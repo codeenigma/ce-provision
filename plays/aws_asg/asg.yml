@@ -1,0 +1,25 @@
+---
+# Common ASG infra.
+- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+  connection: local
+  become: false
+
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+        - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
+    _profile: asg
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+      run_once: true
+    - ansible.builtin.import_role:
+        name: aws/aws_ec2_autoscale_cluster
+      run_once: true
+    - ansible.builtin.import_role:
+        name: _exit
+      run_once: true

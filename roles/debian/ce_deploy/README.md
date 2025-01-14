@@ -20,9 +20,9 @@ ce_deploy:
   # Other ce-deploy settings.
   aws_support: true # installs boto3
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
-  ssh_key_bits: "521" # recommended to use 4096 for RSA keys, 521 is the maximum for ECDSA keys
-  ssh_key_type: ecdsa # set to rsa to create an RSA key
-  public_key_name: id_ecdsa.pub # this might be id_rsa.pub for RSA keys, existing users may have a key of a different name
+  ssh_key_bits: "521" # ignored for ED25519 keys, recommended to use 4096 for RSA keys, 521 is the maximum for ECDSA keys
+  ssh_key_type: ed25519 # set to rsa to create an RSA key or ecdsa to create an ECDSA key
+  public_key_name: id_ed25519.pub # this might be id_rsa.pub for RSA keys or id_ecdsa.pub for ECDSA keys, existing users may have a key of a different name
   username: "{{ _ce_deploy.username }}"
   own_repository: "https://github.com/codeenigma/ce-deploy.git"
   own_repository_branch: "master"

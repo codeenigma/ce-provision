@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Function to send email notification
 send_email_notification() {
@@ -37,7 +37,8 @@ if [ $certbot_exit_code -ne 0 ]; then
     # Certbot failed, send email notification
     recipient="{{ ssl.email }}"
     subject="Certbot Renewal Failed"
-    body="Certbot renewal failed with the following output:
+    hostname=$(cat /etc/hostname)
+    body="Certbot renewal failed on server $hostname with the following output:
 
 $certbot_output"
     send_email_notification "$recipient" "$subject" "$body"

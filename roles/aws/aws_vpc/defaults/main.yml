@@ -2,20 +2,129 @@ aws_vpc:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   name: example-vpc-2
-  cidr_block: "10.0.0.0/16"
+  cidr_block: "{{ _aws_vpc_cidr_base }}.0.0/16"
   # ipv6_cidr: true # uncomment to request an Amazon-provided IPv6 CIDR block with /56 prefix length.
   tags: {}
     #Type: "util"
   state: present
   assign_instances_ipv6: false
-  security_groups:
-    []
-    # - name: web - open
-    #   description: Allow all incoming traffic on ports 80 and 443
-    #   rules:
-    #     - proto: tcp
-    #       ports:
-    #         - 80
-    #         - 443
-    #       cidr_ip: 0.0.0.0/0
-    #       rule_desc: Allow all incoming traffic on ports 80 and 443
+  # List of security groups to create in this VPC, see below for example structure.
+  security_groups: "{{ _security_groups_defaults }}"
+
+# Load common security groups below into a list to use with the aws_vpc.security_groups variable.
+_security_groups_defaults:
+  - "{{ _common_security_groups.common_network }}"
+  - "{{ _common_security_groups.ssh_open }}"
+  - "{{ _common_security_groups.web_open }}"
+  - "{{ _common_security_groups.mailpit_open }}"
+  - "{{ _common_security_groups.ftp_open }}"
+  - "{{ _common_security_groups.sftp_open }}"
+  - "{{ _common_security_groups.ossec }}"
+  - "{{ _common_security_groups.openvpn }}"
+
+# Here is a set of example and commonly required security groups.
+# This closely follows our common firewall rules in roles/debian/firewall_config.
+_common_security_groups:
+  common_network:
+    name: common_network
+    description: Common network access configuration for all servers.
+    rules:
+      - proto: icmp
+        from_port: 8 # ICMP type (8 is IPv4 echo)
+        to_port: -1 # ICMP subtype (-1 for any)
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow ICMP IPv4 ping.
+      - proto: icmp
+        from_port: 128 # ICMP type (128 is IPv6 echo)
+        to_port: -1 # ICMP subtype (-1 for any)
+        cidr_ipv6: "::/0"
+        rule_desc: Allow ICMP IPv6 ping.
+      - proto: tcp
+        cidr_ip: "{{ _aws_vpc_cidr_base }}.0.0/16" # see _init - 10.0.0.0/16 by default
+        ports:
+          - 0-65535
+        rule_desc: Allow all tcp traffic on internal network.
+      - proto: udp
+        cidr_ip: "{{ _aws_vpc_cidr_base }}.0.0/16"
+        ports:
+          - 0-65535
+        rule_desc: Allow all udp traffic on internal network.
+    rules_egress:
+      - proto: tcp
+        cidr_ip: 0.0.0.0/0
+        ports:
+          - 1-1024
+          - 2049
+        rule_desc: Allow ports 1-1024 and 2049 for NFS over tcp as standard.
+      - proto: udp
+        cidr_ip: 0.0.0.0/0
+        ports:
+          - 1-1024
+        rule_desc: Allow ports 1-1024 over udp as standard.
+  ssh_open:
+    name: ssh_open
+    description: Allow all incoming traffic on port 22.
+    rules:
+      - proto: tcp
+        ports:
+          - 22
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming tcp traffic on port 22.
+  web_open:
+    name: web_open
+    description: Allow all incoming web traffic on ports 80 and 443.
+    rules:
+      - proto: tcp
+        ports:
+          - 80
+          - 443
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming tcp traffic on ports 80 and 443.
+  mailpit_open:
+    name: mailpit_open
+    description: Allow all incoming traffic on port 8025 for Mailpit.
+    rules:
+      - proto: tcp
+        ports:
+          - 8025
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming tcp traffic on port 8025.
+  ftp_open:
+    name: ftp_open
+    description: Allow all incoming traffic on ports 20 and 21 for FTP.
+    rules:
+      - proto: tcp
+        ports:
+          - 20
+          - 21
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming tcp traffic on ports 20 and 21.
+  sftp_open:
+    name: sftp_open
+    description: Allow all incoming traffic on ports 989 and 990 for sFTP.
+    rules:
+      - proto: tcp
+        ports:
+          - 898
+          - 990
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming tcp traffic on ports 989 and 990.
+  ossec:
+    name: ossec
+    description: Allow all incoming traffic on ports 1514 and 1515 for OSSEC.
+    rules:
+      - proto: udp
+        ports:
+          - 1514
+          - 1515
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming udp traffic on ports 1514 and 1515.
+  openvpn:
+    name: openvpn
+    description: Allow all incoming traffic on port 1194 for OpenVPN.
+    rules:
+      - proto: udp
+        ports:
+          - 1194
+        cidr_ip: 0.0.0.0/0
+        rule_desc: Allow all incoming udp traffic on port 1194.
