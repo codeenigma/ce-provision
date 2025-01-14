@@ -3,7 +3,7 @@ dependencies:
   - role: debian/user_provision
   - { role: debian/ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: _meta/common_base
-  - role: aws/aws_credentials
+  - { role: aws/aws_credentials, when ce_provision.aws_support }
   - role: debian/ce_provision
   - role: debian/gitlab
   - role: debian/gitlab_runner

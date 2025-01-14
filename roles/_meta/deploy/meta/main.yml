@@ -4,7 +4,7 @@ dependencies:
   - { role: debian/ssh_server, when: ( is_local is not defined or not is_local ) }
   - role: _meta/common_base
   - role: debian/ce_deploy
-  - role: aws/aws_credentials
+  - { role: aws/aws_credentials, when: ce_deploy.aws_support }
   - role: debian/gitlab
   - role: debian/gitlab_runner
   - role: debian/sops
