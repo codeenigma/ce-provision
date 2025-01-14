@@ -84,7 +84,6 @@ FIREWALL="true"
 AWS_SUPPORT="false"
 IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
-ANSIBLE_COMMAND=""
 
 # Parse options.
 parse_options "$@"
