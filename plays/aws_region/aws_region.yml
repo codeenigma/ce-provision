@@ -1,0 +1,17 @@
+---
+# Global infra setup.
+- hosts: localhost
+  connection: local
+  become: false
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+    # used for tagging
+    _profile: core
+  roles:
+    - _init
+    - _meta/aws_region
+    - _exit

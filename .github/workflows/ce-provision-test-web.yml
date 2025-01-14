@@ -1,9 +1,7 @@
 name: Run web server test build
 
-# Run this workflow nightly and every time a new commit pushed to your repository
+# Run this every time a new commit is pushed to your repository
 on:
-  schedule:
-    - cron: '30 4 * * *'
   pull_request:
 
 jobs:

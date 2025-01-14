@@ -1,0 +1,5 @@
+---
+# Creates hosts entry so play isn't skipped.
+- ansible.builtin.import_playbook: ../aws_ec2_standalone/launch.yml
+# Spins up the cluster.
+- ansible.builtin.import_playbook: asg.yml
