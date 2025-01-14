@@ -9,5 +9,3 @@ dependencies:
   - role: debian/gitlab_runner
   - role: debian/sops
   - role: debian/gpg_key
-  - role: debian/pam_ldap
-  - role: debian/pam_linotp
