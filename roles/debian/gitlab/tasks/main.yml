@@ -96,6 +96,7 @@
 
 - name: Stop Gitlab.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
+  when: gitlab.force_stop
 
 - name: Reconfigure Gitlab.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
@@ -126,6 +127,7 @@
 
 - name: Ensure GitLab is started.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
+  when: gitlab.force_stop
 
 # @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
