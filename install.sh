@@ -14,7 +14,8 @@ usage(){
   /usr/bin/echo '--version: ce-provision version to use (default: 2.x)'
   /usr/bin/echo '--user: Ansible controller user (default: controller)'
   /usr/bin/echo '--config: Git URL to your ce-provision Ansible config repository (default: https://github.com/codeenigma/ce-provision-config-example.git)'
-  /usr/bin/echo '--config-branch: branch of your Ansible config repository to use (default: 1.x)'
+  /usr/bin/echo '--config-branch: branch of your Ansible config repository to use (default: 2.x)'
+  /usr/bin/echo '--hostname: the server hostname to set (default: depends on system or provider)'
   /usr/bin/echo '--no-firewall: skip installing iptables with ports 22, 80 and 443 open'
   /usr/bin/echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
   /usr/bin/echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
@@ -42,6 +43,10 @@ parse_options(){
       "--config-branch")
           shift
           CONFIG_REPO_BRANCH="$1"
+        ;;
+      "--hostname")
+          shift
+          SERVER_HOSTNAME="$1"
         ;;
       "--gitlab")
           shift
@@ -72,22 +77,16 @@ parse_options(){
 VERSION="2.x"
 CONTROLLER_USER="controller"
 CONFIG_REPO="https://github.com/codeenigma/ce-provision-config-example.git"
-CONFIG_REPO_BRANCH="1.x"
+CONFIG_REPO_BRANCH="2.x"
 GITLAB_URL="no"
 LE_SUPPORT="no"
 FIREWALL="true"
 AWS_SUPPORT="false"
 IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
-ANSIBLE_COMMAND=""
 
 # Parse options.
 parse_options "$@"
-
-# Set the hostname for Git email to our GitLab URL, if set.
-if [ "$GITLAB_URL" != "no" ]; then
-  SERVER_HOSTNAME=$GITLAB_URL
-fi
 
 # Check root user.
 if [ "$(id -u)" -ne 0 ]
@@ -162,7 +161,9 @@ if [ ! -d "/home/$CONTROLLER_USER/ce-provision" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "git clone --branch $CONFIG_REPO_BRANCH $CONFIG_REPO /home/$CONTROLLER_USER/ce-provision/config"
   /usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/ln -s /home/$CONTROLLER_USER/ce-provision/config/ansible.cfg /home/$CONTROLLER_USER/ce-provision/ansible.cfg"
 else
-  /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Skipping."
+  /usr/bin/echo "ce-provision directory at /home/$CONTROLLER_USER/ce-provision already exists. Updating."
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && git pull origin $VERSION"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision/config && git pull origin $CONFIG_REPO_BRANCH"
   /usr/bin/echo "-------------------------------------------------"
 fi
 /usr/bin/mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
@@ -174,6 +175,10 @@ fi
   vars_files:
     - vars.yml
   tasks:
+    - name: Configure system hosts file.
+      ansible.builtin.import_role:
+        name: debian/hosts
+      when: not is_local
     - name: Install ce-provision.
       ansible.builtin.import_role:
         name: debian/ce_provision
@@ -187,6 +192,10 @@ EOL
 _domain_name: ${SERVER_HOSTNAME}
 _ce_provision_data_dir: /home/${CONTROLLER_USER}/ce-provision/data
 _ce_provision_username: ${CONTROLLER_USER}
+hosts_hostname: ${SERVER_HOSTNAME}
+hosts_entries:
+  - name: ${SERVER_HOSTNAME}
+    ip: 127.0.0.1
 ce_provision:
   venv_path: /home/${CONTROLLER_USER}/ce-python
   venv_command: /usr/bin/python3 -m venv
@@ -196,8 +205,8 @@ ce_provision:
   new_user: ${CONTROLLER_USER}
   username: ${CONTROLLER_USER}
   ssh_key_bits: "521"
-  ssh_key_type: ecdsa
-  public_key_name: id_ecdsa.pub
+  ssh_key_type: ed25519
+  public_key_name: id_ed25519.pub
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "${VERSION}"
   own_repository_skip_checkout: false
@@ -230,7 +239,7 @@ user_provision:
   groups:
     - bypass2fa
   ssh_keys:
-    - "{{ lookup('file', '/home/${CONTROLLER_USER}/ce-provision/data/localhost/home/${CONTROLLER_USER}/.ssh/id_ecdsa.pub') }}"
+    - "{{ lookup('file', '/home/${CONTROLLER_USER}/ce-provision/data/localhost/home/${CONTROLLER_USER}/.ssh/' + ce_provision.public_key_name) }}"
   ssh_private_keys: []
   known_hosts: []
   known_hosts_hash: true
@@ -254,14 +263,8 @@ firewall_config:
       - "443"
 EOL
 
-# Tell Ansible this is a Docker container
-if [ "$IS_LOCAL" = "true" ]; then
-  ANSIBLE_COMMAND="ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
-else
-  ANSIBLE_COMMAND="ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
-fi
 # Configure ce-provision
-/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/$ANSIBLE_COMMAND"
+/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
 /usr/bin/rm "/home/$CONTROLLER_USER/ce-provision/provision.yml"
 
 # Install firewall
@@ -281,7 +284,7 @@ if [ "$FIREWALL" = "true" ]; then
       ansible.builtin.import_role:
         name: debian/firewall_config
 EOL
-  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
   /usr/bin/echo "-------------------------------------------------"
 else
   /usr/bin/echo "-------------------------------------------------"
@@ -301,6 +304,10 @@ if [ "$GITLAB_URL" != "no" ]; then
   vars_files:
     - vars.yml
   tasks:
+    - name: Configure system hosts file.
+      ansible.builtin.import_role:
+        name: debian/hosts
+      when: not is_local
     - name: Install GitLab Runner.
       ansible.builtin.import_role:
         name: debian/gitlab_runner
@@ -312,6 +319,12 @@ EOL
   /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
 ---
 _domain_name: ${SERVER_HOSTNAME}
+hosts_hostname: ${SERVER_HOSTNAME}
+hosts_entries:
+  - name: ${SERVER_HOSTNAME}
+    ip: 127.0.0.1
+    aliases:
+      - ${GITLAB_URL}
 gitlab_runner:
   apt_origin: "origin=packages.gitlab.com/runner/gitlab-runner,codename=\${distro_codename},label=gitlab-runner" # used by apt_unattended_upgrades
   apt_signed_by: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
@@ -346,7 +359,7 @@ gitlab:
   private_projects: true
   unicorn_worker_processes: 2
   puma_worker_processes: 2
-  initial_root_password: "Ch@ng3m3"
+  initial_root_password: "{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits') }}"
   ldap:
     enable: false
   mattermost: false
@@ -399,7 +412,7 @@ EOT
 EOT
     /usr/bin/echo "-------------------------------------------------"
   fi
-  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook /home/$CONTROLLER_USER/ce-provision/provision.yml"
+  /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-playbook --extra-vars \"{is_local: $IS_LOCAL}\" /home/$CONTROLLER_USER/ce-provision/provision.yml"
   /usr/bin/echo "-------------------------------------------------"
 else
   /usr/bin/echo "GitLab not requested. Skipping."
