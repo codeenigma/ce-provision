@@ -1,10 +1,6 @@
 # AWS ACL
 Creates an ACL to be attached to a CloudFront distribution or an Application Load Balancer (ALB).
 
-<!--TOC-->
-<!--ENDTOC-->
-
-<!--ROLEVARS-->
 ## Default variables to create WAF
 If the var is list type, it will go through the process of creating and assignng rules to WAF
 aws_acl.yml needs to be located in global or regional vars
@@ -16,10 +12,25 @@ Since IP set is a thing under WAF, we have option to create, update and use exis
 IP set with a list of IPs will be marked as a thing that needs to be created/updated
 
 If its defined only with rule_name, set_name, action and priority (leaving the list empty) it will just search existing set and assign it to WAF
-```yaml
-removed or
-```
 
+## Default variables to Assign WAF to CF/ALB
+If the var is dict type, it will go through the process assignng WAF to CF/ALB
+aws_acl.yml needs to be located in resource vars
+
+Make sure to use "us-east-1" for CLOUDFRONT scope
+or define region where the ALB is located with REGIONAL scope
+```yaml
+---
+aws_acl:
+  name: "{{ _infra_name }}_main_acl"
+  scope: CLOUDFRONT # Can be REGIONAL for ALBs
+  region: "us-east-1"
+```
+<!--TOC-->
+<!--ENDTOC-->
+
+<!--ROLEVARS-->
+## Default variables
 ```yaml
 ---
 aws_acl:
@@ -120,18 +131,5 @@ aws_acl:
         rule_list: []
         priority: 13
 
-```
-## Default variables to Assign WAF to CF/ALB
-If the var is dict type, it will go through the process assignng WAF to CF/ALB
-aws_acl.yml needs to be located in resource vars
-
-Make sure to use "us-east-1" for CLOUDFRONT scope
-or define region where the ALB is located with REGIONAL scope
-```yaml
----
-aws_acl:
-  name: "{{ _infra_name }}_main_acl"
-  scope: CLOUDFRONT # Can be REGIONAL for ALBs
-  region: "us-east-1"
 ```
 <!--ENDROLEVARS-->
