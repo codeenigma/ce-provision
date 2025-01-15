@@ -1,5 +1,6 @@
 ---
 gpg_key_servers:
+  - hkps://keyserver.ubuntu.com
   - hkps://pgp.mit.edu
   - hkps://keys.openpgp.org
 gpg_key:
