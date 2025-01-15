@@ -3,3 +3,4 @@ aws_provision_ec2_keypair:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}"
+  key_type: "{{ ce_provision.ssh_key_type }}" # defaults to ed25519 in the ce_provision role, set to rsa to or ecdsa as necessary
