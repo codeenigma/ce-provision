@@ -58,6 +58,7 @@ jobs:
       # First build and publish the markdown docs
       - name: Build and commit table of contents and README files back to the repo
         run: |
+          /usr/bin/git merge origin/${{ github.event.pull_request.base.ref }}
           /bin/sh contribute/toc.sh
           /usr/bin/find . -name "*.md" | xargs git add
           /usr/bin/git diff --staged --quiet || /usr/bin/git commit -am "GitHub Actions - updating markdown docs - ${{ github.event.repository.updated_at }}"
