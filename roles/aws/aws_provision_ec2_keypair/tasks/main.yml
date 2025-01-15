@@ -2,6 +2,6 @@
 - name: Create EC2 key pair.
   amazon.aws.ec2_key:
     name: "{{ aws_provision_ec2_keypair.key_name }}"
-    key_material: "{{ lookup('file', '/home/{{ ce_provision.username }}/.ssh/id_{{ aws_provision_ec2_keypair.key_type }}.pub') }}"
+    key_material: "{{ lookup('file', '/home/{{ _ce_provision_username }}/.ssh/id_{{ aws_provision_ec2_keypair.key_type }}.pub') }}"
     profile: "{{ aws_provision_ec2_keypair.aws_profile }}"
     region: "{{ aws_provision_ec2_keypair.region }}"
