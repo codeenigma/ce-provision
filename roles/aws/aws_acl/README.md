@@ -74,6 +74,7 @@ aws_acl:
 #            - RU
 #            - CN
       regular_rules:
+        # Commonly required Drupal rule to allow Panels to function
         - name: allow_panels
           action: allow
           statements_type: "single" # supported "single", "and", "or" and "not" ("and" and "or" supports multiple statements)
