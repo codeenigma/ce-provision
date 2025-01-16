@@ -19,29 +19,37 @@ aws_acl:
       rate_limit:
         value: 600 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
         priority: 2 # can be float with 1 decimal place
-      ip_sets:
-        - rule_name: "Allowed-IPs-rule"
-          set_name: "Allowed-IPs-set"
-          description: "List of IPs to whitelist - Ansible managed"
-          action: allow
-          priority: 1
-          list:
-            - 1.1.1.1/32
-            - 2.2.2.2/32
-      country_codes:
-        - name: "allowed-countries"
-          action: allow
-          priority: 0.2
-          list:
-            - GB
-            - HR
-        - name: "blocked-countries"
-          action: block
-          priority: 8
-          list:
-            - RU
-            - CN
+      ip_sets: []
+#   Example IP set to allow a list of safe IPs
+#        - rule_name: "Allowed-IPs-rule"
+#          set_name: "Allowed-IPs-set"
+#          description: "List of IPs to safelist - Ansible managed"
+#          action: allow
+#          priority: 1
+#          list:
+#            - 1.1.1.1/32
+#            - 2.2.2.2/32
+#            - 30.30.30.0/24
+#   Example country code ruleset allowing one set of countries and blocking another
+#      country_codes:
+#        - name: "allowed-countries"
+#          action: allow
+#          priority: 0.2
+#          list:
+#            - GB
+#            - HR
+#            - FR
+#            - ES
+#            - UY
+#            - JP
+#        - name: "blocked-countries"
+#          action: block
+#          priority: 8
+#          list:
+#            - RU
+#            - CN
       regular_rules:
+        # Commonly required Drupal rule to allow Panels to function
         - name: allow_panels
           action: allow
           statements_type: "single" # supported "single", "and", "or" and "not" ("and" and "or" supports multiple statements)
