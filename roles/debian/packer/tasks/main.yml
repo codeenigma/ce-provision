@@ -6,7 +6,7 @@
     remote_src: true
     mode: 0755
 
-- name: Install the AWS EC2 plugin for Packer.
+- name: Install additional Packer plugins.
   command: "packer plugins install {{ item }}"
   with_items: "{{ packer.plugins }}"
   become: true
