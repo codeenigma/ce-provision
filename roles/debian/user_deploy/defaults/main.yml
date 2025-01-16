@@ -16,12 +16,13 @@ user_deploy:
   utility_host: "localhost"
   utility_username: "{{ _user_deploy_username }}"
   sudo_config: {}
-  # Example config allowing for feature branching. Uncomment to use.
+  # Example config allowing for feature branching. Allows manipulation of NGINX vhosts and cron.d files.
+  # Uncomment to use.
   #  entity_name: "{{ _user_deploy_username }}"
   #  hosts: "ALL"
   #  operators: "(ALL)"
   #  tags: "NOPASSWD:"
-  #  commands: "ALL"
+  #  commands: "/usr/bin/systemctl reload nginx, /usr/bin/systemctl restart nginx, /usr/sbin/nginx -t, sudoedit /etc/nginx/sites-available, sudoedit /etc/nginx/sites-enabled, sudoedit /etc/cron.d"
   #  filename: "{{ _user_deploy_username }}"
   # List of additional groups to add the user to.
   groups:
