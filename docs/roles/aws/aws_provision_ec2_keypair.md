@@ -10,7 +10,8 @@ Creates a key pair for the current "provision user"
 aws_provision_ec2_keypair:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}"
+  key_name: "{{ _ce_provision_username }}@{{ ansible_hostname }}"
+  key_type: ed25519 # defaults to ed25519 as used in the ce_provision role, set to rsa to or ecdsa as necessary
 
 ```
 
