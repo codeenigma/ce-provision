@@ -1,3 +1,6 @@
 ---
 packer:
   version: "1.11.2" # see https://releases.hashicorp.com/packer/
+  plugins:
+    - github.com/hashicorp/amazon
+    - github.com/hashicorp/ansible
