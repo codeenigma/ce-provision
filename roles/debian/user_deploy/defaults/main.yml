@@ -15,7 +15,14 @@ user_deploy:
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: "{{ _user_deploy_username }}"
-  sudoer: false
+  sudo_config: {}
+  # Example config allowing for feature branching. Uncomment to use.
+  #  entity_name: "{{ _user_deploy_username }}"
+  #  hosts: "ALL"
+  #  operators: "(ALL)"
+  #  tags: "NOPASSWD:"
+  #  commands: "ALL"
+  #  filename: "{{ _user_deploy_username }}"
   # List of additional groups to add the user to.
   groups:
     - docker # add the docker group so we can do container builds
