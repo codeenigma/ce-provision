@@ -235,7 +235,13 @@ user_provision:
   update_password: always
   utility_username: "${CONTROLLER_USER}"
   utility_host: localhost
-  sudoer: true
+  sudo_config:
+    entity_name: "${CONTROLLER_USER}"
+    hosts: "ALL"
+    operators: "(ALL)"
+    tags: "NOPASSWD:"
+    commands: "ALL"
+    filename: "${CONTROLLER_USER}"
   groups:
     - bypass2fa
   ssh_keys:
