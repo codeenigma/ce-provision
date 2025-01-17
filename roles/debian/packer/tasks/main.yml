@@ -5,3 +5,9 @@
     dest: /usr/local/bin/
     remote_src: true
     mode: 0755
+
+- name: Install additional Packer plugins.
+  command: "packer plugins install {{ item }}"
+  with_items: "{{ packer.plugins }}"
+  become: true
+  become_user: "{{ ce_provision.username }}"
