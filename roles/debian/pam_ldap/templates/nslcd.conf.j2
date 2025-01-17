@@ -28,11 +28,11 @@ bindpw {{ pam_ldap.bindpw }}
 #rootpwmoddn cn=admin,dc=example,dc=com
 
 # SSL options
-{% if pam_ldap.ssl_use_system_ca % | length > 0 %}
+{% if pam_ldap.ssl_use_system_ca | length > 0 %}
 ssl on
 tls_reqcert demand
 tls_cacertfile /etc/ssl/certs/ca-certificates.crt
-{% elif pam_ldap.ssl_certificate % | length > 0 %}
+{% elif pam_ldap.ssl_certificate | length > 0 %}
 ssl on
 tls_reqcert demand
 tls_cacertfile /etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}
