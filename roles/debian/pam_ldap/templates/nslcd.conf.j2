@@ -28,7 +28,7 @@ bindpw {{ pam_ldap.bindpw }}
 #rootpwmoddn cn=admin,dc=example,dc=com
 
 # SSL options
-{% if pam_ldap.ssl_certificate is defined and pam_ldap.ssl_use_system_ca %}
+{% if pam_ldap.ssl_use_system_ca %}
 ssl on
 tls_reqcert demand
 tls_cacertfile /etc/ssl/certs/ca-certificates.crt
