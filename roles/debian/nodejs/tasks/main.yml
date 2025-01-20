@@ -3,6 +3,7 @@
     name: debian/apt_repository
   vars:
     nodejs_10_config:
+      legacy_repo: ""
       types: "deb deb-src"
       suites: "{{ ansible_distribution_release }}"
       signed_by: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
