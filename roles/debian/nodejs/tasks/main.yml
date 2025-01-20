@@ -3,7 +3,16 @@
   ansible.builtin.include_role:
     name: debian/apt_repository
   vars:
-    apt_repository:
+    apt_repository: "{{ nodejs_10_config if nodejs.version == '10.x' else nodejs_default_config }}"
+  vars:
+    nodejs_10_config:
+      types: "deb deb-src"
+      suites: "{{ ansible_distribution_release }}"
+      signed_by: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:15:00"
+    nodejs_default_config:
       legacy_repo: "deb https://deb.nodesource.com/node_{{ nodejs.version }} nodistro main"
       format: deb822
       name: nodejs
