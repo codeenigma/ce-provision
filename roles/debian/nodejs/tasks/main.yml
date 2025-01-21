@@ -33,7 +33,7 @@
       state: present
       enabled: true
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:15:00"
-    apt_repository: "{{ nodejs_old_config if nodejs.version | version('<', '16.x') else nodejs_default_config }}"
+    apt_repository: "{{ nodejs_old_config if (nodejs.version | regex_replace('\\.x$', '') | int) < 16 else nodejs_default_config }}"
 
 - name: Get current Nodejs version
   ansible.builtin.command: node -v
