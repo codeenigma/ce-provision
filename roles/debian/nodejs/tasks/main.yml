@@ -55,7 +55,7 @@
 
 - name: Install the specified Nodejs version if nodejs.version is defined and different from current version
   ansible.builtin.apt:
-    name: "nodejs={{ nodejs.version }}"
+    name: "nodejs"
     state: present
   when:
     - nodejs.version is defined
