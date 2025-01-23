@@ -461,7 +461,7 @@
     - aws_ec2_autoscale_cluster.deploy_cluster
 
 - name: Create launch template.
-  community.aws.ec2_launch_template:
+  amazon.aws.ec2_launch_template:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     image_id: "{{ aws_ec2_autoscale_cluster.image_id if aws_ec2_autoscale_cluster.image_id is defined else aws_ec2_autoscale_cluster_image_latest.image_id }}"
