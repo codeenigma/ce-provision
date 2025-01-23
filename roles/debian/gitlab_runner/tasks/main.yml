@@ -45,7 +45,7 @@
 # gitlab-runner register --url https://gitlab.com/ --registration-token TOKEN_HERE --name fargate-test-runner --run-untagged --executor custom -n
 # This will automatically update /etc/gitlab-runner/config.toml
 
-# @TODO support different runner types - MPV custom (Fargate) and shell
+# @TODO support different runner types - MVP custom (Fargate) and shell
 
 # Populates the _aws_security_group_list variable used in fargate.toml.j2
 - name: Install Fargate runner.
