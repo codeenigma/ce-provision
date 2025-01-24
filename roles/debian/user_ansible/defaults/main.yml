@@ -14,7 +14,14 @@ user_ansible:
   # Local username of the deploy user.
   utility_host: "localhost"
   utility_username: "{{ _user_ansible_username }}"
-  sudoer: false
+  sudo_config: {} # an empty dictionary will skip creating a sudo config
+  # Example sudo config allowing full sudo permissions - see the debian/sudo_config role for more details.
+  #  entity_name: "{{ _user_ansible_username }}"
+  #  hosts: "ALL"
+  #  operators: "(ALL)"
+  #  tags: "NOPASSWD:"
+  #  commands: "ALL"
+  #  filename: "{{ _user_ansible_username }}"
   # List of additional groups to add the user to.
   groups: []
   # List of SSH pub keys to authorize. These must be provided as strings (content of the pub key).
