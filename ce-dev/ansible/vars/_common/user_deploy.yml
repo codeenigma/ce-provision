@@ -1,8 +1,6 @@
 _user_deploy_username: ce-dev
 user_deploy:
   username: "{{ _user_deploy_username }}"
-  utility_host: "localhost"
-  utility_username: "{{ _user_deploy_username }}"
   sudo_config:
     entity_name: "{{ _user_deploy_username }}"
     hosts: "ALL"
