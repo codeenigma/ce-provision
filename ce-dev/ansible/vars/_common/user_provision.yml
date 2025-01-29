@@ -1,8 +1,6 @@
 _user_provision_username: ce-dev
 user_provision:
   username: "{{ _user_provision_username }}"
-  utility_host: "localhost"
-  utility_username: "{{ _user_provision_username }}"
   sudo_config:
     entity_name: "{{ _user_provision_username }}"
     hosts: "ALL"
