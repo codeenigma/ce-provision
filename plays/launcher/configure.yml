@@ -1,0 +1,12 @@
+---
+# Bare provisioning of a new server.
+# Use `ansible -i X.X.X.X, --user admin` to run against a server.
+- hosts: default
+  become: true
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: debian/user_provision
+    - ansible.builtin.import_role:
+        name: _exit
