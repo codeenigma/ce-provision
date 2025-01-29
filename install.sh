@@ -165,8 +165,8 @@ else
   /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision/config && git pull origin $CONFIG_REPO_BRANCH"
   /usr/bin/echo "-------------------------------------------------"
 fi
-/usr/bin/mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
-/usr/bin/mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/ansible_collections"
+/usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/mkdir -p /home/$CONTROLLER_USER/ce-provision/galaxy/roles"
+/usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/mkdir -p /home/$CONTROLLER_USER/ce-provision/galaxy/ansible_collections"
 /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix -p /home/$CONTROLLER_USER/ce-provision/galaxy/ansible_collections --force"
 
 # Create playbook for ce-provision.
