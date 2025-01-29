@@ -1,7 +1,29 @@
 ---
 # Bare provisioning of a new server.
-# Use `ansible -i X.X.X.X, --user admin` to run against a server.
-- hosts: default
+# Use this command to execute:
+#
+#   cd /home/controller/ce-provision && \
+#     ./scripts/provision.sh --workspace /home/controller/ce-provision \
+#     --repo none --branch none \
+#     --playbook /home/controller/ce-provision/plays/launcher/configure.yml \
+#     --ansible-extra-vars "_provision_host=X.X.X.X"
+#
+# Replace X.X.X.X with your hostname or IP address.
+- hosts: localhost
+  tasks:
+    - name: Add the server to Ansible hosts in memory.
+      ansible.builtin.add_host:
+        hostname: "{{ _provision_host }}"
+    - name: Add the server to hosts.yml.
+      ansible.builtin.lineinfile:
+        path: "/home/{{ _ce_provision_username }}/ce-provision/config/hosts/hosts.yml"
+        line: "{{ _provision_host }}:"
+        create: true
+
+- hosts: "{{ _provision_host }}"
+  vars:
+    ansible_user: admin
+    _ce_provision_build_id: 0
   become: true
   tasks:
     - ansible.builtin.import_role:
