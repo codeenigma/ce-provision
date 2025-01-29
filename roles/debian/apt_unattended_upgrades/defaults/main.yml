@@ -2,6 +2,7 @@
 _apt_unattended_upgrades_default_origins:
     - "origin=Debian,codename=${distro_codename},label=Debian"
     - "origin=Debian,codename=${distro_codename}-security,label=Debian-Security"
+    - "origin=jenkins.io"
 apt_unattended_upgrades:
   enable: true
   # unattended-upgrades template vars.
