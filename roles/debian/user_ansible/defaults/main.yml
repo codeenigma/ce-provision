@@ -11,9 +11,6 @@ user_ansible:
   # This is shown for documentation, you should do this in your config repo
   # uid: 999
   # gid: 999
-  # Local username of the deploy user.
-  utility_host: "localhost"
-  utility_username: "{{ _user_ansible_username }}"
   sudo_config: {} # an empty dictionary will skip creating a sudo config
   # Example sudo config allowing full sudo permissions - see the debian/sudo_config role for more details.
   #  entity_name: "{{ _user_ansible_username }}"
