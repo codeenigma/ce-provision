@@ -9,6 +9,7 @@
 - name: Install AWS EFS utils packaged by Code Enigma.
   ansible.builtin.apt:
     deb: "https://github.com/codeenigma/aws-efs-utils-deb-builder/releases/download/v{{ aws_efs_client.version }}/amazon-efs-utils-{{ aws_efs_client.version }}{{ aws_efs_client.build_suffix }}.deb"
+    force: true
   when:
     - aws_efs_client.deb_url | length == 0
 
