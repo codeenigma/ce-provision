@@ -22,6 +22,13 @@ _ce_ansible_timer_name: upgrade_ansible
 # Generally it is recommended to place these in your ce-provision-config repository under hosts/group_vars/all
 #_aws_profile: example # boto profile name
 #_aws_region: eu-west-1
+_aws_vpc_cidr_base: 10.0 # used to define internal IP range that is unique for every client
+
+# AWS tags
+_aws_resource_name: "" # Name
+# _profile: web_server # Profile
+# _env_type: dev # Env
+# _infra_name: acme # Infra
 
 _init:
   # A list of var directories to include. We only support .yml extensions.

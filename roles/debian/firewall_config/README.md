@@ -61,6 +61,7 @@ firewall_config:
   rulesets:
     - ssh_open
     - web_open
+    - common_network # rule always needs to be last so the DROP rules in the OUTPUT chain get applied at the end
 
   # Ruleset definitions
   # Permitted rule lists
@@ -91,6 +92,29 @@ firewall_config:
   letsencrypt:
     firewall_allowed_tcp_ports:
       - "80"
+  # Standard ports for Prometheus outbound rules to allow scraping of exporters
+  prometheus_server_scraping:
+    firewall_additional_rules:
+      - "iptables -A OUTPUT -p tcp --dport 9100 -j ACCEPT" # allow scraping node exporter
+      - "iptables -A OUTPUT -p tcp --dport 9101 -j ACCEPT" # allow scraping process exporter
+      - "iptables -A OUTPUT -p tcp --dport 9093 -j ACCEPT" # allow posting to alertmanager
+      - "iptables -A OUTPUT -p tcp --dport 9115 -j ACCEPT" # allow scraping blackbox exporter
+  # Commonly required outbound ports for PHP web servers
+  common_web:
+    firewall_additional_rules:
+      - "iptables -A OUTPUT -p tcp --dport 2049 -j ACCEPT" # allow NFS
+      - "iptables -A OUTPUT -p udp --dport 2049 -j ACCEPT" # allow NFS
+      - "iptables -A OUTPUT -p tcp --dport 3306 -j ACCEPT" # allow MySQL
+  # Recommended general firewall settings
+  common_network:
+    firewall_additional_rules:
+      - "iptables -A INPUT -p icmp --icmp-type 8 -s 0/0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT" # ICMP ping in
+      - "iptables -A INPUT -p icmp --icmp-type 128 -s 0/0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT" # ICMP ping in
+      - "iptables -A OUTPUT -p icmp --icmp-type 0 -d 0/0 -m state --state ESTABLISHED,RELATED -j ACCEPT" # ICMP ping out
+      - "iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT" # established connections out
+      - "iptables -A OUTPUT -o lo -j ACCEPT" # allow all local traffic
+      - "iptables -A OUTPUT -p tcp --dport 1025:65535 -j DROP" # block high port tcp traffic outbound
+      - "iptables -A OUTPUT -p udp --dport 1025:65535 -j DROP" # block high port udp traffic outbound
   ossec:
     firewall_allowed_udp_ports:
       - "1514"

@@ -1,6 +1,31 @@
 # AWS ACL
 Creates an ACL to be attached to a CloudFront distribution or an Application Load Balancer (ALB).
 
+## Default variables to create WAF
+If the var is list type, it will go through the process of creating and assignng rules to WAF
+aws_acl.yml needs to be located in global or regional vars
+
+If you don't need one of the rules on the WAF, we can just remove it from the "rules"
+
+Since IP set is a thing under WAF, we have option to create, update and use existing set:
+
+IP set with a list of IPs will be marked as a thing that needs to be created/updated
+
+If its defined only with rule_name, set_name, action and priority (leaving the list empty) it will just search existing set and assign it to WAF
+
+## Default variables to Assign WAF to CF/ALB
+If the var is dict type, it will go through the process assignng WAF to CF/ALB
+aws_acl.yml needs to be located in resource vars
+
+Make sure to use "us-east-1" for CLOUDFRONT scope
+or define region where the ALB is located with REGIONAL scope
+```yaml
+---
+aws_acl:
+  name: "{{ _infra_name }}_main_acl"
+  scope: CLOUDFRONT # Can be REGIONAL for ALBs
+  region: "us-east-1"
+```
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -19,29 +44,37 @@ aws_acl:
       rate_limit:
         value: 600 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking
         priority: 2 # can be float with 1 decimal place
-      ip_sets:
-        - rule_name: "Allowed-IPs-rule"
-          set_name: "Allowed-IPs-set"
-          description: "List of IPs to whitelist - Ansible managed"
-          action: allow
-          priority: 1
-          list:
-            - 1.1.1.1/32
-            - 2.2.2.2/32
-      country_codes:
-        - name: "allowed-countries"
-          action: allow
-          priority: 0.2
-          list:
-            - GB
-            - HR
-        - name: "blocked-countries"
-          action: block
-          priority: 8
-          list:
-            - RU
-            - CN
+      ip_sets: []
+#   Example IP set to allow a list of safe IPs
+#        - rule_name: "Allowed-IPs-rule"
+#          set_name: "Allowed-IPs-set"
+#          description: "List of IPs to safelist - Ansible managed"
+#          action: allow
+#          priority: 1
+#          list:
+#            - 1.1.1.1/32
+#            - 2.2.2.2/32
+#            - 30.30.30.0/24
+#   Example country code ruleset allowing one set of countries and blocking another
+#      country_codes:
+#        - name: "allowed-countries"
+#          action: allow
+#          priority: 0.2
+#          list:
+#            - GB
+#            - HR
+#            - FR
+#            - ES
+#            - UY
+#            - JP
+#        - name: "blocked-countries"
+#          action: block
+#          priority: 8
+#          list:
+#            - RU
+#            - CN
       regular_rules:
+        # Commonly required Drupal rule to allow Panels to function
         - name: allow_panels
           action: allow
           statements_type: "single" # supported "single", "and", "or" and "not" ("and" and "or" supports multiple statements)
@@ -100,5 +133,4 @@ aws_acl:
         priority: 13
 
 ```
-
 <!--ENDROLEVARS-->

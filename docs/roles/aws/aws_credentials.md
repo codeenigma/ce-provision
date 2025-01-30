@@ -12,7 +12,7 @@ Simple role generating credentials "profiles" in users $HOME/.aws/credentials.
 aws_credentials:
   - user: ce-dev
     profiles:
-      - name: profile1
+      - name: profile1 # profiles should never contain hyphens
         access_key_id: XXX
         secret_access_key: XXXX
       - name: example
