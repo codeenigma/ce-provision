@@ -32,7 +32,7 @@ bindpw {{ pam_ldap.bindpw }}
 ssl on
 tls_reqcert demand
 tls_cacertfile /etc/ssl/certs/ca-certificates.crt
-{% elif pam_ldap.ssl_certificate %}
+{% elif pam_ldap.ssl_certificate | length > 0 %}
 ssl on
 tls_reqcert demand
 tls_cacertfile /etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}
