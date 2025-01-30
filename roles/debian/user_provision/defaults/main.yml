@@ -11,9 +11,6 @@ user_provision:
   # This is shown for documentation, you should do this in your config repo
   # uid: 988
   # gid: 988
-  # Local username of the system user.
-  utility_host: "localhost"
-  utility_username: "{{ _user_provision_username }}"
   # Sudo configuration for full passwordless admin privileges.
   sudo_config:
     entity_name: "{{ _user_provision_username }}"
