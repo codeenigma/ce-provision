@@ -33,14 +33,8 @@
   ansible.builtin.include_role:
     name: debian/sudo_config
   vars:
-    sudo_config:
-      entity_name: "{{ user_ansible.username }}"
-      hosts: "ALL"
-      operators: "(ALL)"
-      tags: "NOPASSWD:"
-      commands: "ALL"
-      filename: "{{ user_ansible.username }}"
-  when: user_ansible.sudoer
+    sudo_config: "{{ user_ansible.sudo_config }}"
+  when: user_ansible.sudo_config | length > 0
 
 - name: Copy SSH public key to target.
   ansible.posix.authorized_key:

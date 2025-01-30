@@ -2,6 +2,29 @@
 gitlab_runner:
   apt_origin: "origin=packages.gitlab.com/runner/gitlab-runner,codename=${distro_codename},label=gitlab-runner" # used by apt_unattended_upgrades
   apt_signed_by: https://packages.gitlab.com/runner/gitlab-runner/gpgkey
+  use_docker: false # set to true to install Docker and use the 'docker' executor
+  install_fargate: false
+  restart: true # set to false if you're applying settings to a server responsible for its own runners
+  username: "{{ ce_deploy.username }}"
+  docker_group: "docker"
+  runner_workingdir: "/home/{{ ce_deploy.username }}/build"
+  runner_config: "/etc/gitlab-runner/config.toml"
+  # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
+  fargate:
+    cluster: "my-cluster" # ECS cluster name
+    profile: "example" # AWS boto profile name - can be substituted for "{{ _aws_profile }}" if set
+    region: "eu-west-1" # AWS region name - can be substituted for "{{ _aws_region }}" if set
+    subnet: "subnet-abcdef123456" # subnet ID
+    security_group: "my-security-group" # SG name
+    task_definition: "my-task:1" # task definition in format name:revision, if revision is not provided ECS will use latest
+    public_ip: "false" # if your containers need a public IP assigning
+    version: "1.4.0" # Fargate platform version
+    metadata_dir: "/opt/gitlab-runner/metadata"
+    ssh_user: "root"
+    ssh_port: 22
+  ##################################################
+  # @TODO - these variables are not currently used #
+  ##################################################
   concurrent_jobs: 10
   check_interval: 0
   session_timeout: 1800
@@ -28,22 +51,6 @@ gitlab_runner:
     #  run_args: '["--config", "/etc/gitlab-runner/fargate.toml", "custom", "run"]'
     #  cleanup_exec: "/opt/gitlab-runner/fargate"
     #  cleanup_args: '["--config", "/etc/gitlab-runner/fargate.toml", "custom", "cleanup"]'
-  install_fargate: false
-  restart: true # set to false if you're applying settings to a server responsible for its own runners
-  username: "{{ ce_deploy.username }}"
-  docker_group: "docker"
-  runner_workingdir: "/home/{{ ce_deploy.username }}/build"
-  runner_config: "/etc/gitlab-runner/config.toml"
-  # see https://gitlab.com/gitlab-org/ci-cd/custom-executor-drivers/fargate/-/tree/master/docs
-  fargate:
-    cluster: "my-cluster" # ECS cluster name
-    profile: "example" # AWS boto profile name - can be substituted for "{{ _aws_profile }}" if set
-    region: "eu-west-1" # AWS region name - can be substituted for "{{ _aws_region }}" if set
-    subnet: "subnet-abcdef123456" # subnet ID
-    security_group: "my-security-group" # SG name
-    task_definition: "my-task:1" # task definition in format name:revision, if revision is not provided ECS will use latest
-    public_ip: "false" # if your containers need a public IP assigning
-    version: "1.4.0" # Fargate platform version
-    metadata_dir: "/opt/gitlab-runner/metadata"
-    ssh_user: "root"
-    ssh_port: 22
+  ##################################################
+  # End @TODO                                      #
+  ##################################################
