@@ -7,12 +7,13 @@ _venv_path: "/home/{{ _ce_provision_username }}/ce-python"
 _venv_command: /usr/bin/python3 -m venv
 _venv_install_username: "{{ _ce_provision_username }}"
 _ce_ansible_timer_name: upgrade_ansible
+_env_type: unspecified
 
 # AWS variables - if you are using an AWS account, you can preset certain variables
 # Generally it is recommended to place these in your ce-provision-config repository under hosts/group_vars/all
 #_aws_profile: example # boto profile name
 #_aws_region: eu-west-1
-_aws_vpc_cidr_base: 10.0
+_aws_vpc_cidr_base: 10.0 # used to define internal IP range that is unique for every client
 
 # AWS tags
 _aws_resource_name: "" # Name
