@@ -187,6 +187,12 @@ fi
     - name: Configure controller user.
       ansible.builtin.import_role:
         name: debian/user_provision
+    - name: Install and publish a GPG key for the controller user.
+      ansible.builtin.import_role:
+        name: debian/gpg_key
+    - name: Install SOPS for encrypting secrets in repositories with GPG.
+      ansible.builtin.import_role:
+        name: debian/sops
 EOL
 # Create vars file.
 /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
@@ -249,6 +255,13 @@ user_provision:
   ssh_private_keys: []
   known_hosts: []
   known_hosts_hash: true
+gpg_key:
+  - username: ${CONTROLLER_USER}
+    publish: true
+    key_type: RSA
+    key_length: 4096
+    email: "${CONTROLLER_USER}@${SERVER_HOSTNAME}"
+    expire: 0
 firewall_config:
   purge: true
   firewall_state: started
