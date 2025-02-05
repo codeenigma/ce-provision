@@ -60,6 +60,7 @@
     dest: "{{ _ce_provision_build_tmp_dir }}/config"
     version: "{{ ce_deploy.config_repository_branch | default('main') }}"
   become: false
+  become_user: "{{ _ce_provision_username }}"
   delegate_to: localhost
   when: ce_deploy.config_repository is defined and ce_deploy.config_repository
 
