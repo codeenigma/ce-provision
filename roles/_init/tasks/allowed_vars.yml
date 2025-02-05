@@ -5,14 +5,14 @@
     version: "{{ _init.ce_provision_extra_repository_branch }}"
   delegate_to: localhost
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ _ce_provision_username }}"
 
 - name: Check if file exists.
   ansible.builtin.stat:
     path: "{{ _ce_provision_build_tmp_dir }}/extra/{{ _init.ce_provision_extra_repository_vars_file }}"
   delegate_to: localhost
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ _ce_provision_username }}"
   register: _extra_repository_vars_file
 
 - name: Include custom variables.
@@ -21,7 +21,7 @@
     name: _ce_provision_extra_vars
   delegate_to: localhost
   become: true
-  become_user: "{{ ce_provision.username }}"
+  become_user: "{{ _ce_provision_username }}"
   when:
     - _extra_repository_vars_file.stat.exists
 
