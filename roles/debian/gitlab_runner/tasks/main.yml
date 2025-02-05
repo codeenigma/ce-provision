@@ -20,19 +20,18 @@
       enabled: true
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:30:00"
 
-- name: Add GitLab Runner repository to unattended-upgrades origins list.
-  ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [gitlab_runner.apt_origin] }}"
+- name: Set up unattended-upgrades.
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable
+  block:
+    - name: Add GitLab Runner repository to unattended-upgrades origins list.
+      ansible.builtin.set_fact:
+        _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [gitlab_runner.apt_origin] }}"
 
-- name: Install the unattended-upgrades config.
-  ansible.builtin.include_role:
-    name: debian/apt_unattended_upgrades
-  when:
-    - apt_unattended_upgrades.enable is defined
-    - apt_unattended_upgrades.enable
+    - name: Install the unattended-upgrades config.
+      ansible.builtin.include_role:
+        name: debian/apt_unattended_upgrades
 
 - name: Ensure Gitlab Runner is installed.
   ansible.builtin.apt:
@@ -56,6 +55,7 @@
         name: aws/aws_security_groups
         apply:
           delegate_to: localhost # this is how you delegate the include_role module
+          become_user: "{{ _ce_provision_username }}"
       vars:
         aws_security_groups:
           profile: "{{ gitlab_runner.fargate.profile }}"
