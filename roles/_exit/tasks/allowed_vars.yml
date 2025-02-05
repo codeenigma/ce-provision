@@ -22,6 +22,7 @@
   ansible.builtin.command: "git status -s"
   args:
     chdir: "{{ _ce_provision_build_tmp_dir }}/extra"
+  become: true
   become_user: "{{ _ce_provision_username }}"
   delegate_to: localhost
   register: _ce_provision_extra_vars_git_changed
