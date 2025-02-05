@@ -55,7 +55,6 @@
         name: aws/aws_security_groups
         apply:
           delegate_to: localhost # this is how you delegate the include_role module
-          become_user: "{{ _ce_provision_username }}"
       vars:
         aws_security_groups:
           profile: "{{ gitlab_runner.fargate.profile }}"
