@@ -67,6 +67,7 @@
   ansible.builtin.stat:
     path: "{{ ldap_server.config.path }}"
   register: _ldap_server_ldifs
+  become_user: "{{ _ce_provision_username }}"
   delegate_to: localhost
 
 - name: Copy LDAP schemas from config repo.

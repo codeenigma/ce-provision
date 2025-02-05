@@ -5,8 +5,8 @@
     region: "{{ aws_efs_client.region }}"
     name: "{{ mount.src }}"
   become: true
-  become_user: "{{ user_provision.username }}"
-  delegate_to: "localhost"
+  become_user: "{{ _ce_provision_username }}"
+  delegate_to: localhost
   register: aws_efs_client_efs_volume
 
 - name: Make sure mount point exists.
