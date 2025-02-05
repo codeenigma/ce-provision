@@ -138,7 +138,7 @@ fi
   git ca-certificates git-lfs \
   openssh-client nfs-common stunnel4 \
   python3-venv python3-debian \
-  zip unzip gzip tar dnsutils net-tools
+  acl zip unzip gzip tar dnsutils net-tools
 /usr/bin/echo "-------------------------------------------------"
 
 # Install Ansible in a Python virtual environment.
