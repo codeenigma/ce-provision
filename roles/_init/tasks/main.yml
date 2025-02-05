@@ -55,12 +55,14 @@
     force: false
     mode: "0666"
   become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: localhost
 
 - name: Check if vars dirs exist.
   ansible.builtin.stat:
     path: "{{ _init_vars_dir }}"
   become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: localhost
   register: _init_vars_dir_exists
   with_items: "{{ _init.vars_dirs }}"
@@ -84,6 +86,7 @@
   args:
     executable: /bin/bash
   become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: "localhost"
   register: _init_vars_dirs_md5
   failed_when: false

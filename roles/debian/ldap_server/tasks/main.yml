@@ -68,6 +68,7 @@
     path: "{{ ldap_server.config.path }}"
   register: _ldap_server_ldifs
   become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: localhost
 
 - name: Copy LDAP schemas from config repo.

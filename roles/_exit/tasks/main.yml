@@ -13,6 +13,7 @@
     dest: "{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}"
   delegate_to: localhost
   become_user: "{{ _ce_provision_username }}"
+  become: true
 
 # Tidy up any unneeded APT packages.
 - name: Remove dependencies that are no longer required.

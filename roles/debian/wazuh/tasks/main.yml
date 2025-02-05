@@ -11,6 +11,7 @@
   ansible.builtin.import_role:
     name: "contrib/{{ wazuh.path }}/roles/wazuh/wazuh-indexer"
   become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: localhost
   vars:
     indexer_node_master: "{{ wazuh.indexer.indexer_node_master }}"
