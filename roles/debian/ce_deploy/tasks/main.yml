@@ -120,6 +120,11 @@
     path: "{{ ce_deploy.local_dir }}/data"
     state: directory
 
+- name: Create collections dir.
+  ansible.builtin.file:
+    path: "{{ ce_deploy.ansible_collections_dir }}"
+    state: directory
+
 - name: Ensure ownership of ce-deploy folder.
   ansible.builtin.file:
     path: "{{ ce_deploy.local_dir }}"
@@ -174,6 +179,7 @@
   vars:
     ansible_galaxy:
       username: "{{ ce_deploy.username }}"
+      working_dir: "{{ ce_deploy.local_dir }}"
       extra_params: --force
       galaxy_requirements_file: "{{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
       upgrade_galaxy:
@@ -187,6 +193,7 @@
   vars:
     ansible_galaxy:
       username: "{{ ce_deploy.username }}"
+      working_dir: "{{ ce_deploy.local_dir }}"
       extra_params: --force
       galaxy_requirements_file: "{{ ce_deploy.galaxy_custom_requirements_file }}"
       upgrade_galaxy:

@@ -26,7 +26,7 @@
     - name: Install ansible-galaxy roles and/or collections.
       ansible.builtin.command:
         cmd: "{{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}"
-        chdir: "/home/{{ _ce_provision_username }}/ce-provision"
+        chdir: "{{ ansible_galaxy.working_dir }}"
       become: true
       become_user: "{{ ansible_galaxy.username }}"
 
@@ -38,7 +38,7 @@
   block:
     - name: Build timers variable.
       ansible.builtin.set_fact:
-        _galaxy_upgrade_timer: "{'{{ ansible_galaxy.upgrade_galaxy.name }}_ansible_galaxy_upgrades': { timer_command: 'cd /home/{{ _ce_provision_username }}/ce-provision && {{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}', timer_OnCalendar: '{{ ansible_galaxy.upgrade_galaxy.on_calendar }}' }}"
+        _galaxy_upgrade_timer: "{'{{ ansible_galaxy.upgrade_galaxy.name }}_ansible_galaxy_upgrades': { timer_command: 'cd {{ ansible_galaxy.working_dir }} && {{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}', timer_OnCalendar: '{{ ansible_galaxy.upgrade_galaxy.on_calendar }}' }}"
 
     - name: Turn the timer string into a dictionary.
       ansible.builtin.set_fact:

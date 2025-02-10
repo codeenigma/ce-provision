@@ -4,6 +4,8 @@ ansible_galaxy:
   #venv_path: "/home/controller/ce-python"
 
   username: controller
+  # To use the desired ansible.cfg from the working directory.
+  working_dir: "/home/{{ _ce_provision_username }}/ce-provision"
   # File containing default roles and/or collections to install via Ansible Galaxy.
   # Roles will be installed to the first path specified under roles_path in your ansible.cfg file.
   # Collections will be installed to collections_path in your ansible.cfg file.
