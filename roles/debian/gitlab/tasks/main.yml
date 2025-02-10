@@ -27,6 +27,7 @@
         overwrite: true
       delegate_to: localhost
       become: false
+      when: gitlab.mattermost
 
 - name: Add GitLab repository and key.
   ansible.builtin.include_role:
