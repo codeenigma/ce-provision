@@ -122,6 +122,14 @@
     - openvpn.ipv6_support == "y"
   notify: Restart OpenVPN.
 
+# You can use a 'DEFAULT' file in the specified directory to provide client-specifig config, such as managed push routes
+- name: Add client config directory to config if path is provided.
+  ansible.builtin.lineinfile:
+    path: /etc/openvpn/server.conf
+    line: "client-config-dir {{ openvpn.client_config_dir }}"
+  when:
+    - openvpn.client_config_dir | length > 0
+
 # PAM integration
 - name: Ensure the OpenVPN PAM config is in place.
   ansible.builtin.template:
