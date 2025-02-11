@@ -115,6 +115,16 @@
 - name: Set up client config directory.
   when: openvpn.client_config_dir | length > 0
   block:
+    - name: Remove default push-route.
+      ansible.builtin.lineinfile:
+        path: /etc/openvpn/server.conf
+        search_string: 'redirect-gateway'
+        state: absent
+        owner: root
+        group: root
+        mode: '0644'
+      when: openvpn.client_config_push_routes
+
     - name: Create client config directory if it doesn't exist.
       ansible.builtin.file:
         path: "{{ openvpn.client_config_dir }}"

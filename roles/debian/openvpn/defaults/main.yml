@@ -18,6 +18,7 @@ openvpn:
   # See --client-config-dir in the manual - https://openvpn.net/community-resources/reference-manual-for-openvpn-2-0/
   # This can be useful for activities such as providing a long list of push routes to manage as an include.
   client_config_dir: "" # empty means this will not be set
+  client_config_push_routes: false # if you are providing push routes in your client config, set this to true to remove the default ones
   # PAM and LDAP authentication
   pam:
     enabled: false # relies on `openvpn-plugin-auth-pam.so` which is bundled with OpenVPN server for Debian
