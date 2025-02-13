@@ -96,7 +96,7 @@
     sampled_requests: false
     cloudwatch_metrics: true # or "false" to disable metrics
     metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
-    rules: "{{ _rules }}"
+    rules: "{{ _rules | list }}"
     purge_rules: true
     tags: "{{ _acl.tags }}"
     state: present

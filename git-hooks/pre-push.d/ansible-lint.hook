@@ -23,7 +23,7 @@ for file in $(git diff "$1/$BASE_BRANCH" --name-only --staged); do
       case $file in
         "$ROLE"*)
           printf "\e[36m Running Ansible linter against the\e[1m %s\e[0m\e[36m role. \e[0m \n" "$ROLE"
-          ANSIBLE_LINT_CMD="$DOCKER_CMD $ANSIBLE_LINT $CONTAINER_BASE_PATH/$ROLE"
+          ANSIBLE_LINT_CMD="$DOCKER_CMD $ANSIBLE_LINT -q $CONTAINER_BASE_PATH/$ROLE"
           ERRORS=$($ANSIBLE_LINT_CMD | wc -l)
           if [ "$ERRORS" != "0" ]; then
             $ANSIBLE_LINT_CMD
