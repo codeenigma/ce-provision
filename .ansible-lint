@@ -15,5 +15,6 @@ skip_list:
   - name[template] # it doesn't like Jinja templates being in the middle of a task name, which seems silly to me.
   - name[casing] # sometimes included Galaxy roles break linting rules and cause failures
   - args[module] # causing odd issue with ACL role
+  - jinja[spacing] # pendantic! we get these from GitHub Actions anyway
 exclude_paths:
   - roles/contrib/ # we don't control these roles
