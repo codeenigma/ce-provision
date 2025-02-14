@@ -1,7 +1,7 @@
 ### {{ ansible_managed }}
 
 server {
-    {% if domain.ssl.varnish_bind_port | length > 0 %}
+    {% if domain.ssl.varnish_bind_port %}
     listen {{ domain.ssl.varnish_bind_port }}
     {% else %}
     listen 80;
