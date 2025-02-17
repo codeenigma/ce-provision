@@ -22,7 +22,7 @@ location / {
     # @todo
     # limit_req zone=bots burst=5 nodelay;
 {% endif %}
-    {{ nginx.nginx_location_behavior | join("\n    ") }}
+    {{ nginx_location_behavior | join("\n    ") }}
 }
 
 ############ Blacklist block.
