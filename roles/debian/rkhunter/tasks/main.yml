@@ -19,7 +19,6 @@
     existing_scripts: "{{ existing_scripts | default([]) + [item.item] }}"
   when: item.stat.exists
   loop: "{{ _rkhunter_existing_scripts_to_whitelist.results }}"
-  when: _rkhunter_existing_scripts_to_whitelist is defined
 
 - name: Check paths for portpath existence
   ansible.builtin.stat:
@@ -33,7 +32,6 @@
     existing_portpaths: "{{ existing_portpaths | default([]) + [item.item] }}"
   when: item.stat.exists
   loop: "{{ _rkhunter_existing_portpaths_to_whitelist.results }}"
-  when: _rkhunter_existing_portpaths_to_whitelist is defined
 
 - name: Copy rkhunter configuration.
   ansible.builtin.template:
