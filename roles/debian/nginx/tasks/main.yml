@@ -66,6 +66,10 @@
     state: directory
     mode: "0755"
 
+- name: Set nginx location behavior, fallback to default if no custom behavior is provided
+  set_fact:
+    nginx_location_behavior: "{{ nginx.custom_nginx_location_behavior | default(['try_files @rewrite /index.php?$query_string;']) }}"
+
 - name: Copy project type-specific configuration in place.
   ansible.builtin.template:
     src: "{{ item }}.j2"
