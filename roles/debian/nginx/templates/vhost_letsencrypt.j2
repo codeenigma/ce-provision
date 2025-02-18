@@ -1,7 +1,11 @@
 ### {{ ansible_managed }}
 
 server {
+    {% if domain.ssl.varnish_bind_port %}
+    listen {{ domain.ssl.varnish_bind_port }};
+    {% else %}
     listen 80;
+    {% endif %}
     server_name {{ domain.server_name }};
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
     access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};

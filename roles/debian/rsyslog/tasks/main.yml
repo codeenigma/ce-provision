@@ -8,6 +8,18 @@
     mode: "0644"
     force: true
 
+- name: Copy postfix configuration in place.
+  ansible.builtin.template:
+    src: "postfix.conf.j2"
+    dest: "/etc/25-postfix.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+   - rsyslog.postfix_log is defined
+   - rsyslog.postfix_log
+
 - name: Restart service.
   ansible.builtin.service:
     name: rsyslog
