@@ -1,4 +1,10 @@
 ---
+- name: Install rsyslog with apt
+  ansible.builtin.apt:
+    name: rsyslog
+    state: present
+    update_cache: yes
+
 - name: Copy rsyslog configuration in place.
   ansible.builtin.template:
     src: "rsyslog.{{ rsyslog.role }}.conf.j2"
