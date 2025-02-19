@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name: rsyslog
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Copy rsyslog configuration in place.
   ansible.builtin.template:
