@@ -131,6 +131,23 @@
     - postfix.ce_dev_delivery_mode == "local"
     - is_local
 
+- name: Copy postfix configuration in place.
+  ansible.builtin.template:
+    src: "postfix_conf.j2"
+    dest: "/etc/25-postfix.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+   - postfix.disable_syslog is defined
+   - postfix.disable_syslog
+
+- name: Restart service.
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+
 # Needed for Docker.
 - name: Stop Postfix
   ansible.builtin.command:
