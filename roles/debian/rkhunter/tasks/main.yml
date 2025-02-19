@@ -17,7 +17,9 @@
 - name: Filter existing scripts
   set_fact:
     existing_scripts: "{{ existing_scripts | default([]) + [item.item] }}"
-  when: item.stat.exists
+  when:
+    - item.stat.exists
+    - _rkhunter_existing_scripts_to_whitelist is defined
   loop: "{{ _rkhunter_existing_scripts_to_whitelist.results }}"
 
 - name: Check paths for portpath existence
@@ -30,7 +32,9 @@
 - name: Filter existing portpath
   set_fact:
     existing_portpaths: "{{ existing_portpaths | default([]) + [item.item] }}"
-  when: item.stat.exists
+  when:
+    - item.stat.exists
+    - _rkhunter_existing_portpaths_to_whitelist is defined
   loop: "{{ _rkhunter_existing_portpaths_to_whitelist.results }}"
 
 - name: Copy rkhunter configuration.
