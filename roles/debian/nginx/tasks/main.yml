@@ -67,12 +67,8 @@
     mode: "0755"
 
 - name: Set nginx location behavior, fallback to default if no custom behavior is provided
-  ansible.builtin.set_fact:
+  set_fact:
     nginx_location_behavior: "{{ nginx.custom_nginx_location_behavior | default(['try_files @rewrite /index.php?$query_string;']) }}"
-
-- name: Debug nginx_location_behavior variable
-  ansible.builtin.debug:
-    var: nginx_location_behavior
 
 - name: Copy project type-specific configuration in place.
   ansible.builtin.template:
