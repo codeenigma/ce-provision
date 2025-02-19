@@ -1,7 +1,6 @@
 ---
 
 postfix:
-  disable_syslog: true
   hostname: "{{ ansible_fqdn }}" # if you set this to something else you may have to create PTR records to avoid bouncing
   dest_hosts: "mail.host1.com,mail.host2.com"
   disable_vrfy: "no" # leave as 'no' for Postfix config, not a YAML boolean
