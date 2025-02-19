@@ -133,7 +133,7 @@
 
 - name: Copy postfix configuration in place.
   ansible.builtin.template:
-    src: "postfix.conf.j2"
+    src: "postfix_conf.j2"
     dest: "/etc/25-postfix.conf"
     owner: root
     group: root
