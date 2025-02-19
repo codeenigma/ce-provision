@@ -1,4 +1,0 @@
-# Exclude postfix from logging into syslog
-
-if $programname startswith 'postfix' then /var/log/mail.log
-& stop
