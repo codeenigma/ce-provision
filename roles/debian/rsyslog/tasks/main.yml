@@ -14,13 +14,24 @@
     mode: "0644"
     force: true
 
-- name: Ensure rsyslog is enabled and started
-  ansible.builtin.systemd:
-    name: rsyslog.service
-    enabled: true
-    state: started
+- name: Check if rsyslog init script exists (SysVinit)
+  ansible.builtin.stat:
+    path: /etc/init.d/rsyslog
+  register: rsyslog_init
 
-- name: Restart rsyslog service
-  ansible.builtin.systemd:
-    name: rsyslog.service
+- name: Debug init.d existence
+  ansible.builtin.debug:
+    msg: "Init script exists: {{ rsyslog_init.stat.exists }}"
+
+- name: Restart rsyslog via SysVinit if available
+  ansible.builtin.sysvinit:
+    name: rsyslog
     state: restarted
+  when: rsyslog_init.stat.exists
+
+- name: Restart rsyslog via systemd if init.d not available
+  ansible.builtin.systemd:
+    name: rsyslog
+    state: restarted
+    enabled: true
+  when: not rsyslog_init.stat.exists
