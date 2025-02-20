@@ -145,7 +145,7 @@
 
 - name: Restart rsyslog service
   ansible.builtin.service:
-    name: rsyslog
+    name: rsyslog.service
     state: restarted
 
 # Needed for Docker.
