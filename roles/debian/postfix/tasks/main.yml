@@ -143,10 +143,22 @@
    - postfix.disable_syslog is defined
    - postfix.disable_syslog
 
-- name: Restart rsyslog service
+- name: Check if rsyslog init script exists
+  ansible.builtin.stat:
+    path: /etc/init.d/rsyslog
+  register: rsyslog_init
+
+- name: Restart rsyslog via init.d if available
+  ansible.builtin.command: /etc/init.d/rsyslog restart
+  when: rsyslog_init.stat.exists
+  args:
+    warn: false
+
+- name: Restart rsyslog via service if init.d not available
   ansible.builtin.service:
-    name: rsyslog.service
+    name: rsyslog
     state: restarted
+  when: not rsyslog_init.stat.exists
 
 # Needed for Docker.
 - name: Stop Postfix
