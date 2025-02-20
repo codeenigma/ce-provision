@@ -1,4 +1,10 @@
 ---
+- name: Install rsyslog with apt
+  ansible.builtin.apt:
+    name: rsyslog
+    state: present
+    update_cache: true
+
 - name: Copy rsyslog configuration in place.
   ansible.builtin.template:
     src: "rsyslog.{{ rsyslog.role }}.conf.j2"
@@ -8,7 +14,7 @@
     mode: "0644"
     force: true
 
-- name: Restart service.
-  ansible.builtin.service:
-    name: rsyslog
+- name: Restart rsyslog service
+  ansible.builtin.systemd:
+    name: rsyslog.service
     state: restarted
