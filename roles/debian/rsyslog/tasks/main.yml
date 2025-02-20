@@ -14,19 +14,29 @@
     mode: "0644"
     force: true
 
-- name: Check if rsyslog init script exists
-  ansible.builtin.stat:
-    path: /etc/init.d/rsyslog
-  register: rsyslog_init
+- name: Debug systemd unit files
+  ansible.builtin.shell: "systemctl list-unit-files --type=service | grep rsyslog || echo 'not found'"
+  register: rsyslog_unit_files
+  changed_when: false
 
-- name: Restart rsyslog via init.d if available
-  ansible.builtin.command: /etc/init.d/rsyslog restart
-  when: rsyslog_init.stat.exists
-  args:
-    warn: false
+- name: Show systemd unit files debug
+  ansible.builtin.debug:
+    msg: "Systemd unit files: {{ rsyslog_unit_files.stdout }}"
 
-- name: Restart rsyslog via service if init.d not available
-  ansible.builtin.service:
-    name: rsyslog
-    state: restarted
-  when: not rsyslog_init.stat.exists
+- name: Debug active services
+  ansible.builtin.shell: "systemctl list-units --type=service | grep rsyslog || echo 'not found'"
+  register: rsyslog_active_services
+  changed_when: false
+
+- name: Show active services debug
+  ansible.builtin.debug:
+    msg: "Active systemd services: {{ rsyslog_active_services.stdout }}"
+
+- name: Check SysV services
+  ansible.builtin.shell: "service --status-all | grep rsyslog || echo 'not found'"
+  register: rsyslog_sysv_services
+  changed_when: false
+
+- name: Show SysV services debug
+  ansible.builtin.debug:
+    msg: "SysV service status: {{ rsyslog_sysv_services.stdout }}"
