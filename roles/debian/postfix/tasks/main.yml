@@ -143,11 +143,10 @@
    - postfix.disable_syslog is defined
    - postfix.disable_syslog
 
-- name: Restart rsyslog service to apply postfix log changes
-  ansible.builtin.systemd:
-    name: rsyslog.service
+- name: Restart rsyslog service
+  ansible.builtin.service:
+    name: rsyslog
     state: restarted
-    daemon_reload: true
 
 # Needed for Docker.
 - name: Stop Postfix
