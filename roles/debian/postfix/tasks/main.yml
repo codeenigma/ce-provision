@@ -134,7 +134,7 @@
 - name: Copy postfix configuration in place.
   ansible.builtin.template:
     src: "postfix_conf.j2"
-    dest: "/etc/25-postfix.conf"
+    dest: "/etc/rsyslog.d/25-postfix.conf"
     owner: root
     group: root
     mode: "0644"
@@ -143,10 +143,10 @@
    - postfix.disable_syslog is defined
    - postfix.disable_syslog
 
-- name: Restart service.
-  ansible.builtin.service:
-    name: rsyslog
-    state: restarted
+#- name: Restart service.
+#  ansible.builtin.service:
+#    name: rsyslog
+#    state: restarted
 
 # Needed for Docker.
 - name: Stop Postfix
