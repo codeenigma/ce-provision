@@ -131,25 +131,66 @@
     - postfix.ce_dev_delivery_mode == "local"
     - is_local
 
+- name: Copy postfix configuration in place.
+  ansible.builtin.template:
+    src: "postfix_conf.j2"
+    dest: "/etc/rsyslog.d/25-postfix.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+   - postfix.disable_syslog is defined
+   - postfix.disable_syslog
+
+- name: Restart rsyslog based on environment to apply postfix changes
+  block:
+    - name: Restart rsyslog in a container to apply postfix changes (if is_local is true)
+      ansible.builtin.shell: |
+        pkill -HUP rsyslogd || true
+      when: is_local | default(false)
+
+    - name: Restart rsyslog using systemd to apply postfix changes (if is_local is false)
+      ansible.builtin.systemd:
+        name: rsyslog.service
+        state: restarted
+      when: not (is_local | default(false))
+
 # Needed for Docker.
-- name: Stop Postfix
-  ansible.builtin.command:
-    cmd: /usr/sbin/service postfix stop
+- name: Manage Postfix Service
+  block:
+    - name: Stop Postfix in a container (if is_local is true)
+      ansible.builtin.command:
+        cmd: /usr/sbin/service postfix stop
+      when: is_local | default(false)
 
-- name: Remove trailing lock files.
-  ansible.builtin.file:
-    path: "{{ lock_file }}"
-    state: absent
-  with_items:
-    - /var/spool/postfix/pid/master.pid
-    - /var/lib/postfix/master.lock
-  loop_control:
-    loop_var: lock_file
+    - name: Stop Postfix using systemd (if is_local is false)
+      ansible.builtin.systemd:
+        name: postfix
+        state: stopped
+      when: not (is_local | default(false))
 
-- name: Create Postfix Aliases database
-  ansible.builtin.command:
-    cmd: /usr/bin/newaliases
+    - name: Remove trailing lock files
+      ansible.builtin.file:
+        path: "{{ lock_file }}"
+        state: absent
+      with_items:
+        - /var/spool/postfix/pid/master.pid
+        - /var/lib/postfix/master.lock
+      loop_control:
+        loop_var: lock_file
 
-- name: Restart Postfix
-  ansible.builtin.command:
-    cmd: /usr/sbin/service postfix start
+    - name: Create Postfix Aliases database
+      ansible.builtin.command:
+        cmd: /usr/bin/newaliases
+
+    - name: Start Postfix in a container (if is_local is true)
+      ansible.builtin.command:
+        cmd: /usr/sbin/service postfix start
+      when: is_local | default(false)
+
+    - name: Start Postfix using systemd (if is_local is false)
+      ansible.builtin.systemd:
+        name: postfix
+        state: started
+      when: not (is_local | default(false))
