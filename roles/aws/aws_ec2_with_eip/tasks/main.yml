@@ -163,13 +163,29 @@
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
   register: _aws_ec2_with_eip_instances_eip
 
-- name: allocate a new elastic IP inside a VPC in us-west-2
+- name: Print EIP info
+  ansible.builtin.debug:
+    var: _aws_ec2_with_eip_instances_eip
+
+- name: allocate a new elastic IP inside a VPC
   amazon.aws.ec2_eip:
     region: "{{ aws_ec2_with_eip.region }}"
     in_vpc: true
     tag_name: "Name"
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
+  when: not _aws_ec2_with_eip_instances_eip.addresses
+
+- name: Re-register EIP.
+  amazon.aws.ec2_eip_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    filters:
+      tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
   register: _aws_ec2_with_eip_instances_eip
+
+- name: Print EIP info
+  ansible.builtin.debug:
+    var: _aws_ec2_with_eip_instances_eip
 
 - name: Associate Elastic IP.
   amazon.aws.ec2_eip:
