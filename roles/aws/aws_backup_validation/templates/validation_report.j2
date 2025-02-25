@@ -45,14 +45,15 @@ def lambda_handler(event, context):
   completed_jobs=[]
   failed_jobs=[]
 
-  for plan in _testing_plans['RestoreTestingPlans']
-    print("Getting list of successful restoration.")
-    completed_job = backup_cli.list_restore_jobs(
-      ByCreatedAfter=last_restore_valdation_date,
-      ByStatus='COMPLETED',
-      ByRestoreTestingPlanArn=plan['{{ RestoreTestingPlanArn }}']
-    )
-    completed_jobs+=completed_job['RestoreJobs']
+  print("Getting list of successful restoration.")
+  {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
+completed_job = backup_cli.list_restore_jobs(
+    ByCreatedAfter=last_restore_valdation_date,
+    ByStatus='COMPLETED',
+    ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
+  )
+  completed_jobs+=completed_job['RestoreJobs']
+  {% endfor %}
 
   print("Getting instance details.")
   for inst in completed_jobs:
@@ -86,15 +87,15 @@ def lambda_handler(event, context):
     set_mail_body(success_restore, inst, instance_name, ami_id)
 
   print(mail_body)
-
-  for plan in _testing_plans['RestoreTestingPlans']
-    print("Getting list of failed restoration.")
-    failed_job = backup_cli.list_restore_jobs(
-      ByCreatedAfter=last_restore_valdation_date,
-      ByStatus='FAILED',
-      ByRestoreTestingPlanArn=plan['{{ RestoreTestingPlanArn }}']
-    )
-    failed_jobs += failed_job['RestoreJobs']
+  print("Getting list of failed restoration.")
+  {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
+failed_job = backup_cli.list_restore_jobs(
+    ByCreatedAfter=last_restore_valdation_date,
+    ByStatus='FAILED',
+    ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
+  )
+  failed_jobs += failed_job['RestoreJobs']
+  {% endfor %}
 
   if len(failed_jobs) > 0:
     mail_title = "Failed!"
