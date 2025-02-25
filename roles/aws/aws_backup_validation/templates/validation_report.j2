@@ -47,7 +47,7 @@ def lambda_handler(event, context):
 
   print("Getting list of successful restoration.")
   {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
-  completed_job = backup_cli.list_restore_jobs(
+completed_job = backup_cli.list_restore_jobs(
     ByCreatedAfter=last_restore_valdation_date,
     ByStatus='COMPLETED',
     ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
@@ -89,7 +89,7 @@ def lambda_handler(event, context):
   print(mail_body)
   print("Getting list of failed restoration.")
   {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
-  failed_job = backup_cli.list_restore_jobs(
+failed_job = backup_cli.list_restore_jobs(
     ByCreatedAfter=last_restore_valdation_date,
     ByStatus='FAILED',
     ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
