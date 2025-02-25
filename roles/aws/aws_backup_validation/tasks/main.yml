@@ -66,6 +66,11 @@
         dest: "{{ _ce_provision_build_dir }}/{{ item }}_validation.py"
       loop: "{{ aws_backup_validation.resources }}"
 
+    - name: Get info about newly created restore testing plan.
+      ansible.builtin.command: >
+        aws backup list-restore-testing-plans --region {{ _aws_region }}
+      register: _testing_plans
+
     - name: Write validation report functions
       ansible.builtin.template:
         src: "validation_report.j2"
@@ -99,11 +104,6 @@
         src: "{{ _ce_provision_build_dir }}/validation_report.zip"
         mode: put
       loop: "{{ aws_backup_validation.resources }}"
-
-- name: Get info about newly created restore testing plan.
-  ansible.builtin.command: >
-    aws backup list-restore-testing-plans --region {{ _aws_region }}
-  register: _testing_plans
 
 - name: Create Lambda functions
   amazon.aws.lambda:
