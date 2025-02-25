@@ -19,10 +19,10 @@
     - name: Restart rsyslog in a container (if is_local is true)
       ansible.builtin.shell: |
         pkill -HUP rsyslogd || true
-      when: is_local
+      when: is_local | default(false)
 
     - name: Restart rsyslog using systemd (if is_local is false)
       ansible.builtin.systemd:
         name: rsyslog.service
         state: restarted
-      when: is_local is not defined or not is_local
+      when: not (is_local | default(false))

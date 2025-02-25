@@ -50,7 +50,7 @@ def lambda_handler(event, context):
     completed_job = backup_cli.list_restore_jobs(
       ByCreatedAfter=last_restore_valdation_date,
       ByStatus='COMPLETED',
-      ByRestoreTestingPlanArn=plan['{{ RestoreTestingPlanArn }}']
+      ByRestoreTestingPlanArn=plan['RestoreTestingPlanArn']
     )
     completed_jobs+=completed_job['RestoreJobs']
 
@@ -92,7 +92,7 @@ def lambda_handler(event, context):
     failed_job = backup_cli.list_restore_jobs(
       ByCreatedAfter=last_restore_valdation_date,
       ByStatus='FAILED',
-      ByRestoreTestingPlanArn=plan['{{ RestoreTestingPlanArn }}']
+      ByRestoreTestingPlanArn=plan['RestoreTestingPlanArn']
     )
     failed_jobs += failed_job['RestoreJobs']
 
