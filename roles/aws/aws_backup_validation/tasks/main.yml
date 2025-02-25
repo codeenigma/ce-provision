@@ -100,6 +100,11 @@
         mode: put
       loop: "{{ aws_backup_validation.resources }}"
 
+- name: Get info about newly created restore testing plan.
+  ansible.builtin.command: >
+    aws backup list-restore-testing-plans --region {{ _aws_region }}
+  register: _testing_plans
+
 - name: Create Lambda functions
   amazon.aws.lambda:
     name: "{{ aws_backup_validation.name }}_{{ item }}"
