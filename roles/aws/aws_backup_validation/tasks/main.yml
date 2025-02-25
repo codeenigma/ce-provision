@@ -71,6 +71,10 @@
         aws backup list-restore-testing-plans --region {{ _aws_region }}
       register: _testing_plans
 
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: _testing_plans
+
     - name: Write validation report functions
       ansible.builtin.template:
         src: "validation_report.j2"
