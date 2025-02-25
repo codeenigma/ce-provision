@@ -45,7 +45,7 @@ def lambda_handler(event, context):
   completed_jobs=[]
   failed_jobs=[]
 
-  for plan in _testing_plans['RestoreTestingPlans']
+  for plan in {{ _testing_plans['RestoreTestingPlans'] }}
     print("Getting list of successful restoration.")
     completed_job = backup_cli.list_restore_jobs(
       ByCreatedAfter=last_restore_valdation_date,
@@ -87,7 +87,7 @@ def lambda_handler(event, context):
 
   print(mail_body)
 
-  for plan in _testing_plans['RestoreTestingPlans']
+  for plan in {{ _testing_plans['RestoreTestingPlans'] }}
     print("Getting list of failed restoration.")
     failed_job = backup_cli.list_restore_jobs(
       ByCreatedAfter=last_restore_valdation_date,
