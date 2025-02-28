@@ -72,7 +72,8 @@
 
 - name: Set drupal fallback location if defined
   set_fact:
-    drupal_fallback_behavior: "{{ nginx.drupal_fallback | default(omit) }}"
+    drupal_fallback_behavior: "{{ nginx.drupal_fallback }}"
+  when: nginx.drupal_fallback is defined and nginx.drupal_fallback
 
 - name: Copy project type-specific configuration in place.
   ansible.builtin.template:
