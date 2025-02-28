@@ -70,6 +70,11 @@
   set_fact:
     nginx_location_behavior: "{{ nginx.custom_nginx_location_behavior | default(['try_files @rewrite /index.php?$query_string;']) }}"
 
+- name: Set drupal fallback location if defined
+  set_fact:
+    drupal_fallback_behavior: "{{ nginx.drupal_fallback }}"
+  when: nginx.drupal_fallback is defined and nginx.drupal_fallback
+
 - name: Copy project type-specific configuration in place.
   ansible.builtin.template:
     src: "{{ item }}.j2"
@@ -153,10 +158,6 @@
   when:
     - nginx.overrides is defined
     - nginx.overrides | length > 0
-
-- name: Set nginx location behavior, fallback to default if no custom behavior is provided
-  set_fact:
-    nginx_location_behavior: "{{ nginx.custom_nginx_location_behavior | default(['try_files @rewrite /index.php?$query_string;']) }}"
 
 - name: Test NGINX configuration.
   ansible.builtin.command: nginx -t

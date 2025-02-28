@@ -129,6 +129,7 @@ nginx:
   php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.', '') }}" # for unix socket use "unix:/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock"
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
+  # drupal_fallback: []
   # Default location behavior for nginx
   # If no custom location behavior is defined, this will be used:
   # nginx_location_behavior: ['try_files @rewrite /index.php?$query_string;']
