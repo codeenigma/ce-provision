@@ -1,3 +1,15 @@
+- name: List all for a specific function
+  community.aws.api_gateway_info:
+  register: _api_gateways
+
+- name: Find the index of all firewalls using the type key
+  ansible.builtin.set_fact:
+    _admin_api_gateway: "{{ lookup('ansible.utils.index_of', _api_gateway['rest_apis'], 'eq', _aws_profile'_AdminAPI', 'name') }}"
+
+- name: Find the index of all firewalls, use in a loop
+  ansible.builtin.debug:
+    msg: "{{ _admin_api_gateway }}"
+
 - name: Setup AWS API Gateway setup on AWS and deploy API definition
   community.aws.api_gateway:
     name: "{{ _aws_profile }}_AdminAPI"
