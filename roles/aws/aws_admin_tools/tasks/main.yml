@@ -5,19 +5,11 @@
 
 - name: Find the index of admin tools API
   ansible.builtin.set_fact:
-    _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name') }}"
+    _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_toolsaa', 'name', wantlist=True) }}"
 
 - name: Print admin_api
   ansible.builtin.debug:
-    msg: "{{ _index_admin_api }}"
-
-- name: Print admin_api
-  ansible.builtin.debug:
-    msg: "{{ _api_gateways['rest_apis'] }}"
-
-- name: Print admin_api
-  ansible.builtin.debug:
-    msg: "{{ _api_gateways['rest_apis'][_index_admin_api[0]] }}"
+    msg: "{{ _api_gateways['rest_apis'][_index_admin_api] }}"
 
 - name: Find the index of all firewalls, use in a loop
   ansible.builtin.debug:
@@ -32,4 +24,5 @@
     tracing_enabled: true
     endpoint_type: REGIONAL
     state: present
+  when: _index_admin_api | length > 0
 
