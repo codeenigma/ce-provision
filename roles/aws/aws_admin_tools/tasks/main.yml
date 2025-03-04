@@ -9,6 +9,10 @@
 
 - name: Find the index of all firewalls, use in a loop
   ansible.builtin.debug:
+    msg: "{{ _api_gateways }}"
+
+- name: Find the index of all firewalls, use in a loop
+  ansible.builtin.debug:
     msg: "{{ _admin_api_gateway }}"
 
 - name: Setup AWS API Gateway setup on AWS and deploy API definition
