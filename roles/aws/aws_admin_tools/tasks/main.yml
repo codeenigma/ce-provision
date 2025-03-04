@@ -3,13 +3,13 @@
     region: "{{ _aws_region }}"
   register: _api_gateways
 
-- name: Find the index of all firewalls using the type key
+- name: Find the index of admin tools API
   ansible.builtin.set_fact:
-    _admin_api_gateway: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name') }}"
+    _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name') }}"
 
-- name: Find the index of all firewalls, use in a loop
+- name: Print admin_api
   ansible.builtin.debug:
-    msg: "{{ _api_gateways }}"
+    msg: "{{ _api_gateways[_index_admin_api[0]] }}"
 
 - name: Find the index of all firewalls, use in a loop
   ansible.builtin.debug:
