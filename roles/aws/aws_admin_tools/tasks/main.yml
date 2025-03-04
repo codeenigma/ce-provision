@@ -9,7 +9,7 @@
 
 - name: Print admin_api
   ansible.builtin.debug:
-    msg: "{{ _api_gateways[_index_admin_api[0]] }}"
+    msg: "{{ _api_gateways['rest_apis'][_index_admin_api[0]] }}"
 
 - name: Find the index of all firewalls, use in a loop
   ansible.builtin.debug:
