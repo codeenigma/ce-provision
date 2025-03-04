@@ -16,7 +16,7 @@
     tracing_enabled: true
     endpoint_type: REGIONAL
     state: present
-  when: _index_admin_api | length > 0
+  when: _index_admin_api | length == 0
 
 - name: Update API definitions and settings and deploy as canary
   community.aws.api_gateway:
@@ -28,4 +28,4 @@
     tracing_enabled: true
     endpoint_type: REGIONAL
     state: present
-  when: _index_admin_api | length == 0
+  when: _index_admin_api | length > 0
