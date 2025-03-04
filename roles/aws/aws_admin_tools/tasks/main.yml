@@ -2,7 +2,7 @@
   community.aws.api_gateway:
     name: "{{ _aws_profile }}_AdminAPI"
     region: "{{ _aws_region }}"
-    swagger_file: "{{ lookup('template', 'swag.yml.j2') }}"
+    swagger_text: "{{ lookup('template', 'swag.yml.j2') }}"
     stage: prod
     tracing_enabled: true
     endpoint_type: REGIONAL
