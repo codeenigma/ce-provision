@@ -1,5 +1,6 @@
 - name: List all for a specific function
   community.aws.api_gateway_info:
+    region: "{{ _aws_region }}"
   register: _api_gateways
 
 - name: Find the index of all firewalls using the type key
