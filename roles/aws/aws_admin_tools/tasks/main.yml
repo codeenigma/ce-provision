@@ -17,6 +17,10 @@
   register: _api_gateway
   when: _index_admin_api | length == 0
 
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _api_gateway
+
 - name: Get list of API gateway resources
   ansible.builtin.shell: >
     aws apigateway get-resources \
@@ -25,10 +29,18 @@
   register: _api_gateway_resources
   when: _index_admin_api | length == 0
 
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _api_gateway_resources
+
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
     _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gateway_resources['items'], 'eq', '/', 'path', wantlist=True) }}"
   when: _index_admin_api | length == 0
+
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _index_api_main_resource
 
 - name: Get main resource from API gateway
   ansible.builtin.shell: >
@@ -39,6 +51,10 @@
     --region "{{ _aws_region }}"
   register: _main_api_resource
   when: _index_admin_api | length == 0
+
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _main_api_resource
 
 #- name: Setup AWS API Gateway setup on AWS and deploy API definition
 #  community.aws.api_gateway:
