@@ -5,7 +5,7 @@
 
 - name: Find the index of admin tools API
   ansible.builtin.set_fact:
-    _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_toolsaa', 'name', wantlist=True) }}"
+    _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name', wantlist=True) }}"
 
 - name: Setup AWS API Gateway setup on AWS and deploy API definition
   community.aws.api_gateway:
