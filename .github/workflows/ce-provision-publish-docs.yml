@@ -3,7 +3,10 @@ name: Publish docs
 # Run this workflow on demand or every time a PR is accepted to a main branch
 on:
   pull_request:
+<<<<<<< HEAD
     types: [closed]
+=======
+>>>>>>> 2e8b6992 (Publish docs pr devel 2.x (#2170))
     branches:
       - 1.x
       - 2.x
@@ -87,6 +90,12 @@ jobs:
           chmod 700 /home/ce-dev/.ssh/authorized_keys
           /usr/sbin/sshd&
 
+<<<<<<< HEAD
+=======
+      - name: Start SSHD
+        run: /usr/sbin/sshd&
+
+>>>>>>> 2e8b6992 (Publish docs pr devel 2.x (#2170))
       - name: Initialise wiki2pages for ce-provision ${{ github.event.pull_request.base.ref }}
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && /bin/sh init.sh --repo https://github.com/codeenigma/ce-provision.git --branch ${{ github.event.pull_request.base.ref }} --no-ce-dev"
@@ -98,6 +107,10 @@ jobs:
       - name: Run Hugo
         run: |
           /usr/bin/su - ce-dev -c "cd /home/ce-dev/build/wiki2pages && hugo"
+<<<<<<< HEAD
+=======
+          ls -la /home/ce-dev/build/wiki2pages/public/ce-provision-${{ github.event.pull_request.base.ref }}/
+>>>>>>> 2e8b6992 (Publish docs pr devel 2.x (#2170))
 
       - name: Publish documentation
         run: |
