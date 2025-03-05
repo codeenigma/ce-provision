@@ -9,13 +9,13 @@
 
 - name: print swagger file
   debug:
-    msg: "{{ lookup('template', 'swag.yml.j2') }}"
+    msg: "{{ lookup('template', 'swag.json.j2') }}"
 
 - name: Setup AWS API Gateway setup on AWS and deploy API definition
   community.aws.api_gateway:
     name: "{{ _aws_profile }}_admin_tools"
     region: "{{ _aws_region }}"
-    swagger_text: "{{ lookup('template', 'swag.yml.j2') }}"
+    swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
     stage: prod
     tracing_enabled: true
     endpoint_type: REGIONAL
@@ -27,7 +27,7 @@
     api_id: "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
     name: "{{ _aws_profile }}_admin_tools"
     region: "{{ _aws_region }}"
-    swagger_text: "{{ lookup('template', 'swag.yml.j2') }}"
+    swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
     stage: prod
     tracing_enabled: true
     endpoint_type: REGIONAL
