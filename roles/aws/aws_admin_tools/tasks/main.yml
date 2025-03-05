@@ -18,7 +18,7 @@
   when: _index_admin_api | length == 0
 
 - name: Get list of API gateway resources
- ansible.builtin.shell: >
+  ansible.builtin.shell: >
     aws apigateway get-resources \
     --region "{{ _aws_region }}" \
     --rest-api-id "{{ _api_gateway['id'] }}"
