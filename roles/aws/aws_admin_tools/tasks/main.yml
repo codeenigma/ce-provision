@@ -7,6 +7,10 @@
   ansible.builtin.set_fact:
     _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name', wantlist=True) }}"
 
+- name: Get list of APIs
+  debug:
+    msg: "{{ _api_gateways }}"
+
 - name: Setup AWS API Gateway setup on AWS and deploy API definition
   community.aws.api_gateway:
     name: "{{ _aws_profile }}_admin_tools"
