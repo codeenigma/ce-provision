@@ -17,6 +17,10 @@
   register: _api_gateway
   when: _index_admin_api | length == 0
 
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _api_gateway
+
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gateway.stdout | from_json }}"
