@@ -38,18 +38,6 @@
     _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gate_res, 'eq', '/', 'path', wantlist=True) }}"
   when: _index_admin_api | length == 0
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _index_api_main_resource
-
-- name: Setting prevoius command output into variable
-  ansible.builtin.set_fact:
-    _index_api_main: "{{ _index_api_main_resource.stdout | from_json }}"
-
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _index_api_main
-
 - name: Get main resource from API gateway
   ansible.builtin.shell: >
     aws apigateway create-resource \
