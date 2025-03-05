@@ -24,7 +24,7 @@
 
 - name: Update API definitions and settings and deploy as canary
   community.aws.api_gateway:
-    api_id: "{{ _api_gateways['rest_apis'][_index_admin_api]['id'] }}"
+    api_id: "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
     name: "{{ _aws_profile }}_admin_tools"
     region: "{{ _aws_region }}"
     swagger_text: "{{ lookup('template', 'swag.yml.j2') }}"
