@@ -1,7 +1,3 @@
-- name: Configure IAM roles for Lambda functions.
-  ansible.builtin.include_tasks: lambda_functions.yml
-  loop: "{{ aws_admin_tools.functions }}"
-
 - name: Configure Lambda functions.
   ansible.builtin.include_tasks: lambda_functions.yml
   loop: "{{ aws_admin_tools.functions }}"
