@@ -25,7 +25,7 @@
   ansible.builtin.shell: >
     aws apigateway get-resources \
     --region "{{ _aws_region }}" \
-    --rest-api-id "{{ _api_gateway['id'] }}"
+    --rest-api-id "{{ _api_gateway.stdout['id'] }}"
   register: _api_gateway_resources
   when: _index_admin_api | length == 0
 
