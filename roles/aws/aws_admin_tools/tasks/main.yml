@@ -33,6 +33,10 @@
   ansible.builtin.set_fact:
     _api_gateway_resources: "{{ _api_gateway_resources.stdout | from_json }}"
 
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _api_gateway_resources
+
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
     _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gateway_resources.items, 'eq', '/', 'path', wantlist=True) }}"
@@ -41,10 +45,6 @@
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
     _index_api_main_resource: "{{ _index_api_main_resource.stdout | from_json }}"
-
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _index_api_main_resource
 
 - name: Get main resource from API gateway
   ansible.builtin.shell: >
