@@ -1,4 +1,4 @@
-- name: List all for a specific function
+- name: List all API gateways
   community.aws.api_gateway_info:
     region: "{{ _aws_region }}"
   register: _api_gateways
@@ -6,20 +6,6 @@
 - name: Find the index of admin tools API
   ansible.builtin.set_fact:
     _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name', wantlist=True) }}"
-
-- name: print swagger file
-  debug:
-    msg: "{{ lookup('template', 'swag.json.j2') }}"
-
-- name: Delete swag file
-  file:
-    path: /tmp/swag.json
-    state: absent
-
-- name: Write swag file
-  ansible.builtin.template:
-    src: swag.json.j2
-    dest: /tmp/swag.json
 
 - name: Create API gateway
   ansible.builtin.shell: >
@@ -32,12 +18,12 @@
   when: _index_admin_api | length == 0
 
 - name: Get list of API gateway resources
-  ansible.builtin.shell: >
+ ansible.builtin.shell: >
     aws apigateway get-resources \
     --region "{{ _aws_region }}" \
-    --rest-api-id "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
+    --rest-api-id "{{ _api_gateway['id'] }}"
   register: _api_gateway_resources
-  when: _index_admin_api | length == 0
+  when: _index_admin_api | length > 0
 
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
