@@ -11,26 +11,45 @@
   debug:
     msg: "{{ lookup('template', 'swag.json.j2') }}"
 
-- name: Setup AWS API Gateway setup on AWS and deploy API definition
-  community.aws.api_gateway:
-    name: "{{ _aws_profile }}_admin_tools"
-    region: "{{ _aws_region }}"
-    swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
-    stage: prod
-    tracing_enabled: true
-    endpoint_type: REGIONAL
-    state: present
+- name: Delete swag file
+  file:
+    path: /tmp/swag.json
+    state: absent
+
+- name: Write swag file
+  ansible.builtin.template:
+    src: swag.json.j2
+    dest: /tmp/swag.json
+
+- name: Write swag file
+  ansible.builtin.shell: >
+    aws apigateway create-rest-api \
+    --region "{{ _aws_region }}" \
+    --name "{{ _aws_profile }}_admin_tools" \
+    --description "API for administration functions made automatically by ansible" \
+    --endpoint-configuration "{\"types\": [\"REGIONAL\"]}"
   when: _index_admin_api | length == 0
 
-- name: Update API definitions and settings and deploy as canary
-  community.aws.api_gateway:
-    api_id: "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
-    name: "{{ _aws_profile }}_admin_tools"
-    deploy_desc: "API for administration functions made automatically by ansible"
-    region: "{{ _aws_region }}"
-    swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
-    stage: prod
-    tracing_enabled: true
-    endpoint_type: REGIONAL
-    state: present
-  when: _index_admin_api | length > 0
+#- name: Setup AWS API Gateway setup on AWS and deploy API definition
+#  community.aws.api_gateway:
+#    name: "{{ _aws_profile }}_admin_tools"
+#    region: "{{ _aws_region }}"
+#    swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
+#    stage: prod
+#    tracing_enabled: true
+#    endpoint_type: REGIONAL
+#    state: present
+#  when: _index_admin_api | length == 0
+#
+#- name: Update API definitions and settings and deploy as canary
+#  community.aws.api_gateway:
+#    api_id: "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
+#    name: "{{ _aws_profile }}_admin_tools"
+#    deploy_desc: "API for administration functions made automatically by ansible"
+#    region: "{{ _aws_region }}"
+#    swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
+#    stage: prod
+#    tracing_enabled: true
+#    endpoint_type: REGIONAL
+#    state: present
+#  when: _index_admin_api | length > 0
