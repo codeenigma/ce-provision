@@ -3,4 +3,6 @@
   ansible.builtin.command: /usr/sbin/postmap /etc/postfix/virtual
 
 - name: Reload Postfix configuration.
-  ansible.builtin.command: /usr/sbin/postfix reload
+  ansible.builtin.service:
+    name: postfix
+    state: reloaded
