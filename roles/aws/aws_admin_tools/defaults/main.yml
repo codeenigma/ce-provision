@@ -1,0 +1,16 @@
+aws_admin_tools:
+  runtime: "python3.12"
+  timeout: 60
+  functions:
+    - name: "GetForecastedCosts"
+      type: get
+      policies:
+        - arn:aws:iam::444471199298:policy/CEBillingPolicy
+    - name: "ChangeASGScaling"
+      type: post
+      policies:
+        - arn:aws:iam::aws:policy/aws-service-role/AWSAutoScalingPlansEC2AutoScalingPolicy
+    - name: "GetListOfEC2"
+      type: get
+      policies:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess

@@ -1,4 +1,12 @@
-- name: List all API gateways
+- name: Configure IAM roles for Lambda functions.
+  ansible.builtin.include_tasks: lambda_functions.yml
+  loop: "{{ aws_admin_tools.functions }}"
+
+- name: Configure Lambda functions.
+  ansible.builtin.include_tasks: lambda_functions.yml
+  loop: "{{ aws_admin_tools.functions }}"
+
+- name: List all API gateways.
   community.aws.api_gateway_info:
     region: "{{ _aws_region }}"
   register: _api_gate_list

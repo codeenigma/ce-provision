@@ -18,25 +18,13 @@
     --rest-api-id "{{ _api_gate.id }}"
   register: _api_res_list
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _api_res_list
-
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
     _api_res_list: "{{ _api_res_list.stdout | from_json | json_query('items') }}"
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _api_res_list
-
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
     _api_res_index_list: "{{ lookup('ansible.utils.index_of', _api_res_list, 'eq', '/', 'path', wantlist=True) }}"
-
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _api_gate
 
 - name: Create resource on API gateway
   ansible.builtin.shell: >
@@ -46,7 +34,3 @@
     --path-part "GetBills"
     --region "{{ _aws_region }}"
   register: _main_api_resource
-
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _main_api_resource
