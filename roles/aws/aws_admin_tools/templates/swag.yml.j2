@@ -2,13 +2,14 @@
 swagger: "2.0"
 info:
   #version: "2025-03-03T11:47:22Z"
-  title: "dummytesting_admin_tools"
+  title: "{{ _aws_profile }}_admin_tools"
 #host: "8p1tbwdddi.execute-api.us-east-1.amazonaws.com"
 basePath: "/"
 schemes:
 - "https"
 paths:
-  /GetMonthForecast:
+  {% for funct in ['GetMonthForecast', 'test1', 'test2'] %}
+  /{{ funct }}:
     get:
       produces:
       - "application/json"
@@ -27,6 +28,7 @@ paths:
         passthroughBehavior: "when_no_match"
         timeoutInMillis: 29000
         contentHandling: "CONVERT_TO_TEXT"
+  {% endfor %}
 definitions:
   Empty:
     type: "object"
