@@ -21,13 +21,37 @@
     src: swag.json.j2
     dest: /tmp/swag.json
 
-- name: Write swag file
+- name: Create API gateway
   ansible.builtin.shell: >
     aws apigateway create-rest-api \
     --region "{{ _aws_region }}" \
     --name "{{ _aws_profile }}_admin_tools" \
     --description "API for administration functions made automatically by ansible" \
     --endpoint-configuration "{\"types\": [\"REGIONAL\"]}"
+  register: _api_gateway
+  when: _index_admin_api | length == 0
+
+- name: Get list of API gateway resources
+  ansible.builtin.shell: >
+    aws apigateway get-resources \
+    --region "{{ _aws_region }}" \
+    --rest-api-id "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
+  register: _api_gateway_resources
+  when: _index_admin_api | length == 0
+
+- name: Get index of main resource from API gateway
+  ansible.builtin.set_fact:
+    _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gateway_resources['items'], 'eq', '/', 'path', wantlist=True) }}"
+  when: _index_admin_api | length == 0
+
+- name: Get main resource from API gateway
+  ansible.builtin.shell: >
+    aws apigateway create-resource \
+    --rest-api-id "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
+    --parent-id "{{ _api_gateway_resources['items'][_index_api_main_resource[0]]['id'] }}"
+    --path-part "GetBills"
+    --region "{{ _aws_region }}"
+  register: _main_api_resource
   when: _index_admin_api | length == 0
 
 #- name: Setup AWS API Gateway setup on AWS and deploy API definition
