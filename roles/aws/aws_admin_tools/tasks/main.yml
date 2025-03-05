@@ -29,9 +29,17 @@
   register: _api_gateway_resources
   when: _index_admin_api | length == 0
 
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _api_gateway_resources
+
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
     _api_gate_res: "{{ _api_gateway_resources.stdout | from_json | json_query('items') }}"
+
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: _api_gate_res
 
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
