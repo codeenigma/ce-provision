@@ -3,10 +3,7 @@ name: Publish docs
 # Run this workflow on demand or every time a PR is accepted to a main branch
 on:
   pull_request:
-<<<<<<< HEAD
     types: [closed]
-=======
->>>>>>> 2e8b6992 (Publish docs pr devel 2.x (#2170))
     branches:
       - 1.x
       - 2.x
