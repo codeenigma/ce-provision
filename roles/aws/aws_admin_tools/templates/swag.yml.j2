@@ -8,7 +8,7 @@ basePath: "/"
 schemes:
 - "https"
 paths:
-  {% for funct in ['GetMonthForecast', 'test1', 'test2'] %}
+  {% for funct in ['GetMonthForecast'] %}
   /{{ funct }}:
     get:
       produces:
