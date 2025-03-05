@@ -9,7 +9,7 @@ schemes:
 - "https"
 paths:
   {% for funct in ['GetMonthForecast', 'EnableDisableAutoscaling', 'Test'] %}
-  /{{ funct }}:
+/{{ funct }}:
     get:
       produces:
       - "application/json"
