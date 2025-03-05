@@ -35,7 +35,7 @@
 
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
-    _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gateway_resources['items'], 'eq', '/', 'path', wantlist=True) }}"
+    _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gateway_resources.stdout['items'], 'eq', '/', 'path', wantlist=True) }}"
   when: _index_admin_api | length == 0
 
 - name: Print return information from the previous task
@@ -46,7 +46,7 @@
   ansible.builtin.shell: >
     aws apigateway create-resource \
     --rest-api-id "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
-    --parent-id "{{ _api_gateway_resources['items'][_index_api_main_resource[0]]['id'] }}"
+    --parent-id "{{ _api_gateway_resources['items'][_index_api_main_resource.stdout[0]]['id'] }}"
     --path-part "GetBills"
     --region "{{ _aws_region }}"
   register: _main_api_resource
