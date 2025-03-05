@@ -5,4 +5,3 @@ rsyslog:
   role: client
   # For clients, server name or IP.
   server: my.server.example.com
-  postfix_log: true

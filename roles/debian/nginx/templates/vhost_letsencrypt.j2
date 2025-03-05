@@ -1,8 +1,8 @@
 ### {{ ansible_managed }}
 
 server {
-    {% if domain.ssl.varnish_bind_port %}
-    listen {{ domain.ssl.varnish_bind_port }};
+    {% if nginx.vhost_letsencrypt_port is defined %}
+    listen {{ nginx.vhost_letsencrypt_port }};
     {% else %}
     listen 80;
     {% endif %}
