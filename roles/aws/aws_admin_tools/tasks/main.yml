@@ -23,7 +23,7 @@
     --region "{{ _aws_region }}" \
     --rest-api-id "{{ _api_gateway['id'] }}"
   register: _api_gateway_resources
-  when: _index_admin_api | length > 0
+  when: _index_admin_api | length == 0
 
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
