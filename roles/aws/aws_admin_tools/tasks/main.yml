@@ -1,19 +1,19 @@
 - name: List all API gateways
   community.aws.api_gateway_info:
     region: "{{ _aws_region }}"
-  register: _api_gateways
+  register: _api_gate_list
 
 - name: Find the index of admin tools API
   ansible.builtin.set_fact:
-    _index_admin_api: "{{ lookup('ansible.utils.index_of', _api_gateways['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name', wantlist=True) }}"
+    _api_index: "{{ lookup('ansible.utils.index_of', _api_gate_list['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name', wantlist=True) }}"
 
 - name: Create API Gateway.
   ansible.builtin.include_tasks: create.yml
-  when: _index_admin_api | length == 0
+  when: _api_index | length == 0
 
 - name: Update API Gateway.
   ansible.builtin.include_tasks: update.yml
-  when: _index_admin_api | length > 0
+  when: _api_index | length > 0
 
 #- name: Setup AWS API Gateway setup on AWS and deploy API definition
 #  community.aws.api_gateway:
