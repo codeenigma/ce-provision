@@ -19,27 +19,27 @@
 
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
-    _api_gateway: "{{ _api_gateway.stdout | from_json }}"
+    _api_gate: "{{ _api_gateway.stdout | from_json }}"
 
 - name: Get list of API gateway resources
   ansible.builtin.shell: >
     aws apigateway get-resources \
     --region "{{ _aws_region }}" \
-    --rest-api-id "{{ _api_gateway.id }}"
+    --rest-api-id "{{ _api_gate.id }}"
   register: _api_gateway_resources
   when: _index_admin_api | length == 0
 
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
-    _api_gateway_resources: "{{ _api_gateway_resources.stdout | from_json }}"
+    _api_gate_res: "{{ _api_gateway_resources.stdout | from_json }}"
 
 - name: Print return information from the previous task
   ansible.builtin.debug:
-    var: _api_gateway_resources
+    var: _api_gate_res
 
 - name: Get index of main resource from API gateway
   ansible.builtin.set_fact:
-    _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gateway_resources.items, 'eq', '/', 'path', wantlist=True) }}"
+    _index_api_main_resource: "{{ lookup('ansible.utils.index_of', _api_gate_res.items, 'eq', '/', 'path', wantlist=True) }}"
   when: _index_admin_api | length == 0
 
 - name: Setting prevoius command output into variable
@@ -50,7 +50,7 @@
   ansible.builtin.shell: >
     aws apigateway create-resource \
     --rest-api-id "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
-    --parent-id "{{ _api_gateway_resources[_index_api_main_resource[0]].id }}"
+    --parent-id "{{ _api_gate_res.items[_index_api_main_resource[0]].id }}"
     --path-part "GetBills"
     --region "{{ _aws_region }}"
   register: _main_api_resource
