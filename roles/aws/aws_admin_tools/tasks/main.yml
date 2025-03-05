@@ -26,6 +26,7 @@
   community.aws.api_gateway:
     api_id: "{{ _api_gateways['rest_apis'][_index_admin_api[0]]['id'] }}"
     name: "{{ _aws_profile }}_admin_tools"
+    deploy_desc: "API for administration functions made automatically by ansible"
     region: "{{ _aws_region }}"
     swagger_text: "{{ lookup('template', 'swag.json.j2') }}"
     stage: prod
