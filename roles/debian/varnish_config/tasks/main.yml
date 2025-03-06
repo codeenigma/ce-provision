@@ -1,15 +1,24 @@
 ---
-- name: Copy Varnish default VCL.
-  ansible.builtin.template:
-    src: "{{ item }}"
-    dest: "{{ varnish_config_path }}/default.vcl"
-    owner: root
-    group: root
-    mode: 0644
-  with_first_found:
-    - "{{ playbook_dir }}/templates/{{ varnish_config.template_filename }}.j2"
-    - "{{ _ce_provision_base_dir }}/config/files/templates/{{ varnish_config.template_filename }}.j2"
-    - "default.vcl.j2"
-  notify:
-    - reload systemd # handlers in https://github.com/geerlingguy/ansible-role-varnish/blob/master/handlers/main.yml
-    - restart varnish
+- block:
+    - name: Copy Varnish default VCL.
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ varnish_config_path }}/default.vcl"
+        owner: root
+        group: root
+        mode: 0644
+      with_first_found:
+        - "{{ playbook_dir }}/templates/{{ varnish_config.template_filename }}.j2"
+        - "{{ _ce_provision_base_dir }}/config/files/templates/{{ varnish_config.template_filename }}.j2"
+        - "default.vcl.j2"
+# This will keep varnish config as it is even after varnish upgrade
+    - name: Template varnish systemd service file
+      ansible.builtin.template:
+        src: varnish.service.j2
+        dest: /etc/systemd/system/varnish.service
+        mode: '0644'
+      notify:
+        - reload systemd
+        - restart varnish
+
+# TO DO: add varnish to unattended upgrades
