@@ -1,12 +1,3 @@
-- name: Create IAM roles
-  ansible.builtin.include_tasks: lambda_iam.yml
-  vars:
-    _api_iam: "{{ item }}"
-
-- name: Sleep for 5 seconds for IAM roles.
-  ansible.builtin.wait_for:
-    timeout: 5
-
 - name: Create S3 bucket for lambda functions
   amazon.aws.s3_bucket:
     name: "{{ _aws_profile }}-lambda-api-functions"

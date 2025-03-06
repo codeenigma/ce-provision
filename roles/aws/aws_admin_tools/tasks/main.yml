@@ -1,3 +1,11 @@
+- name: Configure Lambda IAM policies.
+  ansible.builtin.include_tasks: lambda_iam.yml
+  loop: "{{ aws_admin_tools.functions }}"
+
+- name: Sleep for 5 seconds for IAM roles.
+  ansible.builtin.wait_for:
+    timeout: 5
+
 - name: Configure Lambda functions.
   ansible.builtin.include_tasks: lambda_functions.yml
   loop: "{{ aws_admin_tools.functions }}"
