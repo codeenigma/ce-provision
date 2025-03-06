@@ -14,7 +14,13 @@
         tags: []
         recreate: true
         rules:
-          ip_sets: "{{ aws_admin_tools.allowed_ips }}"
+          ip_sets:
+            - rule_name: "Allowed-IPs-for-admin-tools"
+              set_name: "Allowed-IPs-for-admin-tools"
+              description: "List of IPs to allow using API - Ansible managed"
+              action: allow
+              priority: 1
+              list: "{{ aws_admin_tools.allowed_ips }}"
 
 - name: List all API gateways.
   community.aws.api_gateway_info:
