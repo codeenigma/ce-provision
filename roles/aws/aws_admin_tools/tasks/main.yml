@@ -2,6 +2,23 @@
   ansible.builtin.include_tasks: lambda_functions.yml
   loop: "{{ aws_admin_tools.functions }}"
 
+- name: Create WAF for API Gateway
+  ansible.builtin.include_role:
+    name: aws_acl/create.acl
+  vars:
+    _acl:
+      name: "{{ _aws_profile }}_main_acl"
+
+ws_acl:
+  - name: "{{ _infra_name }}_main_acl"
+    description: "ACL rules for API Gateway"
+    scope: REGIONAL
+    region: "{{ _aws_region }}"
+    tags: []
+    recreate: true
+    rules:
+      ip_sets: "{{ aws_admin_tools.allowed_ips }}"
+
 - name: List all API gateways.
   community.aws.api_gateway_info:
     region: "{{ _aws_region }}"

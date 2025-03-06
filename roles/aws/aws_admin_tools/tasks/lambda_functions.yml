@@ -49,6 +49,6 @@
     state: present
     runtime: "{{ aws_admin_tools.runtime }}"
     role: "{{ _iam_api_lambda.iam_role.arn }}"
-    handler: "lambda_function.lambda_handler"
+    handler: "API_{{ item.name }}.lambda_handler"
     tags:
       Name: "API_{{ item.name }}"

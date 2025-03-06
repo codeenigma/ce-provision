@@ -1,39 +1,46 @@
 import json
-import calendar
-from datetime import datetime
 import boto3
 
-costExpl = boto3.client('ce')
+# Defining Clients
+ec2_cli = boto3.client("ec2", region_name="{{ _aws_region }}")
 
 def lambda_handler(event, context):
-    currDay=datetime.now().day
-    currMonth=datetime.now().month
-    print(currMonth)
-    currYear=datetime.now().year
-    print(currYear)
-    lastDay=calendar.monthrange(currYear, currMonth)
 
-    if currMonth < 10:
-        currMonth = '0' + str(currMonth)
-    nextDay = currDay + 1
-    if currDay < 10:
-        currDay = '0' + str(currDay)
-    if nextDay < 10:
-        nextDay = '0' + str(nextDay)
+  print("Gathering instance details.")
+  ec2_instances=ec2_cli.describe_instances()
 
-    startDate=str(currYear) + '-' + str(currMonth) + '-' + str(currDay)
-    endDate=str(currYear) + '-' + str(currMonth) + '-' + str(nextDay)
+  instance_exist = False
+  Ec2_info_list=[]
 
-    estimatedCost = costExpl.get_cost_forecast(
-        TimePeriod={
-            'Start': startDate,
-            'End': endDate
-        },
-        Granularity='MONTHLY',
-        Metric='BLENDED_COST'
-    )
-    return {
-        'statusCode': 200,
-        'Amount': estimatedCost['Total']['Amount'] + ' ' + estimatedCost['Total']['Unit'],
-        'Between': estimatedCost['ForecastResultsByTime'][0]['TimePeriod']['Start'] + ' - ' + estimatedCost['ForecastResultsByTime'][0]['TimePeriod']['End']
-    }
+  for reservation in ec2_instances["Reservations"]:
+    for instance in reservation["Instances"]:
+      pub_ip = ""
+      priv_ip = ""
+      inst_name = ""
+
+      if "PublicIpAddress" in instance:
+          pub_ip = instance['PublicIpAddress']
+      else:
+          pub_ip = "-"
+      if "PrivateIpAddress" in instance:
+          priv_ip = instance['PrivateIpAddress']
+      else:
+          priv_ip = "-"
+
+      for name in instance['Tags']:
+        if name['Key'] == 'Name':
+          inst_name = name['Value']
+
+      new_dict={
+      'EC2 name': inst_name,
+      'State': instance['State'],
+      'Public IP': pub_ip,
+      'Private IP': priv_ip,
+      'Instance type': instance['InstanceType']
+      }
+      Ec2_info_list.append(new_dict)
+
+  return {
+    'statusCode': 200,
+    'EC2 info': Ec2_info_list
+  }

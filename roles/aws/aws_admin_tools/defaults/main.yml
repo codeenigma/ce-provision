@@ -1,6 +1,9 @@
 aws_admin_tools:
   runtime: "python3.12"
-  timeout: 60
+  timeout: 20
+  allowed_ips:
+    - 188.129.46.157
+    - 3.11.82.252
   functions:
     - name: "GetForecastedCosts"
       type: get
@@ -9,7 +12,7 @@ aws_admin_tools:
     - name: "ChangeASGScaling"
       type: post
       policies:
-        - arn:aws:iam::aws:policy/aws-service-role/AWSAutoScalingPlansEC2AutoScalingPolicy
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
     - name: "GetListOfEC2"
       type: get
       policies:
