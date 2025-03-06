@@ -4,7 +4,7 @@
 
 - name: Create WAF for API Gateway
   ansible.builtin.include_role:
-    name: aws_acl/create.acl
+    name: aws_acl/create_acl
   vars:
     _acl:
       name: "{{ _aws_profile }}_main_acl"
