@@ -8,16 +8,13 @@
   vars:
     _acl:
       name: "{{ _aws_profile }}_main_acl"
-
-ws_acl:
-  - name: "{{ _infra_name }}_main_acl"
-    description: "ACL rules for API Gateway"
-    scope: REGIONAL
-    region: "{{ _aws_region }}"
-    tags: []
-    recreate: true
-    rules:
-      ip_sets: "{{ aws_admin_tools.allowed_ips }}"
+      description: "ACL rules for API Gateway"
+      scope: REGIONAL
+      region: "{{ _aws_region }}"
+      tags: []
+      recreate: true
+      rules:
+        ip_sets: "{{ aws_admin_tools.allowed_ips }}"
 
 - name: List all API gateways.
   community.aws.api_gateway_info:
