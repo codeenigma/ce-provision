@@ -11,7 +11,7 @@
         description: "ACL rules for API Gateway"
         scope: REGIONAL
         region: "{{ _aws_region }}"
-        tags: []
+        tags: "{{ _aws_tags }}"
         recreate: true
         rules:
           ip_sets:

@@ -1,9 +1,7 @@
-- name: Create a role and attach policies
-  amazon.aws.iam_role:
-    name: "API_{{ item.name }}"
-    assume_role_policy_document: "{{ lookup('template', 'trusted_entitites.j2') }}"
-    managed_policies: "{{ item.policies }}"
-  register: _iam_api_lambda
+- name: Create IAM roles
+  ansible.builtin.include_tasks: lambda_iam.yml
+  vars:
+    _api_iam: "{{ item }}"
 
 - name: Sleep for 5 seconds for IAM roles.
   ansible.builtin.wait_for:
@@ -15,7 +13,7 @@
     region: "{{ _aws_region }}"
     state: present
 
-- name: Check and clean any previous backup validation files
+- name: Check and clean any previous python files
   ansible.builtin.file:
     path: "/tmp/{{ item.name }}.py"
     state: absent
