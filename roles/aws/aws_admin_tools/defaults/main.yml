@@ -2,8 +2,8 @@ aws_admin_tools:
   runtime: "python3.12"
   timeout: 20
   allowed_ips:
-    - 188.129.46.157
-    - 3.11.82.252
+    - 188.129.46.157/32
+    - 3.11.82.252/32
   functions:
     - name: "GetForecastedCosts"
       type: get
