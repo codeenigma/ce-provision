@@ -7,7 +7,7 @@
     name: aws/aws_acl
   vars:
     aws_acl:
-      - name: "{{ _aws_profile }}_main_acl"
+      - name: "{{ _aws_profile }}_admin_tools"
         description: "ACL rules for API Gateway"
         scope: REGIONAL
         region: "{{ _aws_region }}"
