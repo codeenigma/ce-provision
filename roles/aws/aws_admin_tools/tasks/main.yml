@@ -23,8 +23,8 @@
         recreate: true
         rules:
           ip_sets:
-            - rule_name: "Allowed-IPs-for-admin-tools"
-              set_name: "Allowed-IPs-for-admin-tools"
+            - rule_name: "{{ _aws_profile }}_admin_tools"
+              set_name: "{{ _aws_profile }}_admin_tools"
               description: "List of IPs to allow using API - Ansible managed"
               action: allow
               priority: 1

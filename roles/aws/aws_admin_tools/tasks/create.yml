@@ -11,18 +11,18 @@
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate.stdout | from_json }}"
 
-- name: Get WAF info for API gateway
-  ansible.builtin.shell: >
-    aws wafv2 get-web-acl \
-    --name "{{ _aws_profile }}_admin_tools" \
-    --scope "REGIONAL"
-    --region "{{ _aws_region }}"
+
+- name: obtain all information for a single WAF
+  community.aws.wafv2_web_acl_info:
+    name: "{{ _aws_profile }}_admin_tools"
+    scope: "REGIONAL"
+    region: "{{ _aws_region }}"
   register: _main_waf
 
 - name: Associate WAF with API gateway
   ansible.builtin.shell: >
     aws waf-regional associate-web-acl \
-    --web-acl-id "{{ _main_waf['WebACL']['Id'] }}"
+    --web-acl-id "{{ _main_waf.arn.split('/')[-1] }}"
     --resource-arn "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/stages/prod"
     --region "{{ _aws_region }}"
   register: _main_api_resource
