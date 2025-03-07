@@ -1,9 +1,9 @@
 - name: Create API gateway
-  ansible.builtin.shell: >
-    aws apigateway create-rest-api \
-    --region "{{ _aws_region }}" \
-    --name "{{ _aws_profile }}_admin_tools" \
-    --description "API for administration functions made automatically by ansible" \
+  ansible.builtin.command: >-
+    aws apigateway create-rest-api
+    --region "{{ _aws_region }}"
+    --name "{{ _aws_profile }}_admin_tools"
+    --description "API for administration functions made automatically by ansible"
     --endpoint-configuration "{\"types\": [\"REGIONAL\"]}"
   register: _api_gate
 
@@ -11,22 +11,18 @@
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate.stdout | from_json }}"
 
-- name: Setting prevoius command output into variable
-  ansible.builtin.set_fact:
-    _main_api_deploy: "{{ _main_api_deploy.stdout | from_json }}"
-
 - name: Create stage on API gateway
-  ansible.builtin.shell: >
-    aws apigatewayv2 create-stage \
-    --rest-api-id "{{ _api_gate.id }}" \
-    --stage-name prod \
+  ansible.builtin.command: >-
+    aws apigatewayv2 create-stage
+    --rest-api-id "{{ _api_gate.id }}"
+    --stage-name prod
     --region "{{ _aws_region }}"
   register: _main_api_stage
 
 - name: Get list of API gateway resources
-  ansible.builtin.shell: >
-    aws apigateway get-resources \
-    --region "{{ _aws_region }}" \
+  ansible.builtin.command: >-
+    aws apigateway get-resources
+    --region "{{ _aws_region }}"
     --rest-api-id "{{ _api_gate.id }}"
   register: _api_res_list
 
@@ -50,15 +46,15 @@
   register: _main_waf
 
 - name: Deploy API gateway prior to attaching WAF
-  ansible.builtin.shell: >
-    aws apigateway create-deployment \
-    --rest-api-id "{{ _api_gate.id }}" \
+  ansible.builtin.command: >-
+    aws apigateway create-deployment
+    --rest-api-id "{{ _api_gate.id }}"
     --stage-name "prod"
     --region "{{ _aws_region }}"
 
 - name: Associate WAF with API gateway
-  ansible.builtin.shell: >
-    aws waf-regional associate-web-acl \
+  ansible.builtin.command: >-
+    aws waf-regional associate-web-acl
     --web-acl-id "{{ _main_waf.arn.split('/')[-1] }}"
     --resource-arn "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/stages/prod"
     --region "{{ _aws_region }}"
