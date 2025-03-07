@@ -25,7 +25,7 @@
   ansible.builtin.shell: >
     aws apigateway put-integration \
     --rest-api-id "{{ _api_gate.id }}" \
-    --resource-id {{ _api_resource.id }}" \
+    --resource-id "{{ _api_resource.id }}" \
     --http-method "{{ item.type }}" \
     --type AWS_PROXY \
     --integration-http-method POST \
