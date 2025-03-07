@@ -1,0 +1,30 @@
+---
+# Default variables for YACE Exporter role
+yace_exporter_version: "0.62.1"  # Adjust as needed
+# Construct the download URL using the version variable.
+yace_exporter_download_url: "https://github.com/prometheus-community/yet-another-cloudwatch-exporter/releases/download/v{{ yace_exporter_version }}/yet-another-cloudwatch-exporter-{{ yace_exporter_version }}.linux-amd64.tar.gz"
+
+# Directories and file locations
+yace_exporter_install_dir: "/usr/local/bin"
+yace_exporter_service_name: "yace_exporter"
+yace_exporter_system_user: "yace-exporter"
+yace_exporter_system_group: "yace-exporter"
+
+# Service runtime options
+yace_exporter_listen_address: "0.0.0.0:9105"
+
+# IAM role options
+yace_exporter_iam_roles: []
+
+# YACE configuration (can be a dictionary that gets rendered as YAML)
+yace_exporter_configuration:
+  discovery:
+    jobs:
+      - type: "AWS/EC2"
+        regions:
+          - "us-east-1"
+        metrics:
+          - name: "CPUUtilization"
+            statistics: ["Average"]
+            period: 300
+            length: 600
