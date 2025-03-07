@@ -65,6 +65,15 @@
     --no-api-key-required
     --region "{{ _aws_region }}"
 
+- name: Add mock integration.
+  ansible.builtin.command: >-
+    aws apigateway put-integration
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ _api_resource.id }}"
+    --http-method GET
+    --type MOCK
+    --region {{ _aws_region }}
+
 - name: Create initial deployent for API gateway
   ansible.builtin.command: >-
     aws apigateway create-deployment
