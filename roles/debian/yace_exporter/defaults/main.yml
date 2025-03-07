@@ -48,7 +48,7 @@ yace_exporter_configuration: {}
 #          - DBInstanceIdentifier
 
  # Server IAM policy to allow YACE service to pull metrics
-yace_exporter_iam_configuration: {}
+yace_exporter_iam_configuration: "{}"
  # yace_exporter_iam_configuration: |
  # {
  #     "Version": "2012-10-17",
