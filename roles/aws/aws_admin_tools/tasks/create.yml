@@ -61,6 +61,13 @@
   ansible.builtin.set_fact:
     _main_api_stage: "{{ _main_api_stage.stdout | from_json }}"
 
+- name: Deploy API gateway prior to attaching WAF
+  ansible.builtin.shell: >
+    aws apigateway create-deployment \
+    --rest-api-id "{{ _api_gate.id }}" \
+    --stage-name "prod"
+    --region "{{ _aws_region }}"
+
 - name: Associate WAF with API gateway
   ansible.builtin.shell: >
     aws waf-regional associate-web-acl \
