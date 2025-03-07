@@ -77,12 +77,6 @@
     mode: '0644'
   register: config
 
-- name: Restart YACE service
-  ansible.builtin.service:
-    name: "{{ yace_exporter_service_name }}"
-    state: restarted
-  when: config.changed
-
 - name: Create systemd service file
   ansible.builtin.template:
     src: yace_exporter.service.j2
@@ -94,6 +88,12 @@
   ansible.builtin.systemd:
     daemon_reload: true
   when: config_service.changed
+
+- name: Restart YACE service to apply config updates
+  ansible.builtin.service:
+    name: "{{ yace_exporter_service_name }}"
+    state: restarted
+  when: config.changed
 
 - name: Ensure YACE exporter is enabled and started
   ansible.builtin.systemd:
