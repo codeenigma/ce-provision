@@ -27,10 +27,10 @@
     _api_gate: "{{ _api_gate_list.rest_apis[_api_index] }}"
   when: _api_index | length > 0
 
-- name: Create deployent for API gateway if it exists
+- name: Create initial deployent for API gateway
   ansible.builtin.command: >-
     aws apigateway create-deployment
-    --rest-api-id "{{ _api_gate_list.rest_apis[_api_index].id }}"
+    --rest-api-id "{{ _api_gate.id }}"
     --region "{{ _aws_region }}"
   register: _main_api_deploy
 
