@@ -7,10 +7,6 @@
     --region "{{ _aws_region }}"
   register: _main_api_stage
 
-- name: Setting prevoius command output into variable
-  ansible.builtin.set_fact:
-    _api_res_list: "{{ _api_res_list.stdout | from_json | json_query('items') }}"
-
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
   loop: "{{ aws_admin_tools.functions }}"
@@ -28,6 +24,10 @@
     --region "{{ _aws_region }}"
     --rest-api-id "{{ _api_gate.id }}"
   register: _api_res_list
+
+- name: Setting prevoius command output into variable
+  ansible.builtin.set_fact:
+    _api_res_list: "{{ _api_res_list.stdout | from_json | json_query('items') }}"
 
 - name: Get index of DelMe resource from API gateway
   ansible.builtin.set_fact:
