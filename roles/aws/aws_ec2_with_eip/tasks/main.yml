@@ -163,23 +163,12 @@
       tag:Name: "{{ aws_ec2_with_eip.instance_name }}"
   register: _aws_ec2_with_eip_instances_eip
 
-- name: Generate Terraform template.
-  ansible.builtin.template:
-    src: eip.tf.j2
-    dest: "{{ _ce_provision_build_tmp_dir }}/main.tf"
-    mode: "0666"
-  when: not _aws_ec2_with_eip_instances_eip.addresses
-
-- name: Init Terraform.
-  ansible.builtin.command:
-    cmd: terraform init
-    chdir: "{{ _ce_provision_build_tmp_dir }}"
-  when: not _aws_ec2_with_eip_instances_eip.addresses
-
-- name: Create EIP with Terraform if we don't have one.
-  ansible.builtin.command:
-    cmd: terraform apply -auto-approve
-    chdir: "{{ _ce_provision_build_tmp_dir }}"
+- name: allocate a new elastic IP inside a VPC
+  amazon.aws.ec2_eip:
+    region: "{{ aws_ec2_with_eip.region }}"
+    in_vpc: true
+    tag_name: "Name"
+    tag_value: "{{ aws_ec2_with_eip.instance_name }}"
   when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
