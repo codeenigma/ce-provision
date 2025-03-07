@@ -1,0 +1,101 @@
+---
+- name: Get current IAM instance profile
+  amazon.aws.ec2_metadata_facts:
+
+- name: Make sure instance IAM profile has the required inline IAM policy
+  amazon.aws.iam_policy:
+    profile: "{{ _aws_profile }}"
+    iam_type: role
+    iam_name: "{{ ansible_ec2_iam_instance_profile_role }}"
+    policy_name: YaceExporterAccess
+    policy_json: "{{ yace_exporter_iam_configuration | from_json }}"
+    state: present
+  delegate_to: localhost
+  become: false
+
+- name: Gather system user and group facts
+  ansible.builtin.getent:
+    database: "{{ item }}"
+  loop:
+    - passwd
+    - group
+
+- name: Make sure system group exists
+  ansible.builtin.group:
+    name: "{{ yace_exporter_system_group }}"
+    state: present
+    system: true
+  when: yace_exporter_system_group not in ansible_facts.getent_group
+
+- name: Make sure system user exists
+  ansible.builtin.user:
+    name: "{{ yace_exporter_system_user }}"
+    group: "{{ yace_exporter_system_group }}"
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+  when: yace_exporter_system_user not in ansible_facts.getent_passwd
+
+- name: Ensure configuration directory exists
+  ansible.builtin.file:
+    path: "/etc/yace_exporter"
+    state: directory
+    owner: "{{ yace_exporter_system_user }}"
+    group: "{{ yace_exporter_system_group }}"
+    mode: '0755'
+
+- name: Download exporter archive
+  ansible.builtin.get_url:
+    url: "{{ yace_exporter_download_url }}"
+    dest: "/tmp/yet-another-cloudwatch-exporter-{{ yace_exporter_version }}.tar.gz"
+    mode: '0644'
+  retries: 5
+  delay: 2
+
+- name: Unarchive exporter binary
+  ansible.builtin.unarchive:
+    src: "/tmp/yet-another-cloudwatch-exporter-{{ yace_exporter_version }}.tar.gz"
+    dest: "/tmp/"
+    remote_src: true
+
+- name: Copy binary to install directory
+  ansible.builtin.copy:
+    src: "/tmp/yet-another-cloudwatch-exporter-{{ yace_exporter_version }}.linux-amd64/yace"
+    dest: "{{ yace_exporter_install_dir }}"
+    owner: "{{ yace_exporter_system_user }}"
+    group: "{{ yace_exporter_system_group }}"
+    mode: '0755'
+    remote_src: true
+
+- name: Write or update configuration file
+  ansible.builtin.copy:
+    dest: "/etc/yace_exporter/config.yml"
+    content: "{{ yace_exporter_configuration | to_nice_yaml(sort_keys=False) }}"
+    owner: "{{ yace_exporter_system_user }}"
+    group: "{{ yace_exporter_system_group }}"
+    mode: '0644'
+  register: config
+
+- name: Restart YACE service
+  ansible.builtin.service:
+    name: "{{ yace_exporter_service_name }}"
+    state: restarted
+  when: config.changed
+
+- name: Create systemd service file
+  ansible.builtin.template:
+    src: yace_exporter.service.j2
+    dest: "/etc/systemd/system/{{ yace_exporter_service_name }}.service"
+    mode: '0644'
+  register: config_service
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: config_service.changed
+
+- name: Ensure YACE exporter is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ yace_exporter_service_name }}"
+    enabled: true
+    state: started
