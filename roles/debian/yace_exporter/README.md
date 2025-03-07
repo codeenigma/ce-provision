@@ -40,9 +40,9 @@ yace_exporter_configuration:
                   "cloudwatch:GetMetricData",
                   "cloudwatch:GetMetricStatistics",
                   "cloudwatch:ListMetrics",
-                  "ec2:DescribeSpotFleetRequests",
+                  "ec2:DescribeSpotFleetRequests"
               ],
-              "Effect": "Allow"
+              "Effect": "Allow",
               "Resource": "*"
           }
       ]
