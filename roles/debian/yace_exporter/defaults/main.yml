@@ -60,7 +60,7 @@ yace_exporter_iam_configuration: |
                   "cloudwatch:ListMetrics",
                   "ec2:DescribeSpotFleetRequests",
               ],
-              "Effect": "Allow",
+              "Effect": "Allow"
               "Resource": "*"
           }
       ]
