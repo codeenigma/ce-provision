@@ -14,6 +14,8 @@ yace_exporter_service_name: "yace_exporter"
 
 # YACE configuration
 yace_exporter_configuration: {}
+# Example config
+# yace_exporter_configuration:
 #  apiVersion: v1alpha1
 #  discovery:
 #    jobs:
@@ -48,20 +50,32 @@ yace_exporter_configuration: {}
 #          - DBInstanceIdentifier
 
  # Server IAM policy to allow YACE service to pull metrics
-yace_exporter_iam_configuration: |
-  {
-      "Version": "2012-10-17",
-      "Statement": [
-          {
-              "Action": [
-                  "tag:GetResources",
-                  "cloudwatch:GetMetricData",
-                  "cloudwatch:GetMetricStatistics",
-                  "cloudwatch:ListMetrics",
-                  "ec2:DescribeSpotFleetRequests"
-              ],
-              "Effect": "Allow",
-              "Resource": "*"
-          }
-      ]
-  }
+yace_exporter_iam_configuration: {}
+# Example iam config that grants full permissions
+# yace_exporter_iam_configuration: |
+#  {
+#    "Version": "2012-10-17",
+#    "Statement": [
+#      {
+#        "Action": [
+#          "tag:GetResources",
+#          "cloudwatch:GetMetricData",
+#          "cloudwatch:GetMetricStatistics",
+#          "cloudwatch:ListMetrics",
+#          "apigateway:GET",
+#          "aps:ListWorkspaces",
+#          "autoscaling:DescribeAutoScalingGroups",
+#          "dms:DescribeReplicationInstances",
+#          "dms:DescribeReplicationTasks",
+#          "ec2:DescribeTransitGatewayAttachments",
+#          "ec2:DescribeSpotFleetRequests",
+#          "shield:ListProtections",
+#          "storagegateway:ListGateways",
+#          "storagegateway:ListTagsForResource",
+#          "iam:ListAccountAliases"
+#        ],
+#        "Effect": "Allow",
+#        "Resource": "*"
+#      }
+#    ]
+#  }

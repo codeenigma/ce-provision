@@ -12,6 +12,8 @@
     state: present
   delegate_to: localhost
   become: false
+  when: yace_exporter_iam_configuration != ''
+
 
 - name: Gather system user and group facts
   ansible.builtin.getent:
