@@ -14,7 +14,7 @@
 - name: Create stage on API gateway
   ansible.builtin.command: >-
     aws apigatewayv2 create-stage
-    --rest-api-id "{{ _api_gate.id }}"
+    --api-id "{{ _api_gate.id }}"
     --stage-name prod
     --region "{{ _aws_region }}"
   register: _main_api_stage
