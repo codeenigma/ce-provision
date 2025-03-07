@@ -11,7 +11,7 @@ Role expects to be provided with the following information:
 * `yace_exporter_iam_configuration` - a JSON formatted IAM policy
 
 ### Example
-An basic YACE config that will fetch EC2 CPU usage, with a minimum IAM policy required for that.
+Minimum YACE config that will fetch EC2 CPU usage, with a minimum IAM policy required for that.
 
 ```yaml
 yace_exporter_configuration:
