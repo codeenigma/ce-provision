@@ -1,10 +1,6 @@
 ---
-- name: Get current IAM instance profile
+- name: Get current EC2 instance variables
   amazon.aws.ec2_metadata_facts:
-
-- name: Debug json variable
-  ansible.builtin.debug:
-    var: yace_exporter_iam_configuration
 
 - name: Make sure instance IAM profile has the required inline IAM policy
   amazon.aws.iam_policy:
@@ -16,7 +12,7 @@
     state: present
   delegate_to: localhost
   become: false
-  when: (yace_exporter_iam_configuration | trim) != ''
+  when: yace_exporter_iam_configuration | length > 0
 
 - name: Gather system user and group facts
   ansible.builtin.getent:
