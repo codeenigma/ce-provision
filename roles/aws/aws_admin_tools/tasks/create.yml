@@ -11,6 +11,30 @@
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate.stdout | from_json }}"
 
+- name: Get list of API gateway resources
+  ansible.builtin.shell: >
+    aws apigateway get-resources \
+    --region "{{ _aws_region }}" \
+    --rest-api-id "{{ _api_gate.id }}"
+  register: _api_res_list
+
+- name: Setting prevoius command output into variable
+  ansible.builtin.set_fact:
+    _api_res_list: "{{ _api_res_list.stdout | from_json | json_query('items') }}"
+
+- name: Get index of main resource from API gateway
+  ansible.builtin.set_fact:
+    _api_res_index_list: "{{ lookup('ansible.utils.index_of', _api_res_list, 'eq', '/', 'path', wantlist=True) }}"
+
+- name: Create resource on API gateway
+  ansible.builtin.shell: >
+    aws apigateway create-resource \
+    --rest-api-id "{{ _api_gate.id }}" \
+    --parent-id "{{ _api_res_list[_api_res_index_list[0]].id }}" \
+    --path-part "GetBills" \
+    --region "{{ _aws_region }}"
+  register: _main_api_resource
+
 - name: Obtain all information for a single WAF
   community.aws.wafv2_web_acl_info:
     name: "{{ _aws_profile }}_admin_tools"
@@ -53,27 +77,3 @@
 - name: Setting prevoius command output into variable
   ansible.builtin.set_fact:
     _main_api_resource: "{{ _main_api_resource.stdout | from_json }}"
-
-- name: Get list of API gateway resources
-  ansible.builtin.shell: >
-    aws apigateway get-resources \
-    --region "{{ _aws_region }}" \
-    --rest-api-id "{{ _api_gate.id }}"
-  register: _api_res_list
-
-- name: Setting prevoius command output into variable
-  ansible.builtin.set_fact:
-    _api_res_list: "{{ _api_res_list.stdout | from_json | json_query('items') }}"
-
-- name: Get index of main resource from API gateway
-  ansible.builtin.set_fact:
-    _api_res_index_list: "{{ lookup('ansible.utils.index_of', _api_res_list, 'eq', '/', 'path', wantlist=True) }}"
-
-- name: Create resource on API gateway
-  ansible.builtin.shell: >
-    aws apigateway create-resource \
-    --rest-api-id "{{ _api_gate.id }}" \
-    --parent-id "{{ _api_res_list[_api_res_index_list[0]].id }}" \
-    --path-part "GetBills" \
-    --region "{{ _aws_region }}"
-  register: _main_api_resource
