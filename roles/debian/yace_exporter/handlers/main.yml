@@ -1,0 +1,12 @@
+---
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart YACE service
+  listen: "restart yace_exporter"
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: yace_exporter
+    state: restarted
