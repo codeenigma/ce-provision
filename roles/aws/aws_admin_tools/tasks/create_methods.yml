@@ -1,0 +1,33 @@
+- name: Create resource on API gateway
+  ansible.builtin.shell: >
+    aws apigateway create-resource \
+    --rest-api-id "{{ _api_gate.id }}" \
+    --parent-id "{{ _api_res_list[_api_res_index_list[0]].id }}" \
+    --path-part "{{ item.name }}" \
+    --region "{{ _aws_region }}"
+  register: _api_resource
+
+- name: Setting prevoius command output into variable
+  ansible.builtin.set_fact:
+    _api_resource: "{{ _api_resource.stdout | from_json }}"
+
+- name: Put method on API gateway
+  ansible.builtin.shell: >
+    aws apigateway put-method \
+    --rest-api-id "{{ _api_gate.id }}" \
+    --resource-id "{{ _api_resource.id }}" \
+    --http-method "{{ item.type }}" \
+    --authorization-type "NONE" \
+    --no-api-key-required \
+    --region "{{ _aws_region }}"
+
+- name: Add Lambda for method.
+  ansible.builtin.shell: >
+    aws apigateway put-integration \
+    --rest-api-id "{{ _api_gate.id }}" \
+    --resource-id {{ _api_resource.id }}" \
+    --http-method "{{ item.type }}" \
+    --type AWS_PROXY \
+    --integration-http-method POST \
+    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:444471199298:function:API_{{ item.name }}/invocations" \
+    --region $region
