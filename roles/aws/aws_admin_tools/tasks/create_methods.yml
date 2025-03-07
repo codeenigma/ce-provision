@@ -30,4 +30,4 @@
     --type AWS_PROXY \
     --integration-http-method POST \
     --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:444471199298:function:API_{{ item.name }}/invocations" \
-    --region $region
+    --region {{ _aws_region }}
