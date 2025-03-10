@@ -31,7 +31,7 @@
 - name: Create API gateway
   community.aws.aws_api_gateway:
     state: present
-    region: "{{ aws_region }}"
+    region: "{{ _aws_region }}"
     swagger_file: "/tmp/swag.json"
     stage: prod
     deploy_desc: Production Deployment
