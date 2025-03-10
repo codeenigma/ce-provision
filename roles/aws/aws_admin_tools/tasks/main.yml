@@ -30,6 +30,7 @@
 
 - name: Create API gateway
   community.aws.aws_api_gateway:
+    api_id: _api_gate_list['rest_apis'][0].id
     state: present
     region: "{{ _aws_region }}"
     swagger_file: "/tmp/swag.json"
