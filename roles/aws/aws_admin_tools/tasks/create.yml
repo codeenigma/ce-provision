@@ -47,9 +47,19 @@
     --stage-name "prod"
     --region "{{ _aws_region }}"
 
-- name: Associate WAF with API gateway
-  ansible.builtin.command: >-
-    aws waf-regional associate-web-acl
-    --web-acl-id "{{ _main_waf.arn.split('/')[-1] }}"
-    --resource-arn "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/stages/prod"
-    --region "{{ _aws_region }}"
+#- name: Associate WAF with API gateway
+#  ansible.builtin.command: >-
+#    aws waf-regional associate-web-acl
+#    --web-acl-id "{{ _main_waf.arn.split('/')[-1] }}"
+#    --resource-arn "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}"
+#    --region "{{ _aws_region }}"
+
+- name: Add API gateway to waf
+  community.aws.wafv2_resources:
+    name: "{{ _aws_profile }}_admin_tools"
+    scope: REGIONAL
+    state: present
+    region: "{{ _aws_region }}"
+    arn: "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}"
+
+#aws waf-regional associate-web-acl --web-acl-id c65672c5-23ad-4b0e-8817-610cd2cea7bb --resource-arn arn:aws:apigateway:eu-west-1::/restapis/fw5fsa1ia6/stages/prod --region eu-west-1
