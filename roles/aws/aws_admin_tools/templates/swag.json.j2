@@ -7,8 +7,7 @@
   "basePath" : "/prod",
   "schemes" : [ "https" ],
   "paths" : {
-  {% for funct in ['GetMonthForecast', 'EnableDisableAutoscaling', 'Test'] %}
-  "/{{ funct }}" : {
+    "/GetForecastedCosts" : {
       "get" : {
         "produces" : [ "application/json" ],
         "responses" : {
@@ -22,7 +21,7 @@
         "x-amazon-apigateway-integration" : {
           "type" : "aws",
           "httpMethod" : "POST",
-          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:444471199298:function:getBilling/invocations",
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:444471199298:function:API_GetForecastedCosts/invocations",
           "responses" : {
             "default" : {
               "statusCode" : "200"
@@ -34,8 +33,32 @@
         }
       }
     },
-  {% endfor %}
-  },
+    "/GetListOfEC2" : {
+      "get" : {
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "schema" : {
+              "$ref" : "#/definitions/Empty"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:444471199298:function:API_GetListOfEC2/invocations",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200"
+            }
+          },
+          "passthroughBehavior" : "when_no_match",
+          "timeoutInMillis" : 29000,
+          "contentHandling" : "CONVERT_TO_TEXT"
+        }
+      }
+    },
   "definitions" : {
     "Empty" : {
       "type" : "object",
