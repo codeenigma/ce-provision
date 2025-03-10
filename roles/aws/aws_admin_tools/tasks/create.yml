@@ -62,4 +62,17 @@
     region: "{{ _aws_region }}"
     arn: "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/stages/prod"
 
-#aws waf-regional associate-web-acl --web-acl-id c65672c5-23ad-4b0e-8817-610cd2cea7bb --resource-arn arn:aws:apigateway:eu-west-1::/restapis/fw5fsa1ia6/stages/prod --region eu-west-1
+- name: Generate unique string
+  ansible.builtin.set_fact:
+    _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
+
+- name: Update Lambda policy
+  amazon.aws.lambda_policy:
+    state: present
+    function_name: "API_{{ item.name }}"
+    statement_id: "{{ item.name }}_{{ _rand_str }}"
+    action: lambda:InvokeFunction
+    principal: apigateway.amazonaws.com
+    source_arn: "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/stages/prod/{{ item.name }}"
+    region: "{{ _aws_region }}"
+  loop: "{{ aws_admin_tools.functions }}"
