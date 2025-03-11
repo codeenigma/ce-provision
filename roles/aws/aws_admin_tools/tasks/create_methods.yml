@@ -53,4 +53,5 @@
     --status-code "200"
     --selection-pattern ""
     --response-templates '{"application/json": "{\"json\": \"template\"}"}'
+    --content-handling "CONVERT_TO_TEXT"
     --region {{ _aws_region }}
