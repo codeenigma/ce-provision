@@ -41,7 +41,7 @@
     --resource-id "{{ _api_resource.id }}"
     --http-method "{{ item.type }}"
     --status-code "200"
-    --response-parameters '{ "application/json": "{\"statusCode\": 200}" }'
+    --response-models '{"application/json":"Empty"}'
     --region {{ _aws_region }}
 
 - name: Add integration response
@@ -51,5 +51,6 @@
     --resource-id "{{ _api_resource.id }}"
     --http-method "{{ item.type }}"
     --status-code "200"
-    --response-parameters '{ "application/json": "{\"statusCode\": 200}" }'
+    --selection-pattern ""
+    --response-templates '{"application/json": "{\"json\": \"template\"}"}'
     --region {{ _aws_region }}
