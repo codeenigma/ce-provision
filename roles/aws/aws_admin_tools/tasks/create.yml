@@ -66,13 +66,24 @@
   ansible.builtin.set_fact:
     _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
 
-- name: Update Lambda policy
-  amazon.aws.lambda_policy:
-    state: present
-    function_name: "API_{{ item.name }}"
-    statement_id: "{{ item.name }}_{{ _rand_str }}"
-    action: lambda:InvokeFunction
-    principal: apigateway.amazonaws.com
-    source_arn: "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/*/{{ item.type }}/{{ item.name }}"
-    region: "{{ _aws_region }}"
+#- name: Update Lambda policy
+#  amazon.aws.lambda_policy:
+#    state: present
+#    function_name: "API_{{ item.name }}"
+#    statement_id: "{{ item.name }}_{{ _rand_str }}"
+#    action: lambda:InvokeFunction
+#    principal: apigateway.amazonaws.com
+#    source_arn: "arn:aws:apigateway:{{ _aws_region }}::/restapis/{{ _api_gate.id }}/*/{{ item.type }}/{{ item.name }}"
+#    region: "{{ _aws_region }}"
+#  loop: "{{ aws_admin_tools.functions }}"
+
+- name: Update Lambda triggers
+  ansible.builtin.command: >-
+    aws lambda add-permission
+    --function-name "API_{{ item.name }}"
+    --statement-id "{{ item.name }}_{{ _rand_str }}"
+    --action "lambda:InvokeFunction"
+    --principal apigateway.amazonaws.com
+    --source-arn arn:aws:execute-api:{{ _aws_region }}:444471199298:jwpdpeubgk/*/{{ item.type }}/{{ item.name }}
+    --region {{ _aws_region }}
   loop: "{{ aws_admin_tools.functions }}"
