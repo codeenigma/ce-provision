@@ -132,6 +132,13 @@
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
+- name: Append AWS Cloudwatch default config on Debian 12.
+  ansible.builtin.command: "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a append-config -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-main.json -s"
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_distribution_major_version | int >= 12
+    - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
+
 - name: Update nginx mime.types
   ansible.builtin.template:
     src: mime.types.j2
