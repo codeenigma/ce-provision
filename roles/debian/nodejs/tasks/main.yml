@@ -137,3 +137,19 @@
   when:
     - nodejs.npm_packages | length > 0
     - item.path is defined
+
+- name: Start corepack on boot.
+  when: nodejs.start_corepack
+  block:
+    - name: Place service definition file for node corepack.
+      ansible.builtin.copy:
+        src: node-corepack-start.service
+        dest: /etc/systemd/system/node-corepack-start.service
+
+    - name: Enable the corepack service.
+      ansible.builtin.systemd:
+        name: node-corepack-start.service
+        state: restarted
+        enabled: true
+        masked: false
+        daemon_reload: true
