@@ -79,3 +79,9 @@
     - not domain.access_log == "/var/log/nginx/access.log"
     - not domain.error_log == "/var/log/nginx/error.log"
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
+
+- name: Append AWS Cloudwatch vhost config on Debian 12.
+  ansible.builtin.command: "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a append-config -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-{{ domain.server_name }}.json"
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_distribution_major_version | int >= 12
