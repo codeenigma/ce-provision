@@ -33,3 +33,23 @@
     --integration-http-method POST
     --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:444471199298:function:API_{{ item.name }}/invocations"
     --region {{ _aws_region }}
+
+- name: Add method response
+  ansible.builtin.command: >-
+    aws apigateway put-method-response
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ _api_resource.id }}"
+    --http-method "{{ item.type }}"
+    --status-code "200"
+    --response-parameters '{ "application/json": "{\"statusCode\": 200}" }'
+    --region {{ _aws_region }}
+
+- name: Add integration response
+  ansible.builtin.command: >-
+    aws apigateway put-integration-response
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ _api_resource.id }}"
+    --http-method "{{ item.type }}"
+    --status-code "200"
+    --response-parameters '{ "application/json": "{\"statusCode\": 200}" }'
+    --region {{ _aws_region }}
