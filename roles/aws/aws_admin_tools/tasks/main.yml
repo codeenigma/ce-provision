@@ -61,7 +61,7 @@
 
 - name: output the last element in the 'fruit' list
   ansible.builtin.debug:
-    msg: "{{ _main_api_deploy_tmp }}"
+    msg: "{{ _main_api_deploy_tmp.items  }}"
 
 - name: Set prevoius command output into variable
   ansible.builtin.set_fact:
