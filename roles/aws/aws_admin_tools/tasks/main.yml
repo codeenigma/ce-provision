@@ -1,3 +1,4 @@
+---
 - name: Create API gateway
   ansible.builtin.command: >-
     aws sts get-caller-identity
