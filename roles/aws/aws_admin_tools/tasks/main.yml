@@ -61,11 +61,11 @@
 
 - name: output the last element in the 'fruit' list
   ansible.builtin.debug:
-    msg: "{{ _main_api_deploy_tmp.items  }}"
+    msg: "{{ _main_api_deploy_tmp }}"
 
 - name: Set prevoius command output into variable
   ansible.builtin.set_fact:
-    _main_api_deploy: "{{ _main_api_deploy_tmp.items | last }}"
+    _main_api_deploy: "{{ _main_api_deploy_tmp | last }}"
   when: _api_index | length > 0
 
 - name: Configure Lambda IAM policies.
