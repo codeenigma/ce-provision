@@ -1,4 +1,15 @@
-- name: List all API gateways.
+- name: Create API gateway
+  ansible.builtin.command: >-
+    aws sts get-caller-identity
+    --query Account
+    --output text
+  register: _acc_id
+
+- name: Setting prevoius command output into variable
+  ansible.builtin.set_fact:
+    _acc_id: "{{ _acc_id.stdout | from_json }}"
+
+  - name: List all API gateways.
   community.aws.api_gateway_info:
     region: "{{ _aws_region }}"
   register: _api_gate_list
