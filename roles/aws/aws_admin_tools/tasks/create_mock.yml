@@ -7,7 +7,7 @@
     --region "{{ _aws_region }}"
   register: _api_resource
 
-- name: Setting previous command output into variable.
+- name: Setting command output into variable.
   ansible.builtin.set_fact:
     _api_resource: "{{ _api_resource.stdout | from_json }}"
 
@@ -37,6 +37,6 @@
     --region "{{ _aws_region }}"
   register: _main_api_deploy
 
-- name: Setting previous command output into variable.
+- name: Setting command output into variable.
   ansible.builtin.set_fact:
     _main_api_deploy: "{{ _main_api_deploy.stdout | from_json }}"
