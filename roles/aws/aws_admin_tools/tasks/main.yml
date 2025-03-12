@@ -60,8 +60,8 @@
   when: _api_index | length > 0
 
 - name: output the last element in the 'fruit' list
-  debug:
-    vars: _main_api_deploy_tmp
+  ansible.builtin.debug:
+    msg: "{{ _main_api_deploy_tmp }}"
 
 - name: Set prevoius command output into variable
   ansible.builtin.set_fact:
