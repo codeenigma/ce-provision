@@ -46,6 +46,19 @@
   ansible.builtin.include_tasks: create_mock.yml
   when: _api_index | length == 0
 
+- name: Create last deployent for API gateway
+  ansible.builtin.command: >-
+    aws apigateway get-deployments
+    --rest-api-id "{{ _api_gate.id }}"
+    --region "{{ _aws_region }}"
+  register: _main_api_deploy
+  when: _api_index | length > 0
+
+- name: Setting prevoius command output into variable
+  ansible.builtin.set_fact:
+    _main_api_deploy: "{{ _main_api_deploy.stdout | from_json | [-1] }}"
+  when: _api_index | length > 0
+
 - name: Configure Lambda IAM policies.
   ansible.builtin.include_tasks: lambda_iam.yml
   loop: "{{ aws_admin_tools.functions }}"
