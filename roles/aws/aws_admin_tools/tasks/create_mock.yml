@@ -1,4 +1,4 @@
-- name: Create MOCK resource on API gateway
+- name: Create MOCK resource on API gateway.
   ansible.builtin.command: >-
     aws apigateway create-resource
     --rest-api-id "{{ _api_gate.id }}"
@@ -7,11 +7,11 @@
     --region "{{ _aws_region }}"
   register: _api_resource
 
-- name: Setting prevoius command output into variable
+- name: Setting previous command output into variable.
   ansible.builtin.set_fact:
     _api_resource: "{{ _api_resource.stdout | from_json }}"
 
-- name: Put method on API gateway
+- name: Put method on API gateway.
   ansible.builtin.command: >-
     aws apigateway put-method
     --rest-api-id "{{ _api_gate.id }}"
@@ -30,13 +30,13 @@
     --type MOCK
     --region {{ _aws_region }}
 
-- name: Create initial deployent for API gateway
+- name: Create initial deployent for API gateway.
   ansible.builtin.command: >-
     aws apigateway create-deployment
     --rest-api-id "{{ _api_gate.id }}"
     --region "{{ _aws_region }}"
   register: _main_api_deploy
 
-- name: Setting prevoius command output into variable
+- name: Setting previous command output into variable.
   ansible.builtin.set_fact:
     _main_api_deploy: "{{ _main_api_deploy.stdout | from_json }}"

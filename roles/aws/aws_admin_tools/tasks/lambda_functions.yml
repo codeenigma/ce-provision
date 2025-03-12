@@ -1,38 +1,38 @@
-- name: Create S3 bucket for lambda functions
+- name: Create S3 bucket for lambda functions.
   amazon.aws.s3_bucket:
     name: "{{ _aws_profile }}-lambda-api-functions"
     region: "{{ _aws_region }}"
     state: present
 
-- name: Check and clean any previous python files
+- name: Check and clean any previous python files.
   ansible.builtin.file:
     path: "/tmp/{{ item.name }}.py"
     state: absent
 
-- name: Write Lambda functions
+- name: Write Lambda functions.
   ansible.builtin.template:
     src: "API_{{ item.name }}.py.j2"
     dest: "/tmp/API_{{ item.name }}.py"
 
-- name: Create a zip archive of Lambda functions
+- name: Create a zip archive of Lambda functions.
   community.general.archive:
     path: "/tmp/API_{{ item.name }}.py"
     dest: "/tmp/API_{{ item.name }}.zip"
     format: zip
 
-- name: Place Lambda functions in S3 bucket
+- name: Place Lambda functions in S3 bucket.
   amazon.aws.s3_object:
     bucket: "{{ _aws_profile }}-lambda-api-functions"
     object: "lambda-functions/API-{{ item.name }}.zip"
     src: "/tmp/API_{{ item.name }}.zip"
     mode: put
 
-- name: Get appropriate IAM role for Lambda
+- name: Get appropriate IAM role for Lambda.
   amazon.aws.iam_role_info:
     name: "API_{{ item.name }}"
   register: _iam_api_lambda
 
-- name: Create Lambda functions
+- name: Create Lambda functions.
   amazon.aws.lambda:
     name: "API_{{ item.name }}"
     description: "Lambda function for {{ item.name }}"
