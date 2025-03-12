@@ -1,4 +1,0 @@
-- name: Setting _api_gate if API already exists
-  ansible.builtin.set_fact:
-    _api_gate: "{{ _api_gate_list.rest_apis[_api_index[0]] }}"
-  when: _api_index | length > 0
