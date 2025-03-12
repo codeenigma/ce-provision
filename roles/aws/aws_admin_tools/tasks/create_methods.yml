@@ -17,7 +17,7 @@
   ansible.builtin.command: >-
     aws apigateway delete-resource
     --rest-api-id "{{ _api_gate.id }}"
-    --resource-id "{{ _api_old_resource['items'][_api_old_resource_index].id }}"
+    --resource-id "{{ _api_old_resource['items'][_api_old_resource_index[0]].id }}"
     --region "{{ _aws_region }}"
   register: _api_old_resource
   when: _api_old_resource_index | length > 0
