@@ -61,7 +61,7 @@
 
 - name: Set prevoius command output into variable
   ansible.builtin.set_fact:
-    _main_api_deploy: "{{ _main_api_deploy_tmp.items[-1] }}"
+    _main_api_deploy: "{{ _main_api_deploy_tmp.items | last }}"
   when: _api_index | length > 0
 
 - name: Configure Lambda IAM policies.
