@@ -59,10 +59,6 @@
     _main_api_deploy_tmp: "{{ _main_api_deploy.stdout | from_json }}"
   when: _api_index | length > 0
 
-- name: output the last element in the 'fruit' list
-  ansible.builtin.debug:
-    msg: "{{ _main_api_deploy_tmp['items'] }}"
-
 - name: Set prevoius command output into variable
   ansible.builtin.set_fact:
     _main_api_deploy: "{{ _main_api_deploy_tmp['items'] | last }}"

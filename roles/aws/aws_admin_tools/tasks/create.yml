@@ -1,19 +1,12 @@
-- name: output the last element in the 'fruit' list
-  ansible.builtin.debug:
-    msg: "{{ _main_api_deploy }}"
-
-- name: output the last element in the 'fruit' list
-  ansible.builtin.debug:
-    msg: "{{ _api_gate }}"
-
 - name: Create stage on API gateway
   ansible.builtin.command: >-
     aws apigateway create-stage
     --rest-api-id "{{ _api_gate.id }}"
-    --stage-name prod
+    --stage-name "prod"
     --deployment-id "{{ _main_api_deploy.id }}"
     --region "{{ _aws_region }}"
   register: _main_api_stage
+  when: _api_index | length == 0
 
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
