@@ -19,24 +19,27 @@ def lambda_handler(event, context):
       inst_name = ""
 
       if "PublicIpAddress" in instance:
-          pub_ip = instance['PublicIpAddress']
+        pub_ip = instance['PublicIpAddress']
       else:
-          pub_ip = "-"
+        pub_ip = "-"
       if "PrivateIpAddress" in instance:
-          priv_ip = instance['PrivateIpAddress']
+        priv_ip = instance['PrivateIpAddress']
       else:
-          priv_ip = "-"
+        priv_ip = "-"
 
-      for name in instance['Tags']:
-        if name['Key'] == 'Name':
-          inst_name = name['Value']
+      if "Tags" in instance:
+        for name in instance['Tags']:
+          if name['Key'] == 'Name':
+            inst_name = name['Value']
+      else:
+        inst_name = "-"
 
       new_dict={
-      'EC2 name': inst_name,
-      'State': instance['State'],
-      'Public IP': pub_ip,
-      'Private IP': priv_ip,
-      'Instance type': instance['InstanceType']
+        'EC2 name': inst_name,
+        'State': instance['State'],
+        'Public IP': pub_ip,
+        'Private IP': priv_ip,
+        'Instance type': instance['InstanceType']
       }
       Ec2_info_list.append(new_dict)
 
