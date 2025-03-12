@@ -1,3 +1,11 @@
+- name: output the last element in the 'fruit' list
+  ansible.builtin.debug:
+    msg: "{{ _main_api_deploy }}"
+
+- name: output the last element in the 'fruit' list
+  ansible.builtin.debug:
+    msg: "{{ _api_gate }}"
+
 - name: Create stage on API gateway
   ansible.builtin.command: >-
     aws apigateway create-stage
