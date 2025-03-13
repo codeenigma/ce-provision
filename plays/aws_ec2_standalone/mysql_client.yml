@@ -22,7 +22,7 @@
         profile: "{{ _aws_profile }}"
         db_instance_identifier: "{{ _aws_resource_name }}"
       become: true
-      become_user: "{{ user_provision.username }}"
+      become_user: "{{ _ce_provision_username }}"
       delegate_to: localhost # needs to run on controller
       register: _database_info
     # Install MySQL client

@@ -14,6 +14,11 @@ openvpn:
     # - "1.2.3.4 255.255.255.255" # push specific IP 1.2.3.4
     # - "www.google-analytics.com 255.255.255.255" # push any IP resolving to www.google-analytics.com, must set allow_pull_fqdn to true
   push_routes_ipv6: [] # list of VPN push routes for ipv6 networks - ipv6_support must be "y"
+  # Provide a path to a directory, such as /etc/openvpn/client, to configure a directory where OpenVPN can look up default client configs.
+  # See --client-config-dir in the manual - https://openvpn.net/community-resources/reference-manual-for-openvpn-2-0/
+  # This can be useful for activities such as providing a long list of push routes to manage as an include.
+  client_config_dir: "" # empty means this will not be set
+  client_config_push_routes: false # if you are providing push routes in your client config, set this to true to remove the default ones
   # PAM and LDAP authentication
   pam:
     enabled: false # relies on `openvpn-plugin-auth-pam.so` which is bundled with OpenVPN server for Debian

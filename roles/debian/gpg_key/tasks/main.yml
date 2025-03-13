@@ -1,4 +1,9 @@
 ---
+- name: Ensure GPG is installed.
+  ansible.builtin.apt:
+    name: gpg
+    state: present
+
 - name: Generate GPG key.
   ansible.builtin.include_tasks: gpg.yml
   with_items: "{{ gpg_key }}"

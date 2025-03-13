@@ -138,7 +138,7 @@ fi
   git ca-certificates git-lfs \
   openssh-client nfs-common stunnel4 \
   python3-venv python3-debian \
-  zip unzip gzip tar dnsutils net-tools
+  acl zip unzip gzip tar dnsutils net-tools
 /usr/bin/echo "-------------------------------------------------"
 
 # Install Ansible in a Python virtual environment.
@@ -147,7 +147,6 @@ fi
 /usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
 /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
 /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
-/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix -p /home/$CONTROLLER_USER/.ansible/collections/ansible_collections --force"
 if [ "$AWS_SUPPORT" = "true" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
 fi
@@ -166,7 +165,10 @@ else
   /usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision/config && git pull origin $CONFIG_REPO_BRANCH"
   /usr/bin/echo "-------------------------------------------------"
 fi
-/usr/bin/mkdir -p "/home/$CONTROLLER_USER/ce-provision/galaxy/roles"
+/usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/mkdir -p /home/$CONTROLLER_USER/ce-provision/galaxy/roles"
+/usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/mkdir -p /home/$CONTROLLER_USER/ce-provision/galaxy/ansible_collections"
+/usr/bin/su - "$CONTROLLER_USER" -c "cd /home/$CONTROLLER_USER/ce-provision && /home/$CONTROLLER_USER/ce-python/bin/ansible-galaxy collection install ansible.posix -p /home/$CONTROLLER_USER/ce-provision/galaxy/ansible_collections --force"
+
 # Create playbook for ce-provision.
 /bin/cat >"/home/$CONTROLLER_USER/ce-provision/provision.yml" << EOL
 ---
@@ -185,6 +187,12 @@ fi
     - name: Configure controller user.
       ansible.builtin.import_role:
         name: debian/user_provision
+    - name: Install and publish a GPG key for the controller user.
+      ansible.builtin.import_role:
+        name: debian/gpg_key
+    - name: Install SOPS for encrypting secrets in repositories with GPG.
+      ansible.builtin.import_role:
+        name: debian/sops
 EOL
 # Create vars file.
 /bin/cat >"/home/$CONTROLLER_USER/ce-provision/vars.yml" << EOL
@@ -233,9 +241,13 @@ user_provision:
   create: false
   create_home: false
   update_password: always
-  utility_username: "${CONTROLLER_USER}"
-  utility_host: localhost
-  sudoer: true
+  sudo_config:
+    entity_name: "${CONTROLLER_USER}"
+    hosts: "ALL"
+    operators: "(ALL)"
+    tags: "NOPASSWD:"
+    commands: "ALL"
+    filename: "${CONTROLLER_USER}"
   groups:
     - bypass2fa
   ssh_keys:
@@ -243,6 +255,13 @@ user_provision:
   ssh_private_keys: []
   known_hosts: []
   known_hosts_hash: true
+gpg_key:
+  - username: ${CONTROLLER_USER}
+    publish: true
+    key_type: RSA
+    key_length: 4096
+    email: "${CONTROLLER_USER}@${SERVER_HOSTNAME}"
+    expire: 0
 firewall_config:
   purge: true
   firewall_state: started

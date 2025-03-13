@@ -19,11 +19,18 @@ location @phpprocess {
 # so they get processed through the app level (and 404).
 location / {
 {% if nginx.ratelimitingcrawlers %}
-#    @todo
-#    limit_req zone=bots burst=5 nodelay;
+    # @todo
+    # limit_req zone=bots burst=5 nodelay;
 {% endif %}
-    try_files @rewrite /index.php?$query_string;
+    {{ nginx_location_behavior | join("\n    ") }}
 }
+
+# Fallback to Drupal PHP handler
+{% if nginx.drupal_fallback is defined %}
+location @drupal {
+{{ nginx.drupal_fallback | join("\n    ") }}
+}
+{% endif %}
 
 ############ Blacklist block.
 # Most of those should not be in the webroot in the first place,

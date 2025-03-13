@@ -85,7 +85,7 @@
   ansible.builtin.git:
     repo: "{{ ce_provision.own_repository | default('https://github.com/codeenigma/ce-provision.git') }}"
     dest: "{{ ce_provision.local_dir }}"
-    version: "{{ ce_provision.own_repository_branch | default('master') }}"
+    version: "{{ ce_provision.own_repository_branch | default('main') }}"
     update: true
     accept_hostkey: true #@todo?
   become: true
@@ -98,7 +98,7 @@
     repo: "{{ ce_provision.config_repository }}"
     accept_hostkey: true
     dest: "{{ ce_provision.local_dir }}/config"
-    version: "{{ ce_provision.config_repository_branch | default('master') }}"
+    version: "{{ ce_provision.config_repository_branch | default('main') }}"
   become: true
   become_user: "{{ ce_provision.username }}"
   when:
@@ -225,6 +225,7 @@
   vars:
     ansible_galaxy:
       username: "{{ ce_provision.username }}"
+      working_dir: "{{ ce_provision.local_dir }}"
       extra_params: --force
       galaxy_requirements_file: "{{ ce_provision.local_dir }}/roles/debian/ce_provision/meta/requirements-{{ ansible_distribution_major_version }}.yml"
       upgrade_galaxy:
@@ -238,6 +239,7 @@
   vars:
     ansible_galaxy:
       username: "{{ ce_provision.username }}"
+      working_dir: "{{ ce_provision.local_dir }}"
       extra_params: --force
       galaxy_requirements_file: "{{ ce_provision.galaxy_custom_requirements_file }}"
       upgrade_galaxy:
