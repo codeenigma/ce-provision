@@ -13,7 +13,6 @@
         - arn:aws:iam::aws:policy/AmazonSESFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
       policy_document: "{{ lookup('file', 'trusted_entitites.j2') }}"
-  register: _created_iam_lambda_role
 
 - name: Assign IAM role var.
   ansible.builtin.set_fact:
@@ -29,7 +28,10 @@
           Action: "iam:PassRole"
           Resource: "*"
     state: present
-  register: _pass_role
+
+- name: Assign IAM role var.
+  ansible.builtin.set_fact:
+    _pass_role: "{{ _aws_iam_role_result }}"
 
 - name:  Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
