@@ -1,0 +1,19 @@
+[Unit]
+Description=YACE Exporter Service
+After=network.target
+
+[Service]
+Type=simple
+User={{ yace_exporter_system_user }}
+Group={{ yace_exporter_system_group }}
+ExecStart={{ yace_exporter_install_dir }}/yace --config.file=/etc/yace_exporter/config.yml --listen-address={{ yace_exporter_listen_address }}
+Restart=on-failure
+
+
+SyslogIdentifier=pushgateway
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+
+[Install]
+WantedBy=multi-user.target
