@@ -45,6 +45,12 @@ aws_elb:
       #   - example-server-two
       targets_port: 80 # Port to forward to on target servers.
       modify_targets: false # Set to true if this is a standalone ELB, so the list of targets in the target group can be updated.
+      ## Target Group Stickiness. Disabled by default unless set otherwise. Uncomment if needed:
+      # stickiness_enabled: true
+      # stickiness_type: "lb_cookie" # Valid values are lb_cookie, app_cookie or source_ip.
+      # stickiness_app_cookie_name: "my_app_cookie"
+      # stickiness_app_cookie_duration: 86400
+      # stickiness_lb_cookie_duration: 86400
   # ELB settings
   idle_timeout: 60
   ip_address_type: "ipv4" # Can be 'ipv4' or 'dualstack' (the latter includes IPv4 and IPv6 addresses).
