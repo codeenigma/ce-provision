@@ -78,7 +78,7 @@
 - name: Write or update configuration file.
   ansible.builtin.copy:
     dest: "/etc/yace_exporter/config.yml"
-    content: "{{ yace_exporter_configuration | to_nice_yaml(indent=2,sort_keys=False) | indent(2,False)  }}"
+    content: "{{ yace_exporter_configuration | to_nice_yaml(sort_keys=False) }}"
     owner: "{{ yace_exporter_system_user }}"
     group: "{{ yace_exporter_system_group }}"
     mode: '0644'
