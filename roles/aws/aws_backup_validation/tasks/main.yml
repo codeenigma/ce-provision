@@ -18,21 +18,6 @@
   ansible.builtin.set_fact:
     _created_iam_lambda_role: "{{ _aws_iam_role_result }}"
 
-- name: Create an IAM Managed Policy for passing roles and setup IAM role.
-  amazon.aws.iam_managed_policy:
-    policy_name: "PassRole"
-    policy:
-      Version: "2012-10-17"
-      Statement:
-        - Effect: "Allow"
-          Action: "iam:PassRole"
-          Resource: "*"
-    state: present
-
-- name: Assign IAM role var.
-  ansible.builtin.set_fact:
-    _pass_role: "{{ _aws_iam_role_result }}"
-
 - name:  Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
     name: aws/aws_iam_role
@@ -47,7 +32,10 @@
       managed_policies:
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
-  register: _created_iam_lambda_role
+
+- name: Assign IAM role var.
+  ansible.builtin.set_fact:
+    _pass_role: "{{ _aws_iam_role_result }}"
 
 # TODO: Not all clients have verified identity
 #- name: Get verified domain.
