@@ -1,0 +1,12 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:sts::{{ ansible_ec2_instance_identity_document_accountid }}:assumed-role/{{ ansible_ec2_iam_instance_profile_role }}/{{ ansible_ec2_instance_id }}"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}

@@ -20,6 +20,8 @@ yace_exporter_configuration: {}
 #  discovery:
 #    jobs:
 #      - type: AWS/EC2
+#        roles:
+#          - roleArn: "arn:aws:iam::$ACCOUNT_ID:role/YaceExporterRole"
 #        regions:
 #          - eu-west-1
 #        metrics:
@@ -29,6 +31,8 @@ yace_exporter_configuration: {}
 #            period: 300
 #            length: 300
 #      - type: AWS/RDS
+#        roles:
+#          - roleArn: "arn:aws:iam::$ACCOUNT_ID:role/YaceExporterRole"
 #        regions:
 #          - eu-west-1
 #        searchTags:
