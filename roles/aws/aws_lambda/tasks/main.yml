@@ -5,7 +5,7 @@
     aws_s3_bucket:
       profile: "{{ _aws_profile }}"
       region: "{{ _aws_region }}"
-      name: "{{ aws_lambda.s3_bucket }}"
+      name: "ce-{{ _aws_profile }}-lambda-functions"
       tags: "{{ aws_lambda.tags}}"
       state: "present"
 

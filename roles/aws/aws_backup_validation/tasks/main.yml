@@ -41,10 +41,6 @@
 #- name: Get verified domain.
 #  ansible.builtin.include_tasks: get_valid_email.yml
 
-- name: Clear aws_lambda variable.
-  ansible.builtin.set_fact:
-    aws_lambda: ""
-
 - name: Create backup validation Lambda functions.
   ansible.builtin.include_role:
     name: aws/aws_lambda
