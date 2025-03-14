@@ -4,6 +4,7 @@ aws_lambda:
   timeout: "20" # Maximum number of seconds before function times out
   handler: "lambda_handler" # Name of main function
   s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+  function_file: "" # template to pass in S3 bucket
   runtime: "python3.12"
   role: ""
   tags: []

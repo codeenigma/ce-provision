@@ -51,6 +51,7 @@
       timeout: "{{ aws_backup_validation.timeout }}"
       role: "{{ _created_iam_lambda_role.iam_role }}"
       runtime: "{{ aws_backup_validation.runtime }}"
+      function_file: "{{ lookup('template', 'item' + '_validation.py.j2')  }}"
       tags:
         Name: "{{ item }}_backup_validation"
   loop: "{{ aws_backup_validation.resources }}"
@@ -65,6 +66,7 @@
       timeout: "30"
       role: "{{ _created_iam_lambda_role.iam_role }}"
       runtime: "{{ aws_backup_validation.runtime }}"
+      function_file: "{{ lookup('template', 'validation_report.py.j2')  }}"
       tags:
         Name: "validation_report"
 

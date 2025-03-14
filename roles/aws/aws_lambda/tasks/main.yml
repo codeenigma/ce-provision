@@ -16,7 +16,7 @@
 
 - name: Write Lambda function.
   ansible.builtin.template:
-    src: "{{ aws_lambda.name }}.py.j2"
+    src: "{{ aws_lambda.function_file }}"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
 
 - name: Create a zip archive of Lambda function.
