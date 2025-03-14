@@ -82,7 +82,7 @@
     description: "{{ aws_lambda._result[item + '_validation'].configuration.description }}"
     state: present
     region: "{{ _aws_region }}"
-    event_pattern: '{ "source": ["aws.backup"], "detail-type": ["Restore Job State Change"], "detail": { "resourceType": ["' + "{{ aws_lambda._result[item + '_validation'].item }} + '"], "status": ["COMPLETED"] } }'
+    event_pattern: '{ "source": ["aws.backup"], "detail-type": ["Restore Job State Change"], "detail": { "resourceType": ["{{ aws_lambda._result[item + '\''_validation'\''].item }}"], "status": ["COMPLETED"] } }'
     targets:
       - id: "{{ aws_lambda._result[item + '_validation'].configuration.function_name }}"
         arn: "{{ (aws_lambda._result[item + '_validation'].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
