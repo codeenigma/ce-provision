@@ -26,7 +26,7 @@
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
   when: aws_iam_role.policy_document | type_debug == 'str'
 
-- name: Create assume role policy document if predefined string is passed.
+- name: Create assume role policy document if template is provided.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ aws_iam_role.policy_document }}"
   when: aws_iam_role.policy_document | type_debug != 'str'

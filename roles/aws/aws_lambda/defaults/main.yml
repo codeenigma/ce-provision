@@ -1,0 +1,9 @@
+aws_lambda:
+  name: "lambda_function_name"
+  description: "Description for AWS Lambda function"
+  timeout: "20" # Maximum number of seconds before function times out
+  handler: "lambda_handler" # Name of main function
+  s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+  runtime: "python3.12"
+  role: ""
+  tags: []
