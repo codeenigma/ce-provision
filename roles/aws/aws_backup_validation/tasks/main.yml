@@ -32,6 +32,9 @@
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
 
+- name: Print aws_iam_role results.
+  ansible.builtin.debug:
+    msg: aws_iam_role
 # TODO: Not all clients have verified identity
 #- name: Get verified domain.
 #  ansible.builtin.include_tasks: get_valid_email.yml
