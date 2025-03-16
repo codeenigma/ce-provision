@@ -49,4 +49,4 @@
 
 - name: Register aws_lambda results.
   ansible.builtin.set_fact:
-    aws_lambda: "{{ aws_lambda | combine({'_result': {aws_lambda.name: _aws_lambda_result}}) }}"
+    aws_lambda: "{{ aws_lambda | combine({'_result': {aws_lambda.name: _aws_lambda_result}}, recursive=True) }}"
