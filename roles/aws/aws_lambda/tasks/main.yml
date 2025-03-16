@@ -9,6 +9,10 @@
       tags: "{{ aws_lambda.tags }}"
       state: "present"
 
+- name: Print aws_s3_bucket results.
+  ansible.builtin.debug:
+    msg: "{{ aws_s3_bucket }}"
+
 - name: Check and clean previous Lambda function.
   ansible.builtin.file:
     path: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
