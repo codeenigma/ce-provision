@@ -13,7 +13,6 @@
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
       policy_document: "{{ lookup('file', 'trusted_entitites.j2') }}"
 
-
 - name: Create backup validation Lambda functions.
   ansible.builtin.include_role:
     name: aws/aws_lambda
