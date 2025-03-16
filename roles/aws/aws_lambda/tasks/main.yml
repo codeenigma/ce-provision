@@ -47,7 +47,7 @@
     tags: "{{ aws_lambda.tags }}"
   register: _aws_lambda_result
 
-- name: Remove non UTF-8 items.
+- name: Remove variables containing "-".
   ansible.builtin.set_fact:
     aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['x-amzn-requestid']) }}"
 
