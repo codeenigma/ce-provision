@@ -11,6 +11,7 @@
   vars:
     aws_iam_role:
       name: LambdaBackupRestoreRole
+      aws_profile: "{{ _aws_profile }}"
       managed_policies:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
         - arn:aws:iam::aws:policy/AWSBackupFullAccess
@@ -18,6 +19,7 @@
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
       policy_document: "{{ lookup('file', 'trusted_entitites.j2') }}"
+
 
 - name: Create backup validation Lambda functions.
   ansible.builtin.include_role:
@@ -45,6 +47,7 @@
   vars:
     aws_iam_role:
       name: AWSBackupDefaultServiceRole
+      aws_profile: "{{ _aws_profile }}"
       inline_policies:
         name: "PassRole"
         resource: "*"
