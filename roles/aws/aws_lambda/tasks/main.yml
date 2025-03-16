@@ -49,7 +49,7 @@
 
 - name: Remove variables containing "-".
   ansible.builtin.set_fact:
-    aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['response_metadata']) }}"
+    _aws_lambda_result: "{{ _aws_lambda_result | ansible.utils.remove_keys(target=['response_metadata']) }}"
 
 - name: Register aws_lambda results.
   ansible.builtin.set_fact:
