@@ -42,7 +42,7 @@
     s3_key: "{{ aws_lambda.name }}.zip"
     state: present
     runtime: "{{ aws_lambda.runtime }}"
-    role: "{{ aws_lambda.role.arn }}"
+    role: "{{ aws_lambda.iam_role.arn }}"
     handler: "{{ aws_lambda.name }}.{{ aws_lambda.handler }}"
     tags: "{{ aws_lambda.tags }}"
   register: _aws_lambda_result
