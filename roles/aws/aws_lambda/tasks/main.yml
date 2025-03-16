@@ -5,8 +5,8 @@
     aws_s3_bucket:
       profile: "{{ _aws_profile }}"
       region: "{{ _aws_region }}"
-      name: "ce-{{ _aws_profile }}-lambda-functions"
-      tags: "{{ aws_lambda.tags}}"
+      name: "{{ aws_lambda.s3_bucket }}"
+      tags: "{{ aws_lambda.tags }}"
       state: "present"
 
 - name: Check and clean previous Lambda function.
