@@ -1,4 +1,10 @@
 ---
+- name: Remove non UTF-8 items.
+  ansible.builtin.set_fact:
+    aws_lambda: ""
+    aws_s3_bucket: ""
+    aws_iam_role: ""
+
 - name: Create a role and attach policies for Lambda backup validation.
   ansible.builtin.include_role:
     name: aws/aws_iam_role
