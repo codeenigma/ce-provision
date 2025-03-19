@@ -115,7 +115,7 @@
 
 - name: Print return information from the previous task
   ansible.builtin.debug:
-    var: "{{ _event_bridges }}"
+    var: _event_bridges
 
 - name: Update Lambda policy
   amazon.aws.lambda_policy:
