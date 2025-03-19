@@ -2,4 +2,4 @@
   ansible.builtin.lineinfile:
     path: /etc/bash.bashrc
     line: "export HISTTIMEFORMAT='%Y-%m-%d %T  '"
-    create: yes
+    create: true
