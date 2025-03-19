@@ -76,14 +76,14 @@
 
 - name: Create EventBridge for validation functions.
   amazon.aws.cloudwatchevent_rule:
-    name: "{{ aws_lambda._result[item + '_validation'].configuration.function_name }}"
-    description: "{{ aws_lambda._result[item + '_validation'].configuration.description }}"
+    name: "{{ aws_lambda._result['RestoreValidation_' + item].configuration.function_name }}"
+    description: "{{ aws_lambda._result['RestoreValidation_' + item].configuration.description }}"
     state: present
     region: "{{ _aws_region }}"
     event_pattern: '{ "source": ["aws.backup"], "detail-type": ["Restore Job State Change"], "detail": { "resourceType": ["{{ item }}"], "status": ["COMPLETED"] } }'
     targets:
-      - id: "{{ aws_lambda._result[item + '_validation'].configuration.function_name }}"
-        arn: "{{ (aws_lambda._result[item + '_validation'].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
+      - id: "{{ aws_lambda._result['RestoreValidation_' + item].configuration.function_name }}"
+        arn: "{{ (aws_lambda._result['RestoreValidation_' + item].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _event_bridges
   loop: "{{ aws_backup_validation.resources }}"
 
