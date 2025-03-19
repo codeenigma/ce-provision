@@ -1,4 +1,4 @@
-- name: Create API gateway.
+- name: Get account ID for ARN.
   ansible.builtin.command: >-
     aws sts get-caller-identity
     --query Account

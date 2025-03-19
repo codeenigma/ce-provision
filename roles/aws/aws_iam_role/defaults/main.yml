@@ -3,6 +3,10 @@ aws_iam_role:
   aws_profile: "{{ _aws_profile }}"
   # Pass either names or ARNs for the role.
   managed_policies: []
+  inline_policies:
+    name: "example_inline_polcy" # Name of inline policy
+    resource: "*"
+    action: []
   # Which document policy to apply.
   # Current options are 'ec2', 'ecs' or 'backup'
   policy_document: ec2
