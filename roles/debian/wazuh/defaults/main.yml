@@ -79,6 +79,7 @@ wazuh:
     wazuh_manager_mailto:
       - admin@example.net
     wazuh_manager_email_smtp_server: localhost
+    wazuh_manager_email_notification: "no"
     wazuh_manager_email_from: wazuh@example.net
     wazuh_manager_email_maxperhour: 12
     wazuh_manager_email_queue_size: 131072
