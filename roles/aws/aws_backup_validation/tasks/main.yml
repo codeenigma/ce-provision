@@ -113,15 +113,11 @@
   ansible.builtin.set_fact:
     _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
 
-- name: Print return information from the previous task
-  ansible.builtin.debug:
-    var: _event_bridges
-
 - name: Update Lambda policy
   amazon.aws.lambda_policy:
     state: present
-    function_name: "{{ item.item.configuration.function_name }}"
-    statement_id: "{{ item.item.configuration.function_name }}_{{ _rand_str }}"
+    function_name: "{{ item.rule.name }}"
+    statement_id: "{{ item.rule.name }}_{{ _rand_str }}"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ item.rule.arn }}"
@@ -132,7 +128,7 @@
   amazon.aws.lambda_policy:
     state: present
     function_name: "validation_report"
-    statement_id: "{{ aws_lambda._result['validation_report'].configuration.function_name }}_{{ _rand_str }}"
+    statement_id: "validation_report_{{ _rand_str }}"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ _validation_event.rule.arn }}"
