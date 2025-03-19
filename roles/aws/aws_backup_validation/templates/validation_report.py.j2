@@ -98,9 +98,9 @@ failed_job = backup_cli.list_restore_jobs(
   {% endfor %}
 
   if len(failed_jobs) > 0:
-    mail_title = "Failed!"
+    mail_title = "🔴 Failed!"
   else:
-    mail_title = "Success!"
+    mail_title = "🟢 Success!"
   print("Successful restore jobs:")
   print(completed_jobs)
 

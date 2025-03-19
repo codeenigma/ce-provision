@@ -92,7 +92,7 @@
     description: "{{ _acl.description }}"
     scope: "{{ _acl.scope }}"
     region: "{{ _acl.region }}"
-    default_action: Allow # or "Block"
+    default_action: "{{ _acl.default_action }}" # or "Block"
     sampled_requests: false
     cloudwatch_metrics: true # or "false" to disable metrics
     metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)
