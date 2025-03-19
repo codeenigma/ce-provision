@@ -5,7 +5,7 @@
     name: "{{ aws_s3_bucket.name }}"
     tags: "{{ aws_s3_bucket.tags | combine({'Name': aws_s3_bucket.name}) }}"
     state: present
-  register: _aws_s3_bucket_bucket
+  register: _aws_s3_bucket
 
 - name: Create a matching policy.
   amazon.aws.iam_managed_policy:
@@ -20,8 +20,8 @@
           Resource: "arn:aws:s3:::{{ aws_s3_bucket.name }}"
     make_default: true
     state: present
-  register: _aws_s3_bucket_bucket_policy
+  register: _aws_s3_bucket_policy
 
 - name: Register aws_s3_bucket results.
   ansible.builtin.set_fact:
-    aws_s3_bucket: "{{ aws_s3_bucket | combine({'_result': {aws_s3_bucket.name | replace('-','_'): {'bucket': _aws_s3_bucket_bucket, 'policy': _aws_s3_bucket_bucket_policy}}}, recursive=True) }}"
+    aws_s3_bucket: "{{ aws_s3_bucket | combine({'_result': {aws_s3_bucket.name | replace('-','_'): {'bucket': _aws_s3_bucket, 'policy': _aws_s3_bucket_policy}}}, recursive=True) }}"
