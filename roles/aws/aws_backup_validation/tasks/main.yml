@@ -74,16 +74,23 @@
       tags:
         Name: "validation_report"
 
+- name: Get account ID for ARN.
+  ansible.builtin.command: >-
+    aws sts get-caller-identity
+    --query Account
+    --output text
+  register: _acc_id
+
 - name: Create EventBridge for validation functions.
   amazon.aws.cloudwatchevent_rule:
-    name: "{{ aws_lambda._result['RestoreValidation_' + item].configuration.function_name }}"
-    description: "{{ aws_lambda._result['RestoreValidation_' + item].configuration.description }}"
+    name: "RestoreValidation_{{ item }}"
+    description: "{{ aws_backup_validation.description }}"
     state: present
     region: "{{ _aws_region }}"
     event_pattern: '{ "source": ["aws.backup"], "detail-type": ["Restore Job State Change"], "detail": { "resourceType": ["{{ item }}"], "status": ["COMPLETED"] } }'
     targets:
-      - id: "{{ aws_lambda._result['RestoreValidation_' + item].configuration.function_name }}"
-        arn: "{{ (aws_lambda._result['RestoreValidation_' + item].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
+      - id: "RestoreValidation_{{ item }}"
+        arn: "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:RestoreValidation_{{ item }}"
   register: _event_bridges
   loop: "{{ aws_backup_validation.resources }}"
 
