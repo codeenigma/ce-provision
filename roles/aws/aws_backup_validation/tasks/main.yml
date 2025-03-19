@@ -34,6 +34,10 @@
         Name: "{{ item }}_backup_validation"
   loop: "{{ aws_backup_validation.resources }}"
 
+- name: Remove variables containing "-".
+  ansible.builtin.set_fact:
+    aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['response_metadata', 'function_file']) }}"
+
 - name: Print aws_lambda results.
   ansible.builtin.debug:
     msg: "{{ aws_lambda }}"
