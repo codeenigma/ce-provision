@@ -9,10 +9,6 @@
       tags: []
       state: "present"
 
-- name: Print aws_s3_bucket results.
-  ansible.builtin.debug:
-    msg: "{{ aws_s3_bucket }}"
-
 - name: Check and clean previous Lambda function.
   ansible.builtin.file:
     path: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
@@ -50,10 +46,6 @@
     handler: "{{ aws_lambda.name }}.{{ aws_lambda.handler }}"
     tags: "{{ aws_lambda.tags }}"
   register: _aws_lambda_result
-
-- name: Remove variables containing "-".
-  ansible.builtin.set_fact:
-    _aws_lambda_result: "{{ _aws_lambda_result | ansible.utils.remove_keys(target=['response_metadata', 'function_file']) }}"
 
 - name: Register aws_lambda results.
   ansible.builtin.set_fact:
