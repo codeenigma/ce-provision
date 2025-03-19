@@ -81,6 +81,10 @@
     --output text
   register: _acc_id
 
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _acc_id: "{{ _acc_id.stdout | from_json }}"
+
 - name: Create EventBridge for validation functions.
   amazon.aws.cloudwatchevent_rule:
     name: "RestoreValidation_{{ item }}"
