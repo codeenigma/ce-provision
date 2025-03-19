@@ -62,13 +62,10 @@
 #- name: Get verified domain.
 #  ansible.builtin.include_tasks: get_valid_email.yml
 
-- name: Print aws_iam_role results.
-  ansible.builtin.debug:
-    msg: "{{ aws_iam_role }}"
-
-- name: Print aws_s3_bucket results.
-  ansible.builtin.debug:
-    msg: "{{ aws_s3_bucket }}"
+- name: Unset aws_s3_bucket and aws_lambda dicts.
+  ansible.builtin.set_fact:
+    aws_s3_bucket:
+    aws_lambda:
 
 - name: Create validation report function.
   ansible.builtin.include_role:
