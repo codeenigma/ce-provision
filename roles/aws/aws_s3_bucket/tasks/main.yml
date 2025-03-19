@@ -1,3 +1,7 @@
+- name: Print aws_s3_bucket results.
+  ansible.builtin.debug:
+    msg: "{{ aws_s3_bucket }}"
+
 - name: Create an S3 bucket.
   amazon.aws.s3_bucket:
     profile: "{{ _aws_profile }}"

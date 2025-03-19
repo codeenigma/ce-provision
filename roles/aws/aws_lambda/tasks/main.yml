@@ -6,7 +6,7 @@
       profile: "{{ _aws_profile }}"
       region: "{{ _aws_region }}"
       name: "{{ aws_lambda.s3_bucket }}"
-      tags: "{{ aws_lambda.tags }}"
+      tags: []
       state: "present"
 
 - name: Print aws_s3_bucket results.
