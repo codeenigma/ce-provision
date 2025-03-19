@@ -62,6 +62,10 @@
   ansible.builtin.debug:
     msg: "{{ aws_iam_role }}"
 
+- name: Print aws_s3_bucket results.
+  ansible.builtin.debug:
+    msg: "{{ aws_s3_bucket }}"
+
 - name: Create validation report function.
   ansible.builtin.include_role:
     name: aws/aws_lambda
