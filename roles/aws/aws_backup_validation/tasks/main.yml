@@ -1,6 +1,6 @@
 ---
 - name: Create a role and attach policies for Lambda backup validation.
-  ansible.builtin.import_role:
+  ansible.builtin.include_role:
     name: aws/aws_iam_role
   vars:
     aws_iam_role:
@@ -19,7 +19,7 @@
     msg: "{{ aws_iam_role }}"
 
 - name: Create backup validation Lambda functions.
-  ansible.builtin.import_role:
+  ansible.builtin.include_role:
     name: aws/aws_lambda
   vars:
     aws_lambda:
@@ -39,7 +39,7 @@
     msg: "{{ aws_lambda }}"
 
 - name: Create an IAM Managed Policy for passing roles and setup IAM role.
-  ansible.builtin.import_role:
+  ansible.builtin.include_role:
     name: aws/aws_iam_role
   vars:
     aws_iam_role:
@@ -63,7 +63,7 @@
     msg: "{{ aws_iam_role }}"
 
 - name: Create validation report function.
-  ansible.builtin.import_role:
+  ansible.builtin.include_role:
     name: aws/aws_lambda
   vars:
     aws_lambda:
