@@ -1,0 +1,5 @@
+- name: Copy bash histformat startup option.
+  ansible.builtin.lineinfile:
+    path: /etc/bash.bashrc
+    line: "export HISTTIMEFORMAT='%Y-%m-%d %T  '"
+    create: yes
