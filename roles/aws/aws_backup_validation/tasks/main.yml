@@ -113,6 +113,10 @@
   ansible.builtin.set_fact:
     _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
 
+- name: Print return information from the previous task
+  ansible.builtin.debug:
+    var: "{{ _event_bridges }}"
+
 - name: Update Lambda policy
   amazon.aws.lambda_policy:
     state: present
