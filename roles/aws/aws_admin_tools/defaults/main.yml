@@ -2,12 +2,12 @@ aws_admin_tools:
   runtime: "python3.12"
   timeout: 20
   allowed_ips:
-    - 3.11.82.252/32 # Ip of server with access to API-s
+    - 192.168.1.1/32 # Ip of server with access to API-s
   functions:
     - name: "GetForecastedCosts"
       type: GET
       policies:
-        - "arn:aws:iam::aws:policy/job-function/Billing"
+        - "arn:aws:iam::{{ _acc_id }}:policy/CEBillingPolicy" # Custom policy
     - name: "ChangeASGScaling"
       type: POST
       policies:

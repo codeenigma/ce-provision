@@ -55,6 +55,7 @@
     wazuh_manager_mailto: "{{ wazuh.manager.wazuh_manager_mailto }}"
     wazuh_manager_email_smtp_server: "{{ wazuh.manager.wazuh_manager_email_smtp_server }}"
     wazuh_manager_email_from: "{{ wazuh.manager.wazuh_manager_email_from }}"
+    wazuh_manager_email_notification: "{{ wazuh.manager.wazuh_manager_email_notification }}"
     wazuh_manager_email_maxperhour: "{{ wazuh.manager.wazuh_manager_email_maxperhour }}"
     wazuh_manager_email_queue_size: "{{ wazuh.manager.wazuh_manager_email_queue_size }}"
     wazuh_manager_email_log_source: "{{ wazuh.manager.wazuh_manager_email_log_source }}"
