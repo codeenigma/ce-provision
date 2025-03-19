@@ -30,10 +30,6 @@
         Name: "{{ item }}_backup_validation"
   loop: "{{ aws_backup_validation.resources }}"
 
-- name: Pause for 5 seconds.
-  ansible.builtin.pause:
-    seconds: 5
-
 #- name: Remove variables containing "-".
 #  ansible.builtin.set_fact:
 #    aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['response_metadata', 'function_file']) }}"
@@ -71,7 +67,7 @@
       name: "validation_report"
       description: "{{ aws_backup_validation.description }}"
       timeout: "30"
-      role: "{{ aws_iam_role._result['AWSBackupDefaultServiceRole'] }}"
+      role: "{{ aws_iam_role._result['LambdaBackupRestoreRole'] }}"
       runtime: "{{ aws_backup_validation.runtime }}"
       function_file: "{{ lookup('template', 'validation_report.py.j2') }}"
       s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
