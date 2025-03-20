@@ -41,6 +41,10 @@
     _assume_role_policy: "{{ aws_iam_role.policy_document }}"
   when: aws_iam_role.policy_document | type_debug != 'string'
 
+- name: Debug assume role policy content
+  ansible.builtin.debug:
+    var: _assume_role_policy
+
 - name: Create an IAM role.
   amazon.aws.iam_role:
     profile: "{{ aws_iam_role.aws_profile }}"
