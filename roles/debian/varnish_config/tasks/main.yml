@@ -20,5 +20,4 @@
       notify:
         - reload systemd
         - restart varnish
-
 # TO DO: add varnish to unattended upgrades
