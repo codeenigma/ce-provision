@@ -23,7 +23,7 @@
 
 - name: Check if policy document file exists.
   ansible.builtin.stat:
-    path: "{{ playbook_dir }}/files/{{ aws_iam_role.policy_document + '_document_policy.json' }}"
+    path: "{{ role_path }}/files/{{ aws_iam_role.policy_document }}_document_policy.json"
   register: policy_file_stat
 
 - name: Fail if the assume role policy document file does not exist.
@@ -33,7 +33,7 @@
 
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
-    _assume_role_policy: lookup('file', 'files/' + aws_iam_role.policy_document + '_document_policy.json')
+    _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
   when: aws_iam_role.policy_document | type_debug == 'string' and policy_file_stat.stat.exists
 
 - name: Create assume role policy document if template is provided.
