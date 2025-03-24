@@ -1,0 +1,49 @@
+import json
+import boto3
+
+# Defining Clients
+ec2_cli = boto3.client("ec2", region_name="{{ _aws_region }}")
+
+def lambda_handler(event, context):
+
+  print("Gathering instance details.")
+  ec2_instances=ec2_cli.describe_instances()
+
+  instance_exist = False
+  Ec2_info_list=[]
+
+  for reservation in ec2_instances["Reservations"]:
+    for instance in reservation["Instances"]:
+      pub_ip = ""
+      priv_ip = ""
+      inst_name = ""
+
+      if "PublicIpAddress" in instance:
+        pub_ip = instance['PublicIpAddress']
+      else:
+        pub_ip = "-"
+      if "PrivateIpAddress" in instance:
+        priv_ip = instance['PrivateIpAddress']
+      else:
+        priv_ip = "-"
+
+      if "Tags" in instance:
+        for name in instance['Tags']:
+          if name['Key'] == 'Name':
+            inst_name = name['Value']
+      else:
+        inst_name = "-"
+
+      new_dict={
+        'EC2 name': inst_name,
+        'State': instance['State'],
+        'Public IP': pub_ip,
+        'Private IP': priv_ip,
+        'Instance type': instance['InstanceType']
+      }
+      Ec2_info_list.append(new_dict)
+
+  return {
+    'statusCode': 200,
+    'EC2 info': Ec2_info_list
+  }

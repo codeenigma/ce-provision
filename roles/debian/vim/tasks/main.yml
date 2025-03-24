@@ -1,0 +1,21 @@
+- name: Check if vim after-plugins directory exists.
+  ansible.builtin.stat:
+    path: "/etc/vim/after/plugin"
+  register: vim_afterplugins
+
+- name: Create vim after-plugins directory.
+  ansible.builtin.file:
+    path: /etc/vim/after/plugin
+    state: directory
+    mode: '0755'
+  when:
+    - not vim_afterplugins.stat.exists
+
+- name: Copy vim mouse options plugin.
+  ansible.builtin.template:
+    src: "mouse.vim.j2"
+    dest: "/etc/vim/after/plugin/mouse.vim"
+    owner: root
+    group: root
+    mode: 0755
+    force: true
