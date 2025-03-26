@@ -33,7 +33,7 @@
       managed_policies:
         - "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
         - "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
-      policy_document: "backup"
+      policy_document: backup
   when: aws_backup.backup.iam_role_arn == "Default"
 
 - name: Set IAM role ARN for backups.
