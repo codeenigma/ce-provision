@@ -21,10 +21,6 @@
     _combined_policies: "{{ aws_iam_role.managed_policies }}"
   when: inline_policies.action is not defined or inline_policies.action == 0
 
-- name: Check polcy document
-  ansible.builtin.debug:
-    msg: "{{ aws_iam_role.policy_document | type_debug }}"
-
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"

@@ -12,6 +12,7 @@
         - arn:aws:iam::aws:policy/AmazonRDSFullAccess
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
         - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/AmazonSESFullAccess
       policy_document: "{{ lookup('file', 'trusted_entitites.j2') }}"
 
 - name: Create backup validation Lambda functions.
