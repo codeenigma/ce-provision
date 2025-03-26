@@ -34,21 +34,21 @@
 #  ansible.builtin.set_fact:
 #    aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['response_metadata', 'function_file']) }}"
 
-#- name: Create an IAM Managed Policy for passing roles and setup IAM role.
-#  ansible.builtin.include_role:
-#    name: aws/aws_iam_role
-#  vars:
-#    aws_iam_role:
-#      name: AWSBackupDefaultServiceRole
-#      aws_profile: "{{ _aws_profile }}"
-#      inline_policies:
-#        name: "PassRole"
-#        resource: "*"
-#        action: "iam:PassRole"
-#      policy_document: "{{ lookup('file', 'pass_role_backup.j2') }}"
-#      managed_policies:
-#        - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
-#        - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
+- name: Create an IAM Managed Policy for passing roles and setup IAM role.
+  ansible.builtin.include_role:
+    name: aws/aws_iam_role
+  vars:
+    aws_iam_role:
+      name: AWSBackupDefaultServiceRole
+      aws_profile: "{{ _aws_profile }}"
+      inline_policies:
+        name: "PassRole"
+        resource: "*"
+        action: "iam:PassRole"
+      policy_document: "{{ lookup('file', 'pass_role_backup.j2') }}"
+      managed_policies:
+        - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
+        - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
 
 # TODO: Not all clients have verified identity
 #- name: Get verified domain.
