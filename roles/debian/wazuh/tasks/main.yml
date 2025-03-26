@@ -134,15 +134,15 @@
   when: filebeat_exists
 
 - name: Check if wazuh-manager service exists
-  ansible.builtin.systemd:
-    name: wazuh-manager
+  ansible.builtin.command: systemctl list-units --full -all | grep -q wazuh-manager
   register: wazuh_service
   ignore_errors: true
+  changed_when: false
 
 - name: Generate random password
   ansible.builtin.set_fact:
     authd_password: "{{ lookup('password', '/dev/null length=32') }}"
-  when: not wazuh_service.failed | default(true)
+  when: wazuh_service.rc == 0
 
 - name: Write the password to /var/ossec/etc/authd.pass
   ansible.builtin.copy:
@@ -151,10 +151,10 @@
     mode: '0640'
     owner: root
     group: wazuh
-  when: not wazuh_service.failed | default(true)
+  when: wazuh_service.rc == 0
 
 - name: Restart wazuh-manager to apply changes
   ansible.builtin.systemd:
     name: wazuh-manager
     state: restarted
-  when: not wazuh_service.failed | default(true)
+  when: wazuh_service.rc == 0
