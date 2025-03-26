@@ -3,7 +3,11 @@
     _policies: "{{ item.policies + ['arn:aws:iam::aws:policy/CloudWatchLogsFullAccess'] }}"
 
 - name: Create a role and attach policies.
-  amazon.aws.iam_role:
-    name: "API_{{ item.name }}"
-    assume_role_policy_document: "{{ lookup('template', 'trusted_entitites.j2') }}"
-    managed_policies: "{{ _policies }}"
+  ansible.builtin.include_role:
+    name: aws/aws_iam_role
+  vars:
+    aws_iam_role:
+      name: "API_{{ item.name }}"
+      aws_profile: "{{ _aws_profile }}"
+      managed_policies: "{{ _policies }}"
+      policy_document: "{{ lookup('template', 'trusted_entitites.j2') }}"
