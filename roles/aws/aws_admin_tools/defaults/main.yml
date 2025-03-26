@@ -11,6 +11,7 @@ aws_admin_tools:
         resource: "*"
         acton:
           - "ce:*"
+      policies: []
     - name: "ChangeASGScaling"
       type: POST
       policies:
