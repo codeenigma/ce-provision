@@ -1,0 +1,22 @@
+aws_admin_tools:
+  runtime: "python3.12"
+  timeout: 20
+  allowed_ips:
+    - 192.168.1.1/32 # Ip of server with access to API-s
+  functions:
+    - name: "GetForecastedCosts"
+      type: GET
+      inline_policies:
+        name: "{{ _aws_profile }}Billing"
+        resource: "*"
+        acton:
+          - "ce:*"
+      policies: []
+    - name: "ChangeASGScaling"
+      type: POST
+      policies:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+    - name: "GetListOfEC2"
+      type: GET
+      policies:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess

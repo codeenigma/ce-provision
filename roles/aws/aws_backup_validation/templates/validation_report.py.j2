@@ -42,15 +42,21 @@ def lambda_handler(event, context):
   failed_validation = False
   global mail_body
   last_restore_valdation_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+  completed_jobs=[]
+  failed_jobs=[]
 
   print("Getting list of successful restoration.")
-  completed_jobs = backup_cli.list_restore_jobs(
-          ByCreatedAfter=last_restore_valdation_date,
-          ByStatus='COMPLETED'
+  {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
+completed_job = backup_cli.list_restore_jobs(
+    ByCreatedAfter=last_restore_valdation_date,
+    ByStatus='COMPLETED',
+    ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
   )
+  completed_jobs+=completed_job['RestoreJobs']
+  {% endfor %}
 
   print("Getting instance details.")
-  for inst in completed_jobs['RestoreJobs']:
+  for inst in completed_jobs:
     success_restore = True
     print("Getting instance arn.")
     ami_arn = inst['RecoveryPointArn'].split(':')[2]
@@ -81,21 +87,25 @@ def lambda_handler(event, context):
     set_mail_body(success_restore, inst, instance_name, ami_id)
 
   print(mail_body)
-
-  failed_jobs = backup_cli.list_restore_jobs(
-          ByCreatedAfter=last_restore_valdation_date,
-          ByStatus='FAILED'
+  print("Getting list of failed restoration.")
+  {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
+failed_job = backup_cli.list_restore_jobs(
+    ByCreatedAfter=last_restore_valdation_date,
+    ByStatus='FAILED',
+    ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
   )
+  failed_jobs += failed_job['RestoreJobs']
+  {% endfor %}
 
-  if len(failed_jobs['RestoreJobs']) > 0:
-    mail_title = "Failed!"
+  if len(failed_jobs) > 0:
+    mail_title = "🔴 Failed!"
   else:
-    mail_title = "Success!"
+    mail_title = "🟢 Success!"
   print("Successful restore jobs:")
-  print(completed_jobs['RestoreJobs'])
+  print(completed_jobs)
 
   print("Failed restore jobs:")
-  print(failed_jobs['RestoreJobs'])
+  print(failed_jobs)
 
   print("Sending email!")
   response = ses_cli.send_email(

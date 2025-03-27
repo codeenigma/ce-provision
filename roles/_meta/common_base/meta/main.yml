@@ -28,6 +28,8 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/locales
   - role: debian/user_root
+  - role: debian/swap
+    when: is_local is not defined or not is_local
   - role: debian/apt_extra_packages
   - role: debian/apt_unattended_upgrades
     when: is_local is not defined or not is_local
@@ -35,10 +37,17 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/rkhunter
     when: is_local is not defined or not is_local
+  - role: debian/rsyslog
   - role: debian/postfix
   - role: debian/clamav
     when: is_local is not defined or not is_local
   - role: debian/firewall_config
     when: is_local is not defined or not is_local
   - role: debian/sudo_config
+    when: is_local is not defined or not is_local
+  - role: debian/vim
+    when: is_local is not defined or not is_local
+  - role: debian/bash
+    when: is_local is not defined or not is_local
+  - role: debian/collectd
     when: is_local is not defined or not is_local

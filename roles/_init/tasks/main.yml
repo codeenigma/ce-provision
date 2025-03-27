@@ -107,6 +107,7 @@
     - current_play_dir_md5 == previous_play_dir_md5
     - not _init.force_play
     - not _ce_provision_force_play
+    - not is_local
 
 - name: Include vars directories.
   ansible.builtin.include_vars:

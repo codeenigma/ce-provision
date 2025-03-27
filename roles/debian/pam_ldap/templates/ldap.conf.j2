@@ -1,4 +1,5 @@
 BASE {{ pam_ldap.lookup_base }}
+
 URI {{ pam_ldap.endpoints | join(' ') }}
 {% if pam_ldap.ssl_use_system_ca %}
 TLS_CACERT /etc/ssl/certs/ca-certificates.crt
