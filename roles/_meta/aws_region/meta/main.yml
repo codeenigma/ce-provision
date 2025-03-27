@@ -8,3 +8,4 @@ dependencies:
   - role: aws/aws_cloudwatch_log_group
   - role: aws/aws_backup
   - role: aws/aws_backup_sns
+  - role: aws/aws_admin_tools

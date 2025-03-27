@@ -55,6 +55,7 @@
     wazuh_manager_mailto: "{{ wazuh.manager.wazuh_manager_mailto }}"
     wazuh_manager_email_smtp_server: "{{ wazuh.manager.wazuh_manager_email_smtp_server }}"
     wazuh_manager_email_from: "{{ wazuh.manager.wazuh_manager_email_from }}"
+    wazuh_manager_email_notification: "{{ wazuh.manager.wazuh_manager_email_notification }}"
     wazuh_manager_email_maxperhour: "{{ wazuh.manager.wazuh_manager_email_maxperhour }}"
     wazuh_manager_email_queue_size: "{{ wazuh.manager.wazuh_manager_email_queue_size }}"
     wazuh_manager_email_log_source: "{{ wazuh.manager.wazuh_manager_email_log_source }}"
@@ -131,3 +132,29 @@
     name: filebeat
     state: restarted
   when: filebeat_exists
+
+- name: Check if wazuh-manager service exists
+  ansible.builtin.command: systemctl list-unit-files --type=service --no-pager
+  register: wazuh_service
+  ignore_errors: true
+  changed_when: false
+
+- name: Generate random password
+  ansible.builtin.set_fact:
+    authd_password: "{{ lookup('password', '/dev/null length=32') }}"
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
+
+- name: Write the password to /var/ossec/etc/authd.pass
+  ansible.builtin.copy:
+    dest: /var/ossec/etc/authd.pass
+    content: "{{ authd_password }}"
+    mode: '0640'
+    owner: root
+    group: wazuh
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
+
+- name: Restart wazuh-manager to apply changes
+  ansible.builtin.systemd:
+    name: wazuh-manager
+    state: restarted
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
