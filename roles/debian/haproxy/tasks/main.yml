@@ -23,7 +23,7 @@
     mode: 0644
     force: true
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

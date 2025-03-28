@@ -11,7 +11,7 @@
     loop_var: user_creds
   no_log: true
 
-- name: Generate AWS credentials
+- name: Generate AWS credentials.
   ansible.builtin.template:
     src: credentials.j2
     dest: "/home/{{ user_creds.user }}/.aws/credentials"

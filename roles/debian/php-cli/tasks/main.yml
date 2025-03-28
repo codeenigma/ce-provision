@@ -8,25 +8,25 @@
   loop_control:
     loop_var: version
 
-- name: Set php version (phar)
+- name: Set php version (phar).
   ansible.builtin.command: "update-alternatives --set phar /usr/bin/phar{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
-- name: Set php version (phar.phar)
+- name: Set php version (phar.phar).
   ansible.builtin.command: "update-alternatives --set phar.phar /usr/bin/phar.phar{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
-- name: Set php version (php)
+- name: Set php version (php).
   ansible.builtin.command: "update-alternatives --set php /usr/bin/php{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
 
-- name: Set php version (php-config)
+- name: Set php version (php-config).
   ansible.builtin.command: "update-alternatives --set php-config /usr/bin/php-config{{ version }}"
   with_items: "{{ php.version }}"
   loop_control:
@@ -41,7 +41,7 @@
   loop_control:
     loop_var: version
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

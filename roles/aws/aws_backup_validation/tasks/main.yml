@@ -99,7 +99,7 @@
   loop: "{{ aws_backup_validation.resources }}"
   register: _event_bridges
 
-- name: Create schedule for validation reports
+- name: Create schedule for validation reports.
   amazon.aws.cloudwatchevent_rule:
     name: validation_report
     schedule_expression: "cron(0 0 ? * MON *)"
@@ -110,11 +110,11 @@
         arn: "{{ (aws_lambda._result['validation_report'].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _validation_event
 
-- name: Generate unique string
+- name: Generate unique string.
   ansible.builtin.set_fact:
     _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
 
-- name: Update Lambda policy
+- name: Update Lambda policy.
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ item.rule.name }}"
@@ -125,7 +125,7 @@
     region: "{{ _aws_region }}"
   loop: "{{ _event_bridges.results }}"
 
-- name: Update lambda validation report policy
+- name: Update lambda validation report policy.
   amazon.aws.lambda_policy:
     state: present
     function_name: "validation_report"

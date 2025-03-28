@@ -1,5 +1,5 @@
 ---
-- name: Create amazon ip reputation rule
+- name: Create amazon ip reputation rule.
   ansible.builtin.set_fact:
     amazon_ip_reputation:
       name: "AWS-AWSManagedRulesAmazonIpReputationList"
@@ -27,6 +27,6 @@
   ansible.builtin.set_fact:
     amazon_ip_reputation: "{{ amazon_ip_reputation | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [amazon_ip_reputation] }}"

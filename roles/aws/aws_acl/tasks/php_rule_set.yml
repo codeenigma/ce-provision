@@ -1,5 +1,5 @@
 ---
-- name: Create php rule set rule
+- name: Create php rule set rule.
   ansible.builtin.set_fact:
     php_rule_set:
       name: "AWS-AWSManagedRulesPHPRuleSet"
@@ -23,6 +23,6 @@
   ansible.builtin.set_fact:
     php_rule_set: "{{ php_rule_set | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [php_rule_set] }}"

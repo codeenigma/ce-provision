@@ -17,7 +17,7 @@
     region: "{{ _acl.region }}"
   register: _ip_set_info
 
-- name: Set action string
+- name: Set action string.
   ansible.builtin.set_fact:
     _action: "{ {{ _ip_set.action }}: {} }"
 

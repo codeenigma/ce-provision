@@ -1,9 +1,9 @@
 ---
-- name: Set action string
+- name: Set action string.
   ansible.builtin.set_fact:
     _action: "{ {{ _cc_set.action }}: {} }"
 
-- name: Create country block rule
+- name: Create country block rule.
   ansible.builtin.set_fact:
     cc_rule:
       name: "{{ _cc_set.name }}"
@@ -25,6 +25,6 @@
   ansible.builtin.set_fact:
     cc_rule: "{{ cc_rule | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [cc_rule] }}"

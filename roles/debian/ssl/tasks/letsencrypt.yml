@@ -88,7 +88,7 @@
     - not _letsencrypt_cert.stat.exists
     - _ssl_services | length > 0
 
-- name: Clean up _letsencrypt_domain_string variable .
+- name: Clean up _letsencrypt_domain_string variable.
   ansible.builtin.set_fact:
     _letsencrypt_domain_string: ""
 

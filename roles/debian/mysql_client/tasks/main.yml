@@ -29,7 +29,7 @@
     group: "{{ mysql_client.creds_file_group }}"
     mode: 0600
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

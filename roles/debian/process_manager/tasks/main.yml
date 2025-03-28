@@ -1,5 +1,6 @@
 ---
-- ansible.builtin.set_fact:
+- name: "Set _process_manager_service variable."
+  ansible.builtin.set_fact:
     _process_manager_service: "{{ process_manager.process_name }}.service"
 
 - name: "Load all available services."
