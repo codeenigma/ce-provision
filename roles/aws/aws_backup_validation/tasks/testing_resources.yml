@@ -10,19 +10,19 @@
   register: _testing_selection_exists
   when: _testing_plan_info.stdout != "null"
 
-- name: Get default backup role arn
+- name: Get default backup role arn.
   amazon.aws.iam_role_info:
     name: AWSBackupDefaultServiceRole
   register: _default_backup_role_arn
 
-- name: Get VPC info
+- name: Get VPC info.
   amazon.aws.ec2_vpc_net_info:
     region: "{{ _aws_region }}"
     filters:
       "tag:Name": "{{ aws_vpc.name }}"
   register: _main_vpc_info
 
-- name: Get subnets info
+- name: Get subnets info.
   amazon.aws.ec2_vpc_subnet_info:
     region: "{{ _aws_region }}"
     filters:
@@ -74,7 +74,7 @@
   register: _restore_testing_query
   when: _instance_type_restore is defined
 
-- name: Check if protected reource exist
+- name: Check if protected reource exist.
   ansible.builtin.command: >
     aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
   register: _protected_res

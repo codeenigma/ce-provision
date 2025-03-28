@@ -1,5 +1,5 @@
 ---
-- name: Create a role and attach policies
+- name: Create a role and attach policies.
   amazon.aws.iam_role:
     name: LambdaAsgAmiCleanupRole
     assume_role_policy_document: "{{ lookup('template', 'assume_lambda_iam_policy.j2') }}"
@@ -8,17 +8,18 @@
       - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
   register: _created_iam_lambda_cleanup_role
 
-- name: Ensure python script is removed
+# TODO: Use aws_lambda role to create function
+- name: Ensure python script is removed.
   ansible.builtin.file:
     path: "{{ _ce_provision_build_dir }}/clean_up_ami.py"
     state: absent
 
-- name: Ensure zip file is removed
+- name: Ensure zip file is removed.
   ansible.builtin.file:
     path: "{{ _ce_provision_build_dir }}/clean_up_ami.zip"
     state: absent
 
-- name: Write Lambda function
+- name: Write Lambda function.
   ansible.builtin.template:
     src: cleanup_ami.py.j2
     dest: "{{ _ce_provision_build_dir }}/clean_up_ami.py"
@@ -35,11 +36,11 @@
 #    log_group_name: ami_asg_cleanup
 #  register: _ami_asg_log
 
-- name: Sleep for 20 seconds for IAM before Lambda creation
+- name: Sleep for 5 seconds for IAM before Lambda creation.
   ansible.builtin.wait_for:
-    timeout: 20
+    timeout: 5
 
-- name: Create Lambda function
+- name: Create Lambda function.
   amazon.aws.lambda:
     name: "clean_up_ami"
     region: "{{ _aws_region }}"
@@ -53,7 +54,7 @@
       Test: 'This is test tag'
   register: _created_iam_lambda_cleanup_function
 
-- name: Create scheduler to invoke Lambda function
+- name: Create scheduler to invoke Lambda function.
   amazon.aws.cloudwatchevent_rule:
     name: "cleanup_asg_ami_{{ _aws_resource_name }}"
     schedule_expression: "{{ aws_ami_asg_cleanup.scheduler_cron }}"

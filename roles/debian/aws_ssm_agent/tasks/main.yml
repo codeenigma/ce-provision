@@ -8,5 +8,5 @@
   until: result is succeeded
   register: result
 
-- name: Start the agent
+- name: Start the agent.
   ansible.builtin.command: systemctl enable amazon-ssm-agent

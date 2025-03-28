@@ -9,7 +9,7 @@
     description: "{{ aws_rds.description }}"
   register: _aws_rds_rds_subnet_group
 
-- name: Create RDS parameter group
+- name: Create RDS parameter group.
   amazon.aws.rds_instance_param_group:
     state: present
     name: "{{ aws_rds.db_parameter_group_name }}"
@@ -75,7 +75,7 @@
       return_type: ids
   when: aws_rds.security_groups | length > 0
 
-- name: Create RDS instance
+- name: Create RDS instance.
   amazon.aws.rds_instance:
     profile: "{{ aws_rds.aws_profile }}"
     region: "{{ aws_rds.region }}"

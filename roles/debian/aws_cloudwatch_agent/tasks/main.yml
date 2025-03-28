@@ -26,10 +26,10 @@
   when:
     - aws_cloudwatch_agent.use_credentials
 
-- name: Start the agent
+- name: Start the agent.
   ansible.builtin.command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
 
-- name: Generate AWS credentials
+- name: Generate AWS credentials.
   ansible.builtin.template:
     src: credentials.j2
     dest: /home/cwagent/.aws/credentials
@@ -38,20 +38,20 @@
   when:
     - aws_cloudwatch_agent.use_credentials
 
-- name: Remove default config
+- name: Remove default config.
   ansible.builtin.file:
     path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/default
     state: absent
 
-- name: Install main config
+- name: Install main config.
   ansible.builtin.template:
     src: config.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/config.json
     owner: cwagent
     group: cwagent
 
-- name: Stop the agent
+- name: Stop the agent.
   ansible.builtin.command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
 
-- name: Start the agent
+- name: Start the agent.
   ansible.builtin.command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start

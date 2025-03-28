@@ -11,7 +11,7 @@
       return_type: ids
   when: aws_opensearch.security_groups | length > 0
 
-- name: Get the current AWS account caller identity information
+- name: Get the current AWS account caller identity information.
   amazon.aws.aws_caller_info:
     profile: "{{ aws_opensearch.aws_profile }}"
   delegate_to: localhost
