@@ -1,19 +1,19 @@
 ---
-- name: Define empty wget list
+- name: Define empty wget list.
   ansible.builtin.set_fact:
     wget_list: []
 
-- name: Define empty apt list
+- name: Define empty apt list.
   ansible.builtin.set_fact:
     apt_list: []
 
-- name: Add items with URL to wget list
+- name: Add items with URL to wget list.
   ansible.builtin.set_fact:
     wget_list: "{{ wget_list + [item] }}"
   loop: "{{ apt_extra_packages }}"
   when: "item is regex('^https?://')"
 
-- name: Add non URL items to apt list
+- name: Add non URL items to apt list.
   ansible.builtin.set_fact:
     apt_list: "{{ apt_list + [item] }}"
   when: "item is not regex('^https?://')"
@@ -42,7 +42,7 @@
   loop_control:
     loop_var: wget_item
 
-- name: Remove gawk.csh from /etc/profile.d
+- name: Remove gawk.csh from /etc/profile.d.
   ansible.builtin.file:
     path: /etc/profile.d/gawk.csh
     state: absent

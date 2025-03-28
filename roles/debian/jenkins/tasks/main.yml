@@ -73,7 +73,7 @@
     src: "jenkins.j2"
     dest: /etc/default/jenkins
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:
@@ -82,17 +82,17 @@
     - jenkins.overrides is defined
     - jenkins.overrides | length > 0
 
-- name: Create init.groovy.d directory
+- name: Create init.groovy.d directory.
   ansible.builtin.file:
     path: "/var/lib/jenkins/init.groovy.d"
     state: directory
     mode: "0755"
 
-- name: Check if groovy security file exists
+- name: Check if groovy security file exists.
   ansible.builtin.stat:
     path: "/var/lib/jenkins/init.groovy.d/basic-security.groovy"
 
-- name: Copy groovy security file
+- name: Copy groovy security file.
   ansible.builtin.template:
     src: "basic-security.groovy.j2"
     dest: "/var/lib/jenkins/init.groovy.d/basic-security.groovy"
@@ -106,7 +106,8 @@
     state: restarted
   when: aptoutput.changed
 
-- ansible.builtin.pause:
+- name: Paise for 2 minutes.
+  ansible.builtin.pause:
     minutes: 2
   when: aptoutput.changed
 

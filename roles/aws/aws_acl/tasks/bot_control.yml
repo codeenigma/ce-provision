@@ -1,5 +1,5 @@
 ---
-- name: Define empty action rule list
+- name: Define empty action rule list.
   ansible.builtin.set_fact:
     _action_rules: []
 
@@ -60,17 +60,17 @@
           action_to_use:
             block: {}
 
-  - name: Attach common action rules to list
+  - name: Attach common action rules to list.
     ansible.builtin.set_fact:
       _action_rules: "{{ _action_rules | default([]) + _action_rules_common }}"
 
-  - name: Define common config
+  - name: Define common config.
     ansible.builtin.set_fact:
       _rule_config:
         - a_w_s_managed_rules_bot_control_rule_set:
             inspection_level: "COMMON"
 
-- name: Define targeted actions rules
+- name: Define targeted actions rules.
   when: _acl.rules.bot_control.target == "TARGETED"
   block:
     - name: Define targeted actions
@@ -98,11 +98,11 @@
             action_to_use:
               block: {}
 
-    - name: Attach targeted action rules to list
+    - name: Attach targeted action rules to list.
       ansible.builtin.set_fact:
         _action_rules: "{{ _action_rules | default([]) + _action_rules_tgt }}"
 
-    - name: Define targeted config
+    - name: Define targeted config.
       ansible.builtin.set_fact:
         _rule_config:
           - a_w_s_managed_rules_bot_control_rule_set:

@@ -1,5 +1,5 @@
 ---
-- name: Create anonymous ip list rule
+- name: Create anonymous ip list rule.
   ansible.builtin.set_fact:
     anonymous_ip_list:
       name: "AWS-AWSManagedRulesAnonymousIpList"
@@ -30,6 +30,6 @@
   ansible.builtin.set_fact:
     anonymous_ip_list: "{{ anonymous_ip_list | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [anonymous_ip_list] }}"

@@ -1,9 +1,9 @@
 ---
-- name: Set action string
+- name: Set action string.
   ansible.builtin.set_fact:
     _action: "{ {{ _reg_rule.action }}: {} }"
 
-- name: Set statement string
+- name: Set statement string.
   ansible.builtin.set_fact:
     _statements: ""
 
@@ -16,12 +16,12 @@
   loop_control:
     loop_var: _stat
 
-- name: Encapsulate statement with type
+- name: Encapsulate statement with type.
   ansible.builtin.set_fact:
     _statements: "{ {{ _reg_rule.statements_type }}_statement: { statements: [{{ _statements }}] } }"
   when: _reg_rule.statements_type != "single"
 
-- name: Create regular rule
+- name: Create regular rule.
   ansible.builtin.set_fact:
     regular_rule:
         name: "{{ _reg_rule.name }}"
@@ -41,6 +41,6 @@
   ansible.builtin.set_fact:
     regular_rule: "{{ regular_rule | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [regular_rule] }}"

@@ -35,7 +35,7 @@
   ansible.builtin.set_fact:
     _api_resource: "{{ _api_resource.stdout | from_json }}"
 
-- name: Put method on API gateway
+- name: Put method on API gateway.
   ansible.builtin.command: >-
     aws apigateway put-method
     --rest-api-id "{{ _api_gate.id }}"

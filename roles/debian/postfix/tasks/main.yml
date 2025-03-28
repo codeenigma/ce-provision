@@ -1,15 +1,15 @@
 ---
-- name: Install Postfix
+- name: Install Postfix.
   ansible.builtin.apt:
     pkg: postfix
     state: present
 
-- name: Install procmail
+- name: Install procmail.
   ansible.builtin.apt:
     pkg: procmail
     state: present
 
-- name: Copy master config
+- name: Copy master config.
   ansible.builtin.copy:
     src: "files/{{ item }}"
     dest: "/etc/postfix/"
@@ -19,7 +19,7 @@
   with_items:
     - master.cf
 
-- name: Configure mailname
+- name: Configure mailname.
   ansible.builtin.template:
     src: "mailname.j2"
     dest: "/etc/mailname"
@@ -27,7 +27,7 @@
     group: root
     mode: "0644"
 
-- name: Configure main.cf
+- name: Configure main.cf.
   ansible.builtin.template:
     src: "main.cf.j2"
     dest: "/etc/postfix/main.cf"
@@ -36,7 +36,7 @@
     mode: "0644"
   notify: Reload Postfix configuration.
 
-- name: Configure transport
+- name: Configure transport.
   ansible.builtin.template:
     src: "transport.j2"
     dest: "/etc/postfix/transport"
@@ -46,17 +46,17 @@
   notify:
     - Reload Postfix configuration.
 
-- name: Initialise transport db
+- name: Initialise transport db.
   ansible.builtin.command:
     cmd: /usr/sbin/postmap /etc/postfix/transport
 
-- name: Install SASL
+- name: Install SASL.
   ansible.builtin.package:
     name: libsasl2-modules
     state: present
   when: postfix.use_ses
 
-- name: Configure SASL
+- name: Configure SASL.
   ansible.builtin.template:
     src: "sasl_passwd.j2"
     dest: "/etc/postfix/sasl_passwd"
@@ -143,34 +143,34 @@
    - postfix.disable_syslog is defined
    - postfix.disable_syslog
 
-- name: Restart rsyslog based on environment to apply postfix changes
+- name: Restart rsyslog based on environment to apply postfix changes.
   block:
-    - name: Restart rsyslog in a container to apply postfix changes (if is_local is true)
+    - name: Restart rsyslog in a container to apply postfix changes (if is_local is true).
       ansible.builtin.shell: |
         pkill -HUP rsyslogd || true
       when: is_local
 
-    - name: Restart rsyslog using systemd to apply postfix changes (if is_local is false)
+    - name: Restart rsyslog using systemd to apply postfix changes (if is_local is false).
       ansible.builtin.systemd:
         name: rsyslog.service
         state: restarted
       when: is_local is not defined or not is_local
 
 # Needed for Docker.
-- name: Manage Postfix Service
+- name: Manage Postfix Service.
   block:
-    - name: Stop Postfix in a container (if is_local is true)
+    - name: Stop Postfix in a container (if is_local is true).
       ansible.builtin.command:
         cmd: /usr/sbin/service postfix stop
       when: is_local
 
-    - name: Stop Postfix using systemd (if is_local is false)
+    - name: Stop Postfix using systemd (if is_local is false).
       ansible.builtin.systemd:
         name: postfix
         state: stopped
       when: is_local is not defined or not is_local
 
-    - name: Remove trailing lock files
+    - name: Remove trailing lock files.
       ansible.builtin.file:
         path: "{{ lock_file }}"
         state: absent
@@ -180,16 +180,16 @@
       loop_control:
         loop_var: lock_file
 
-    - name: Create Postfix Aliases database
+    - name: Create Postfix Aliases database.
       ansible.builtin.command:
         cmd: /usr/bin/newaliases
 
-    - name: Start Postfix in a container (if is_local is true)
+    - name: Start Postfix in a container (if is_local is true).
       ansible.builtin.command:
         cmd: /usr/sbin/service postfix start
       when: is_local
 
-    - name: Start Postfix using systemd (if is_local is false)
+    - name: Start Postfix using systemd (if is_local is false).
       ansible.builtin.systemd:
         name: postfix
         state: started

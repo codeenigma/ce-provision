@@ -1,9 +1,9 @@
 ---
-- name: Set rate based statement from template
+- name: Set rate based statement from template.
   ansible.builtin.set_fact:
     _rbs: "{{ lookup('ansible.builtin.template', './rate_limit.j2') | from_yaml }}"
 
-- name: Set action statement
+- name: Set action statement.
   ansible.builtin.set_fact:
     _action: "{ {{ _acl.rules.rate_limit.action | default('block') }}: {} }"
 
