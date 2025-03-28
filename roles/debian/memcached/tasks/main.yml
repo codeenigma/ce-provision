@@ -12,7 +12,7 @@
     group: root
     mode: 0644
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:
@@ -21,7 +21,7 @@
     - memcached.overrides is defined
     - memcached.overrides | length > 0
 
-- name: Ensure memcached is restarted
+- name: Ensure memcached is restarted.
   ansible.builtin.service:
     name: memcached
     state: restarted

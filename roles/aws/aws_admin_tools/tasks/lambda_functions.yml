@@ -1,3 +1,4 @@
+# TODO use aws_lambda role here
 - name: Create S3 bucket for lambda functions.
   amazon.aws.s3_bucket:
     name: "{{ _aws_profile }}-lambda-api-functions"
