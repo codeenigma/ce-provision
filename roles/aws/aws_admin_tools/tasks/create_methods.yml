@@ -53,9 +53,8 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --request-templates '{ "application/json": "{\"statusCode\": 200}" }'
     --integration-http-method POST
-    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:API_{{ item.name }}/invocations"
+    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:API_{{ item.name }}/invocations"
     --region {{ _aws_region }}
 
 - name: Add method response.
