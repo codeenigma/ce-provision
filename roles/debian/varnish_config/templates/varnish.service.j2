@@ -9,7 +9,7 @@ KillMode=process
 PIDFile= {{ varnish_pidfile }}
 
 # Maximum number of open files (for ulimit -n)
-LimitNOFILE= {{ limit_nofile }}
+LimitNOFILE= {{ varnish_limit_nofile }}
 
 # Locked shared memory
 LimitMEMLOCK= {{ limit_memlock }}

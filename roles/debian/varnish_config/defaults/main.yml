@@ -1,8 +1,6 @@
 ---
 # Defaults file for varnish_config, other variables exist from importing geerlingguy.varnish and can be overriden
 
-varnish_pidfile: /run/varnishd.pid
-limit_nofile: 131072
 limit_memlock: 82000
 limit_core: infinity
 tasks_max: infinity
@@ -23,4 +21,3 @@ varnish_config:
   upstream_proxies: []
   # Provide an alternative filename if you are providing a template.
   template_filename: default.vcl
-  # Varnish systemd overrides to make varnish consistent even after upgrades
