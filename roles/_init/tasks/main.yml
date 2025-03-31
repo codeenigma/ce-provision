@@ -37,7 +37,7 @@
   when: _init.lock_file | length > 0
 
 # Load Linux services into ansible_facts.services.
-- name: Populate service facts
+- name: Populate service facts.
   ansible.builtin.service_facts:
 
 - name: Set "tracking" file for the playbook.
@@ -97,7 +97,7 @@
   loop_control:
     loop_var: _init_vars_dir_md5
 
-- name: Lookup current playbook md5
+- name: Lookup current playbook md5.
   ansible.builtin.set_fact:
     previous_play_dir_md5: "{{ lookup('file', '{{ _ce_provision_data_dir }}/{{ current_play_md5_file }}') }}"
 
@@ -107,6 +107,7 @@
     - current_play_dir_md5 == previous_play_dir_md5
     - not _init.force_play
     - not _ce_provision_force_play
+    - not is_local
 
 - name: Include vars directories.
   ansible.builtin.include_vars:

@@ -305,7 +305,7 @@
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
 
-- name: Create ami cleanup function
+- name: Create ami cleanup function.
   ansible.builtin.include_role:
     name: aws/aws_ami_asg_cleanup
 
@@ -336,6 +336,11 @@
     health_check_timeout: "{{ aws_ec2_autoscale_cluster.health_check_timeout }}"
     healthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_healthy_count }}"
     unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
+    stickiness_enabled: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_enabled | default(omit) }}"
+    stickiness_type: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_type | default(omit) }}"
+    stickiness_app_cookie_name: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_app_cookie_name | default(omit) }}"
+    stickiness_app_cookie_duration: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_app_cookie_duration | default(omit) }}"
+    stickiness_lb_cookie_duration: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_lb_cookie_duration | default(omit) }}"
     modify_targets: false
   register: _aws_ec2_target_group_created
   when:

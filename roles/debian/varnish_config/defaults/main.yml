@@ -21,3 +21,4 @@ varnish_config:
   upstream_proxies: []
   # Provide an alternative filename if you are providing a template.
   template_filename: default.vcl
+  # Varnish systemd overrides to make varnish consistent even after upgrades

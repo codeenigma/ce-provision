@@ -66,11 +66,11 @@
     state: directory
     mode: "0755"
 
-- name: Set nginx location behavior, fallback to default if no custom behavior is provided
+- name: Set nginx location behavior, fallback to default if no custom behavior is provided.
   set_fact:
     nginx_location_behavior: "{{ nginx.custom_nginx_location_behavior | default(['try_files @rewrite /index.php?$query_string;']) }}"
 
-- name: Set drupal fallback location if defined
+- name: Set drupal fallback location if defined.
   set_fact:
     drupal_fallback_behavior: "{{ nginx.drupal_fallback }}"
   when: nginx.drupal_fallback is defined and nginx.drupal_fallback
@@ -132,7 +132,7 @@
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
 
-- name: Update nginx mime.types
+- name: Update nginx mime.types.
   ansible.builtin.template:
     src: mime.types.j2
     dest: /etc/nginx/mime.types
@@ -150,7 +150,7 @@
     - nginx.domains | length > 0
     - nginx.recreate_vhosts
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

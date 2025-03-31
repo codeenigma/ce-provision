@@ -1,5 +1,5 @@
 ---
-- name: Create known bad inputs rule
+- name: Create known bad inputs rule.
   ansible.builtin.set_fact:
     known_bad_inputs:
       name: "AWS-AWSManagedRulesKnownBadInputsRuleSet"
@@ -23,6 +23,6 @@
   ansible.builtin.set_fact:
     known_bad_inputs: "{{ known_bad_inputs | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [known_bad_inputs] }}"

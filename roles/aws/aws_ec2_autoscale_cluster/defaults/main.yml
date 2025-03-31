@@ -144,6 +144,12 @@ aws_ec2_autoscale_cluster:
   health_check_timeout: 5
   health_check_healthy_count: 5
   health_check_unhealthy_count: 2
+  ## Target Group Stickiness. Disabled by default unless set otherwise. Uncomment if needed:
+  # target_group_stickiness_enabled: true
+  # target_group_stickiness_type: "lb_cookie" # Valid values are lb_cookie, app_cookie or source_ip.
+  # target_group_stickiness_app_cookie_name: "my_app_cookie"
+  # target_group_stickiness_app_cookie_duration: 86400
+  # target_group_stickiness_lb_cookie_duration: 86400
   # ALB settings
   create_elb: true # determines whether an ELB (currently, this is an ALB) is created as part of the ASG. This needs to be `true` in order to create a CloudFront distribution.
   alb_idle_timeout: 60

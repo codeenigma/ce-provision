@@ -1,0 +1,49 @@
+# TODO use aws_lambda role here
+- name: Create S3 bucket for lambda functions.
+  amazon.aws.s3_bucket:
+    name: "{{ _aws_profile }}-lambda-api-functions"
+    region: "{{ _aws_region }}"
+    state: present
+
+- name: Check and clean any previous python files.
+  ansible.builtin.file:
+    path: "/tmp/{{ item.name }}.py"
+    state: absent
+
+- name: Write Lambda functions.
+  ansible.builtin.template:
+    src: "API_{{ item.name }}.py.j2"
+    dest: "/tmp/API_{{ item.name }}.py"
+
+- name: Create a zip archive of Lambda functions.
+  community.general.archive:
+    path: "/tmp/API_{{ item.name }}.py"
+    dest: "/tmp/API_{{ item.name }}.zip"
+    format: zip
+
+- name: Place Lambda functions in S3 bucket.
+  amazon.aws.s3_object:
+    bucket: "{{ _aws_profile }}-lambda-api-functions"
+    object: "lambda-functions/API-{{ item.name }}.zip"
+    src: "/tmp/API_{{ item.name }}.zip"
+    mode: put
+
+- name: Get appropriate IAM role for Lambda.
+  amazon.aws.iam_role_info:
+    name: "API_{{ item.name }}"
+  register: _iam_api_lambda
+
+- name: Create Lambda functions.
+  amazon.aws.lambda:
+    name: "API_{{ item.name }}"
+    description: "Lambda function for {{ item.name }}"
+    region: "{{ _aws_region }}"
+    timeout: "{{ aws_admin_tools.timeout }}"
+    s3_bucket: "{{ _aws_profile }}-lambda-api-functions"
+    s3_key: "lambda-functions/API-{{ item.name }}.zip"
+    state: present
+    runtime: "{{ aws_admin_tools.runtime }}"
+    role: "{{ _iam_api_lambda.iam_roles[0].arn }}"
+    handler: "API_{{ item.name }}.lambda_handler"
+    tags:
+      Name: "API_{{ item.name }}"

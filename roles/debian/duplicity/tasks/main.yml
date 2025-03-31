@@ -131,7 +131,7 @@
         timer_OnCalendar: "{{ duplicity.on_calendar }}"
   when: duplicity.create_timer
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

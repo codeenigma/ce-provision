@@ -25,7 +25,7 @@
   become: true
   notify: Reload PostgreSQL.
 
-- name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost
+- name: GRANT ALL PRIVILEGES ON DATABASE mattermost TO mattermost.
   community.postgresql.postgresql_privs:
     db: postgres
     privs: ALL
