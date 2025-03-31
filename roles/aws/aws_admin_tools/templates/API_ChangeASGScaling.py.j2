@@ -1,39 +1,30 @@
 import json
-import calendar
-from datetime import datetime
 import boto3
 
-costExpl = boto3.client('ce')
+asg_cli = boto3.client('autoscaling', region_name="{{ _aws_region }}")
 
 def lambda_handler(event, context):
-    currDay=datetime.now().day
-    currMonth=datetime.now().month
-    print(currMonth)
-    currYear=datetime.now().year
-    print(currYear)
-    lastDay=calendar.monthrange(currYear, currMonth)
 
-    if currMonth < 10:
-        currMonth = '0' + str(currMonth)
-    nextDay = currDay + 1
-    if currDay < 10:
-        currDay = '0' + str(currDay)
-    if nextDay < 10:
-        nextDay = '0' + str(nextDay)
-
-    startDate=str(currYear) + '-' + str(currMonth) + '-' + str(currDay)
-    endDate=str(currYear) + '-' + str(currMonth) + '-' + str(nextDay)
-
-    estimatedCost = costExpl.get_cost_forecast(
-        TimePeriod={
-            'Start': startDate,
-            'End': endDate
-        },
-        Granularity='MONTHLY',
-        Metric='BLENDED_COST'
+    policies = asg_cli.describe_policies(
+        AutoScalingGroupName=event['asg_name']
     )
+
+    if policies['ScalingPolicies'][0]['Enabled']:
+        enable = False
+    else:
+        enable = True
+
+    for inst in policies['ScalingPolicies']:
+        put_result = asg_cli.put_scaling_policy(
+            AutoScalingGroupName=inst['AutoScalingGroupName'],
+            PolicyName=inst['PolicyName'],
+            PolicyType=inst['PolicyType'],
+            AdjustmentType=inst['AdjustmentType'],
+            ScalingAdjustment=inst['ScalingAdjustment'],
+            Enabled=enable
+        )
+
     return {
         'statusCode': 200,
-        'Amount': estimatedCost['Total']['Amount'] + ' ' + estimatedCost['Total']['Unit'],
-        'Between': estimatedCost['ForecastResultsByTime'][0]['TimePeriod']['Start'] + ' - ' + estimatedCost['ForecastResultsByTime'][0]['TimePeriod']['End']
+        'body': event
     }
