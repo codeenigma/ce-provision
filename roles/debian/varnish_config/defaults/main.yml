@@ -1,8 +1,6 @@
 ---
 # Defaults file for varnish_config, other variables exist from importing geerlingguy.varnish and can be overriden
 
-varnish_pidfile: /run/varnishd.pid
-limit_nofile: 131072
 limit_memlock: 82000
 limit_core: infinity
 tasks_max: infinity
