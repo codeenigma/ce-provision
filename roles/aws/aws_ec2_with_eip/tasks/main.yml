@@ -167,8 +167,8 @@
   amazon.aws.ec2_eip:
     region: "{{ aws_ec2_with_eip.region }}"
     in_vpc: true
-    tag_name: "Name"
-    tag_value: "{{ aws_ec2_with_eip.instance_name }}"
+    tags:
+      Name: "{{ aws_ec2_with_eip.instance_name }}"
   when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
