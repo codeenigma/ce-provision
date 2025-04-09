@@ -36,10 +36,6 @@
 #    log_group_name: ami_asg_cleanup
 #  register: _ami_asg_log
 
-- name: Sleep for 5 seconds for IAM before Lambda creation.
-  ansible.builtin.wait_for:
-    timeout: 5
-
 - name: Create Lambda function.
   amazon.aws.lambda:
     name: "clean_up_ami"
