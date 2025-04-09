@@ -38,7 +38,7 @@
   block:
     - name: Build timers variable.
       ansible.builtin.set_fact:
-        _galaxy_upgrade_timer: "{'{{ ansible_galaxy.upgrade_galaxy.name }}_ansible_galaxy_upgrades': { timer_command: '{{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}', timer_user: '{{ ansible_galaxy.username }}',timer_workingdir: '{{ ansible_galaxy.working_dir }}',timer_OnCalendar: '{{ ansible_galaxy.upgrade_galaxy.on_calendar }}' }}"
+        _galaxy_upgrade_timer: "{'{{ ansible_galaxy.upgrade_galaxy.name }}_ansible_galaxy_upgrades': { timer_command: '{{ _venv_path }}/bin/ansible-galaxy {{ _galaxy_command }}', timer_user: '{{ ansible_galaxy.username }}', timer_workingdir: '{{ ansible_galaxy.working_dir }}', timer_OnCalendar: '{{ ansible_galaxy.upgrade_galaxy.on_calendar }}' }}"
 
     - name: Turn the timer string into a dictionary.
       ansible.builtin.set_fact:
