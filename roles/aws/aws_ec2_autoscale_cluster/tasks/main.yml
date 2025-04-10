@@ -26,7 +26,9 @@
   when: (aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0)
 
 - name: Create matching Security Group.
-  ansible.builtin.include_tasks: "security_group.yml"
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    tasks_from: security_group
   vars:
     aws_vpc:
       name: "{{ aws_ec2_autoscale_cluster.name }}"
