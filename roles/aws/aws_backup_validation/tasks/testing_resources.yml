@@ -30,7 +30,9 @@
   register: _main_subnets_info
 
 - name: Create SG for restored instances.
-  ansible.builtin.include_tasks: "security_group.yml"
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    tasks_from: security_group
   vars:
     aws_vpc:
       name: "Restore_testing"
