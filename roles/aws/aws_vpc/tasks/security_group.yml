@@ -10,3 +10,8 @@
     rules: "{{ aws_vpc.rules | default(omit) }}"
     rules_egress: "{{ aws_vpc.rules_egress | default(omit) }}"
     purge_rules: "{{ aws_vpc.purge_rules | default(omit) }}"
+  register: _aws_vpc_result
+
+- name: Register aws_vpc SG results.
+  ansible.builtin.set_fact:
+    aws_vpc: "{{ aws_vpc | combine({'_result': {aws_vpc.name: _aws_vpc_result}}, recursive=True) }}"
