@@ -17,7 +17,7 @@
     name: "{{ aws_ami.repack.cluster_name }}-repacker"
     tags: "{{ aws_ami.tags }}"
     state: present
-    vpc_id: "{{ aws_ami.repack.vpc_id }}"
+    id: "{{ aws_ami.repack.vpc_id }}"
     description: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
     rules:
       - proto: tcp
