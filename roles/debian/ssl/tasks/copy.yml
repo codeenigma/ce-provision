@@ -1,5 +1,5 @@
 ---
-- name: Copy public cert file to destination
+- name: Copy public cert file to destination.
   ansible.builtin.copy:
     content: "{{ ssl.cert }}"
     dest: "{{ ssl_facts[certificate_domain].certificate }}"
@@ -8,7 +8,7 @@
     mode: 0644
     force: "{{ ssl.replace_existing }}"
 
-- name: Copy CA cert file to destination
+- name: Copy CA cert file to destination.
   ansible.builtin.copy:
     content: "{{ ssl.ca_cert }}"
     dest: "{{ ssl_facts[certificate_domain].ca_certificate }}"
@@ -19,7 +19,7 @@
   when:
     - ssl.ca_cert is defined
 
-- name: Copy private key file to destination
+- name: Copy private key file to destination.
   ansible.builtin.copy:
     content: "{{ ssl.key }}"
     dest: "{{ ssl_facts[certificate_domain].key }}"

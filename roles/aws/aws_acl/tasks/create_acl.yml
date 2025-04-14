@@ -3,7 +3,7 @@
   ansible.builtin.set_fact:
     _rules: []
 
-- name: Set priority dict
+- name: Set priority dict.
   set_fact:
     _priority_dict: {}
 
@@ -82,17 +82,13 @@
     - _acl.rules.anonymous_ip_list is defined
     - _acl.rules.anonymous_ip_list.enabled
 
-- name: Print the rules
-  ansible.builtin.debug:
-    msg: "{{ _rules }}"
-
 - name: Create web acl.
   community.aws.wafv2_web_acl:
     name: "{{ _acl.name }}" # Member must satisfy regular expression pattern: ^[\\w\\-]+$
     description: "{{ _acl.description }}"
     scope: "{{ _acl.scope }}"
     region: "{{ _acl.region }}"
-    default_action: Allow # or "Block"
+    default_action: "{{ _acl.default_action }}" # or "Block"
     sampled_requests: false
     cloudwatch_metrics: true # or "false" to disable metrics
     metric_name: test-metric-name # not sure about this name, since each rule also has it's own metrics name (maybe log group name)

@@ -1,5 +1,5 @@
 ---
-- name: Create cyber security rule
+- name: Create cyber security rule.
   ansible.builtin.set_fact:
     cyber_sec_rule:
       name: "CyberSecurityCloud-HighSecurityOWASPSet"
@@ -55,6 +55,6 @@
   ansible.builtin.set_fact:
     cyber_sec_rule: "{{ cyber_sec_rule | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [cyber_sec_rule] }}"

@@ -7,14 +7,14 @@
     cache_valid_time: 240
   notify: Update rkhunter
 
-- name: Check paths for script existence
+- name: Check paths for script existence.
   ansible.builtin.stat:
     path: "{{ item }}"
   register: _rkhunter_existing_scripts_to_whitelist
   loop: "{{ rkhunter.scriptwhitelist }}"
   when: rkhunter.scriptwhitelist | length > 0
 
-- name: Filter existing scripts
+- name: Filter existing scripts.
   set_fact:
     existing_scripts: "{{ existing_scripts | default([]) + [item.item] }}"
   when:
@@ -22,14 +22,14 @@
     - _rkhunter_existing_scripts_to_whitelist is defined
   loop: "{{ _rkhunter_existing_scripts_to_whitelist.results }}"
 
-- name: Check paths for portpath existence
+- name: Check paths for portpath existence.
   ansible.builtin.stat:
     path: "{{ item.split(':')[0] }}"
   register: _rkhunter_existing_portpaths_to_whitelist
   loop: "{{ rkhunter.portpathwhitelist }}"
   when: rkhunter.portpathwhitelist | length > 0
 
-- name: Filter existing portpath
+- name: Filter existing portpath.
   set_fact:
     existing_portpaths: "{{ existing_portpaths | default([]) + [item.item] }}"
   when:
@@ -53,7 +53,7 @@
     group: root
     mode: 0644
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

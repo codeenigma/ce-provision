@@ -10,11 +10,11 @@
       return_type: ids
   when: aws_efs.security_groups | length > 0
 
-- name: Reset subnet ids info
+- name: Reset subnet ids info.
   ansible.builtin.set_fact:
     _aws_efs_subnets_ids: []
 
-- name: Reset targets info
+- name: Reset targets info.
   ansible.builtin.set_fact:
     _aws_efs_targets: {}
 
@@ -30,7 +30,7 @@
   loop_control:
     loop_var: target
 
-- name: Create EFS volume
+- name: Create EFS volume.
   community.aws.efs:
     profile: "{{ aws_efs.aws_profile }}"
     name: "{{ aws_efs.name }}"

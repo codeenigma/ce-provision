@@ -1,5 +1,5 @@
 ---
-- name: Install rsyslog with apt
+- name: Install rsyslog with apt.
   ansible.builtin.apt:
     name: rsyslog
     state: present
@@ -14,14 +14,14 @@
     mode: "0644"
     force: true
 
-- name: Restart rsyslog based on environment
+- name: Restart rsyslog based on environment.
   block:
-    - name: Restart rsyslog in a container (if is_local is true)
+    - name: Restart rsyslog in a container (if is_local is true).
       ansible.builtin.shell: |
         pkill -HUP rsyslogd || true
       when: is_local
 
-    - name: Restart rsyslog using systemd (if is_local is false)
+    - name: Restart rsyslog using systemd (if is_local is false).
       ansible.builtin.systemd:
         name: rsyslog.service
         state: restarted
