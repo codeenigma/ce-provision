@@ -1,4 +1,4 @@
-- name: Add NodeJS repository and key
+- name: Add NodeJS repository and key.
   ansible.builtin.include_role:
     name: debian/apt_repository
   vars:
@@ -35,17 +35,17 @@
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:15:00"
     apt_repository: "{{ nodejs_old_config if (nodejs.version | regex_replace('\\.x$', '') | int) < 16 else nodejs_default_config }}"
 
-- name: Get current Nodejs version
+- name: Get current Nodejs version.
   ansible.builtin.command: node -v
   register: current_nodejs_version
   failed_when: false
   changed_when: false
 
-- name: Extract the major version of the current Nodejs version so we can compare & condition properly
+- name: Extract the major version of the current Nodejs version so we can compare & condition properly.
   ansible.builtin.set_fact:
     current_major_version: "{{ current_nodejs_version.stdout | regex_replace('v([0-9]+).*', '\\1') }}"
 
-- name: Remove Nodejs if it differs from current nodejs.version
+- name: Remove Nodejs if it differs from current nodejs.version.
   ansible.builtin.apt:
     name: nodejs
     state: absent
@@ -53,7 +53,7 @@
     - nodejs.version is defined
     - (nodejs.version | regex_replace('\\.x$', '')) != current_major_version
 
-- name: Install the specified Nodejs version if nodejs.version is defined and different from current version
+- name: Install the specified Nodejs version if nodejs.version is defined and different from current version.
   ansible.builtin.apt:
     name: "nodejs"
     state: present

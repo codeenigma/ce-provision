@@ -55,6 +55,7 @@
     wazuh_manager_mailto: "{{ wazuh.manager.wazuh_manager_mailto }}"
     wazuh_manager_email_smtp_server: "{{ wazuh.manager.wazuh_manager_email_smtp_server }}"
     wazuh_manager_email_from: "{{ wazuh.manager.wazuh_manager_email_from }}"
+    wazuh_manager_email_notification: "{{ wazuh.manager.wazuh_manager_email_notification }}"
     wazuh_manager_email_maxperhour: "{{ wazuh.manager.wazuh_manager_email_maxperhour }}"
     wazuh_manager_email_queue_size: "{{ wazuh.manager.wazuh_manager_email_queue_size }}"
     wazuh_manager_email_log_source: "{{ wazuh.manager.wazuh_manager_email_log_source }}"
@@ -116,17 +117,17 @@
     ansible_shell_allow_world_readable_temp: true
   when: wazuh.agent.install and not wazuh_agent_sources_installation.enabled
 
-- name: Check if Filebeat service exists
+- name: Check if Filebeat service exists.
   ansible.builtin.command:
     cmd: systemctl list-units --type=service --state=running
   register: _service_list
   changed_when: false
 
-- name: Set fact if Filebeat is found & present
+- name: Set fact if Filebeat is found & present.
   ansible.builtin.set_fact:
     filebeat_exists: "{{ _service_list.stdout is search('filebeat.service') }}"
 
-- name: Restart filebeat at the end # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
+- name: Restart filebeat at the end. # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
   ansible.builtin.systemd:
     name: filebeat
     state: restarted

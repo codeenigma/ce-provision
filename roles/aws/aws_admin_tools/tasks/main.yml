@@ -1,0 +1,108 @@
+- name: Get account ID for ARN.
+  ansible.builtin.command: >-
+    aws sts get-caller-identity
+    --query Account
+    --output text
+  register: _acc_id
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _acc_id: "{{ _acc_id.stdout | from_json }}"
+
+- name: List all API gateways.
+  community.aws.api_gateway_info:
+    region: "{{ _aws_region }}"
+  register: _api_gate_list
+
+- name: Find the index of admin tools API.
+  ansible.builtin.set_fact:
+    _api_index: "{{ lookup('ansible.utils.index_of', _api_gate_list['rest_apis'], 'eq', _aws_profile + '_admin_tools', 'name', wantlist=True) }}"
+
+- name: Create API gateway.
+  ansible.builtin.command: >-
+    aws apigateway create-rest-api
+    --region "{{ _aws_region }}"
+    --name "{{ _aws_profile }}_admin_tools"
+    --description "API for administration functions made automatically by ansible"
+    --endpoint-configuration "{\"types\": [\"REGIONAL\"]}"
+  register: _api_gate
+  when: _api_index | length == 0
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _api_gate: "{{ _api_gate.stdout | from_json }}"
+  when: _api_index | length == 0
+
+- name: Setting _api_index if API already exists.
+  ansible.builtin.set_fact:
+    _api_gate: "{{ _api_gate_list.rest_apis[_api_index[0]] }}"
+  when: _api_index | length > 0
+
+- name: Get list of API gateway resources.
+  ansible.builtin.command: >-
+    aws apigateway get-resources
+    --region "{{ _aws_region }}"
+    --rest-api-id "{{ _api_gate.id }}"
+  register: _api_res_list
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _api_res_list: "{{ _api_res_list.stdout | from_json | json_query('items') }}"
+
+- name: Get index of main "/" resource from API gateway.
+  ansible.builtin.set_fact:
+    _api_res_index_list: "{{ lookup('ansible.utils.index_of', _api_res_list, 'eq', '/', 'path', wantlist=True) }}"
+
+- name: Create MOCK deployment.
+  ansible.builtin.include_tasks: create_mock.yml
+  when: _api_index | length == 0
+
+- name: Get all deployments from API gateway.
+  ansible.builtin.command: >-
+    aws apigateway get-deployments
+    --rest-api-id "{{ _api_gate.id }}"
+    --region "{{ _aws_region }}"
+  register: _main_api_deploy
+  when: _api_index | length > 0
+
+- name: Set previous command output into variable.
+  ansible.builtin.set_fact:
+    _main_api_deploy_tmp: "{{ _main_api_deploy.stdout | from_json }}"
+  when: _api_index | length > 0
+
+- name: Get last item from deployment list.
+  ansible.builtin.set_fact:
+    _main_api_deploy: "{{ _main_api_deploy_tmp['items'] | last }}"
+  when: _api_index | length > 0
+
+- name: Configure Lambda IAM policies.
+  ansible.builtin.include_tasks: lambda_iam.yml
+  loop: "{{ aws_admin_tools.functions }}"
+
+- name: Configure Lambda functions.
+  ansible.builtin.include_tasks: lambda_functions.yml
+  loop: "{{ aws_admin_tools.functions }}"
+
+- name: Create WAF for API Gateway.
+  ansible.builtin.include_role:
+    name: aws/aws_acl
+  vars:
+    aws_acl:
+      - name: "{{ _aws_profile }}_admin_tools"
+        description: "ACL rules for API Gateway"
+        scope: REGIONAL
+        region: "{{ _aws_region }}"
+        tags: "{{ _aws_tags }}"
+        recreate: true
+        default_action: "Block"
+        rules:
+          ip_sets:
+            - rule_name: "{{ _aws_profile }}_admin_tools"
+              set_name: "{{ _aws_profile }}_admin_tools"
+              description: "List of IPs to allow using API - Ansible managed"
+              action: allow
+              priority: 1
+              list: "{{ aws_admin_tools.allowed_ips }}"
+
+- name: Create API Gateway resurces.
+  ansible.builtin.include_tasks: create.yml

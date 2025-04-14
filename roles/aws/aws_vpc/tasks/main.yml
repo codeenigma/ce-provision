@@ -27,7 +27,7 @@
     loop_var: security_group
     label: "{{ security_group.name }}"
 
-- name: Create IGW
+- name: Create IGW.
   amazon.aws.ec2_vpc_igw:
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"

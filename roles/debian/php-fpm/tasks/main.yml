@@ -37,7 +37,7 @@
   ansible.builtin.include_role:
     name: debian/php_xdebug
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

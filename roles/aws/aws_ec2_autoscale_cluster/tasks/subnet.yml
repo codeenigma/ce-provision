@@ -28,7 +28,7 @@
       subnets:
         - "{{ _aws_ec2_autoscale_cluster_subnet_definition }}"
 
-- name: Gather private subnet information
+- name: Gather private subnet information.
   amazon.aws.ec2_vpc_subnet_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
@@ -37,7 +37,7 @@
       tag:Name: "{{ _aws_ec2_autoscale_cluster_private_subnet_name }}"
   register: _aws_ec2_autoscale_cluster_subnet
 
-- name: Gather public subnet information
+- name: Gather public subnet information.
   amazon.aws.ec2_vpc_subnet_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"

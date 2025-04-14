@@ -1,5 +1,5 @@
 ---
-- name: Create common rule set rule
+- name: Create common rule set rule.
   ansible.builtin.set_fact:
     common_rule_set:
       name: "AWS-AWSManagedRulesCommonRuleSet"
@@ -23,6 +23,6 @@
   ansible.builtin.set_fact:
     common_rule_set: "{{ common_rule_set | combine(_priority_dict) }}"
 
-- name: Add rule to list
+- name: Add rule to list.
   ansible.builtin.set_fact:
     _rules: "{{ _rules + [common_rule_set] }}"
