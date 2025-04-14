@@ -10,19 +10,19 @@
   register: _testing_selection_exists
   when: _testing_plan_info.stdout != "null"
 
-- name: Get default backup role arn
+- name: Get default backup role arn.
   amazon.aws.iam_role_info:
     name: AWSBackupDefaultServiceRole
   register: _default_backup_role_arn
 
-- name: Get VPC info
+- name: Get VPC info.
   amazon.aws.ec2_vpc_net_info:
     region: "{{ _aws_region }}"
     filters:
       "tag:Name": "{{ aws_vpc.name }}"
   register: _main_vpc_info
 
-- name: Get subnets info
+- name: Get subnets info.
   amazon.aws.ec2_vpc_subnet_info:
     region: "{{ _aws_region }}"
     filters:
@@ -30,25 +30,32 @@
   register: _main_subnets_info
 
 - name: Create SG for restored instances.
-  amazon.aws.ec2_security_group:
-    name: Restore_testing
-    description: This SG is used to allow SSM and SSH access to the server
-    region: "{{ _aws_region }}"
-    vpc_id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
-    rules:
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 443
-        to_port: 443
-        cidr_ip: 0.0.0.0/0
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: 0.0.0.0/0
-  register: _restore_testing_sg
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    tasks_from: security_group
+  vars:
+    aws_vpc:
+      name: "Restore_testing"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
+      description: "This SG is used to allow SSM and SSH access to the server"
+      rules:
+        - proto: tcp
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 443
+          to_port: 443
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+
+- name: Construct AWS instance type dict.
+  ansible.builtin.set_fact:
+    _restore_testing_sg: "{{ aws_vpc._result['Restore_testing'] }}"
 
 - name: Remove restore testing query file.
   ansible.builtin.file:
@@ -74,7 +81,7 @@
   register: _restore_testing_query
   when: _instance_type_restore is defined
 
-- name: Check if protected reource exist
+- name: Check if protected reource exist.
   ansible.builtin.command: >
     aws backup list-protected-resources --query "Results[?ResourceArn=='{{ _resource_arn }}']" --region {{ _aws_region }}
   register: _protected_res

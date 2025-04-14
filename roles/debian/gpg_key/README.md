@@ -8,6 +8,7 @@ Generates a passwordless GPG key for a given user or users.
 ```yaml
 ---
 gpg_key_servers:
+  - hkps://keyserver.ubuntu.com
   - hkps://pgp.mit.edu
   - hkps://keys.openpgp.org
 gpg_key:

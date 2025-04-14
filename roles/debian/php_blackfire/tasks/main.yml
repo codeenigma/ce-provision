@@ -75,7 +75,7 @@
     - blackfire.enable
     - is_local
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

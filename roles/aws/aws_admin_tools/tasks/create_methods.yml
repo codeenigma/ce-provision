@@ -35,7 +35,7 @@
   ansible.builtin.set_fact:
     _api_resource: "{{ _api_resource.stdout | from_json }}"
 
-- name: Put method on API gateway
+- name: Put method on API gateway.
   ansible.builtin.command: >-
     aws apigateway put-method
     --rest-api-id "{{ _api_gate.id }}"
@@ -53,7 +53,6 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --request-templates '{ "application/json": "{\"statusCode\": 200}" }'
     --integration-http-method POST
     --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:API_{{ item.name }}/invocations"
     --region {{ _aws_region }}

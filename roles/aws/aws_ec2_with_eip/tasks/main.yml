@@ -167,8 +167,8 @@
   amazon.aws.ec2_eip:
     region: "{{ aws_ec2_with_eip.region }}"
     in_vpc: true
-    tag_name: "Name"
-    tag_value: "{{ aws_ec2_with_eip.instance_name }}"
+    tags:
+      Name: "{{ aws_ec2_with_eip.instance_name }}"
   when: not _aws_ec2_with_eip_instances_eip.addresses
 
 - name: Re-register EIP.
@@ -190,7 +190,7 @@
     tag_name: Name
     tag_value: "{{ aws_ec2_with_eip.instance_name }}"
 
-- name: Add a DNS record in route 53
+- name: Add a DNS record in route 53.
   amazon.aws.route53:
     state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"
@@ -203,7 +203,7 @@
     - aws_ec2_with_eip.route_53.zone is defined
     - aws_ec2_with_eip.route_53.zone | length > 0
 
-- name: Add a matching wildcard DNS record
+- name: Add a matching wildcard DNS record.
   amazon.aws.route53:
     state: "{{ aws_ec2_with_eip.route_53.state }}"
     profile: "{{ aws_ec2_with_eip.route_53.aws_profile }}"

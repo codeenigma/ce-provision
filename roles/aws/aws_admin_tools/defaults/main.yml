@@ -6,8 +6,12 @@ aws_admin_tools:
   functions:
     - name: "GetForecastedCosts"
       type: GET
-      policies:
-        - "arn:aws:iam::{{ _acc_id }}:policy/CEBillingPolicy" # Custom policy
+      inline_policies:
+        name: "{{ _aws_profile }}Billing"
+        resource: "*"
+        acton:
+          - "ce:*"
+      policies: []
     - name: "ChangeASGScaling"
       type: POST
       policies:
