@@ -9,17 +9,17 @@
           Resource: "{{ aws_iam_role.inline_policies.resource }}"
     state: present
   register: _inline_iam_policy
-  when: inline_policies.action is defined and inline_policies.action > 0
+  when: aws_iam_role.inline_policies.action is defined and aws_iam_role.inline_policies.action > 0
 
 - name: Join managed and inline policy.
   ansible.builtin.set_fact:
     _combined_policies: "{{ aws_iam_role.managed_policies + [_inline_iam_policy.arn] }}"
-  when: inline_policies.action is defined and inline_policies.action > 0
+  when: aws_iam_role.inline_policies.action is defined and aws_iam_role.inline_policies.action > 0
 
 - name: Create combined var if inline policy is not defined or empty.
   ansible.builtin.set_fact:
     _combined_policies: "{{ aws_iam_role.managed_policies }}"
-  when: inline_policies.action is not defined or inline_policies.action == 0
+  when: aws_iam_role.inline_policies.action is not defined or aws_iam_role.inline_policies.action == 0
 
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
