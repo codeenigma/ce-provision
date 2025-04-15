@@ -1,114 +1,49 @@
 ---
-- name: Install Selenium dependencies.
+- name: Install Java
   ansible.builtin.apt:
-    pkg:
-      - firefox-esr
+    name: openjdk-17-jre
+    state: present
+    update_cache: yes
+
+- name: Install chromium and chromium-driver
+  ansible.builtin.apt:
+    name:
       - chromium
-      - xvfb
-      - xterm
-    state: present
-    update_cache: true
-    cache_valid_time: 240
+      - chromium-driver
 
-- name: Install VNC.
-  ansible.builtin.apt:
-    pkg: tightvncserver
-    state: present
-  when: selenium.display_manager == 'VNC'
-
-- name: Set Selenium major version.
-  ansible.builtin.set_fact:
-    _selenium_major_version: "{{ selenium.version | regex_replace('\\.[0-9]+$', '') }}"
-
-- name: Create Selenium folder.
+- name: Create directory for Selenium Standalone
   ansible.builtin.file:
     path: /opt/selenium
     state: directory
 
-- name: Download Selenium.
+- name: Download selenium-server-standalone.jar
   ansible.builtin.get_url:
-    url: "http://selenium-release.storage.googleapis.com/{{ _selenium_major_version }}/selenium-server-standalone-{{ selenium.version }}.jar"
-    dest: "/opt/selenium/selenium-server-standalone.jar"
+    url: "https://github.com/SeleniumHQ/selenium/releases/download/selenium-{ selenium.version }/selenium-server-{ selenium.version }.jar"
+    dest: /opt/selenium/selenium-server-standalone.jar
+    mode: '0644'
 
-- name: Download GeckoDriver.
-  ansible.builtin.unarchive:
-    src: "https://github.com/mozilla/geckodriver/releases/download/v{{ selenium.gecko_version }}/geckodriver-v{{ selenium.gecko_version }}-linux64.tar.gz"
-    dest: /opt/selenium
-    remote_src: true
+- name: Create a script to run Selenium Standalone Server
+  ansible.builtin.template:  :
+    src: start-selenium.sh.j2
+    dest: /opt/selenium/start-selenium.sh
+    mode: '0755'
 
-- name: Download ChromeDriver.
-  ansible.builtin.unarchive:
-    src: "https://chromedriver.storage.googleapis.com/{{ selenium.chrome_version }}/chromedriver_linux64.zip"
-    dest: /opt/selenium
-    remote_src: true
-
-- name: Install init.d service.
+- name: Create a script to stop Selenium Standalone Server
   ansible.builtin.template:
-    src: "selenium.init.j2"
-    dest: /etc/init.d/selenium
-    owner: root
-    group: root
-    mode: 0755
+    src: stop-selenium.sh.j2
+    dest: /opt/selenium/stop-selenium.sh
+    mode: '0755'
 
-- name: Create Selenium start script.
-  ansible.builtin.template:
-    src: "selenium-daemon-start-{{ selenium.display_manager }}.j2"
-    dest: /opt/selenium/selenium-daemon-start
-    owner: root
-    group: root
-    mode: 0555
-    force: true
+- name: Run Selenium Standalone Server in background
+  ansible.builtin.shell: nohup /opt/selenium/start-selenium.sh &
+  async: 30
+  poll: 0
 
-- name: Create selenium stop script.
-  ansible.builtin.template:
-    src: "selenium-daemon-stop.j2"
-    dest: /opt/selenium/selenium-daemon-stop
-    owner: root
-    group: root
-    mode: 0555
-
-- name: Create home X dir if needed.
-  ansible.builtin.file:
-    path: "/home/{{ user_deploy.username }}/.vnc"
-    owner: "{{ user_deploy.username }}"
-    group: "{{ user_deploy.username }}"
-    state: directory
-  when: selenium.display_manager == "VNC"
-
-- name: Create X startup script.
-  ansible.builtin.template:
-    src: "xstartup.j2"
-    dest: "/home/{{ user_deploy.username }}/.vnc/xstartup"
-    owner: "{{ user_deploy.username }}"
-    group: "{{ user_deploy.username }}"
-    mode: 0755
-  when: selenium.display_manager == "VNC"
-
-- name: Generate VNC password.
-  ansible.builtin.shell: "set -o pipefail && echo '{{ user_deploy.username }}' | vncpasswd -f > /home/{{ user_deploy.username }}/.vnc/passwd"
-  args:
-    executable: /bin/bash
-  become: true
-  become_user: "{{ user_deploy.username }}"
-  when: selenium.display_manager == "VNC"
-
-- name: Fix VNC folder permissions.
-  ansible.builtin.file:
-    dest: "/home/{{ user_deploy.username }}/.vnc"
-    owner: "{{ user_deploy.username }}"
-    group: "{{ user_deploy.username }}"
-    mode: 0700
-  when: selenium.display_manager == "VNC"
-
-- name: Fix VNC password file permissions.
-  ansible.builtin.file:
-    dest: "/home/{{ user_deploy.username }}/.vnc/passwd"
-    owner: "{{ user_deploy.username }}"
-    group: "{{ user_deploy.username }}"
-    mode: 0700
-  when: selenium.display_manager == "VNC"
-
-- name: Ensure Selenium is restarted.
-  ansible.builtin.service:
-    name: selenium
-    state: restarted
+- name: Check if Selenium is running
+  ansible.builtin.uri:
+    url: "https://{ selenium.url_server }:{ selenium.port }{selenium.path}/status"
+    return_content: yes
+  register: result
+  retries: 5
+  delay: 10
+  until: result.status == 200

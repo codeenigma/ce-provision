@@ -1,0 +1,6 @@
+#!/bin/sh
+
+PID=$(pgrep --full "selenium-server-standalone.jar")
+if [ ! -z "$PID" ]; then
+  kill $PID
+fi

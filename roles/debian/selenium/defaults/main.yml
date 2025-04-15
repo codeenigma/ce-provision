@@ -1,6 +1,6 @@
 ---
 selenium:
-  version: 3.141.59
-  gecko_version: 0.23.0
-  chrome_version: 2.45
-  display_manager: XVFB
+  version: 4.31.0
+  port: 4444
+  path: "/wd/hub"
+  url_server: localhost
