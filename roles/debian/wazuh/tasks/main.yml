@@ -144,6 +144,21 @@
     authd_password: "{{ lookup('password', '/dev/null length=32') }}"
   when: "'wazuh-manager.service' in wazuh_service.stdout"
 
+- name: Check if wazuh-manager service exists
+  ansible.builtin.command: systemctl list-unit-files --type=service --no-pager
+  register: wazuh_service
+  ignore_errors: true
+  changed_when: false
+
+- name: Write the password to /var/ossec/etc/authd.pass
+  ansible.builtin.copy:
+    dest: /var/ossec/etc/authd.pass
+    content: "{{ _wazuh_authd }}"
+    mode: '0640'
+    owner: root
+    group: wazuh
+  when: "'wazuh-manager.service' in wazuh_service.stdout or 'wazuh-agent.service' in wazuh_service.stdout"
+
 - name: Write the password to /var/ossec/etc/authd.pass
   ansible.builtin.copy:
     dest: /var/ossec/etc/authd.pass
