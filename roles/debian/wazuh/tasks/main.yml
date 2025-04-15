@@ -133,6 +133,15 @@
     state: restarted
   when: filebeat_exists
 
+<<<<<<< HEAD
+=======
+- name: Check if wazuh-manager service exists
+  ansible.builtin.command: systemctl list-unit-files --type=service --no-pager
+  register: wazuh_service
+  ignore_errors: true
+  changed_when: false
+
+>>>>>>> Fixing-inline-policy-tasks
 - name: Write the password to /var/ossec/etc/authd.pass
   ansible.builtin.copy:
     dest: /var/ossec/etc/authd.pass
@@ -146,4 +155,14 @@
   ansible.builtin.systemd:
     name: wazuh-manager
     state: restarted
+<<<<<<< HEAD
   when: "'wazuh-manager.service' in wazuh_service.stdout or 'wazuh-agent.service' in wazuh_service.stdout"
+=======
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
+
+- name: Restart wazuh-agent to apply changes
+  ansible.builtin.systemd:
+    name: wazuh-agent
+    state: restarted
+  when: "'wazuh-agent.service' in wazuh_service.stdout"
+>>>>>>> Fixing-inline-policy-tasks
