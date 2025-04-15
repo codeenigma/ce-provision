@@ -45,7 +45,8 @@
       inline_policies:
         name: "PassRole"
         resource: "*"
-        action: "iam:PassRole"
+        action:
+          - "iam:PassRole"
       policy_document: "{{ lookup('file', 'pass_role_backup.j2') }}"
       managed_policies:
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
