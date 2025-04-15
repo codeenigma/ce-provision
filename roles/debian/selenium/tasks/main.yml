@@ -3,7 +3,7 @@
   ansible.builtin.apt:
     name: openjdk-17-jre
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Install chromium and chromium-driver
   ansible.builtin.apt:
@@ -42,7 +42,7 @@
 - name: Check if Selenium is running
   ansible.builtin.uri:
     url: "https://{ selenium.url_server }:{ selenium.port }{selenium.path}/status"
-    return_content: yes
+    return_content: true
   register: result
   retries: 5
   delay: 10
