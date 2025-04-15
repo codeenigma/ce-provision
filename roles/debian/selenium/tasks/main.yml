@@ -23,7 +23,7 @@
     mode: '0644'
 
 - name: Create a script to run Selenium Standalone Server
-  ansible.builtin.template:  :
+  ansible.builtin.template:
     src: start-selenium.sh.j2
     dest: /opt/selenium/start-selenium.sh
     mode: '0755'
