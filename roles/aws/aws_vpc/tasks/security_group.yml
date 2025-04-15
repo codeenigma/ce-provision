@@ -1,3 +1,7 @@
+- name: Pring aws_vpc var
+  ansible.builtin.debug:
+    msg: "{{ aws_vpc }}"
+
 - name: Create Security Group.
   amazon.aws.ec2_security_group:
     name: "{{ aws_vpc.name }}"
