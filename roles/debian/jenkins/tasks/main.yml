@@ -100,9 +100,18 @@
     group: "{{ jenkins.user }}"
     mode: 0775
 
-- name: Restart Jenkins.
+- name: Copy jenkins service file with jenkins port number.
+  ansible.builtin.template:
+    src: "jenkins.service.j2"
+    dest: "/usr/lib/systemd/system/jenkins.service"
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: Restart Jenkins and reload daemon.
   ansible.builtin.service:
     name: jenkins
+    daemon_reload: true
     state: restarted
   when: aptoutput.changed
 
