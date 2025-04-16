@@ -142,7 +142,7 @@
 - name: Deploy custom Wazuh local rules
   ansible.builtin.copy:
     src: custom_wazuh_rules.xml
-    dest: "{{ wazuh_dir | default('/var/ossec') }}/etc/rules/custom_401_rules.xml"
+    dest: "{{ wazuh_dir | default('/var/ossec') }}/etc/rules/custom_wazuh_rules.xml"
     owner: wazuh
     group: wazuh
     mode: '0640'
