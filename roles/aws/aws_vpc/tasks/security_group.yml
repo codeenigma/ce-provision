@@ -6,9 +6,9 @@
     tags: "{{ aws_vpc.tags | combine({'Name': aws_vpc.name}) }}"
     state: "{{ aws_vpc.state }}"
     vpc_id: "{{ aws_vpc.id }}"
-    description: "{{ aws_vpc.description }}"
-    rules: "{{ aws_vpc.rules | default(omit) }}"
-    rules_egress: "{{ aws_vpc.rules_egress | default(omit) }}"
+    description: "{{ security_group.description }}"
+    rules: "{{ security_group.rules | default(omit) }}"
+    rules_egress: "{{ security_group.rules_egress | default(omit) }}"
     purge_rules: "{{ aws_vpc.purge_rules | default(omit) }}"
   register: _aws_vpc_result
 

@@ -14,10 +14,6 @@
   vars:
     aws_vpc:
       name: "default"
-      profile: "{{ aws_vpc.aws_profile }}"
-      region: "{{ aws_vpc.region }}"
-      tags: "{{ aws_vpc.tags }}"
-      state: "{{ aws_vpc.state }}"
       id: "{{ _aws_vpc_vpc.vpc.id }}"
       description: "default VPC security group"
       purge_rules: false
@@ -27,10 +23,6 @@
   vars:
     aws_vpc:
       name: "{{ security_group.name }}"
-      profile: "{{ aws_vpc.aws_profile }}"
-      region: "{{ aws_vpc.region }}"
-      tags: "{{ aws_vpc.tags | combine({'Name': security_group.name}) }}"
-      state: "{{ aws_vpc.state }}"
       id: "{{ _aws_vpc_vpc.vpc.id }}"
       description: "default VPC security group"
       rules: "{{ security_group.rules | default(omit) }}"

@@ -25,7 +25,7 @@
       timeout: "{{ aws_backup_validation.timeout }}"
       role: "{{ aws_iam_role._result['LambdaBackupRestoreRole'] }}"
       runtime: "{{ aws_backup_validation.runtime }}"
-      function_file: "{{ lookup('template', item + '_validation.py.j2')  }}"
+      function_file: "{{ lookup('template', item + '_validation.py.j2') }}"
       s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
       tags:
         Name: "{{ item }}_backup_validation"
