@@ -139,6 +139,18 @@
   ignore_errors: true
   changed_when: false
 
+- name: Deploy custom Wazuh local rules
+  ansible.builtin.copy:
+    src: custom_wazuh_rules.xml
+    dest: "{{ wazuh_dir | default('/var/ossec') }}/etc/rules/custom_wazuh_rules.xml"
+    owner: wazuh
+    group: wazuh
+    mode: '0640'
+  notify: restart wazuh-manager
+  tags:
+    - rules
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
+
 - name: Write the password to /var/ossec/etc/authd.pass
   ansible.builtin.copy:
     dest: /var/ossec/etc/authd.pass
