@@ -15,7 +15,6 @@
     state: "{{ aws_elasticache.state }}"
     subnets: "{{ aws_elasticache.subnets }}"
     region: "{{ aws_elasticache.region }}"
-    profile: "{{ aws_elasticache.aws_profile }}"
     description: "{{ aws_elasticache.description }}"
   register: _aws_elasticache_subnet_group
 
