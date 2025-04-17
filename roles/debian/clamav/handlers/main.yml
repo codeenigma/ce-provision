@@ -3,4 +3,3 @@
     name: clamav-daemon.socket
     state: restarted
     enabled: true
-
