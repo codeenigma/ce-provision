@@ -2,7 +2,7 @@
 - name: Download jenkins key.
   ansible.builtin.get_url:
     url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
-    dest: "{{ jenkins.apt_signed_by }}"
+    dest: /usr/share/keyrings/jenkins-keyring.asc
     mode: '0644'
 
 - name: Add Jenkins repository.
