@@ -1,17 +1,23 @@
 ---
-- name: Add Jenkins repository and key.
+- name: Download jenkins key.
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/debian/jenkins.io-2023.key
+    dest: "{{ jenkins.apt_signed_by }}"
+    mode: '0644'
+
+- name: Add Jenkins repository.
   ansible.builtin.include_role:
     name: debian/apt_repository
   vars:
     apt_repository:
-      legacy_repo: "deb http://pkg.jenkins.io/debian binary/"
+      legacy_repo: "deb http://pkg.jenkins.io/debian-stable binary/"
       format: list # Jenkins repo does not support deb822
-      list_repo_string: "http://pkg.jenkins.io/debian binary/" # override automated repo string generation
+      list_repo_string: "http://pkg.jenkins.io/debian-stable binary/" # override automated repo string generation
       name: jenkins
       types:
         - deb
       uris:
-        - http://pkg.jenkins.io/debian
+        - http://pkg.jenkins.io/debian-stable
       signed_by: "{{ jenkins.apt_signed_by }}"
       state: present
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
