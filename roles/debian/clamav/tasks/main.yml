@@ -50,4 +50,4 @@
   when: clamav_daemon_enabled
   notify:
     - reload systemd
-    - restart clamav-daemon.socket
+    - Restart clamav-daemon.socket

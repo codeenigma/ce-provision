@@ -4,6 +4,3 @@
     state: restarted
     enabled: true
 
-- name: Reload systemd
-  ansible.builtin.command: systemctl daemon-reload
-  become: true
