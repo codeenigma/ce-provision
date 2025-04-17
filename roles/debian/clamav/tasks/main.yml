@@ -41,3 +41,13 @@
     pkg: clamdscan
     state: present
   when: clamav.install_clamdscan
+
+- name: Clamav daemon socket overrides
+  ansible.builtin.template:
+    src: clamav-daemon.socket.j2
+    dest: /etc/systemd/system/clamav-daemon.socket
+    mode: '0644'
+  when: clamav_daemon_enabled
+  notify:
+    - reload systemd
+    - restart clamav-daemon.socket
