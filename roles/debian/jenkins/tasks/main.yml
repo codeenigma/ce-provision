@@ -1,8 +1,4 @@
 ---
-- name: Print signed by var.
-  ansible.builtin.debug:
-    msg: "{{ jenkins.apt_signed_by }}"
-
 - name: Add Jenkins repository.
   ansible.builtin.include_role:
     name: debian/apt_repository
@@ -118,13 +114,9 @@
     daemon_reload: true
     state: restarted
 
-- name: Paise for 2 minutes.
-  ansible.builtin.pause:
-    minutes: 2
-
 - name: Download Jenkins CLI.
   ansible.builtin.get_url:
-    url: "https://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
+    url: "http://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
     validate_certs: false
     dest: /opt/jenkins-cli.jar
 
