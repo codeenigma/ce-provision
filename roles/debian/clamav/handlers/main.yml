@@ -1,0 +1,5 @@
+- name: Restart clamav-daemon.socket
+  ansible.builtin.service:
+    name: clamav-daemon.socket
+    state: restarted
+    enabled: true
