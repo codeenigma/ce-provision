@@ -117,12 +117,10 @@
     name: jenkins
     daemon_reload: true
     state: restarted
-  when: aptoutput.changed
 
 - name: Paise for 2 minutes.
   ansible.builtin.pause:
     minutes: 2
-  when: aptoutput.changed
 
 - name: Download Jenkins CLI.
   ansible.builtin.get_url:
