@@ -138,13 +138,13 @@
         timer_OnCalendar: "{{ jenkins.on_calendar }}"
 
 - name: Install Jenkins Plugins.
-  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
+  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s http://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
   become: true
   become_user: "{{ jenkins.user }}"
   register: pluginoutput
 
 - name: Safe restart Jenkins.
-  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
+  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s http://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
   become: true
   become_user: "{{ jenkins.user }}"
   when: pluginoutput.changed
