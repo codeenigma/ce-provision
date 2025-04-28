@@ -8,6 +8,7 @@
 
 - name: Fetch groups.
   amazon.aws.ec2_security_group_info:
+    profile: "{{ aws_security_groups.aws_profile }}"
     region: "{{ aws_security_groups.region }}"
     filters:
       group-name: "{{ _aws_security_group_names }}"

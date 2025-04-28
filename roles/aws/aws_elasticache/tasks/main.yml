@@ -4,6 +4,7 @@
     name: aws/aws_security_groups
   vars:
     aws_security_groups:
+      profile: "{{ aws_elasticache.aws_profile }}"
       region: "{{ aws_elasticache.region }}"
       group_names: "{{ aws_elasticache.elasticache_security_groups }}"
       return_type: ids
@@ -23,6 +24,7 @@
 
 - name: Create ElastiCache cluster.
   community.aws.elasticache:
+    profile: "{{ aws_elasticache.aws_profile }}"
     name: "{{ aws_elasticache.name }}"
     region: "{{ aws_elasticache.region }}"
     state: "{{ aws_elasticache.state }}"
