@@ -24,6 +24,7 @@ LINT="no"
 ABSOLUTE_PLAYBOOK_PATH="no"
 PARALLEL_RUN="no"
 BOTO_PROFILE=""
+TAGS=""
 # Ensure build workspace exists.
 if [ ! -d "$BUILD_WORKSPACE_BASE" ]; then
     mkdir "$BUILD_WORKSPACE_BASE"
@@ -79,6 +80,10 @@ parse_options(){
         ;;
       "--list-tasks")
           LIST_TASKS="yes"
+        ;;
+      "--tags")
+          shift
+          TAGS="$1"
         ;;
       "--verbose")
           VERBOSE="yes"
@@ -195,6 +200,9 @@ ansible_play(){
   fi
   if [ "$LIST_TASKS" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD --list-tasks"
+  fi
+  if [ -n "$TAGS" ]; then
+    ANSIBLE_CMD="$ANSIBLE_CMD --tags $TAGS"
   fi
   if [ "$VERBOSE" = "yes" ]; then
     ANSIBLE_CMD="$ANSIBLE_CMD -vvvv"
