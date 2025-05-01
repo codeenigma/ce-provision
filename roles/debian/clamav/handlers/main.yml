@@ -5,5 +5,5 @@
     enabled: true
 
 - name: Reload systemd
-  systemd:
+  ansible.builtin.systemd_service:
     daemon_reload: true
