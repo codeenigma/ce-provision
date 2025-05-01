@@ -151,7 +151,7 @@
       when: is_local
 
     - name: Restart rsyslog using systemd to apply postfix changes (if is_local is false).
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         name: rsyslog.service
         state: restarted
       when: is_local is not defined or not is_local
@@ -165,7 +165,7 @@
       when: is_local
 
     - name: Stop Postfix using systemd (if is_local is false).
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         name: postfix
         state: stopped
       when: is_local is not defined or not is_local
@@ -190,7 +190,7 @@
       when: is_local
 
     - name: Start Postfix using systemd (if is_local is false).
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         name: postfix
         state: started
       when: is_local is not defined or not is_local

@@ -128,7 +128,7 @@
     filebeat_exists: "{{ _service_list.stdout is search('filebeat.service') }}"
 
 - name: Restart filebeat at the end. # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: filebeat
     state: restarted
   when: filebeat_exists
@@ -161,13 +161,13 @@
   when: "'wazuh-manager.service' in wazuh_service.stdout or 'wazuh-agent.service' in wazuh_service.stdout"
 
 - name: Restart wazuh-manager to apply changes
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: wazuh-manager
     state: restarted
   when: "'wazuh-manager.service' in wazuh_service.stdout"
 
 - name: Restart wazuh-agent to apply changes
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: wazuh-agent
     state: restarted
   when: "'wazuh-agent.service' in wazuh_service.stdout"
