@@ -3,3 +3,7 @@
     name: clamav-daemon.socket
     state: restarted
     enabled: true
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
