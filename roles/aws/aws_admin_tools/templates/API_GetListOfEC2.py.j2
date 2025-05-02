@@ -17,6 +17,9 @@ def lambda_handler(event, context):
       pub_ip = ""
       priv_ip = ""
       inst_name = ""
+      eip_list=[]
+      priv_eip=[]
+      pub_eip=[]
 
       if "PublicIpAddress" in instance:
         pub_ip = instance['PublicIpAddress']
@@ -31,6 +34,20 @@ def lambda_handler(event, context):
         for name in instance['Tags']:
           if name['Key'] == 'Name':
             inst_name = name['Value']
+
+            eip_list = ec2_cli.describe_addresses(
+              Filters=[
+                {
+                  'Name': 'tag:Name',
+                  'Values': [inst_name]
+                }
+              ]
+            )
+            for eip in eip_list['Addresses']:
+              if "PublicIp" in eip:
+                pub_eip.append(eip['PublicIp'])
+              if "PrivateIpAddress" in eip:
+                priv_eip.append(eip['PrivateIpAddress'])
       else:
         inst_name = "-"
 
@@ -39,7 +56,11 @@ def lambda_handler(event, context):
         'State': instance['State'],
         'Public IP': pub_ip,
         'Private IP': priv_ip,
-        'Instance type': instance['InstanceType']
+        'Instance type': instance['InstanceType'],
+        'EIP': {
+          'public': pub_eip,
+          'private': priv_eip
+        }
       }
       Ec2_info_list.append(new_dict)
 
