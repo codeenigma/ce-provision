@@ -9,7 +9,7 @@ aws_admin_tools:
       inline_policies:
         name: "{{ _aws_profile }}Billing"
         resource: "*"
-        acton:
+        action:
           - "ce:*"
       policies: []
     - name: "Change_ASG_Scaling"
@@ -22,7 +22,7 @@ aws_admin_tools:
       inline_policies:
         name: "ListEc2"
         resource: "*"
-        acton:
+        action:
           - "ec2:DescribeAddresses"
           - "ec2:DescribeInstances"
     - name: "Get_IP_Set"
@@ -31,7 +31,7 @@ aws_admin_tools:
       inline_policies:
         name: "Get_IP_Set"
         resource: "*"
-        acton:
+        action:
           - "wafv2:GetIPSet"
     - name: "Update_IP_Set"
       type: POST
@@ -39,5 +39,5 @@ aws_admin_tools:
       inline_policies:
         name: "Update_IP_Set"
         resource: "*"
-        acton:
+        action:
           - "wafv2:UpdateIPSet"
