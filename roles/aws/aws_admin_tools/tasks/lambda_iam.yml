@@ -10,4 +10,5 @@
       name: "API_{{ item.name }}"
       aws_profile: "{{ _aws_profile }}"
       managed_policies: "{{ _policies }}"
+      inline_policies: "{{ item.inline_policies }}"
       policy_document: "{{ lookup('template', 'trusted_entitites.j2') }}"
