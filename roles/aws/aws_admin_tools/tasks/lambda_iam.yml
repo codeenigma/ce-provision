@@ -2,10 +2,6 @@
   ansible.builtin.set_fact:
     _policies: "{{ item.policies + ['arn:aws:iam::aws:policy/CloudWatchLogsFullAccess'] }}"
 
-- name: Print inline polcies.
-  ansible.builtin.debug:
-    msg: "{{ item.inline_policies }}"
-
 - name: Create a role and attach policies.
   ansible.builtin.include_role:
     name: aws/aws_iam_role
