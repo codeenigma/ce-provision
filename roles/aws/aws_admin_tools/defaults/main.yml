@@ -4,7 +4,7 @@ aws_admin_tools:
   allowed_ips:
     - 192.168.1.1/32 # Ip of server with access to API-s
   functions:
-    - name: "Get_Forecasted_Costs"
+    - name: "get_forecasted_costs"
       type: GET
       inline_policies:
         name: "{{ _aws_profile }}Billing"
@@ -12,32 +12,32 @@ aws_admin_tools:
         action:
           - "ce:*"
       policies: []
-    - name: "Change_ASG_Scaling"
+    - name: "change_asg_scaling"
       type: POST
       policies:
         - arn:aws:iam::aws:policy/AmazonEC2FullAccess
-    - name: "Get_List_Of_EC2"
+    - name: "get_list_of_ec2"
       type: GET
       policies: []
       inline_policies:
-        name: "ListEc2"
+        name: "list_ec2"
         resource: "*"
         action:
           - "ec2:DescribeAddresses"
           - "ec2:DescribeInstances"
-    - name: "Get_IP_Set"
+    - name: "get_ip_set"
       type: GET
       policies: []
       inline_policies:
-        name: "Get_IP_Set"
+        name: "get_ip_set"
         resource: "*"
         action:
           - "wafv2:GetIPSet"
-    - name: "Update_IP_Set"
+    - name: "update_ip_set"
       type: POST
       policies: []
       inline_policies:
-        name: "Update_IP_Set"
+        name: "update_ip_set"
         resource: "*"
         action:
           - "wafv2:UpdateIPSet"
