@@ -65,7 +65,7 @@
 - name: Update Lambda triggers.
   ansible.builtin.command: >-
     aws lambda add-permission
-    --function-name "API_{{ item.name }}"
+    --function-name "api_{{ item.name }}"
     --statement-id "{{ item.name }}_{{ _rand_str }}"
     --action "lambda:InvokeFunction"
     --principal apigateway.amazonaws.com
