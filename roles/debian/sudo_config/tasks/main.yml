@@ -5,11 +5,24 @@
     state: directory
     mode: "0750"
 
-- name: "Add {{ sudo_config.entity_name }} to sudoers."
+- name: Add {{ sudo_config.entity_name }} to sudoers.
   ansible.builtin.template:
     src: "sudoer.j2"
     dest: "/etc/sudoers.d/{{ sudo_config.filename }}"
     owner: root
     group: root
     mode: "0440"
+  when: sudo_config.entity_name | length > 0
+  loop: "{{ sudo_config }}"
+  loop_control:
+    loop_var: sudo_config
+
+- name: Validate sudoers file for {{ sudo_config.filename }}
+  ansible.builtin.command: "visudo -cf /etc/sudoers.d/{{ sudo_config.filename }}"
+  register: visudo_check
+  changed_when: false
+  failed_when: visudo_check.rc != 0
+  loop: "{{ sudo_config }}"
+  loop_control:
+    loop_var: sudo_config
   when: sudo_config.entity_name | length > 0
