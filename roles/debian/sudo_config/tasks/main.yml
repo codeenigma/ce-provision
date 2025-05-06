@@ -40,7 +40,6 @@
     owner: root
     group: root
     mode: "0440"
-    remote_src: yes
   when: item.entity_name | default('') | length > 0
   with_items: "{{ sudo_config if sudo_config is iterable and sudo_config is not mapping else [sudo_config] }}"
 
