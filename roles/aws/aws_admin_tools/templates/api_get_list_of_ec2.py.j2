@@ -5,66 +5,44 @@ import boto3
 ec2_cli = boto3.client("ec2", region_name="{{ _aws_region }}")
 
 def lambda_handler(event, context):
+    print("Gathering instance details.")
 
-  print("Gathering instance details.")
-  ec2_instances=ec2_cli.describe_instances()
+    # Describe instances and addresses once
+    instances_response = ec2_cli.describe_instances()
+    addresses_response = ec2_cli.describe_addresses()
 
-  instance_exist = False
-  Ec2_info_list=[]
+    # Preprocess EIPs for quick lookup by tag:Name
+    eip_map = {}
+    for eip in addresses_response.get('Addresses', []):
+        name_tag = next((tag['Value'] for tag in eip.get('Tags', []) if tag['Key'] == 'Name'), None)
+        if name_tag:
+            eip_map.setdefault(name_tag, {'Public': [], 'Private': []})
+            if 'PublicIp' in eip:
+                eip_map[name_tag]['Public'].append(eip['PublicIp'])
+            if 'PrivateIpAddress' in eip:
+                eip_map[name_tag]['Private'].append(eip['PrivateIpAddress'])
 
-  for reservation in ec2_instances["Reservations"]:
-    for instance in reservation["Instances"]:
-      pub_ip = ""
-      priv_ip = ""
-      inst_name = ""
-      eip_list=[]
-      priv_eip=[]
-      pub_eip=[]
+    ec2_info_list = []
 
-      if "PublicIpAddress" in instance:
-        pub_ip = instance['PublicIpAddress']
-      else:
-        pub_ip = "-"
-      if "PrivateIpAddress" in instance:
-        priv_ip = instance['PrivateIpAddress']
-      else:
-        priv_ip = "-"
+    for reservation in instances_response.get("Reservations", []):
+        for instance in reservation.get("Instances", []):
+            inst_name = "-"
+            if "Tags" in instance:
+                for tag in instance["Tags"]:
+                    if tag["Key"] == "Name":
+                        inst_name = tag["Value"]
+                        break
 
-      if "Tags" in instance:
-        for name in instance['Tags']:
-          if name['Key'] == 'Name':
-            inst_name = name['Value']
+            ec2_info_list.append({
+                "EC2Name": inst_name,
+                "State": instance.get("State", {}),
+                "PublicIP": instance.get("PublicIpAddress", "-"),
+                "PrivateIP": instance.get("PrivateIpAddress", "-"),
+                "InstanceType": instance.get("InstanceType", "-"),
+                "EIP": eip_map.get(inst_name, {"Public": [], "Private": []})
+            })
 
-            eip_list = ec2_cli.describe_addresses(
-              Filters=[
-                {
-                  'Name': 'tag:Name',
-                  'Values': [inst_name]
-                }
-              ]
-            )
-            for eip in eip_list['Addresses']:
-              if "PublicIp" in eip:
-                pub_eip.append(eip['PublicIp'])
-              if "PrivateIpAddress" in eip:
-                priv_eip.append(eip['PrivateIpAddress'])
-      else:
-        inst_name = "-"
-
-      new_dict={
-        'EC2 name': inst_name,
-        'State': instance['State'],
-        'Public IP': pub_ip,
-        'Private IP': priv_ip,
-        'Instance type': instance['InstanceType'],
-        'EIP': {
-          'public': pub_eip,
-          'private': priv_eip
-        }
-      }
-      Ec2_info_list.append(new_dict)
-
-  return {
-    'statusCode': 200,
-    'EC2 info': Ec2_info_list
-  }
+    return {
+        "statusCode": 200,
+        "EC2Info": ec2_info_list
+    }

@@ -41,3 +41,14 @@ aws_admin_tools:
         resource: "*"
         action:
           - "wafv2:UpdateIPSet"
+    - name: "get_acl_list"
+      type: GET
+      policies: []
+      inline_policies:
+        name: "get_acl_list"
+        resource: "*"
+        action:
+          - "wafv2:ListResourcesForWebACL",
+          - "wafv2:ListWebACLs",
+          - "wafv2:GetWebACL",
+          - "cloudfront:ListDistributionsByWebACLId"
