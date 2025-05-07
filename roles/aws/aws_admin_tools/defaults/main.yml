@@ -14,8 +14,13 @@ aws_admin_tools:
       policies: []
     - name: "change_asg_scaling"
       type: POST
-      policies:
-        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+      policies: []
+      inline_policies:
+        name: "change_asg_scaling"
+        resource: "*"
+        action:
+          - "autoscaling:DescribePolicies"
+          - "autoscaling:PutScalingPolicy"
     - name: "get_list_of_ec2"
       type: GET
       policies: []
@@ -41,3 +46,14 @@ aws_admin_tools:
         resource: "*"
         action:
           - "wafv2:UpdateIPSet"
+    - name: "get_acl_list"
+      type: GET
+      policies: []
+      inline_policies:
+        name: "get_acl_list"
+        resource: "*"
+        action:
+          - "wafv2:ListResourcesForWebACL"
+          - "wafv2:ListWebACLs"
+          - "wafv2:GetWebACL"
+          - "cloudfront:ListDistributionsByWebACLId"
