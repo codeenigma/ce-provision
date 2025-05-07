@@ -23,7 +23,7 @@
   with_items: "{{ sudo_config if sudo_config is iterable and sudo_config is not mapping else [sudo_config] }}"
   register: sudo_templates
 
-- name: Validate sudoers file
+- name: Validate sudoers file on remote
   ansible.builtin.command: "visudo -cf {{ temp_sudoers_dir.path }}/{{ item.filename }}"
   register: visudo_check
   failed_when: visudo_check.rc != 0
@@ -32,6 +32,7 @@
   when: item.entity_name | default('') | length > 0
   loop_control:
     label: "{{ item.filename }}"
+  delegate_to: "{{ inventory_hostname }}"
 
 - name: Install validated sudoers file
   ansible.builtin.copy:
@@ -40,7 +41,7 @@
     owner: root
     group: root
     mode: "0440"
-    remote_src: yes
+    remote_src: true
   when: item.entity_name | default('') | length > 0
   with_items: "{{ sudo_config if sudo_config is iterable and sudo_config is not mapping else [sudo_config] }}"
 
