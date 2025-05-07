@@ -19,7 +19,7 @@ aws_admin_tools:
         name: "change_asg_scaling"
         resource: "*"
         action:
-          - "autoscaling:DescribePolicies",
+          - "autoscaling:DescribePolicies"
           - "autoscaling:PutScalingPolicy"
     - name: "get_list_of_ec2"
       type: GET
@@ -53,7 +53,7 @@ aws_admin_tools:
         name: "get_acl_list"
         resource: "*"
         action:
-          - "wafv2:ListResourcesForWebACL",
-          - "wafv2:ListWebACLs",
-          - "wafv2:GetWebACL",
+          - "wafv2:ListResourcesForWebACL"
+          - "wafv2:ListWebACLs"
+          - "wafv2:GetWebACL"
           - "cloudfront:ListDistributionsByWebACLId"
