@@ -14,8 +14,13 @@ aws_admin_tools:
       policies: []
     - name: "change_asg_scaling"
       type: POST
-      policies:
-        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+      policies: []
+      inline_policies:
+        name: "change_asg_scaling"
+        resource: "*"
+        action:
+          - "autoscaling:DescribePolicies",
+          - "autoscaling:PutScalingPolicy"
     - name: "get_list_of_ec2"
       type: GET
       policies: []
