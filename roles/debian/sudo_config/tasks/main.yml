@@ -5,14 +5,14 @@
     state: directory
     mode: "0750"
 
-- name: Create temporary directory for sudoers validation
+- name: Create temporary directory for sudoers validation.
   ansible.builtin.tempfile:
     state: directory
     suffix: sudoers
   register: temp_sudoers_dir
   when: sudo_config | default([]) | length > 0
 
-- name: Create sudoers file for validation
+- name: Create sudoers file for validation.
   ansible.builtin.template:
     src: "sudoer.j2"
     dest: "{{ temp_sudoers_dir.path }}/{{ item.filename }}"
@@ -23,7 +23,7 @@
   with_items: "{{ sudo_config if sudo_config is iterable and sudo_config is not mapping else [sudo_config] }}"
   register: sudo_templates
 
-- name: Validate sudoers file on remote
+- name: Validate sudoers file on remote.
   ansible.builtin.command: "visudo -cf {{ temp_sudoers_dir.path }}/{{ item.filename }}"
   register: visudo_check
   failed_when: visudo_check.rc != 0
@@ -34,7 +34,7 @@
     label: "{{ item.filename }}"
   delegate_to: "{{ inventory_hostname }}"
 
-- name: Install validated sudoers file
+- name: Install validated sudoers file.
   ansible.builtin.copy:
     src: "{{ temp_sudoers_dir.path }}/{{ item.filename }}"
     dest: "/etc/sudoers.d/{{ item.filename }}"
@@ -45,7 +45,7 @@
   when: item.entity_name | default('') | length > 0
   with_items: "{{ sudo_config if sudo_config is iterable and sudo_config is not mapping else [sudo_config] }}"
 
-- name: Clean up temporary files
+- name: Clean up temporary files.
   ansible.builtin.file:
     path: "{{ temp_sudoers_dir.path }}"
     state: absent
