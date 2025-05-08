@@ -23,9 +23,9 @@
         regexp: "{{ item.regexp }}"
         replace: "{{ item.replace }}"
       loop:
-        - { regexp: '10\\.8\\.0\\.1', replace: "{{ ovpn_gateway }}" }
-        - { regexp: '10\\.8\\.0\\.0/\\d+', replace: "{{ ovpn_cidr }}" }
-        - { regexp: '10\\.8\\.0\\.0', replace: "{{ ovpn_ip }}" }
+        - { regexp: '\\b10\\.8\\.0\\.1\\b', replace: "{{ ovpn_gateway }}" }
+        - { regexp: '\\b10\\.8\\.0\\.0/\\d{1,2}\\b', replace: "{{ ovpn_cidr }}" }
+        - { regexp: '\\b10\\.8\\.0\\.0\\b', replace: "{{ ovpn_ip }}" }
       loop_control:
         label: "{{ item.regexp }}"
 
@@ -130,13 +130,13 @@
       notify: Restart OpenVPN.
 
 # You can use a 'DEFAULT' file in the specified directory to provide client-specifig config, such as managed push routes
-- name: Set up client config directory.
+- name: Add another client config directory.
   when: openvpn.client_config_dir | length > 0
   block:
     - name: Remove default push-route.
       ansible.builtin.lineinfile:
         path: /etc/openvpn/server.conf
-        search_string: 'redirect-gateway'
+        search_string: 'redirect-gateway' # this string is absent by default, leaving the task for now just in case.
         state: absent
         owner: root
         group: root
@@ -234,7 +234,7 @@
         mode: '0644'
       notify: Restart OpenVPN.
 
-# Update routes with non-persistent IP addresses, like Loadbalancers.
+# Update routes with non-persistent IP addresses, such as Loadbalancers. Because 'allow_pull_fqdn' may not work properly.
 - name: Install a script to update routes with non-persistent IP addresses.
   when: openvpn.push_routes_elb | length > 0
   block:
@@ -248,24 +248,33 @@
       ansible.builtin.copy:
         dest: /etc/systemd/system/update-elb-routes.service
         content: |
+          #
+          # Managed by ansible
+          # Role: systemd-timer
+          #
           [Unit]
-          Description=Update ELB routes for OpenVPN
-          After=network-online.target
+          Description=Update ELB routes for OpenVPN Service
 
           [Service]
           Type=oneshot
           ExecStart=/usr/local/bin/update-elb-routes.sh
+      notify: Reload systemd.
 
     - name: Install systemd timer unit for ELB-routes updater.
       ansible.builtin.copy:
         dest: /etc/systemd/system/update-elb-routes.timer
         content: |
+          #
+          # Managed by ansible
+          # Role: systemd-timer
+          #
           [Unit]
-          Description=Run update-elb-routes periodically
+          Description=Update ELB routes for OpenVPN Timer
 
           [Timer]
           OnUnitActiveSec={{ openvpn.elb_routes_update_interval | default('1h') }}
-          Persistent=true
+          Persistent=false
+          AccuracySec=300s
 
           [Install]
           WantedBy=timers.target
@@ -275,15 +284,9 @@
       ansible.builtin.systemd_service:
         name: update-elb-routes.timer
         enabled: true
-        state: started
-
-    - name: Add ELB-routes config to OpenVPN.
-      ansible.builtin.blockinfile:
-        path: /etc/openvpn/server.conf
-        block: |
-          # Dynamic push route list updated by /usr/local/bin/update-elb-routes.sh.
-          include /etc/openvpn/elb-routes.inc
-      notify: Restart OpenVPN.
+        state: restarted
+        masked: false
+        daemon_reload: true
 
 # Only works when openvpn.port_choice == '1' because otherwise port will not be 1194 and regexp will not match
 - name: Use FQDN as OpenVPN server remote in client config.
