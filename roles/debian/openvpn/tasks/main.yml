@@ -237,7 +237,7 @@
 
 - name: Update routes with dynamic IPs.
   when: push_routes_elb | length > 0
-- block:
+  block:
     - name: Place the ELB-routes updater script.
       ansible.builtin.template:
         src: update-elb-routes.sh.j2
