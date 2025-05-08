@@ -1,5 +1,5 @@
 #!/bin/bash -e
-ELB_HOSTNAMES="{{ push_routes_elb | join(' ') }}"
+ELB_HOSTNAMES="{{ openvpn.push_routes_elb | join(' ') }}"
 TMP=$(mktemp)
 
 for h in $ELB_HOSTNAMES; do
