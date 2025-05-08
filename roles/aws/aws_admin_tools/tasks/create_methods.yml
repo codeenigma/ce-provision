@@ -35,7 +35,7 @@
   ansible.builtin.set_fact:
     _api_resource: "{{ _api_resource.stdout | from_json }}"
 
-- name: Put method on API gateway.
+- name: Put method on API gateway without URL params.
   ansible.builtin.command: >-
     aws apigateway put-method
     --rest-api-id "{{ _api_gate.id }}"
@@ -44,8 +44,27 @@
     --authorization-type "NONE"
     --no-api-key-required
     --region "{{ _aws_region }}"
+  when: item.url_params is not defined and item.url_params | length = 0
 
-- name: Add Lambda for method.
+- name: Create request template string.
+  ansible.builtin.template:
+    src: request_template.j2
+    dest: request_template
+  when: item.url_params is defined and item.url_params | length > 0
+
+- name: Put method on API gateway with URL params.
+  ansible.builtin.command: >-
+    aws apigateway put-method
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ _api_resource.id }}"
+    --http-method "{{ item.type }}"
+    --authorization-type "NONE"
+    --request-parameters file://request_template
+    --no-api-key-required
+    --region "{{ _aws_region }}"
+  when: item.url_params is defined and item.url_params | length > 0
+
+- name: Add Lambda for method without URL params.
   ansible.builtin.command: >-
     aws apigateway put-integration
     --rest-api-id "{{ _api_gate.id }}"
@@ -56,6 +75,38 @@
     --integration-http-method POST
     --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
     --region {{ _aws_region }}
+  when: item.url_params is not defined and item.url_params | length = 0
+
+- name: Append URL param to the list.
+  ansible.builtin.set_fact:
+    _url_params: "{{ _url_params|default([]) + ['\"item\": \"$input.params(\'item\')\"'] }}"
+  loop: item.url_params
+  when: item.url_params is defined and item.url_params | length > 0
+
+- name: Join URL param into string.
+  ansible.builtin.set_fact:
+    _url_params_string: "{{ _url_params | join(',') }}"
+  when: item.url_params is defined and item.url_params | length > 0
+
+- name: Create request template string.
+  ansible.builtin.template:
+    src: integration_template.j2
+    dest: integration_template
+  when: item.url_params is defined and item.url_params | length > 0
+
+- name: Add Lambda for method with URL params.
+  ansible.builtin.command: >-
+    aws apigateway put-integration
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ _api_resource.id }}"
+    --http-method "{{ item.type }}"
+    --type AWS
+    --content-handling CONVERT_TO_TEXT
+    --integration-http-method POST
+    --request-template file://integration_template
+    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+    --region {{ _aws_region }}
+  when: item.url_params is defined and item.url_params | length > 0
 
 - name: Add method response.
   ansible.builtin.command: >-
