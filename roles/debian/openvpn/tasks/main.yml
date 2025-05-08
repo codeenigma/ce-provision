@@ -236,7 +236,7 @@
 
 # Update routes with non-persistent IP addresses, like Loadbalancers.
 - name: Install a script to update routes with non-persistent IP addresses.
-  when: push_routes_elb | length > 0
+  when: openvpn.push_routes_elb | length > 0
   block:
     - name: Place the ELB-routes updater script.
       ansible.builtin.template:
