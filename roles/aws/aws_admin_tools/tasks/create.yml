@@ -21,6 +21,11 @@
     _old_api_res_list: "{{ _old_api_res_list.stdout | from_json | json_query('items') }}"
   when: _api_index | length > 0
 
+- name: Extract the root resource from the list.
+  ansible.builtin.set_fact:
+    _old_api_res_list: "{{ _old_api_res_list | rejectattr('path', 'eq', '/') | list }}"
+  when: _api_index | length > 0
+
 - name: Delete the old resources.
   ansible.builtin.command: >-
     aws apigateway delete-resource
