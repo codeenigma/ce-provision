@@ -23,9 +23,9 @@
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   loop:
-    - { regexp: '10\\.8\\.0\\.1',         replace: "{{ ovpn_gateway }}" }
-    - { regexp: '10\\.8\\.0\\.0/\\d+',    replace: "{{ ovpn_cidr }}"    }
-    - { regexp: '10\\.8\\.0\\.0',         replace: "{{ ovpn_ip }}"      }
+    - { regexp: '10\\.8\\.0\\.1', replace: "{{ ovpn_gateway }}" }
+    - { regexp: '10\\.8\\.0\\.0/\\d+', replace: "{{ ovpn_cidr }}" }
+    - { regexp: '10\\.8\\.0\\.0', replace: "{{ ovpn_ip }}" }
   loop_control:
     label: "{{ item.regexp }}"
   when: openvpn.ipv4_settings | length > 0
