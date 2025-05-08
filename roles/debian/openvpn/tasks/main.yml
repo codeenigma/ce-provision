@@ -8,27 +8,31 @@
     group: "{{ user_provision.username }}"
     force: true
 
-- name: Derive openvpn network facts.
-  ansible.builtin.set_fact:
-    ovpn_ip: "{{ openvpn.ipv4_settings.split(' ')[0] }}"
-    ovpn_mask: "{{ openvpn.ipv4_settings.split(' ')[1] }}"
-    ovpn_prefix: "{{ ovpn_mask | ipaddr('prefix') }}"
-    ovpn_cidr: "{{ ovpn_ip }}/{{ ovpn_prefix }}"
-    ovpn_gateway: "{{ ovpn_cidr | ipaddr('first_usable') }}"
+- name: Update network options in the OpenVPN install script.
   when: openvpn.ipv4_settings | length > 0
+  block:
+    - name: Derive OpenVPN ip and mask.
+      ansible.builtin.set_fact:
+        ovpn_ip: "{{ openvpn.ipv4_settings.split(' ')[0] }}"
+        ovpn_mask: "{{ openvpn.ipv4_settings.split(' ')[1] }}"
 
-- name: Patch OpenVPN install script with derived network settings.
-  ansible.builtin.replace:
-    path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
-    regexp: "{{ item.regexp }}"
-    replace: "{{ item.replace }}"
-  loop:
-    - { regexp: '10\\.8\\.0\\.1', replace: "{{ ovpn_gateway }}" }
-    - { regexp: '10\\.8\\.0\\.0/\\d+', replace: "{{ ovpn_cidr }}" }
-    - { regexp: '10\\.8\\.0\\.0', replace: "{{ ovpn_ip }}" }
-  loop_control:
-    label: "{{ item.regexp }}"
-  when: openvpn.ipv4_settings | length > 0
+    - name: Derive OpenVPN prefix, cidr and gateway.
+      ansible.builtin.set_fact:
+        ovpn_prefix: "{{ ovpn_mask | ansible.utils.ipaddr('prefix') }}"
+        ovpn_cidr:   "{{ ovpn_ip }}/{{ ovpn_prefix }}"
+        ovpn_gateway: "{{ ovpn_cidr | ansible.utils.ipaddr('first_usable') }}"
+
+    - name: Patch OpenVPN install script with derived network settings.
+      ansible.builtin.replace:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
+      loop:
+        - { regexp: '10\\.8\\.0\\.1', replace: "{{ ovpn_gateway }}" }
+        - { regexp: '10\\.8\\.0\\.0/\\d+', replace: "{{ ovpn_cidr }}" }
+        - { regexp: '10\\.8\\.0\\.0', replace: "{{ ovpn_ip }}" }
+      loop_control:
+        label: "{{ item.regexp }}"
 
 - name: Place the headless installer script.
   ansible.builtin.template:
@@ -235,7 +239,8 @@
         mode: '0644'
       notify: Restart OpenVPN.
 
-- name: Update routes with dynamic IPs.
+# Update routes with non-persistent IP addresses, like Loadbalancers.
+- name: Install a script to update routes with non-persistent IP addresses.
   when: push_routes_elb | length > 0
   block:
     - name: Place the ELB-routes updater script.
