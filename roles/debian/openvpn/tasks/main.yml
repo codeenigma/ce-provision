@@ -21,6 +21,7 @@
         ovpn_prefix: "{{ ovpn_mask | ansible.utils.ipaddr('prefix') }}"
         ovpn_cidr:   "{{ ovpn_ip }}/{{ ovpn_prefix }}"
         ovpn_gateway: "{{ ovpn_cidr | ansible.utils.ipaddr('first_usable') }}"
+      when: ovpn_mask | length > 0
 
     - name: Patch OpenVPN install script with derived network settings.
       ansible.builtin.replace:
