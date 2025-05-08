@@ -80,7 +80,7 @@
 - name: Append URL param to the list.
   ansible.builtin.set_fact:
     _url_params: "{{ _url_params|default([]) + ['\"item\": \"$input.params(\\'item\\')\"'] }}"
-  loop: item.url_params
+  loop: "{{ item.url_params | list }}"
   when: item.url_params is defined and item.url_params | length > 0
 
 - name: Join URL param into string.
