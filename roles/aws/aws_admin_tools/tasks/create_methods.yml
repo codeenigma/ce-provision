@@ -44,7 +44,7 @@
     --authorization-type "NONE"
     --no-api-key-required
     --region "{{ _aws_region }}"
-  when: item.url_params is not defined and item.url_params | length == 0
+  when: item.url_params is not defined or item.url_params | length == 0
 
 - name: Create request template string.
   ansible.builtin.template:
@@ -75,7 +75,7 @@
     --integration-http-method POST
     --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
     --region {{ _aws_region }}
-  when: item.url_params is not defined and item.url_params | length == 0
+  when: item.url_params is not defined or item.url_params | length == 0
 
 - name: Append URL param to the list.
   ansible.builtin.set_fact:
