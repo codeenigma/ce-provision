@@ -302,9 +302,9 @@
           Description=Update ELB routes for OpenVPN Timer
 
           [Timer]
-          OnUnitActiveSec={{ openvpn.elb_routes_update_interval | default('1h') }}
+          OnCalendar=*-*-* *:00:00
           Persistent=false
-          AccuracySec=300s
+          AccuracySec=600s
 
           [Install]
           WantedBy=timers.target
