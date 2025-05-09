@@ -13,26 +13,32 @@
   block:
     - name: Derive OpenVPN network details.
       ansible.builtin.set_fact:
-        ovpn_net:     "{{ openvpn.ipv4_settings.split(' ')[0] }}"
-        ovpn_cidr:    "{{ openvpn.ipv4_settings.split(' ')[0] }}/{{ openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix') }}"
+        ovpn_prefix: "{{ openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix') }}"
+        ovpn_cidr: "{{ openvpn.ipv4_settings.split(' ')[0] }}/{{ openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix') }}"
         ovpn_gateway: "{{ (openvpn.ipv4_settings.split(' ')[0] ~ '/' ~ (openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix'))) | ansible.utils.ipaddr('first_usable') }}"
 
-    - name: Replace any 10.8.0.0/XX CIDR with new CIDR
+    - name: Replace OpenVPN server network.
+      ansible.builtin.lineinfile:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        search_string: 'server 10.8.0.0 255.255.255.0'
+        line: "server {{ openvpn.ipv4_settings }}"
+
+    - name: Replace 10.8.0.0/24 with new CIDR.
       ansible.builtin.replace:
         path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
-        regexp: '\b10\.8\.0\.0/\d{1,2}\b'
+        regexp: '\b10\.8\.0\.0/24\b'
         replace: '{{ ovpn_cidr }}'
 
-    - name: Replace bare 10.8.0.0 with new network base
+    - name: Replace 10.8.0.1/24 with new gateway/mask.
       ansible.builtin.replace:
         path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
-        regexp: '\b10\.8\.0\.0\b'
-        replace: '{{ ovpn_net }}'
+        regexp: '\b10\.8\.0\.1/24\b'
+        replace: '{{ ovpn_gateway }}/{{ ovpn_prefix }}'
 
-    - name: Replace bare 10.8.0.1 with new gateway
+    - name: Replace bare 10.8.0.1 with new gateway.
       ansible.builtin.replace:
         path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
-        regexp: '\b10\.8\.0\.1\b'
+        regexp: '(?<=\s)10\.8\.0\.1(?=[\s"|]|$)'
         replace: '{{ ovpn_gateway }}'
 
 - name: Place the headless installer script.
