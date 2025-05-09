@@ -7,7 +7,7 @@ def lambda_handler(event, context):
 
     print("Gathering instance details.")
     ip_set=waf_cli.get_ip_set(
-        Name=event['ip_set'],
+        Name=event['set_name'],
         Scope='REGIONAL',
         Id=event['id']
     )

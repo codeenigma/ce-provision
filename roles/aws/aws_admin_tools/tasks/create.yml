@@ -8,6 +8,33 @@
   register: _main_api_stage
   when: _api_index | length == 0
 
+- name: Get list of old API gateway resources.
+  ansible.builtin.command: >-
+    aws apigateway get-resources
+    --region "{{ _aws_region }}"
+    --rest-api-id "{{ _api_gate.id }}"
+  register: _old_api_res_list
+  when: _api_index | length > 0
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _old_api_res_list: "{{ _old_api_res_list.stdout | from_json | json_query('items') }}"
+  when: _api_index | length > 0
+
+- name: Extract the root resource from the list.
+  ansible.builtin.set_fact:
+    _old_api_res_list: "{{ _old_api_res_list | rejectattr('path', 'eq', '/') | list }}"
+  when: _api_index | length > 0
+
+- name: Delete the old resources.
+  ansible.builtin.command: >-
+    aws apigateway delete-resource
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ item.id }}"
+    --region "{{ _aws_region }}"
+  loop: "{{ _old_api_res_list }}"
+  when: _api_index | length > 0
+
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
   loop: "{{ aws_admin_tools.functions }}"

@@ -32,6 +32,9 @@ aws_admin_tools:
           - "ec2:DescribeInstances"
     - name: "get_ip_set"
       type: GET
+      url_params:
+        - set_name
+        - id
       policies: []
       inline_policies:
         name: "get_ip_set"
