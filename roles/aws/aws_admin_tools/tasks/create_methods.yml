@@ -79,7 +79,7 @@
 
 - name: Generate JSON structure for URL param.
   set_fact:
-    json_parts: "{{ item.url_params | map('regex_replace', '^(.*)$', '\"\\1\": \"$input.params(\\''\\1\\'')\"') | list }}"
+    json_parts: "{{ item.url_params | map('regex_replace', '^(.*)$', '\"\\1\": \"$input.params(''\\1'')\"') | list }}"
   when: item.url_params is defined and item.url_params | length > 0
 
 - name: Combine into final JSON string
