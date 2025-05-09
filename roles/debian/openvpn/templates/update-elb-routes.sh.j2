@@ -1,0 +1,14 @@
+#!/bin/bash -e
+ELB_HOSTNAMES="{{ openvpn.push_routes_elb | join(' ') }}"
+TMP=$(mktemp)
+
+for h in $ELB_HOSTNAMES; do
+  host -t A "$h" 1.1.1.1 | awk '/has address/ { print "push \"route "$NF" 255.255.255.255\"" }'
+done | sort -u > "$TMP" 
+
+if ! cmp -s "$TMP" /etc/openvpn/ccd/elb-routes; then
+  mv "$TMP" /etc/openvpn/ccd/elb-routes
+  systemctl restart openvpn.service
+else
+  rm "$TMP"
+fi
