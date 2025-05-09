@@ -13,21 +13,27 @@
   block:
     - name: Derive OpenVPN network details.
       ansible.builtin.set_fact:
-        ovpn_ip:     "{{ openvpn.ipv4_settings.split(' ')[0] }}"
+        ovpn_net:     "{{ openvpn.ipv4_settings.split(' ')[0] }}"
         ovpn_cidr:    "{{ openvpn.ipv4_settings.split(' ')[0] }}/{{ openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix') }}"
         ovpn_gateway: "{{ (openvpn.ipv4_settings.split(' ')[0] ~ '/' ~ (openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix'))) | ansible.utils.ipaddr('first_usable') }}"
 
-    - name: Patch OpenVPN install script with derived network settings.
+    - name: Replace any 10.8.0.0/XX CIDR with new CIDR
       ansible.builtin.replace:
         path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
-        regexp: "{{ item.regexp }}"
-        replace: "{{ item.replace }}"
-      loop:
-        - { regexp: '\\b10\\.8\\.0\\.1\\b', replace: "{{ ovpn_gateway }}" }
-        - { regexp: '\\b10\\.8\\.0\\.0/\\d{1,2}\\b', replace: "{{ ovpn_cidr }}" }
-        - { regexp: '\\b10\\.8\\.0\\.0\\b', replace: "{{ ovpn_ip }}" }
-      loop_control:
-        label: "{{ item.regexp }}"
+        regexp: '\b10\.8\.0\.0/\d{1,2}\b'
+        replace: '{{ ovpn_cidr }}'
+
+    - name: Replace bare 10.8.0.0 with new network base
+      ansible.builtin.replace:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        regexp: '\b10\.8\.0\.0\b'
+        replace: '{{ ovpn_net }}'
+
+    - name: Replace bare 10.8.0.1 with new gateway
+      ansible.builtin.replace:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        regexp: '\b10\.8\.0\.1\b'
+        replace: '{{ ovpn_gateway }}'
 
 - name: Place the headless installer script.
   ansible.builtin.template:
