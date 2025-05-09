@@ -13,8 +13,13 @@ skip_list:
   - fqcn-builtins
   - template-instead-of-copy # to skip over roles/ssl/tasks/copy.yml errors, temporarily.
   - name[template] # it doesn't like Jinja templates being in the middle of a task name, which seems silly to me.
+<<<<<<< HEAD
   - name[casing] # sometimes included Galaxy roles break linting rules and cause failures
   - args[module] # causing odd issue with ACL role
   - jinja[spacing] # pendantic! we get these from GitHub Actions anyway
 exclude_paths:
   - roles/contrib/ # we don't control these roles
+=======
+exclude_paths:
+  - roles/debian/wazuh/ # imported role uses yes/no instead of true/false so always fails
+>>>>>>> 188b7830 (Updating paths in meta roles. (#1218))
