@@ -13,7 +13,6 @@
   block:
     - name: Derive OpenVPN network details.
       ansible.builtin.set_fact:
-        ovpn_net: "{{ openvpn.ipv4_settings.split(' ')[0] }}"
         ovpn_prefix: "{{ openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix') }}"
         ovpn_cidr: "{{ openvpn.ipv4_settings.split(' ')[0] }}/{{ openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix') }}"
         ovpn_gateway: "{{ (openvpn.ipv4_settings.split(' ')[0] ~ '/' ~ (openvpn.ipv4_settings.split(' ')[1] | ansible.utils.ipaddr('prefix'))) | ansible.utils.ipaddr('first_usable') }}"
