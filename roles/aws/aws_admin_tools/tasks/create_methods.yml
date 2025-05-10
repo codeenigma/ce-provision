@@ -81,8 +81,8 @@
   ansible.builtin.set_fact:
     url_params_string: >-
       {% for _url in item.url_params %}
-      {{ '' if loop.first else ', ' }}
-      "{{ _url }}": "do('{{ _url }}')"
+      {{ '' if loop.first else ',' }}
+      \"{{ _url }}\": \"$input.params('{{ _url }}')\"
       {% endfor %}
   when: item.url_params is defined and item.url_params | length > 0
 
