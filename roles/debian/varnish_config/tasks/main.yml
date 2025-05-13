@@ -42,5 +42,3 @@
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable
 
-
-
