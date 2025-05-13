@@ -18,7 +18,7 @@ export ENDPOINT={{ openvpn.nat_endpoint }}
 {% endif %}
 {% if openvpn.dns | int == 13 %}
 export DNS1={{ openvpn.dns1 }}
-{% if openvpn.dns2 | length %}
+{% if openvpn.dns2 is defined and openvpn.dns2 | length %}
 export DNS2={{ openvpn.dns2 }}
 {% endif %}
 {% endif %}
