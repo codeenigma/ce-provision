@@ -16,6 +16,12 @@ export PASS=1
 {% if openvpn.nat_endpoint is defined and openvpn.nat_endpoint | length %}
 export ENDPOINT={{ openvpn.nat_endpoint }}
 {% endif %}
+{% if openvpn.dns | int == 13 %}
+export DNS1={{ openvpn.dns1 }}
+{% if openvpn.dns2 is defined and openvpn.dns2 | length %}
+export DNS2={{ openvpn.dns2 }}
+{% endif %}
+{% endif %}
 
 # Execute installer
 {{ openvpn.script_install_path }}/openvpn-install.sh
