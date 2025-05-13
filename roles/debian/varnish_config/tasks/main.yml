@@ -41,7 +41,7 @@
 
 - name: Add varnish to the unattended upgrades.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ apt_unattended_upgrades_default_origins + ['origin=packagecloud.io/varnishcache/varnish{{ varnish_version_result.stdout }},suite=${distro_codename},component=main'] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + ['origin=packagecloud.io/varnishcache/varnish{{ varnish_version_result.stdout }},suite=${distro_codename},component=main'] }}"
   when:
     - apt_unattended_upgrades.enable is defined
     - apt_unattended_upgrades.enable
