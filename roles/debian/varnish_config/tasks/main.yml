@@ -32,7 +32,9 @@
     update_cache: true
 
 - name: Get current varnish version.
-  ansible.builtin.shell: dpkg-query -W -f='${Version}' varnish | grep -oP '^\d+\.\d+' | sed 's/\.//g'
+  ansible.builtin.shell: |
+    set -o pipefail
+    dpkg-query -W -f='${Version}' varnish | grep -oP '^\d+\.\d+' | sed 's/\.//g'
   register: varnish_version_result
 
 - name: Add varnish to the unattended upgrades.
