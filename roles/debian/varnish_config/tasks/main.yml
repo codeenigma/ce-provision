@@ -35,6 +35,8 @@
   ansible.builtin.shell: |
     set -o pipefail
     dpkg-query -W -f='${Version}' varnish | grep -oP '^\d+\.\d+' | sed 's/\.//g'
+  args:
+    executable: /bin/bash
   register: varnish_version_result
 
 - name: Add varnish to the unattended upgrades.
