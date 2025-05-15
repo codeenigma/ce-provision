@@ -2,6 +2,7 @@
 - name: Create the deploy group.
   ansible.builtin.group:
     name: "{{ ce_deploy.username }}"
+    gid: "{{ ce_deploy.gid | default(omit) }}"
     system: true
   when: ce_deploy.new_user
 
