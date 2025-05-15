@@ -19,7 +19,7 @@
 - name: Use provided VPC id.
   ansible.builtin.set_fact:
     _aws_vpc_subnet_vpc_id: "{{ aws_vpc_subnet.vpc_id }}"
-  when: aws_vpc_subnet.vpc_name is not defined or aws_vpc_subnet.vpc_name | length == 0
+  when: aws_vpc_subnet.vpc_name is not defined or (aws_vpc_subnet.vpc_name | length) == 0
 
 - name: Create VPC subnets.
   ansible.builtin.include_tasks: "subnet.yml"
