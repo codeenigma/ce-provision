@@ -7,17 +7,21 @@
     filters:
       "tag:Name": "{{ aws_elb.vpc_name }}"
   register: _aws_ec2_elb_vpc
-  when: ( aws_elb.vpc_name is defined and aws_elb.vpc_name | length > 0 )
+  when:
+    - aws_elb.vpc_name is defined
+    - aws_elb.vpc_name | length > 0
 
 - name: Set the VPC id from name.
   ansible.builtin.set_fact:
     _aws_ec2_elb_vpc_id: "{{ _aws_ec2_elb_vpc.vpcs[0].vpc_id }}"
-  when: ( aws_elb.vpc_name is defined and aws_elb.vpc_name | length > 0 )
+  when:
+    - aws_elb.vpc_name is defined
+    - aws_elb.vpc_name | length > 0
 
 - name: Use provided VPC id.
   ansible.builtin.set_fact:
     _aws_ec2_elb_vpc_id: "{{ aws_elb.vpc_id }}"
-  when: ( aws_elb.vpc_name is not defined or aws_elb.vpc_name | length < 0 )
+  when: aws_elb.vpc_name is not defined or (aws_elb.vpc_name | length) == 0
 
 - name: Reset subnets lists.
   ansible.builtin.set_fact:
