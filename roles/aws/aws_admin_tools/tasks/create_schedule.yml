@@ -1,7 +1,3 @@
-- name: print
-  ansible.builtin.debug:
-    msg: "{{ aws_lambda._result }}"
-
 - name: Create schedule for validation reports.
   amazon.aws.cloudwatchevent_rule:
     name: "{{ item.name }}"

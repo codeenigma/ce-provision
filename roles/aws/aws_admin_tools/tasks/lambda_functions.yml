@@ -1,53 +1,19 @@
-# TODO use aws_lambda role here
-- name: Create S3 bucket for lambda functions.
-  amazon.aws.s3_bucket:
-    name: "{{ _aws_profile }}-lambda-api-functions"
-    region: "{{ _aws_region }}"
-    state: present
-
-- name: Check and clean any previous python files.
-  ansible.builtin.file:
-    path: "/tmp/{{ item.name }}.py"
-    state: absent
-
-- name: Write Lambda functions.
-  ansible.builtin.template:
-    src: "{{ item.resource }}_{{ item.name }}.py.j2"
-    dest: "/tmp/{{ item.resource }}_{{ item.name }}.py"
-
-- name: Create a zip archive of Lambda functions.
-  community.general.archive:
-    path: "/tmp/{{ item.resource }}_{{ item.name }}.py"
-    dest: "/tmp/{{ item.resource }}_{{ item.name }}.zip"
-    format: zip
-
-- name: Place Lambda functions in S3 bucket.
-  amazon.aws.s3_object:
-    bucket: "{{ _aws_profile }}-lambda-api-functions"
-    object: "lambda-functions/{{ item.resource }}-{{ item.name }}.zip"
-    src: "/tmp/{{ item.resource }}_{{ item.name }}.zip"
-    mode: put
-
 - name: Get appropriate IAM role for Lambda.
   amazon.aws.iam_role_info:
     name: "{{ item.resource }}_{{ item.name }}"
   register: _iam_lambda
 
-- name: Print iam info
-  ansible.builtin.debug:
-    msg: "{{ _iam_lambda }}"
-
-- name: Create Lambda functions.
-  amazon.aws.lambda:
-    name: "{{ item.resource }}_{{ item.name }}"
-    description: "Lambda function for {{ item.name }}"
-    region: "{{ _aws_region }}"
-    timeout: "{{ item.schedule.timeout | default(aws_admin_tools.timeout) }}"
-    s3_bucket: "{{ _aws_profile }}-lambda-api-functions"
-    s3_key: "lambda-functions/{{ item.resource }}-{{ item.name }}.zip"
-    state: present
-    runtime: "{{ aws_admin_tools.runtime }}"
-    role: "{{ _iam_lambda.iam_roles[0].arn }}"
-    handler: "{{ item.resource }}_{{ item.name }}.lambda_handler"
-    tags:
-      Name: "{{ item.resource }}_{{ item.name }}"
+- name: Create backup validation Lambda functions.
+  ansible.builtin.include_role:
+    name: aws/aws_lambda
+  vars:
+    aws_lambda:
+      name: "{{ item.resource }}_{{ item.name }}"
+      description: "Lambda function for {{ item.name }}"
+      timeout: "{{ item.timeout | default(aws_admin_tools.timeout) }}"
+      role: "{{ _iam_lambda.iam_roles[0].arn }}"
+      runtime: "{{ aws_admin_tools.runtime }}"
+      function_file: "{{ lookup('template', item.resource + '_' + item.name + '.py.j2') }}"
+      s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+      tags:
+        Name: "{{ item.resource }}_{{ item.name }}"
