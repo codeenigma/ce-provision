@@ -1,0 +1,28 @@
+
+- name: Create schedule for validation reports.
+  amazon.aws.cloudwatchevent_rule:
+    name: "{{ item.name }}"
+    schedule_expression: "{{ item.schedule.cron }}"
+    description: "Scheduled function that generates info used by API Gateway."
+    region: "{{ _aws_region }}"
+    targets:
+      - id: "{{ 'schedule_' + item.name }}"
+        arn: "{{ (aws_lambda._result['schedule_' + item.name].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
+  register: _schedule_result
+
+- name: Generate unique string.
+  ansible.builtin.set_fact:
+    _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
+
+- name: Update Lambda policy.
+  amazon.aws.lambda_policy:
+    state: present
+    function_name: "{{ 'schedule_' + item.name }}"
+    statement_id: "{{ 'schedule_' + item.name + '_' + _rand_str }}"
+    action: lambda:InvokeFunction
+    principal: events.amazonaws.com
+    source_arn: "{{ _schedule.rule.arn }}"
+    region: "{{ _aws_region }}"
+  loop: "{{ _schedule_result }}"
+  loop_control:
+    loop_var: _schedule
