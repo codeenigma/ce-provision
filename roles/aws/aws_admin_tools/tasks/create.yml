@@ -37,11 +37,11 @@
 
 - name: Extract the scheduled functions from the list.
   ansible.builtin.set_fact:
-    _schedule_functions: "{{ aws_admin_tools.functions | selectattr('schedule', 'defined') | list }}"
+    _schedule_functions: "{{ aws_admin_tools.functions | selectattr('schedule', 'eq', 'api') | list }}"
 
 - name: Extract the API Gateway functions from the list.
   ansible.builtin.set_fact:
-    _api_functions: "{{ aws_admin_tools.functions | rejectattr('schedule', 'defined') | list }}"
+    _api_functions: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 'schedule') | list }}"
 
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
