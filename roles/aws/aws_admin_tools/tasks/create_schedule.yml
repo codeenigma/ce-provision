@@ -2,7 +2,7 @@
 - name: Create schedule for validation reports.
   amazon.aws.cloudwatchevent_rule:
     name: "{{ item.name }}"
-    schedule_expression: "{{ item.schedule.cron }}"
+    schedule_expression: "{{ item.cron }}"
     description: "Scheduled function that generates info used by API Gateway."
     region: "{{ _aws_region }}"
     targets:
