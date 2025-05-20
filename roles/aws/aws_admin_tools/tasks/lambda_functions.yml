@@ -11,7 +11,7 @@
       name: "{{ item.resource }}_{{ item.name }}"
       description: "Lambda function for {{ item.name }}"
       timeout: "{{ item.timeout | default(aws_admin_tools.timeout) }}"
-      role: "{{ _iam_lambda.iam_roles[0] }}"
+      role: "{{ aws_iam_role._result[item.resource + '_' + item.name] }}"
       runtime: "{{ aws_admin_tools.runtime }}"
       function_file: "{{ lookup('template', item.resource + '_' + item.name + '.py.j2') }}"
       s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
