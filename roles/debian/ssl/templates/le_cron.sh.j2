@@ -10,7 +10,7 @@ send_email_notification() {
 }
 
 # stop services
-{% for service in _ssl_services %}
+{% for service in _ssl_services | unique %}
 /usr/sbin/service {{ service }} stop
 {% endfor %}
 
