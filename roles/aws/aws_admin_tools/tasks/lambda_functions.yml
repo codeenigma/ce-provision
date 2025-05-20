@@ -40,7 +40,7 @@
     region: "{{ _aws_region }}"
     timeout: "{{ aws_admin_tools.timeout }}"
     s3_bucket: "{{ _aws_profile }}-lambda-api-functions"
-    s3_key: "lambda-functions/API-{{ item.name }}.zip"
+    s3_key: "lambda-functions/{{ _type }}-{{ item.name }}.zip"
     state: present
     runtime: "{{ aws_admin_tools.runtime }}"
     role: "{{ _iam_lambda.iam_roles[0].arn }}"
