@@ -28,15 +28,6 @@
   register: _api_gate
   when: _api_index | length == 0
 
-
-- name: Extract the scheduled functions from the list.
-  ansible.builtin.set_fact:
-    _schedule_functions: "{{ aws_admin_tools.functions | selectattr('schedule', 'defined') | list }}"
-
-- name: Extract the API Gateway functions from the list.
-  ansible.builtin.set_fact:
-    _api_functions: "{{ aws_admin_tools.functions | rejectattr('schedule', 'defined') | list }}"
-
 - name: Setting previous command output into variable.
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate.stdout | from_json }}"
@@ -85,17 +76,9 @@
   ansible.builtin.include_tasks: lambda_iam.yml
   loop: "{{ aws_admin_tools.functions }}"
 
-- name: Configure Lambda functions for API Gateways.
+- name: Configure Lambda functions.
   ansible.builtin.include_tasks: lambda_functions.yml
-  loop: "{{ _api_functions }}"
-  vars:
-    _type: "api"
-
-- name: Configure Lambda functions for EventBridge.
-  ansible.builtin.include_tasks: lambda_functions.yml
-  loop: "{{ _schedule_functions }}"
-  vars:
-    _type: "schedule"
+  loop: "{{ aws_admin_tools.functions }}"
 
 - name: Create WAF for API Gateway.
   ansible.builtin.include_role:
