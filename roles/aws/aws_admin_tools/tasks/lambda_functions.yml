@@ -33,12 +33,16 @@
     name: "{{ _type }}_{{ item.name }}"
   register: _iam_lambda
 
+- name: Print iam info
+  ansible.builtin.debug:
+    msg: "{{ _iam_lambda }}"
+
 - name: Create Lambda functions.
   amazon.aws.lambda:
     name: "{{ _type }}_{{ item.name }}"
     description: "Lambda function for {{ item.name }}"
     region: "{{ _aws_region }}"
-    timeout: "{{ aws_admin_tools.timeout }}"
+    timeout: "{{ item.schedule.timeout | default(aws_admin_tools.timeout) }}"
     s3_bucket: "{{ _aws_profile }}-lambda-api-functions"
     s3_key: "lambda-functions/{{ _type }}-{{ item.name }}.zip"
     state: present
