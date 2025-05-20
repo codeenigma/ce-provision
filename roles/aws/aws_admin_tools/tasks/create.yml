@@ -37,7 +37,11 @@
 
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
-  loop: "{{ aws_admin_tools.functions }}"
+  loop: "{{ _api_functions }}"
+
+- name: Create Event Bridge schedule.
+  ansible.builtin.include_tasks: create_schedule.yml
+  loop: "{{ _schedule_functions }}"
 
 - name: Obtain all information for a single WAF.
   community.aws.wafv2_web_acl_info:
@@ -98,4 +102,4 @@
     --principal apigateway.amazonaws.com
     --source-arn arn:aws:execute-api:{{ _aws_region }}:{{ _acc_id }}:{{ _api_gate.id }}/*/{{ item.type }}/{{ item.name }}
     --region {{ _aws_region }}
-  loop: "{{ aws_admin_tools.functions }}"
+  loop: "{{ _api_functions }}"

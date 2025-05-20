@@ -12,30 +12,30 @@
 
 - name: Write Lambda functions.
   ansible.builtin.template:
-    src: "api_{{ item.name }}.py.j2"
-    dest: "/tmp/api_{{ item.name }}.py"
+    src: "{{ type }}_{{ item.name }}.py.j2"
+    dest: "/tmp/{{ type }}_{{ item.name }}.py"
 
 - name: Create a zip archive of Lambda functions.
   community.general.archive:
-    path: "/tmp/api_{{ item.name }}.py"
-    dest: "/tmp/api_{{ item.name }}.zip"
+    path: "/tmp/{{ type }}_{{ item.name }}.py"
+    dest: "/tmp/{{ type }}_{{ item.name }}.zip"
     format: zip
 
 - name: Place Lambda functions in S3 bucket.
   amazon.aws.s3_object:
     bucket: "{{ _aws_profile }}-lambda-api-functions"
-    object: "lambda-functions/API-{{ item.name }}.zip"
-    src: "/tmp/api_{{ item.name }}.zip"
+    object: "lambda-functions/{{ type }}-{{ item.name }}.zip"
+    src: "/tmp/{{ type }}_{{ item.name }}.zip"
     mode: put
 
 - name: Get appropriate IAM role for Lambda.
   amazon.aws.iam_role_info:
-    name: "api_{{ item.name }}"
-  register: _iam_api_lambda
+    name: "{{ type }}_{{ item.name }}"
+  register: _iam_lambda
 
 - name: Create Lambda functions.
   amazon.aws.lambda:
-    name: "api_{{ item.name }}"
+    name: "{{ type }}_{{ item.name }}"
     description: "Lambda function for {{ item.name }}"
     region: "{{ _aws_region }}"
     timeout: "{{ aws_admin_tools.timeout }}"
@@ -43,7 +43,7 @@
     s3_key: "lambda-functions/API-{{ item.name }}.zip"
     state: present
     runtime: "{{ aws_admin_tools.runtime }}"
-    role: "{{ _iam_api_lambda.iam_roles[0].arn }}"
-    handler: "api_{{ item.name }}.lambda_handler"
+    role: "{{ _iam_lambda.iam_roles[0].arn }}"
+    handler: "{{ type }}_{{ item.name }}.lambda_handler"
     tags:
-      Name: "api_{{ item.name }}"
+      Name: "{{ type }}_{{ item.name }}"
