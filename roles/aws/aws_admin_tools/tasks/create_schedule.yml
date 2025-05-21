@@ -9,15 +9,11 @@
         arn: "{{ (aws_lambda._result['schedule_' + item.name].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _schedule_result
 
-- name: Generate unique string.
-  ansible.builtin.set_fact:
-    _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
-
 - name: Update Lambda policy.
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ 'schedule_' + item.name }}"
-    statement_id: "{{ 'schedule_' + item.name + '_' + _rand_str }}"
+    statement_id: "{{ 'schedule_' + item.name }}"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ _schedule.rule.arn }}"

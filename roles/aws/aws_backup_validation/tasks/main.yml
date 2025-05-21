@@ -111,15 +111,11 @@
         arn: "{{ (aws_lambda._result['validation_report'].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _validation_event
 
-- name: Generate unique string.
-  ansible.builtin.set_fact:
-    _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
-
 - name: Update Lambda policy.
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ item.rule.name }}"
-    statement_id: "{{ item.rule.name }}_{{ _rand_str }}"
+    statement_id: "{{ item.rule.name }}"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ item.rule.arn }}"
@@ -130,7 +126,7 @@
   amazon.aws.lambda_policy:
     state: present
     function_name: "validation_report"
-    statement_id: "validation_report_{{ _rand_str }}"
+    statement_id: "validation_report"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ _validation_event.rule.arn }}"
