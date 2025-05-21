@@ -33,7 +33,7 @@
     --resource-id "{{ item.id }}"
     --region "{{ _aws_region }}"
   loop: "{{ _old_api_res_list }}"
-  when: _api_index | length > 0 and _old_api_res_list is iterable
+  when: _api_index | length > 0 and _old_api_res_list | type_debug == "list"
 
 - name: Extract the scheduled functions from the list.
   ansible.builtin.set_fact:
