@@ -5,14 +5,16 @@ aws_admin_tools:
     - 192.168.1.1/32 # Ip of server with access to API-s
   functions:
     - name: "get_forecasted_costs"
+      resource: api # can be "api" or "schedule"
       type: GET
-      inline_policies:
+      inline_policies: # Define inline policies which will be in use for executing Lambda function
         name: "{{ _aws_profile }}Billing"
         resource: "*"
         action:
           - "ce:*"
       policies: []
     - name: "change_asg_scaling"
+      resource: api
       type: POST
       policies: []
       inline_policies:
@@ -22,6 +24,7 @@ aws_admin_tools:
           - "autoscaling:DescribePolicies"
           - "autoscaling:PutScalingPolicy"
     - name: "get_ip_set"
+      resource: api
       type: GET
       url_params:
         - set_name
@@ -34,8 +37,8 @@ aws_admin_tools:
           - "wafv2:GetIPSet"
     - name: "test"
       resource: schedule
-      cron: "cron(0 0 ? * MON *)"
-      timeout: 300
+      cron: "cron(0 0 ? * MON *)" # If schedule is defined, we need the cron
+      timeout: 300 # Timeout can be set per function, or use global if missing
       policies: []
       inline_policies:
         name: "test"
