@@ -32,8 +32,12 @@
     --rest-api-id "{{ _api_gate.id }}"
     --resource-id "{{ item.id }}"
     --region "{{ _aws_region }}"
-  loop: "{{ _old_api_res_list }}"
-  when: _api_index | length > 0 and _old_api_res_list | type_debug == "list"
+  loop: "{{ _old_api_res_list | default([]) }}"
+  when:
+    - _api_index | length > 0
+    - _old_api_res_list is defined
+    - _old_api_res_list | type_debug == "list"
+    - _old_api_res_list | length > 0
 
 - name: Extract the scheduled functions from the list.
   ansible.builtin.set_fact:
