@@ -16,8 +16,5 @@
     statement_id: "{{ 'schedule_' + item.name }}"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
-    source_arn: "{{ _schedule.rule.arn }}"
+    source_arn: "{{ _schedule_result.rule.arn }}"
     region: "{{ _aws_region }}"
-  loop: "{{ _schedule_result }}"
-  loop_control:
-    loop_var: _schedule
