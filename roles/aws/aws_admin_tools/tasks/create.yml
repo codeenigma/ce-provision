@@ -36,6 +36,7 @@
   when:
     - _api_index | length > 0
     - _old_api_res_list is defined
+    - _old_api_res_list is not skipped
     - _old_api_res_list | type_debug == "list"
     - _old_api_res_list | length > 0
 
