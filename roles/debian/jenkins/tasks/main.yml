@@ -148,3 +148,10 @@
   become: true
   become_user: "{{ jenkins.user }}"
   when: pluginoutput.changed
+
+- name: Add jenkins to the unattended upgrades.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [jenkins.apt_origin_jenkins] }}"
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
