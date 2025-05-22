@@ -13,12 +13,12 @@
     aws apigateway get-resources
     --region "{{ _aws_region }}"
     --rest-api-id "{{ _api_gate.id }}"
-  register: _old_api_res_list
+  register: _old_apis_result
   when: _api_index | length > 0
 
 - name: Setting previous command output into variable.
   ansible.builtin.set_fact:
-    _old_api_res_list: "{{ _old_api_res_list.stdout | from_json | json_query('items') }}"
+    _old_api_res_list: "{{ _old_apis_result.stdout | from_json | json_query('items') }}"
   when: _api_index | length > 0
 
 - name: Extract the root resource from the list.
@@ -36,9 +36,6 @@
   when:
     - _api_index | length > 0
     - _old_api_res_list is defined
-    - _old_api_res_list is not skipped
-    - _old_api_res_list | type_debug == "list"
-    - _old_api_res_list | length > 0
 
 - name: Extract the scheduled functions from the list.
   ansible.builtin.set_fact:
