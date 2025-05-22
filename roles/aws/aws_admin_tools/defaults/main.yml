@@ -5,14 +5,16 @@ aws_admin_tools:
     - 192.168.1.1/32 # Ip of server with access to API-s
   functions:
     - name: "get_forecasted_costs"
+      resource: api # can be "api" or "schedule"
       type: GET
-      inline_policies:
+      inline_policies: # Define inline policies which will be in use for executing Lambda function
         name: "{{ _aws_profile }}Billing"
         resource: "*"
         action:
           - "ce:*"
       policies: []
     - name: "change_asg_scaling"
+      resource: api
       type: POST
       policies: []
       inline_policies:
@@ -21,16 +23,8 @@ aws_admin_tools:
         action:
           - "autoscaling:DescribePolicies"
           - "autoscaling:PutScalingPolicy"
-    - name: "get_list_of_ec2"
-      type: GET
-      policies: []
-      inline_policies:
-        name: "list_ec2"
-        resource: "*"
-        action:
-          - "ec2:DescribeAddresses"
-          - "ec2:DescribeInstances"
     - name: "get_ip_set"
+      resource: api
       type: GET
       url_params:
         - set_name
@@ -41,22 +35,13 @@ aws_admin_tools:
         resource: "*"
         action:
           - "wafv2:GetIPSet"
-    - name: "update_ip_set"
-      type: POST
+    - name: "test"
+      resource: schedule
+      cron: "cron(0 0 ? * MON *)" # If schedule is defined, we need the cron
+      timeout: 300 # Timeout can be set per function, or use global if missing
       policies: []
       inline_policies:
-        name: "update_ip_set"
+        name: "test"
         resource: "*"
         action:
-          - "wafv2:UpdateIPSet"
-    - name: "get_acl_list"
-      type: GET
-      policies: []
-      inline_policies:
-        name: "get_acl_list"
-        resource: "*"
-        action:
-          - "wafv2:ListResourcesForWebACL"
-          - "wafv2:ListWebACLs"
           - "wafv2:GetWebACL"
-          - "cloudfront:ListDistributionsByWebACLId"
