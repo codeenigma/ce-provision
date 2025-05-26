@@ -14,8 +14,6 @@ _env_type: unspecified
 #_aws_profile: example # boto profile name
 #_aws_region: eu-west-1
 _aws_vpc_cidr_base: 10.0 # used to define internal IP range that is unique for every client
-
-aws_acl_enable: false # To include aws/aws_acl role and create ACLs for WAF or AWS admin tools.
 aws_admin_tools_enable: false # Set to true to include aws_admin_tools role.
 
 # AWS tags
