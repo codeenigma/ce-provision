@@ -11,7 +11,13 @@
         - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
     # used for tagging
     _profile: core
-  roles:
-    - _init
-    - _meta/aws_region
-    - _exit
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: _meta/aws_region
+    - ansible.builtin.import_role:
+        name: aws/aws_admin_tools
+      when: aws_admin_tools_enable
+    - ansible.builtin.import_role:
+        name: _exit
