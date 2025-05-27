@@ -18,16 +18,14 @@ done | sort -u > "$TMP_ROUTES"
   echo "# END ELB ROUTES"
 } > "$TMP_BLOCK"
 
-# Replace or insert block in TMP_CONF.
+# Get the config file without the 'Routes' block for comparison.
 if grep -q '^# BEGIN ELB ROUTES' "$CONF_FILE"; then
   sed '/^# BEGIN ELB ROUTES$/,/^# END ELB ROUTES$/d' "$CONF_FILE" > "$TMP_CONF"
-  printf "\n" >> "$TMP_CONF"
-  cat "$TMP_BLOCK" >> "$TMP_CONF"
 else
   cp "$CONF_FILE" "$TMP_CONF"
-  printf "\n" >> "$TMP_CONF"
-  cat "$TMP_BLOCK" >> "$TMP_CONF"
 fi
+# Add the 'Routes' block to the temporary config.
+cat "$TMP_BLOCK" >> "$TMP_CONF"
 
 # Replace CONF_FILE if routes changed.
 if ! cmp -s "$CONF_FILE" "$TMP_CONF"; then
