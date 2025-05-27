@@ -273,6 +273,21 @@
 - name: Install a script to update routes with non-persistent IP addresses.
   when: openvpn.push_routes_elb | length > 0
   block:
+
+    - name: Check if OpenVPN routes file exists.
+      ansible.builtin.stat:
+        path: "{{ openvpn.push_routes_elb_path }}"
+      register: _push_routes_elb_path
+
+    - name: Create OpenVPN routes file if missing.
+      ansible.builtin.file:
+        path: "{{ openvpn.push_routes_elb_path }}"
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+      when: not _push_routes_elb_path.stat.exists
+
     - name: Place the ELB-routes updater script.
       ansible.builtin.template:
         src: update-elb-routes.sh.j2
