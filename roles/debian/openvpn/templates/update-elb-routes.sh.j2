@@ -1,15 +1,37 @@
 #!/bin/bash -e
 ELB_HOSTNAMES="{{ openvpn.push_routes_elb | join(' ') }}"
-TMP=$(mktemp)
+CONF_FILE="{{ openvpn.push_routes_elb_path }}"
 
+TMP_ROUTES=$(mktemp)
+TMP_BLOCK=$(mktemp)
+TMP_CONF=$(mktemp)
+
+# Resolve ELB hostnames and generate unique push-route lines.
 for h in $ELB_HOSTNAMES; do
   host -t A "$h" 1.1.1.1 | awk '/has address/ { print "push \"route "$NF" 255.255.255.255\"" }'
-done | sort -u > "$TMP" 
+done | sort -u > "$TMP_ROUTES"
 
-if ! cmp -s "$TMP" /etc/openvpn/ccd/DEFAULT; then
-  mv "$TMP" /etc/openvpn/ccd/DEFAULT
-  chmod 644 /etc/openvpn/ccd/DEFAULT
-  systemctl restart openvpn.service
+# Build the marker block.
+{
+  echo "# BEGIN ELB ROUTES"
+  cat "$TMP_ROUTES"
+  echo "# END ELB ROUTES"
+} > "$TMP_BLOCK"
+
+# Get the config file without the 'Routes' block for comparison.
+if grep -q '^# BEGIN ELB ROUTES' "$CONF_FILE"; then
+  sed '/^# BEGIN ELB ROUTES$/,/^# END ELB ROUTES$/d' "$CONF_FILE" > "$TMP_CONF"
 else
-  rm "$TMP"
+  cp "$CONF_FILE" "$TMP_CONF"
 fi
+# Add the 'Routes' block to the temporary config.
+cat "$TMP_BLOCK" >> "$TMP_CONF"
+
+# Replace CONF_FILE if routes changed.
+if ! cmp -s "$CONF_FILE" "$TMP_CONF"; then
+  mv "$TMP_CONF" "$CONF_FILE"
+  chmod 644 "$CONF_FILE"
+  systemctl restart openvpn.service
+fi
+
+rm -f "$TMP_CONF" "$TMP_ROUTES" "$TMP_BLOCK"
