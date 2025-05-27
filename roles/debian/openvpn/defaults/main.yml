@@ -16,11 +16,12 @@ openvpn:
   push_routes_ipv6: [] # list of VPN push routes for ipv6 networks - ipv6_support must be "y"
   # Provide a path to a directory, such as /etc/openvpn/client, to configure a directory where OpenVPN can look up default client configs.
   # See --client-config-dir in the manual - https://openvpn.net/community-resources/reference-manual-for-openvpn-2-0/
-  # This can be useful for activities such as providing a long list of push routes to manage as an include.
-  client_config_dir: "" # specify to add another directory other than the default /etc/openvpn/ccd
+  # You can use a 'DEFAULT' file in the specified directory as an include or provide client-specific config, such as managed push routes.
+  client_config_dir: "" # specify to set own config directory. If not set the default is /etc/openvpn/ccd.
   push_routes_elb: [] # list of DNS names for resolve and update openvpn 'push routes' with changing IP addresses.
     # - myloadbalancer.example.com
     # - example-elb.example.com
+  push_routes_elb_path: "/etc/openvpn/ccd/DEFAULT" # path to the file with the updatable routes
   client_config_push_routes: false # if you are providing push routes in your client config, set this to true to remove the default ones
   # PAM and LDAP authentication
   pam:

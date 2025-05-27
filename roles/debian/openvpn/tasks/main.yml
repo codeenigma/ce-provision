@@ -159,8 +159,7 @@
       with_items: "{{ openvpn.push_routes_ipv6 }}"
       notify: Restart OpenVPN.
 
-# You can use a 'DEFAULT' file in the specified directory to provide client-specifig config, such as managed push routes
-- name: Add another client config directory.
+- name: Override client config directory.
   when: openvpn.client_config_dir | length > 0
   block:
     - name: Remove default push-route.
@@ -180,6 +179,12 @@
         owner: root
         group: root
         mode: '0755'
+
+    - name: Remove default client-config-dir param.
+      ansible.builtin.lineinfile:
+        path: /etc/openvpn/server.conf
+        search_string: 'client-config-dir /etc/openvpn/ccd'
+        state: absent
 
     - name: Add client config directory to config if path is provided.
       ansible.builtin.lineinfile:
