@@ -50,10 +50,6 @@
         cidr_ip: 0.0.0.0/0
   register: _restore_testing_sg
 
-- name: Construct AWS instance type dict.
-  ansible.builtin.set_fact:
-    _restore_testing_sg: "{{ aws_vpc._result['Restore_testing'] }}"
-
 - name: Remove restore testing query file.
   ansible.builtin.file:
     path: /tmp/restore_testing.json
