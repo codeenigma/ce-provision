@@ -8,9 +8,50 @@
   register: _main_api_stage
   when: _api_index | length == 0
 
+- name: Get list of old API gateway resources.
+  ansible.builtin.command: >-
+    aws apigateway get-resources
+    --region "{{ _aws_region }}"
+    --rest-api-id "{{ _api_gate.id }}"
+  register: _old_apis_result
+  when: _api_index | length > 0
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _old_api_res_list: "{{ _old_apis_result.stdout | from_json | json_query('items') }}"
+  when: _api_index | length > 0
+
+- name: Extract the root resource from the list.
+  ansible.builtin.set_fact:
+    _old_api_res_list: "{{ _old_api_res_list | rejectattr('path', 'eq', '/') | list }}"
+  when: _api_index | length > 0
+
+- name: Delete the old resources.
+  ansible.builtin.command: >-
+    aws apigateway delete-resource
+    --rest-api-id "{{ _api_gate.id }}"
+    --resource-id "{{ item.id }}"
+    --region "{{ _aws_region }}"
+  loop: "{{ _old_api_res_list | default([]) }}"
+  when:
+    - _api_index | length > 0
+    - _old_api_res_list is defined
+
+- name: Extract the scheduled functions from the list.
+  ansible.builtin.set_fact:
+    _api_functions: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 'api') | list }}"
+
+- name: Extract the API Gateway functions from the list.
+  ansible.builtin.set_fact:
+    _schedule_functions: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 'schedule') | list }}"
+
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
-  loop: "{{ aws_admin_tools.functions }}"
+  loop: "{{ _api_functions }}"
+
+- name: Create Event Bridge schedule.
+  ansible.builtin.include_tasks: create_schedule.yml
+  loop: "{{ _schedule_functions }}"
 
 - name: Obtain all information for a single WAF.
   community.aws.wafv2_web_acl_info:
@@ -65,10 +106,10 @@
 - name: Update Lambda triggers.
   ansible.builtin.command: >-
     aws lambda add-permission
-    --function-name "API_{{ item.name }}"
+    --function-name "api_{{ item.name }}"
     --statement-id "{{ item.name }}_{{ _rand_str }}"
     --action "lambda:InvokeFunction"
     --principal apigateway.amazonaws.com
     --source-arn arn:aws:execute-api:{{ _aws_region }}:{{ _acc_id }}:{{ _api_gate.id }}/*/{{ item.type }}/{{ item.name }}
     --region {{ _aws_region }}
-  loop: "{{ aws_admin_tools.functions }}"
+  loop: "{{ _api_functions }}"

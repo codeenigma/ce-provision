@@ -67,3 +67,4 @@ aws_elb:
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/amazon/aws/elb_application_lb_module.html
   listeners: []
   elb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ELB SSL policy to only accect TLSv1.2 and apply more secure ciphers.
+  web_acl: false # Set to true to create Web ACL for ALB.

@@ -128,7 +128,7 @@
     filebeat_exists: "{{ _service_list.stdout is search('filebeat.service') }}"
 
 - name: Restart filebeat at the end. # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: filebeat
     state: restarted
   when: filebeat_exists
@@ -138,6 +138,18 @@
   register: wazuh_service
   ignore_errors: true
   changed_when: false
+
+- name: Deploy custom Wazuh local rules
+  ansible.builtin.copy:
+    src: custom_wazuh_rules.xml
+    dest: "{{ wazuh_dir | default('/var/ossec') }}/etc/rules/custom_wazuh_rules.xml"
+    owner: wazuh
+    group: wazuh
+    mode: '0640'
+  notify: restart wazuh-manager
+  tags:
+    - rules
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
 
 - name: Write the password to /var/ossec/etc/authd.pass
   ansible.builtin.copy:
@@ -149,13 +161,13 @@
   when: "'wazuh-manager.service' in wazuh_service.stdout or 'wazuh-agent.service' in wazuh_service.stdout"
 
 - name: Restart wazuh-manager to apply changes
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: wazuh-manager
     state: restarted
   when: "'wazuh-manager.service' in wazuh_service.stdout"
 
 - name: Restart wazuh-agent to apply changes
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: wazuh-agent
     state: restarted
   when: "'wazuh-agent.service' in wazuh_service.stdout"
