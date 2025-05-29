@@ -1,0 +1,792 @@
+"""
+AWS Lambda Function for Infrastructure Data Collection
+
+This Lambda function collects AWS infrastructure data and saves to S3.
+It is a Lambda-compatible refactoring of the aws-cli_data-collection.py script.
+
+Dependencies: boto3, json, logging
+
+Environment Variables:
+    S3_BUCKET_NAME     - S3 bucket to store the output JSON
+    S3_KEY_PREFIX      - (Optional) Prefix to use for S3 keys (default: 'infra-data/')
+    DEFAULT_REGIONS    - (Optional) Comma-separated regions to collect data from (default: all regions)
+    ACCOUNT_ALIAS      - (Optional) Name to use for the account in metadata (default: AWS account ID)
+
+Event Parameters:
+    specific_region     - Single region to process (overrides DEFAULT_REGIONS)
+    regions             - List of regions to process (overrides DEFAULT_REGIONS and specific_region)
+"""
+
+import json
+import logging
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+import concurrent.futures
+from typing import Dict, List, Optional, Any, Tuple, Union
+
+import boto3
+from botocore.exceptions import ClientError
+
+# Configure logging for Lambda environment
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Constants
+ALL_REGIONS = [
+    "ap-south-1", "ap-northeast-3", "ap-northeast-2", "ap-southeast-1", 
+    "ap-southeast-2", "ap-northeast-1", "ca-central-1", "eu-central-1",
+    "eu-west-1", "eu-west-2", "eu-west-3", "eu-north-1", "sa-east-1",
+    "us-east-1", "us-east-2", "us-west-1", "us-west-2"
+]
+
+# S3 configuration from environment variables
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
+S3_KEY_PREFIX = os.environ.get('S3_KEY_PREFIX', 'infra-data/')
+# Ansible injected region variable for client-specific region (overridden via Ansible templating)
+ANSIBLE_REGION = "{{ _aws_region }}"
+
+def get_account_identifier() -> str:
+    """Get account ID or alias to use as identifier."""
+    # First check if there's an environment variable defined
+    account_alias = os.environ.get('ACCOUNT_ALIAS')
+    if account_alias:
+        return account_alias
+    
+    # Otherwise use the AWS account ID from STS
+    try:
+        sts_client = boto3.client('sts')
+        account_id = sts_client.get_caller_identity()['Account']
+        return account_id
+    except Exception as e:
+        logger.warning(f"Failed to get account ID: {str(e)}")
+        return "unknown-account"
+
+def get_regions(event: Dict[str, Any]) -> List[str]:
+    """Get list of regions to process based on Lambda event or environment variables."""
+    # Ansible region override (set via Ansible templating)
+    if ANSIBLE_REGION:
+        return [ANSIBLE_REGION]
+    # Check for regions in event
+    if 'regions' in event and isinstance(event['regions'], list):
+        return event['regions']
+    
+    # Check for single region in event
+    if 'specific_region' in event and event['specific_region']:
+        return [event['specific_region']]
+    
+    # Check for regions in environment variable
+    env_regions = os.environ.get('DEFAULT_REGIONS')
+    if env_regions:
+        return [r.strip() for r in env_regions.split(',')]
+    
+    # Default to all regions
+    return ALL_REGIONS
+
+def create_session() -> boto3.Session:
+    """
+    Create an AWS session using Lambda execution role credentials.
+    
+    In Lambda, this automatically uses the IAM role assigned to the function.
+    """
+    return boto3.Session()
+
+def collect_ec2(session, region):
+    """Collect EC2 instance data for a region."""
+    try:
+        ec2_client = session.client('ec2', region_name=region)
+        response = ec2_client.describe_instances()
+        
+        instances = []
+        for reservation in response.get('Reservations', []):
+            for instance in reservation.get('Instances', []):
+                # Extract instance name from tags
+                instance_name = "N/A"
+                if instance.get('Tags'):
+                    for tag in instance.get('Tags', []):
+                        if tag['Key'] == 'Name':
+                            instance_name = tag['Value']
+                            break
+                
+                # Determine pricing model
+                if instance.get('InstanceLifecycle') is None:
+                    pricing_model = "On-Demand"
+                elif instance.get('InstanceLifecycle') == "spot":
+                    pricing_model = "Spot Instances"
+                else:
+                    pricing_model = instance.get('InstanceLifecycle')
+                
+                # Get volume information
+                try:
+                    volumes_response = ec2_client.describe_volumes(
+                        Filters=[
+                            {'Name': 'attachment.instance-id', 'Values': [instance['InstanceId']]}
+                        ]
+                    )
+                    
+                    root_volume_size = 0
+                    storage_type = "N/A"
+                    additional_ebs_volumes = []
+                    
+                    volumes = volumes_response.get('Volumes', [])
+                    if volumes:
+                        root_volume_size = volumes[0].get('Size', 0)
+                        storage_type = volumes[0].get('VolumeType', 'N/A')
+                        
+                        for volume in volumes[1:]:
+                            additional_ebs_volumes.append({
+                                'Type': volume.get('VolumeType', 'N/A'),
+                                'Size': volume.get('Size', 0)
+                            })
+                except Exception as e:
+                    logger.warning(f"Error getting volume info for instance {instance.get('InstanceId')}: {str(e)}")
+                
+                instances.append({
+                    'InstanceName': instance_name,
+                    'InstanceID': instance['InstanceId'],
+                    'Region': region,
+                    'InstanceType': instance.get('InstanceType', 'N/A'),
+                    'Status': instance.get('State', {}).get('Name', 'N/A'),
+                    'StorageType': storage_type,
+                    'RootVolumeSize': root_volume_size,
+                    'AdditionalEBSVolumes': additional_ebs_volumes,
+                    'PricingModel': pricing_model
+                })
+        
+        return instances
+    except ClientError as e:
+        logger.error(f"Error collecting EC2 data for region {region}: {str(e)}")
+        return []
+
+def collect_asg(session, region):
+    """Collect Auto Scaling Group data for a region."""
+    try:
+        asg_client = session.client('autoscaling', region_name=region)
+        response = asg_client.describe_auto_scaling_groups()
+        
+        asgs = []
+        for asg in response.get('AutoScalingGroups', []):
+            asgs.append({
+                'ASGName': asg.get('AutoScalingGroupName', 'N/A'),
+                'Region': region,
+                'DesiredCapacity': asg.get('DesiredCapacity', 0),
+                'MinCapacity': asg.get('MinSize', 0),
+                'MaxCapacity': asg.get('MaxSize', 0)
+            })
+        
+        return asgs
+    except ClientError as e:
+        logger.error(f"Error collecting ASG data for region {region}: {str(e)}")
+        return []
+
+def collect_rds(session, region):
+    """Collect RDS database data for a region."""
+    try:
+        rds_client = session.client('rds', region_name=region)
+        response = rds_client.describe_db_instances()
+        
+        databases = []
+        for db in response.get('DBInstances', []):
+            databases.append({
+                'DBInstanceIdentifier': db.get('DBInstanceIdentifier', 'N/A'),
+                'Region': region,
+                'EngineType': db.get('Engine', 'N/A'),
+                'DBInstanceClass': db.get('DBInstanceClass', 'N/A'),
+                'AllocatedStorage': db.get('AllocatedStorage', 0),
+                'StorageType': db.get('StorageType', 'N/A'),
+                'MultiAZ': db.get('MultiAZ', False),
+                'ReadReplicas': db.get('ReadReplicaDBInstanceIdentifiers', [])
+            })
+        
+        return databases
+    except ClientError as e:
+        logger.error(f"Error collecting RDS data for region {region}: {str(e)}")
+        return []
+
+def collect_s3(session):
+    """Collect S3 bucket data."""
+    try:
+        s3_client = session.client('s3')
+        response = s3_client.list_buckets()
+        
+        buckets = []
+        for bucket in response.get('Buckets', []):
+            bucket_name = bucket.get('Name')
+            
+            # Get bucket region
+            try:
+                location_response = s3_client.get_bucket_location(Bucket=bucket_name)
+                region = location_response.get('LocationConstraint')
+                if region is None:
+                    region = 'us-east-1'
+            except ClientError as e:
+                logger.warning(f"Error getting location for bucket {bucket_name}: {str(e)}")
+                region = 'us-east-1'
+            
+            buckets.append({
+                'BucketName': bucket_name,
+                'Region': region,
+                'StorageClass': 'Standard',
+                'NumberOfObjects': 0,
+                'TotalStorageUsed_GB': 0
+            })
+        
+        return buckets
+    except ClientError as e:
+        logger.error(f"Error collecting S3 data: {str(e)}")
+        return []
+
+def collect_nat_gw(session, region):
+    """Collect NAT Gateway data for a region."""
+    try:
+        ec2_client = session.client('ec2', region_name=region)
+        response = ec2_client.describe_nat_gateways()
+        
+        nat_gateways = []
+        for nat in response.get('NatGateways', []):
+            elastic_ips = []
+            for address in nat.get('NatGatewayAddresses', []):
+                if address.get('PublicIp'):
+                    elastic_ips.append(address.get('PublicIp'))
+            
+            nat_gateways.append({
+                'NATGatewayID': nat.get('NatGatewayId', 'N/A'),
+                'Region': region,
+                'VpcID': nat.get('VpcId', 'N/A'),
+                'ElasticIPsAssociated': elastic_ips,
+                'DataProcessed_GB': 0,
+                'NumberOfNATGateways': 1
+            })
+        
+        return nat_gateways
+    except ClientError as e:
+        logger.error(f"Error collecting NAT Gateway data for region {region}: {str(e)}")
+        return []
+
+def collect_elb(session, region):
+    """Collect Elastic Load Balancer data for a region."""
+    try:
+        elbs = []
+        
+        # Classic Load Balancers
+        try:
+            elb_client = session.client('elb', region_name=region)
+            classic_response = elb_client.describe_load_balancers()
+            
+            for lb in classic_response.get('LoadBalancerDescriptions', []):
+                elbs.append({
+                    'LoadBalancerName': lb.get('LoadBalancerName', 'N/A'),
+                    'Region': region,
+                    'Type': 'Classic',
+                    'NumberOfLoadBalancers': 1,
+                    'DataProcessed_GB': 0,
+                    'ActiveConnections': 0
+                })
+        except ClientError as e:
+            logger.warning(f"Error collecting Classic ELB data for region {region}: {str(e)}")
+        
+        # Application and Network Load Balancers
+        try:
+            elbv2_client = session.client('elbv2', region_name=region)
+            v2_response = elbv2_client.describe_load_balancers()
+            
+            for lb in v2_response.get('LoadBalancers', []):
+                elbs.append({
+                    'LoadBalancerName': lb.get('LoadBalancerName', 'N/A'),
+                    'Region': region,
+                    'Type': lb.get('Type', 'N/A'),
+                    'NumberOfLoadBalancers': 1,
+                    'DataProcessed_GB': 0,
+                    'ActiveConnections': 0
+                })
+        except ClientError as e:
+            logger.warning(f"Error collecting ALB/NLB data for region {region}: {str(e)}")
+        
+        return elbs
+    except Exception as e:
+        logger.error(f"Error collecting ELB data for region {region}: {str(e)}")
+        return []
+
+def collect_cloudfront(session, region=None):
+    """
+    Collect CloudFront distribution data.
+    CloudFront is a global service, so region parameter is ignored but kept for API consistency.
+    """
+    try:
+        # CloudFront is a global service, always use us-east-1
+        cf_client = session.client('cloudfront', region_name='us-east-1')
+        response = cf_client.list_distributions()
+        
+        # Track unique distributions by ID to prevent duplicates
+        unique_distributions = {}
+        
+        if 'DistributionList' in response and 'Items' in response['DistributionList']:
+            for item in response['DistributionList']['Items']:
+                dist_id = item.get('Id', 'N/A')
+                if dist_id not in unique_distributions:
+                    # Extract origin domains
+                    origins = []
+                    for origin in item.get('Origins', {}).get('Items', []):
+                        origins.append(origin.get('DomainName', 'N/A'))
+                    
+                    unique_distributions[dist_id] = {
+                        'DistributionID': dist_id,
+                        'DomainName': item.get('DomainName', 'N/A'),
+                        'Status': item.get('Status', 'N/A'),
+                        'Enabled': item.get('Enabled', False),
+                        'Origin': ', '.join(origins),
+                        'DataTransferGB': 0
+                    }
+        
+        return list(unique_distributions.values())
+    except ClientError as e:
+        logger.error(f"Error collecting CloudFront data: {str(e)}")
+        return []
+
+def collect_data_transfer(region):
+    """
+    Collect Data Transfer cost data for a region.
+    
+    Note: This is a placeholder function. In a Lambda environment,
+    actual data transfer metrics would likely need to be retrieved
+    from CloudWatch metrics or Cost Explorer, which is beyond
+    the scope of this script.
+    """
+    return [{
+        'Region': region,
+        'InterRegionDataTransfer_GB': 0,
+        'DataTransferToInternet_GB': 0,
+        'DataTransferWithinAWSServices_GB': 0
+    }]
+
+def collect_vpc_data_transfer(region):
+    """
+    Collect VPC Data Transfer for a region.
+    
+    Note: This is a placeholder function. In a Lambda environment,
+    actual VPC data transfer metrics would need to be retrieved
+    from CloudWatch metrics, which is beyond the scope of this script.
+    """
+    return [{
+        'Region': region,
+        'VPC_DataTransfer_GB': 0
+    }]
+
+def collect_ebs_volumes(session, region):
+    """Collect EBS volume data for a region."""
+    try:
+        ec2_client = session.client('ec2', region_name=region)
+        response = ec2_client.describe_volumes()
+        
+        volumes = []
+        total_size = 0
+        unattached_count = 0
+        volume_types = {}
+        
+        for volume in response.get('Volumes', []):
+            # Extract volume name from tags
+            volume_name = None
+            if volume.get('Tags'):
+                for tag in volume.get('Tags', []):
+                    if tag['Key'] == 'Name':
+                        volume_name = tag['Value']
+                        break
+            
+            # Count by volume type
+            volume_type = volume.get('VolumeType', 'unknown')
+            if volume_type in volume_types:
+                volume_types[volume_type]['count'] += 1
+                volume_types[volume_type]['totalSize'] += volume.get('Size', 0)
+            else:
+                volume_types[volume_type] = {
+                    'count': 1,
+                    'totalSize': volume.get('Size', 0)
+                }
+            
+            # Check if volume is attached
+            attachments = []
+            for attachment in volume.get('Attachments', []):
+                attachments.append({
+                    'Instance': attachment.get('InstanceId', 'N/A'),
+                    'Device': attachment.get('Device', 'N/A'),
+                    'State': attachment.get('State', 'N/A')
+                })
+            
+            if not attachments:
+                unattached_count += 1
+            
+            total_size += volume.get('Size', 0)
+            
+            volumes.append({
+                'ID': volume.get('VolumeId', 'N/A'),
+                'Size': volume.get('Size', 0),
+                'Type': volume.get('VolumeType', 'N/A'),
+                'State': volume.get('State', 'N/A'),
+                'Name': volume_name,
+                'Region': region,
+                'Attachments': attachments
+            })
+        
+        return {
+            'Volumes': volumes,
+            'Summary': {
+                'TotalVolumes': len(volumes),
+                'TotalSizeGB': total_size,
+                'UnattachedVolumes': unattached_count,
+                'VolumesByType': volume_types
+            }
+        }
+    except ClientError as e:
+        logger.error(f"Error collecting EBS volume data for region {region}: {str(e)}")
+        return {
+            'Volumes': [],
+            'Summary': {
+                'TotalVolumes': 0,
+                'TotalSizeGB': 0,
+                'UnattachedVolumes': 0,
+                'VolumesByType': {}
+            }
+        }
+
+def collect_elastic_ips(session, region):
+    """Collect Elastic IP data for a region."""
+    try:
+        ec2_client = session.client('ec2', region_name=region)
+        response = ec2_client.describe_addresses()
+        
+        addresses = []
+        associated_count = 0
+        unassociated_count = 0
+        
+        for address in response.get('Addresses', []):
+            # Extract EIP name from tags
+            eip_name = None
+            if address.get('Tags'):
+                for tag in address.get('Tags', []):
+                    if tag['Key'] == 'Name':
+                        eip_name = tag['Value']
+                        break
+            
+            # Check if EIP is associated
+            if address.get('AssociationId'):
+                associated_count += 1
+            else:
+                unassociated_count += 1
+            
+            addresses.append({
+                'PublicIP': address.get('PublicIp', 'N/A'),
+                'Name': eip_name,
+                'State': 'Associated' if address.get('AssociationId') else 'Unassociated',
+                'Instance': address.get('InstanceId', 'N/A'),
+                'Region': region
+            })
+        
+        return {
+            'Addresses': addresses,
+            'Summary': {
+                'TotalEIPs': len(addresses),
+                'UnassociatedEIPs': unassociated_count,
+                'AssociatedEIPs': associated_count,
+                'ByState': {
+                    'Associated': associated_count,
+                    'Unassociated': unassociated_count
+                }
+            }
+        }
+    except ClientError as e:
+        logger.error(f"Error collecting Elastic IP data for region {region}: {str(e)}")
+        return {
+            'Addresses': [],
+            'Summary': {
+                'TotalEIPs': 0,
+                'UnassociatedEIPs': 0,
+                'AssociatedEIPs': 0,
+                'ByState': {
+                    'Associated': 0,
+                    'Unassociated': 0
+                }
+            }
+        }
+
+def upload_to_s3(data: Dict[str, Any], account_id: str) -> Tuple[bool, str]:
+    """Upload JSON data to S3 bucket."""
+    if not S3_BUCKET_NAME:
+        logger.error("S3_BUCKET_NAME environment variable not set")
+        return False, "S3_BUCKET_NAME not configured"
+    
+    # Create S3 key with timestamp
+    timestamp = datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S')
+    key = f"{S3_KEY_PREFIX.rstrip('/')}/{account_id}/{timestamp}_infra.json"
+    
+    # Also create a "latest" version at a consistent path for API Gateway access
+    latest_key = f"{S3_KEY_PREFIX.rstrip('/')}/{account_id}/latest_infra.json"
+    
+    try:
+        s3_client = boto3.client('s3')
+        
+        # Upload with timestamp
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=key,
+            Body=json.dumps(data, indent=2),
+            ContentType='application/json'
+        )
+        
+        # Upload "latest" version
+        s3_client.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=latest_key,
+            Body=json.dumps(data, indent=2),
+            ContentType='application/json'
+        )
+        
+        logger.info(f"Successfully uploaded data to s3://{S3_BUCKET_NAME}/{key}")
+        return True, key
+    except Exception as e:
+        logger.error(f"Error uploading to S3: {str(e)}")
+        return False, str(e)
+
+def validate_json_structure(data: Dict[str, Any]) -> Tuple[bool, str]:
+    """
+    Validate the JSON structure against expected schema.
+    Returns (is_valid, error_message)
+    """
+    required_top_level_keys = {
+        'EC2Instances', 'AutoScalingGroups', 'RDSDatabases', 'S3Storage',
+        'NATGateways', 'ElasticLoadBalancers', 'CloudFrontDistributions',
+        'VPCs', 'DataTransferCosts', 'StorageVolumes', 'ElasticIPs'
+    }
+    
+    # Check for required top-level keys
+    missing_keys = required_top_level_keys - set(data.keys())
+    if missing_keys:
+        return False, f"Missing required top-level keys: {missing_keys}"
+    
+    # Additional validation can be added here
+    
+    return True, ""
+
+def collect_comprehensive_data(regions: List[str]) -> Dict[str, Any]:
+    """Collect all AWS data and return as dict."""
+    # Create AWS session using Lambda execution role
+    session = create_session()
+    
+    # Initialize empty data structures
+    all_ec2_data = []
+    all_asg_data = []
+    all_rds_data = []
+    all_nat_gw_data = []
+    all_elb_data = []
+    all_vpc_data = []
+    all_data_transfer = []
+    
+    # Change these from arrays to combined objects to properly aggregate across regions
+    combined_ebs_volumes = {
+        'Volumes': [],
+        'Summary': {
+            'TotalVolumes': 0,
+            'TotalSizeGB': 0,
+            'UnattachedVolumes': 0,
+            'VolumesByType': {}
+        }
+    }
+    
+    combined_elastic_ips = {
+        'Addresses': [],
+        'Summary': {
+            'TotalEIPs': 0,
+            'UnassociatedEIPs': 0,
+            'AssociatedEIPs': 0,
+            'ByState': {
+                'Associated': 0,
+                'Unassociated': 0
+            }
+        }
+    }
+    
+    # Get account identifier (ID or alias)
+    account_id = get_account_identifier()
+    
+    # Collect global services first
+    logger.info("Collecting global service data...")
+    
+    # S3 data (global service)
+    s3_data = collect_s3(session)
+    logger.info("S3 data collected.")
+    
+    # CloudFront data (global service)
+    logger.info("Collecting CloudFront data...")
+    cloudfront_data = collect_cloudfront(session)
+    logger.info("CloudFront data collected.")
+    
+    # Process each region
+    for region in regions:
+        logger.info(f"Collecting data for region: {region}")
+        
+        # EC2
+        logger.info(f"  Collecting EC2 data for {region}...")
+        region_ec2 = collect_ec2(session, region)
+        all_ec2_data.extend(region_ec2)
+        
+        # RDS
+        logger.info(f"  Collecting RDS data for {region}...")
+        region_rds = collect_rds(session, region)
+        all_rds_data.extend(region_rds)
+        
+        # Auto Scaling Groups
+        logger.info(f"  Collecting ASG data for {region}...")
+        region_asg = collect_asg(session, region)
+        all_asg_data.extend(region_asg)
+        
+        # NAT Gateways
+        logger.info(f"  Collecting NAT Gateway data for {region}...")
+        region_nat_gw = collect_nat_gw(session, region)
+        all_nat_gw_data.extend(region_nat_gw)
+        
+        # Elastic Load Balancers
+        logger.info(f"  Collecting ELB data for {region}...")
+        region_elb = collect_elb(session, region)
+        all_elb_data.extend(region_elb)
+        
+        # VPCs
+        logger.info(f"  Collecting VPC data for {region}...")
+        region_vpc = collect_vpc_data_transfer(region)
+        all_vpc_data.extend(region_vpc)
+        
+        # Data Transfer Costs
+        logger.info(f"  Collecting Data Transfer Costs for {region}...")
+        region_data_transfer = collect_data_transfer(region)
+        all_data_transfer.extend(region_data_transfer)
+        
+        # EBS Volumes
+        logger.info(f"  Collecting EBS Volumes for {region}...")
+        region_ebs_volumes = collect_ebs_volumes(session, region)
+        if region_ebs_volumes:
+            combined_ebs_volumes['Volumes'].extend(region_ebs_volumes.get('Volumes', []))
+            region_summary = region_ebs_volumes.get('Summary', {})
+            combined_ebs_volumes['Summary']['TotalVolumes'] += region_summary.get('TotalVolumes', 0)
+            combined_ebs_volumes['Summary']['TotalSizeGB'] += region_summary.get('TotalSizeGB', 0)
+            combined_ebs_volumes['Summary']['UnattachedVolumes'] += region_summary.get('UnattachedVolumes', 0)
+            
+            # Merge volume types
+            region_volume_types = region_summary.get('VolumesByType', {})
+            for vol_type, info in region_volume_types.items():
+                if vol_type in combined_ebs_volumes['Summary']['VolumesByType']:
+                    combined_ebs_volumes['Summary']['VolumesByType'][vol_type]['count'] += info.get('count', 0)
+                    combined_ebs_volumes['Summary']['VolumesByType'][vol_type]['totalSize'] += info.get('totalSize', 0)
+                else:
+                    combined_ebs_volumes['Summary']['VolumesByType'][vol_type] = info
+        
+        # Elastic IPs
+        logger.info(f"  Collecting Elastic IPs for {region}...")
+        region_elastic_ips = collect_elastic_ips(session, region)
+        if region_elastic_ips:
+            combined_elastic_ips['Addresses'].extend(region_elastic_ips.get('Addresses', []))
+            region_summary = region_elastic_ips.get('Summary', {})
+            combined_elastic_ips['Summary']['TotalEIPs'] += region_summary.get('TotalEIPs', 0)
+            combined_elastic_ips['Summary']['UnassociatedEIPs'] += region_summary.get('UnassociatedEIPs', 0)
+            combined_elastic_ips['Summary']['AssociatedEIPs'] += region_summary.get('AssociatedEIPs', 0)
+            combined_elastic_ips['Summary']['ByState']['Associated'] += region_summary.get('ByState', {}).get('Associated', 0)
+            combined_elastic_ips['Summary']['ByState']['Unassociated'] += region_summary.get('ByState', {}).get('Unassociated', 0)
+        
+        logger.info(f"  Region {region} data collection complete")
+    
+    # Create final JSON output
+    logger.info("Creating final JSON output...")
+    
+    # Combine all collected data
+    complete_data = {
+        'EC2Instances': all_ec2_data,
+        'AutoScalingGroups': all_asg_data,
+        'RDSDatabases': all_rds_data,
+        'S3Storage': s3_data,
+        'NATGateways': all_nat_gw_data,
+        'ElasticLoadBalancers': all_elb_data,
+        'CloudFrontDistributions': cloudfront_data,
+        'VPCs': all_vpc_data,
+        'DataTransferCosts': all_data_transfer,
+        'StorageVolumes': {
+            'Details': combined_ebs_volumes['Volumes'],
+            'Summary': combined_ebs_volumes['Summary']
+        },
+        'ElasticIPs': {
+            'Details': combined_elastic_ips['Addresses'],
+            'Summary': combined_elastic_ips['Summary']
+        },
+        'MetaData': {
+            'AccountID': account_id,
+            'RegionsScanned': regions,
+            'CollectionTimestamp': datetime.utcnow().isoformat(),
+            'LambdaFunction': 'api_lambda_data-collection'
+        }
+    }
+    
+    return complete_data
+
+def lambda_handler(event, context):
+    """
+    Lambda function handler for AWS infrastructure data collection.
+    """
+    logger.info("Starting infrastructure data collection Lambda")
+    logger.info(f"Event: {json.dumps(event)}")
+    
+    # Basic validation of S3 configuration
+    if not S3_BUCKET_NAME:
+        error_msg = "S3_BUCKET_NAME environment variable not set"
+        logger.error(error_msg)
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': error_msg})
+        }
+    
+    # Get regions to process
+    regions = get_regions(event)
+    logger.info(f"Will scan the following regions: {regions}")
+    
+    # Get account identifier
+    account_id = get_account_identifier()
+    logger.info(f"Collecting data for account: {account_id}")
+    
+    # Collect data
+    infra_data = collect_comprehensive_data(regions)
+    
+    # Validate JSON structure
+    is_valid, error_message = validate_json_structure(infra_data)
+    if not is_valid:
+        error_msg = f"Invalid JSON structure: {error_message}"
+        logger.error(error_msg)
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': error_msg})
+        }
+    
+    # Upload to S3
+    upload_success, s3_key = upload_to_s3(infra_data, account_id)
+    if not upload_success:
+        error_msg = f"Failed to upload data to S3: {s3_key}"
+        logger.error(error_msg)
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': error_msg})
+        }
+    
+    # Return success response
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'message': "Successfully collected and stored infrastructure data",
+            'account': account_id,
+            'regions_scanned': regions,
+            's3_bucket': S3_BUCKET_NAME,
+            's3_key': s3_key,
+            'latest_key': f"{S3_KEY_PREFIX.rstrip('/')}/{account_id}/latest_infra.json"
+        })
+    }
+
+# For local testing
+if __name__ == "__main__":
+    test_event = {
+        'specific_region': 'us-east-1'  # Test with a single region for speed
+    }
+    print(json.dumps(lambda_handler(test_event, None), indent=2))

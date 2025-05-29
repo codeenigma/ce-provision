@@ -45,3 +45,42 @@ aws_admin_tools:
         resource: "*"
         action:
           - "wafv2:GetWebACL"
+    - name: "get_cost_explorer_data"
+      type: GET
+      policies: []
+      inline_policies:
+        name: "get_cost_explorer_data"
+        resource: "*"
+        action:
+          - "lambda:InvokeFunction"
+          - "ce:GetCostAndUsage"
+    - name: "save_infra_data_to_s3"
+      schedule:
+        cron: "cron(0 6,12 ? * MON-FRI *)"
+        timeout: 300
+      policies: []
+      inline_policies:
+        name: "save_infra_data_to_s3"
+        resource: "*"
+        action:
+          - "logs:CreateLogGroup"
+          - "logs:CreateLogStream"
+          - "logs:PutLogEvents"
+          - "ec2:Describe*"
+          - "rds:Describe*"
+          - "elasticloadbalancing:Describe*"
+          - "cloudfront:ListDistributions"
+          - "s3:List*"
+          - "s3:Get*"
+          - "autoscaling:Describe*"
+          - "sts:GetCallerIdentity"
+          - "s3:PutObject"
+    - name: "get_infra_data_from_s3" # This is the bit that sets up the API Gateway to pull and share infra data over API. No Lambda function needed here though. How do we do this? See docs
+      type: GET
+      policies: []
+      inline_policies:
+        name: "get_infra_data_from_s3"
+        resource: "*"
+        action:
+          - "lambda:InvokeFunction" # ??
+          - "ce:GetCostAndUsage" # ??
