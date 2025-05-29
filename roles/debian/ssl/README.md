@@ -42,8 +42,10 @@ nginx:
         reload_command: reload
         reload:
           - nginx
-        on_calendar: "Mon *-*-* 04:00:00"
 ```
+Variable "on_calendar" is no longer in use since we have 1 general cron to renew all domains
+
+"web_server" can be standalone and webroot, differnce is that webroot wont start webserver to validate SSL, while standalone requires port on which webserver will be running in order to validate cert so we need the "http_01_port" for standalone option
 
 As in the example above, you need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
 
