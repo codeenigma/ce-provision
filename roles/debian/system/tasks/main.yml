@@ -143,3 +143,24 @@
   when:
     - system.nohetznerdhcp
     - hetznercloudcheck.rc == 0
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Check whether a package called sysstat is installed
+  ansible.builtin.debug:
+    msg: "{{ ansible_facts.packages['foobar'] | length }} versions of sysstat are installed!"
+  register: sysstatpackageinstalled
+  when: "'sysstat' in ansible_facts.packages"
+
+- name: Copy sysstat config.
+  ansible.builtin.template:
+    src: "sysstat.j2"
+    dest: "/etc/default/sysstat"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  when:
+    - sysstatpackageinstalled.rc == 1
