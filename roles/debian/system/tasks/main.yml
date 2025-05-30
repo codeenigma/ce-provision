@@ -157,29 +157,29 @@
     sysstat_installed: true
   when: ansible_facts.packages is defined and 'sysstat' in ansible_facts.packages
 
-- name: Debug sysstat version info
-  ansible.builtin.debug:
-    msg: "{{ ansible_facts.packages['sysstat'] | length }} versions of sysstat are installed!"
-  when: sysstat_installed | default(false)
+- name: Enable syssat data collection if package is installed.
+  when:
+    - sysstat_installed | default(false)
+  block:
+    - name: Debug sysstat version info
+      ansible.builtin.debug:
+        msg: "{{ ansible_facts.packages['sysstat'] | length }} versions of sysstat are installed!"
 
-- name: Copy sysstat config
-  ansible.builtin.template:
-    src: "sysstat.j2"
-    dest: "/etc/default/sysstat"
-    owner: root
-    group: root
-    mode: '0644'
-    force: true
-  when: sysstat_installed | default(false)
+    - name: Copy sysstat config
+      ansible.builtin.template:
+        src: "sysstat.j2"
+        dest: "/etc/default/sysstat"
+        owner: root
+        group: root
+        mode: '0644'
+        force: true
 
-- name: Enable sysstat service at boot
-  ansible.builtin.service:
-    name: sysstat
-    enabled: true
-  when: sysstat_installed | default(false)
+    - name: Enable sysstat service at boot
+      ansible.builtin.service:
+        name: sysstat
+        enabled: true
 
-- name: Restart sysstat service
-  ansible.builtin.service:
-    name: sysstat
-    state: restarted
-  when: sysstat_installed | default(false)
+    - name: Restart sysstat service
+      ansible.builtin.service:
+        name: sysstat
+        state: restarted
