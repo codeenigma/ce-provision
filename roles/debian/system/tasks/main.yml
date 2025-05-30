@@ -144,14 +144,18 @@
     - system.nohetznerdhcp
     - hetznercloudcheck.rc == 0
 
-- name: Determine if sysstat is installed
-  set_fact:
-    sysstat_installed: true
-  when: "'sysstat' in ansible_facts.packages"
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
 
-- name: Print the package facts
+- name: Print the package facts (optional)
   ansible.builtin.debug:
     var: ansible_facts.packages
+
+- name: Set flag if sysstat is installed
+  ansible.builtin.set_fact:
+    sysstat_installed: true
+  when: ansible_facts.packages is defined and 'sysstat' in ansible_facts.packages
 
 - name: Debug sysstat version info
   ansible.builtin.debug:
@@ -164,6 +168,6 @@
     dest: "/etc/default/sysstat"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
     force: true
   when: sysstat_installed | default(false)
