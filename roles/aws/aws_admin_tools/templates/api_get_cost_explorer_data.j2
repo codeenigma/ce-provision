@@ -1,0 +1,359 @@
+import json
+import boto3
+import datetime
+from typing import Dict, List, Optional, Any
+import time
+
+# Ansible injected region variable for client-specific region (overridden via Ansible templating)
+ANSIBLE_REGION = "{{ _aws_region }}"
+
+# Mapping of AWS service names to friendly names
+SERVICE_NAME_MAPPING: Dict[str, str] = {
+    "APN Annual Program Fee": "APN Fee",
+    "AWS AppSync": "AppSync",
+    "AWS Backup": "AWS Backup",
+    "AWS CloudFormation": "CloudFormation",
+    "AWS CloudShell": "CloudShell",
+    "AWS CloudTrail": "CloudTrail",
+    "AWS CodeBuild": "CodeBuild",
+    "AWS Comprehend": "Comprehend",
+    "AWS Config": "Config",
+    "AWS Cost Explorer": "Cost Explorer",
+    "AWS Glue": "Glue",
+    "AWS GuardDuty": "GuardDuty",
+    "AWS Inspector": "Inspector",
+    "AWS Key Management Service": "KMS",
+    "AWS Lambda": "Lambda",
+    "AWS Location": "Location Service",
+    "AWS Macie": "Macie",
+    "AWS Secrets Manager": "Secrets Manager",
+    "AWS Security Hub": "Security Hub",
+    "AWS Step Functions": "Step Functions",
+    "AWS Support (Business)": "Support (Business)",
+    "AWS Support (Developer)": "Support (Developer)",
+    "AWS Systems Manager": "Systems Manager",
+    "AWS X-Ray": "X-Ray",
+    "AWS WAF": "WAF",
+    "Amazon AppSync": "AppSync",
+    "Amazon Bedrock": "Bedrock",
+    "Amazon CloudFront": "CloudFront",
+    "Amazon CloudSearch": "CloudSearch",
+    "Amazon CloudWatch": "CloudWatch",
+    "Amazon Cognito": "Cognito",
+    "Amazon DynamoDB": "DynamoDB",
+    "Amazon EC2 Container Registry (ECR)": "EC2 Container Registry",
+    "Amazon ElastiCache": "ElastiCache",
+    "Amazon Elastic Compute Cloud - Compute": "EC2-Instances",
+    "Amazon Elastic Container Service": "ECS",
+    "Amazon Elastic Container Service for Kubernetes": "ECS for K8",
+    "Amazon Elastic File System": "EFS",
+    "Amazon Elastic Load Balancing": "ELB",
+    "Amazon Glacier": "Glacier",
+    "Amazon GuardDuty": "GuardDuty",
+    "Amazon Inspector": "Inspector",
+    "Amazon Kinesis": "Kinesis",
+    "Amazon Lightsail": "Lightsail",
+    "Amazon Location Service": "Location Service",
+    "Amazon OpenSearch Service": "OpenSearch",
+    "Amazon Polly": "Polly",
+    "Amazon Registrar": "Registrar",
+    "Amazon Relational Database Service": "RDS",
+    "Amazon Route 53": "Route 53",
+    "Amazon S3": "S3",
+    "Amazon SES": "SES",
+    "Amazon SNS": "SNS",
+    "Amazon SQS": "SQS",
+    "Amazon Simple Email Service": "SES",
+    "Amazon Simple Notification Service": "SNS",
+    "Amazon Simple Queue Service": "SQS",
+    "Amazon Simple Storage Service": "S3",
+    "Amazon Simple Workflow Service": "Simple Workflow Service",
+    "Amazon Systems Manager": "Systems Manager",
+    "Amazon Textract": "Textract",
+    "Amazon Translate": "Translate",
+    "Amazon Virtual Private Cloud": "VPC",
+    "Amazon WAF": "WAF",
+    "AmazonCloudWatch": "CloudWatch",
+    "Claude (Amazon Bedrock Edition)": "Claude (Bedrock)",
+    "CloudFront Security Bundle": "CF Security Bundle",
+    "CloudWatch Events": "CloudWatch Events",
+    "Cyber Security Cloud Managed Rules for AWS WAF": "Cyber Security Cloud Managed Rules for AWS WAF -HighSecurity OWASP Set-",
+    "EC2 - Other": "EC2-Other",
+    "Savings Plans for AWS Compute usage": "Savings Plans for AWS Compute",
+    "Tax": "Tax"
+}
+
+# Initialize Cost Explorer client with ansible region override
+ce_client = boto3.client('ce', region_name=ANSIBLE_REGION)
+
+def calculate_date_range(months: int = 2) -> Dict[str, str]:
+    """
+    Calculate start and end dates for the given number of months.
+    Default is 2 months (previous full month + current month partial).
+    """
+    today = datetime.date.today()
+    first_current_month = today.replace(day=1)
+    
+    # Calculate start date (first day of N months ago)
+    if months <= 1:
+        # If months is 1 or less, start from the beginning of current month
+        start_date = first_current_month
+    else:
+        # Start from the beginning of (months-1) months ago
+        month_offset = months - 1
+        year_offset = month_offset // 12
+        month_remainder = month_offset % 12
+        
+        start_month = first_current_month.month - month_remainder
+        start_year = first_current_month.year - year_offset
+        
+        if start_month <= 0:
+            start_month += 12
+            start_year -= 1
+            
+        start_date = datetime.date(start_year, start_month, 1)
+    
+    return {
+        'Start': start_date.isoformat(),
+        'End': today.isoformat()
+    }
+
+def process_cost_explorer_response(response: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Process the AWS Cost Explorer response into a more user-friendly format.
+    """
+    results = response.get("ResultsByTime", [])
+    if not results:
+        return {"error": "No cost data found"}
+    
+    # Initialize data structures
+    time_periods = []
+    
+    # Current date to identify partial months
+    current_date = datetime.date.today()
+    current_month_start = current_date.replace(day=1)
+    current_month_iso = current_month_start.isoformat()
+    
+    # Tracking for averages
+    full_months_data = []
+    all_services = set()
+    
+    # Process each time period
+    for result in results:
+        time_period = result.get("TimePeriod", {})
+        start = time_period.get("Start", "")
+        end = time_period.get("End", "")
+        
+        # Initialize period data
+        period_data = {
+            "start": start,
+            "end": end,
+            "services": {},
+            "total": 0.0,
+            "is_full_month": True if start != current_month_iso else False
+        }
+        
+        # Process each service group in this period
+        for group in result.get("Groups", []):
+            raw_service_name = group.get("Keys", [""])[0]
+            friendly_name = SERVICE_NAME_MAPPING.get(raw_service_name, raw_service_name)
+            all_services.add(friendly_name)
+            
+            try:
+                amount = float(group.get("Metrics", {}).get("UnblendedCost", {}).get("Amount", "0"))
+            except ValueError:
+                amount = 0.0
+            
+            period_data["services"][friendly_name] = round(amount, 2)
+            period_data["total"] += amount
+        
+        period_data["total"] = round(period_data["total"], 2)
+        
+        # Store full month data for average calculation
+        if period_data["is_full_month"]:
+            full_months_data.append(period_data)
+        
+        # Remove the is_full_month flag before adding to time_periods
+        is_full = period_data.pop("is_full_month", False)
+        time_periods.append(period_data)
+    
+    # Calculate averages from full months only
+    averages = {"services": {}, "total": 0.0, "months_included": len(full_months_data)}
+    
+    if full_months_data:
+        # Initialize all services to 0
+        for service in all_services:
+            averages["services"][service] = 0.0
+        
+        # Sum up the costs for each service
+        for period in full_months_data:
+            for service, amount in period["services"].items():
+                averages["services"][service] += amount
+            averages["total"] += period["total"]
+        
+        # Calculate the average by dividing by the number of full months
+        full_month_count = len(full_months_data)
+        if full_month_count > 0:
+            averages["total"] = round(averages["total"] / full_month_count, 2)
+            for service in averages["services"]:
+                averages["services"][service] = round(averages["services"][service] / full_month_count, 2)
+        
+        # Sort services by average cost (descending)
+        averages["services"] = {k: averages["services"][k] for k in 
+                               sorted(averages["services"].keys(), 
+                                     key=lambda x: averages["services"].get(x, 0), 
+                                     reverse=True) 
+                               if averages["services"][k] > 0}
+    
+    # Final structured output
+    return {
+        "average": averages,
+        "time_periods": time_periods
+    }
+
+def lambda_handler(event, context):
+    try:
+        # Ensure event is a dictionary
+        if event is None:
+            event = {}
+        
+        # More comprehensive debugging
+        debug_info = {
+            "event_received": event is not None,
+            "event_type": type(event).__name__,
+            "event_keys": list(event.keys()) if isinstance(event, dict) else "not_a_dict"
+        }
+        
+        # Add current time for reference
+        debug_info["timestamp"] = time.time()
+        debug_info["formatted_time"] = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+        
+        # Safely get nested values
+        def safe_get(obj, *keys):
+            if not isinstance(obj, dict):
+                return None
+            current = obj
+            for key in keys:
+                if not isinstance(current, dict) or key not in current:
+                    return None
+                current = current[key]
+            return current
+        
+        # More safely extract values
+        params_struct = safe_get(event, 'params')
+        querystring_struct = safe_get(event, 'params', 'querystring')
+        query_params = safe_get(event, 'queryStringParameters')
+        
+        debug_info.update({
+            "params_structure": params_struct,
+            "querystring_structure": querystring_struct,
+            "query_string_params": query_params,
+            "full_context": {
+                "path": safe_get(event, 'path'),
+                "method": safe_get(event, 'httpMethod'),
+                "headers": safe_get(event, 'headers'),
+                "raw_query_string": safe_get(event, 'rawQueryString'),
+                "is_base64_encoded": safe_get(event, 'isBase64Encoded')
+            }
+        })
+        
+        # Get months parameter from query string (default to 2)
+        months = 2
+        debug_info["default_months"] = months
+        
+        # Track parameter access attempts
+        param_attempts = []
+        
+        # Safely try to get months parameter
+        try:
+            # Try to get months from new template structure (Method Request Pass-Through)
+            param_attempts.append("Checking event['params']['querystring']")
+            months_param_1 = safe_get(event, 'params', 'querystring', 'months')
+            
+            if months_param_1 is not None:
+                param_attempts.append(f"Found months in params.querystring: {months_param_1}")
+                try:
+                    months = int(months_param_1)
+                    param_attempts.append(f"Parsed value: {months}")
+                    if months < 1:
+                        months = 2  # Use default if invalid
+                        param_attempts.append(f"Value was < 1, reset to 2")
+                except (ValueError, TypeError) as e:
+                    param_attempts.append(f"Error parsing: {str(e)}")
+                    # Continue with default value
+            else:
+                param_attempts.append("months not found in params.querystring")
+            
+            # Fall back to the original query string parameter format
+            if months == 2:  # If not set by previous method
+                param_attempts.append("Trying fallback: event['queryStringParameters']")
+                months_param_2 = safe_get(event, 'queryStringParameters', 'months')
+                
+                if months_param_2 is not None:
+                    param_attempts.append(f"Found months in queryStringParameters: {months_param_2}")
+                    try:
+                        months = int(months_param_2)
+                        param_attempts.append(f"Parsed value: {months}")
+                        if months < 1:
+                            months = 2  # Use default if invalid
+                            param_attempts.append(f"Value was < 1, reset to 2")
+                    except (ValueError, TypeError) as e:
+                        param_attempts.append(f"Error parsing: {str(e)}")
+                        # Continue with default value
+                else:
+                    param_attempts.append("months not found in queryStringParameters")
+        except Exception as e:
+            param_attempts.append(f"Error during parameter processing: {str(e)}")
+            # Continue with default value
+        
+        # Track the final months value used
+        debug_info["final_months_value"] = months
+        debug_info["param_attempts"] = param_attempts
+        
+        # Calculate time period
+        time_period = calculate_date_range(months)
+        debug_info["calculated_time_period"] = time_period
+        
+        # Call AWS Cost Explorer API
+        response = ce_client.get_cost_and_usage(
+            TimePeriod=time_period,
+            Granularity='MONTHLY',
+            Metrics=['UnblendedCost'],
+            GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'}]
+        )
+        
+        # Process response into a more user-friendly format
+        processed_data = process_cost_explorer_response(response)
+        
+        # Add metadata
+        processed_data["metadata"] = {
+            "start_date": time_period["Start"],
+            "end_date": time_period["End"],
+            "months_requested": months,
+            "usage_info": "To request a specific number of months, add '?months=N' to the URL (e.g., '/cost-explorer?months=6' for 6 months of data)",
+            "debug": debug_info
+        } 
+        
+        # Return processed data with proper API Gateway format
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps(processed_data)
+        }
+        
+    except Exception as e:
+        # Return error with proper API Gateway format
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'error': 'CostExplorerError',
+                'message': str(e)
+            })
+        }
