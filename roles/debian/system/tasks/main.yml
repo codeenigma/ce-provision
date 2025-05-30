@@ -171,3 +171,15 @@
     mode: '0644'
     force: true
   when: sysstat_installed | default(false)
+
+- name: Enable sysstat service at boot
+  ansible.builtin.service:
+    name: sysstat
+    enabled: true
+  when: sysstat_installed | default(false)
+
+- name: Restart sysstat service
+  ansible.builtin.service:
+    name: sysstat
+    state: restarted
+  when: sysstat_installed | default(false)
