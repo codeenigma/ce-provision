@@ -154,7 +154,7 @@
 
 - name: Check whether a package called sysstat is installed
   ansible.builtin.debug:
-    msg: "{{ ansible_facts.packages['foobar'] | length }} versions of sysstat are installed!"
+    msg: "{{ ansible_facts.packages['sysstat'] | length }} versions of sysstat are installed!"
   register: sysstatpackageinstalled
   when: "'sysstat' in ansible_facts.packages"
 
