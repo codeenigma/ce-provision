@@ -27,14 +27,10 @@
       runtime: "{{ aws_backup_validation.runtime }}"
       function_file: "{{ lookup('template', item + '_validation.py.j2') }}"
       s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
-      s3_bucket_prefix: "{{ aws_backup_validation.s3_bucket_prefix }}"
+      s3_bucket_prefix: "lambda-functions"
       tags:
         Name: "{{ item }}_backup_validation"
   loop: "{{ aws_backup_validation.resources }}"
-
-#- name: Remove variables containing "-".
-#  ansible.builtin.set_fact:
-#    aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['response_metadata', 'function_file']) }}"
 
 - name: Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
@@ -74,7 +70,7 @@
       runtime: "{{ aws_backup_validation.runtime }}"
       function_file: "{{ lookup('template', 'validation_report.py.j2') }}"
       s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
-      s3_bucket_prefix: "{{ aws_backup_validation.s3_bucket_prefix }}"
+      s3_bucket_prefix: "lambda-functions"
       tags:
         Name: "validation_report"
 

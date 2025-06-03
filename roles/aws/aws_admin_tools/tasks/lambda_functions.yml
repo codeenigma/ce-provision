@@ -15,5 +15,6 @@
       runtime: "{{ aws_admin_tools.runtime }}"
       function_file: "{{ lookup('template', item.resource + '_' + item.name + '.py.j2') }}"
       s3_bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
+      s3_bucket_prefix: "lambda-functions"
       tags:
         Name: "{{ item.resource }}_{{ item.name }}"
