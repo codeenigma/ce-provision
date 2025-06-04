@@ -62,6 +62,12 @@
     _object_missing: true
   when: item.resource == "s3" and item.object not in _objects_in_s3_bucket.s3_keys
 
+- name: Create default file for S3.
+  ansible.builtin.template:
+    src: default_s3_object.j2
+    dest: default_s3_object
+  when: _object_missing is defined and _object_missing
+
 - name: Add default file to S3 bucket if it doesn't exist.
   amazon.aws.s3_object:
     bucket: "{{ item.bucket }}"
