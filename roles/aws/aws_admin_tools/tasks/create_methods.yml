@@ -52,14 +52,14 @@
   register: _objects_in_s3_bucket
   when: item.resource == "s3"
 
-- name: Set _object_exists to true if object exist.
+- name: Set _object_missing to true if object exist.
   ansible.builtin.set_fact:
-    _object_exists: true
+    _object_missing: true
   when: item.resource == "s3" and item.object in _objects_in_s3_bucket.s3_keys
 
-- name: Set _object_exists to false if object doesn't exist.
+- name: Set _object_missing to false if object doesn't exist.
   ansible.builtin.set_fact:
-    _object_exists: false
+    _object_missing: false
   when: item.resource == "s3" and item.object not in _objects_in_s3_bucket.s3_keys
 
 - name: Add default file to S3 bucket if it doesn't exist.
@@ -68,6 +68,7 @@
     object: "{{ item.object }}"
     src: "{{ lookup('template', 'default_s3_object') }}"
     mode: put
+  when: _object_missing is defined and _object_missing
 
 - name: Build arn for Lambda.
   ansible.builtin.set_fact:
