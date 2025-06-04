@@ -1,27 +1,3 @@
-- name: Get resources.
-  ansible.builtin.command: >-
-    aws apigateway get-resources
-    --rest-api-id "{{ _api_gate.id }}"
-    --region "{{ _aws_region }}"
-  register: _api_old_resource
-
-- name: Setting previous command output into variable.
-  ansible.builtin.set_fact:
-    _api_old_resource: "{{ _api_old_resource.stdout | from_json }}"
-
-- name: Find the index of root resource.
-  ansible.builtin.set_fact:
-    _api_old_resource_index: "{{ lookup('ansible.utils.index_of', _api_old_resource['items'], 'eq', '/' + item.name, 'path', wantlist=True) }}"
-
-- name: Delete resource.
-  ansible.builtin.command: >-
-    aws apigateway delete-resource
-    --rest-api-id "{{ _api_gate.id }}"
-    --resource-id "{{ _api_old_resource['items'][_api_old_resource_index[0]].id }}"
-    --region "{{ _aws_region }}"
-  register: _api_old_resource
-  when: _api_old_resource_index | length > 0
-
 - name: Create resource on API gateway.
   ansible.builtin.command: >-
     aws apigateway create-resource
@@ -64,6 +40,16 @@
     --region "{{ _aws_region }}"
   when: item.url_params is defined and item.url_params | length > 0
 
+- name: Build arn for S3 bucket.
+  ansible.builtin.set_fact:
+    _target_arn: "arn:aws:apigateway:{{ _aws_region }}:s3:path/{{ item.bucket }}/{{ item.object }}"
+  when: ite.resource == "s3"
+
+- name: Build arn for Lambda.
+  ansible.builtin.set_fact:
+    _target_arn: "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+  when: ite.resource == "lambda"
+
 - name: Add Lambda for method without URL params.
   ansible.builtin.command: >-
     aws apigateway put-integration
@@ -73,7 +59,7 @@
     --type AWS
     --content-handling CONVERT_TO_TEXT
     --integration-http-method POST
-    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+    --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
   when: item.url_params is not defined or item.url_params | length == 0
 
@@ -108,7 +94,7 @@
     --integration-http-method POST
     --passthrough-behavior WHEN_NO_TEMPLATES
     --request-template file://integration_template
-    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+    --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
   when: item.url_params is defined and item.url_params | length > 0
 

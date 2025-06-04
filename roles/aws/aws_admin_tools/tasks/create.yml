@@ -37,17 +37,21 @@
     - _api_index | length > 0
     - _old_api_res_list is defined
 
-- name: Extract the scheduled functions from the list.
+- name: Extract the API Gateway functions from the list.
   ansible.builtin.set_fact:
     _api_functions: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 'api') | list }}"
 
-- name: Extract the API Gateway functions from the list.
+- name: Extract the scheduled functions from the list.
   ansible.builtin.set_fact:
     _schedule_functions: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 'schedule') | list }}"
 
+- name: Extract the API Gateway with S3 from the list.
+  ansible.builtin.set_fact:
+    _api_s3: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 's3') | list }}"
+
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
-  loop: "{{ _api_functions }}"
+  loop: "{{ _api_functions + _api_s3 }}"
 
 - name: Create Event Bridge schedule.
   ansible.builtin.include_tasks: create_schedule.yml
@@ -113,3 +117,5 @@
     --source-arn arn:aws:execute-api:{{ _aws_region }}:{{ _acc_id }}:{{ _api_gate.id }}/*/{{ item.type }}/{{ item.name }}
     --region {{ _aws_region }}
   loop: "{{ _api_functions }}"
+
+# TODO Add scheduled triggers
