@@ -28,10 +28,6 @@
   register: _api_gate
   when: _api_index | length == 0
 
-- name: Remove old resources if API Gaeway exists.
-  ansible.builtin.include_tasks: remove_old_reources.yml
-  when: _api_index | length > 0
-
 - name: Setting previous command output into variable.
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate.stdout | from_json }}"
@@ -40,6 +36,10 @@
 - name: Setting _api_index if API already exists.
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate_list.rest_apis[_api_index[0]] }}"
+  when: _api_index | length > 0
+
+- name: Remove old resources if API Gateway exists.
+  ansible.builtin.include_tasks: remove_old_reources.yml
   when: _api_index | length > 0
 
 - name: Get list of API gateway resources.
