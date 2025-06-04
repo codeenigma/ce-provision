@@ -49,6 +49,11 @@
   ansible.builtin.set_fact:
     _api_s3: "{{ aws_admin_tools.functions | selectattr('resource', 'eq', 's3') | list }}"
 
+- name: Remove old resources if API Gateway exists.
+  ansible.builtin.include_tasks: remove_old_reources.yml
+  loop: "{{ _api_functions + _api_s3 }}"
+  when: _api_index | length > 0
+
 - name: Create resources and set methods on API Gateway.
   ansible.builtin.include_tasks: create_methods.yml
   loop: "{{ _api_functions + _api_s3 }}"
