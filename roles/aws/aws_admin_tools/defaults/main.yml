@@ -47,6 +47,7 @@ aws_admin_tools:
           - "wafv2:GetWebACL"
     - name: "get_infra_data_from_s3" # This is the bit that sets up the API Gateway to pull and share infra data over API. No Lambda function needed here though. How do we do this? See docs
       resource: s3
+      type: GET
       bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
       object: "lambda-results/infra-info"
       url_params:
