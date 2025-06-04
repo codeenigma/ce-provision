@@ -45,6 +45,30 @@
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:s3:path/{{ item.bucket }}/{{ item.object }}"
   when: item.resource == "s3"
 
+- name: List Objects in S3 bucket.
+  amazon.aws.aws_s3:
+    bucket: "{{ item.bucket }}"
+    mode: list
+  register: _objects_in_s3_bucket
+  when: item.resource == "s3"
+
+- name: Set _object_exists to true if object exist.
+  ansible.builtin.set_fact:
+    _object_exists: true
+  when: item.resource == "s3" and item.object in _objects_in_s3_bucket.s3_keys
+
+- name: Set _object_exists to false if object doesn't exist.
+  ansible.builtin.set_fact:
+    _object_exists: false
+  when: item.resource == "s3" and item.object not in _objects_in_s3_bucket.s3_keys
+
+- name: Add default file to S3 bucket if it doesn't exist.
+  amazon.aws.s3_object:
+    bucket: "{{ item.bucket }}"
+    object: "{{ item.object }}"
+    src: "{{ lookup('template', 'default_s3_object') }}"
+    mode: put
+
 - name: Build arn for Lambda.
   ansible.builtin.set_fact:
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
