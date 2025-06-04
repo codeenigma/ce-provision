@@ -33,13 +33,14 @@
     _api_gate: "{{ _api_gate.stdout | from_json }}"
   when: _api_index | length == 0
 
-- name: Setting _api_index if API already exists.
+- name: Setting _api_gate if API already exists.
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate_list.rest_apis[_api_index[0]] }}"
   when: _api_index | length > 0
 
 - name: Remove old resources if API Gateway exists.
   ansible.builtin.include_tasks: remove_old_reources.yml
+  loop: "{{ _api_functions + _api_s3 }}"
   when: _api_index | length > 0
 
 - name: Get list of API gateway resources.
