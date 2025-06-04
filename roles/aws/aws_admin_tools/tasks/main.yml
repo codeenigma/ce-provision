@@ -28,6 +28,10 @@
   register: _api_gate
   when: _api_index | length == 0
 
+- name: Remove old resources if API Gaeway exists.
+  ansible.builtin.include_tasks: remove_old_reources.yml
+  when: _api_index | length > 0
+
 - name: Setting previous command output into variable.
   ansible.builtin.set_fact:
     _api_gate: "{{ _api_gate.stdout | from_json }}"
@@ -72,13 +76,17 @@
   ansible.builtin.set_fact:
     _main_api_deploy: "{{ _main_api_deploy_tmp['items'] | last }}"
 
+- name: Extract the API Gateway without s3 for resource.
+  ansible.builtin.set_fact:
+    _api_without_s3: "{{ aws_admin_tools.functions | rejectattr('resource', 'eq', 's3') | list }}"
+
 - name: Configure Lambda IAM policies.
   ansible.builtin.include_tasks: lambda_iam.yml
-  loop: "{{ aws_admin_tools.functions }}"
+  loop: "{{ _api_without_s3 }}"
 
 - name: Configure Lambda functions.
   ansible.builtin.include_tasks: lambda_functions.yml
-  loop: "{{ aws_admin_tools.functions }}"
+  loop: "{{ _api_without_s3 }}"
 
 - name: Create WAF for API Gateway.
   ansible.builtin.include_role:
