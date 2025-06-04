@@ -48,7 +48,7 @@
 - name: Build arn for Lambda.
   ansible.builtin.set_fact:
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
-  when: item.resource == "lambda"
+  when: item.resource == "api"
 
 - name: Add Lambda for method without URL params.
   ansible.builtin.command: >-
