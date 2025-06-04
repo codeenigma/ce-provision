@@ -52,14 +52,14 @@
   register: _objects_in_s3_bucket
   when: item.resource == "s3"
 
-- name: Set _object_missing to true if object exist.
-  ansible.builtin.set_fact:
-    _object_missing: true
-  when: item.resource == "s3" and item.object in _objects_in_s3_bucket.s3_keys
-
-- name: Set _object_missing to false if object doesn't exist.
+- name: Set _object_missing to false if object exist.
   ansible.builtin.set_fact:
     _object_missing: false
+  when: item.resource == "s3" and item.object in _objects_in_s3_bucket.s3_keys
+
+- name: Set _object_missing to true if object doesn't exist.
+  ansible.builtin.set_fact:
+    _object_missing: true
   when: item.resource == "s3" and item.object not in _objects_in_s3_bucket.s3_keys
 
 - name: Add default file to S3 bucket if it doesn't exist.
