@@ -43,12 +43,12 @@
 - name: Build arn for S3 bucket.
   ansible.builtin.set_fact:
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:s3:path/{{ item.bucket }}/{{ item.object }}"
-  when: ite.resource == "s3"
+  when: item.resource == "s3"
 
 - name: Build arn for Lambda.
   ansible.builtin.set_fact:
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
-  when: ite.resource == "lambda"
+  when: item.resource == "lambda"
 
 - name: Add Lambda for method without URL params.
   ansible.builtin.command: >-
