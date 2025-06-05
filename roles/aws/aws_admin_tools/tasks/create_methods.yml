@@ -81,7 +81,7 @@
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
   when: item.resource == "api"
 
-- name: Add Lambda for method without URL params.
+- name: Add Service for method without URL params.
   ansible.builtin.command: >-
     aws apigateway put-integration
     --rest-api-id "{{ _api_gate.id }}"
@@ -89,7 +89,7 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --integration-http-method POST
+    --integration-http-method {{ 'GET' if item.resource == 's3' else 'POST' }}
     --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
     {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/api_get_s3"' if item.resource == 's3' else '' }}
@@ -111,7 +111,7 @@
     dest: integration_template
   when: item.url_params is defined and item.url_params | length > 0
 
-- name: Add Lambda for method with URL params.
+- name: Add Service for method with URL params.
   ansible.builtin.command: >-
     aws apigateway put-integration
     --rest-api-id "{{ _api_gate.id }}"
@@ -119,7 +119,7 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --integration-http-method POST
+    --integration-http-method {{ 'GET' if item.resource == 's3' else 'POST' }}
     --passthrough-behavior WHEN_NO_TEMPLATES
     --request-template file://integration_template
     --uri "{{ _target_arn }}"
