@@ -92,7 +92,7 @@
     --integration-http-method POST
     --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
-    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/' + item.name + '"' if item.resource == 's3' else '' }}
+    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/api_get_s3"' if item.resource == 's3' else '' }}
   when: item.url_params is not defined or item.url_params | length == 0
 
 - name: Generate template parts for each param
@@ -124,7 +124,7 @@
     --request-template file://integration_template
     --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
-    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/' + item.name + '"' if item.resource == 's3' else '' }}
+    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/api_get_s3"' if item.resource == 's3' else '' }}
   when: item.url_params is defined and item.url_params | length > 0
 
 - name: Add method response.
