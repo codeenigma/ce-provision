@@ -51,3 +51,5 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/collectd
     when: is_local is not defined or not is_local
+  - role: debian/system
+    when: is_local is not defined or not is_local
