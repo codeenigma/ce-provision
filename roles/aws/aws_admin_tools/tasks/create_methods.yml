@@ -46,7 +46,7 @@
   when: item.resource == "s3"
 
 - name: List Objects in S3 bucket.
-  amazon.aws.aws_s3:
+  amazon.aws.s3_object:
     bucket: "{{ item.bucket }}"
     mode: list
   register: _objects_in_s3_bucket
