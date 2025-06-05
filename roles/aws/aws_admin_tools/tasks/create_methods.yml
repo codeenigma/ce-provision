@@ -43,7 +43,6 @@
 - name: Build arn for S3 bucket.
   ansible.builtin.set_fact:
     _target_arn: "arn:aws:apigateway:{{ _aws_region }}:s3:path/{{ item.bucket }}/{{ item.object }}"
-    _target_arn: "arn:aws:s3:::codeenigma-dummy-general-storage-eu-west-1/lambda-results/infra-info"
   when: item.resource == "s3"
 
 - name: List Objects in S3 bucket.
