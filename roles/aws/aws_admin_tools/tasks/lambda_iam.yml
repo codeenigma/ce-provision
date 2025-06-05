@@ -11,4 +11,4 @@
       aws_profile: "{{ _aws_profile }}"
       managed_policies: "{{ _policies }}"
       inline_policies: "{{ item.inline_policies | default(omit) }}"
-      policy_document: "{{ lookup('template', 'trusted_entitites.j2') }}"
+      policy_document: "{{ lookup('template', 'trust_lambda.j2') }}"
