@@ -28,7 +28,7 @@
     dest: request_template
   when: item.url_params is defined and item.url_params | length > 0
 
-- name: Put method on API gateway with URL params for Lambda.
+- name: Put method on API gateway with URL params.
   ansible.builtin.command: >-
     aws apigateway put-method
     --rest-api-id "{{ _api_gate.id }}"
@@ -38,20 +38,7 @@
     --request-parameters file://request_template
     --no-api-key-required
     --region "{{ _aws_region }}"
-  when: item.url_params is defined and item.url_params | length > 0 and item.resource != "s3"
-
-- name: Put method on API gateway with URL params for S3.
-  ansible.builtin.command: >-
-    aws apigateway put-method
-    --rest-api-id "{{ _api_gate.id }}"
-    --resource-id "{{ _api_resource.id }}"
-    --http-method "{{ item.type }}"
-    --authorization-type "NONE"
-    --request-parameters file://request_template
-    --no-api-key-required
-    --region "{{ _aws_region }}"
-    --credentials "arn:aws:iam::{{ _acc_id }}:role/{{ item.name }}"
-  when: item.url_params is defined and item.url_params | length > 0 and item.resource == "s3"
+  when: item.url_params is defined and item.url_params | length > 0
 
 - name: Build arn for S3 bucket.
   ansible.builtin.set_fact:
@@ -106,21 +93,8 @@
     --integration-http-method POST
     --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
-  when: item.url_params is not defined or item.url_params | length == 0 and item.resource != "s3"
-
-- name: Add S3 bucket for method without URL params.
-  ansible.builtin.command: >-
-    aws apigateway put-integration
-    --rest-api-id "{{ _api_gate.id }}"
-    --resource-id "{{ _api_resource.id }}"
-    --http-method "{{ item.type }}"
-    --type AWS
-    --content-handling CONVERT_TO_TEXT
-    --integration-http-method POST
-    --uri "{{ _target_arn }}"
-    --region {{ _aws_region }}
-    --credentials "arn:aws:iam::{{ _acc_id }}:role/{{ item.name }}"
-  when: item.url_params is not defined or item.url_params | length == 0 and item.resource == "s3"
+    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/' + item.name + '"' if item.resource == 's3' else '' }}
+  when: item.url_params is not defined or item.url_params | length == 0
 
 - name: Generate template parts for each param
   set_fact:
@@ -151,6 +125,7 @@
     --request-template file://integration_template
     --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
+    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/' + item.name + '"' if item.resource == 's3' else '' }}
   when: item.url_params is defined and item.url_params | length > 0
 
 - name: Add method response.

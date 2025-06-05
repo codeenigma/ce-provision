@@ -76,6 +76,22 @@
   ansible.builtin.set_fact:
     _api_without_s3: "{{ aws_admin_tools.functions | rejectattr('resource', 'eq', 's3') | list }}"
 
+- name: Set CloudWatch logs full access for apigateway.
+  ansible.builtin.set_fact:
+    _policies: "{{ ['arn:aws:iam::aws:policy/CloudWatchLogsFullAccess'] }}"
+
+- name: Create a policy for API Gateway to assume role.
+  ansible.builtin.include_role:
+    name: aws/aws_iam_role
+  vars:
+    aws_iam_role:
+      name: "api_get_s3"
+      aws_profile: "{{ _aws_profile }}"
+      managed_policies: "{{ _policies }}"
+      inline_policies:
+        - "s3:GetObject"
+      policy_document: "{{ lookup('template', 'trust_apigateway.j2') }}"
+
 - name: Configure Lambda IAM policies.
   ansible.builtin.include_tasks: lambda_iam.yml
   loop: "{{ _api_without_s3 }}"
