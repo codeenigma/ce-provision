@@ -119,7 +119,7 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --integration-http-method POST
+    --integration-http-method {{ 'GET' if item.resource == 's3' else 'POST' }}
     --passthrough-behavior WHEN_NO_TEMPLATES
     --request-template file://integration_template
     --uri "{{ _target_arn }}"
