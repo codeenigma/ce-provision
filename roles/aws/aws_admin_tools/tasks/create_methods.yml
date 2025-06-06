@@ -1,27 +1,3 @@
-- name: Get resources.
-  ansible.builtin.command: >-
-    aws apigateway get-resources
-    --rest-api-id "{{ _api_gate.id }}"
-    --region "{{ _aws_region }}"
-  register: _api_old_resource
-
-- name: Setting previous command output into variable.
-  ansible.builtin.set_fact:
-    _api_old_resource: "{{ _api_old_resource.stdout | from_json }}"
-
-- name: Find the index of root resource.
-  ansible.builtin.set_fact:
-    _api_old_resource_index: "{{ lookup('ansible.utils.index_of', _api_old_resource['items'], 'eq', '/' + item.name, 'path', wantlist=True) }}"
-
-- name: Delete resource.
-  ansible.builtin.command: >-
-    aws apigateway delete-resource
-    --rest-api-id "{{ _api_gate.id }}"
-    --resource-id "{{ _api_old_resource['items'][_api_old_resource_index[0]].id }}"
-    --region "{{ _aws_region }}"
-  register: _api_old_resource
-  when: _api_old_resource_index | length > 0
-
 - name: Create resource on API gateway.
   ansible.builtin.command: >-
     aws apigateway create-resource
@@ -64,7 +40,48 @@
     --region "{{ _aws_region }}"
   when: item.url_params is defined and item.url_params | length > 0
 
-- name: Add Lambda for method without URL params.
+- name: Build arn for S3 bucket.
+  ansible.builtin.set_fact:
+    _target_arn: "arn:aws:apigateway:{{ _aws_region }}:s3:path/{{ item.bucket }}/{{ item.object }}"
+  when: item.resource == "s3"
+
+- name: List Objects in S3 bucket.
+  amazon.aws.s3_object:
+    bucket: "{{ item.bucket }}"
+    mode: list
+  register: _objects_in_s3_bucket
+  when: item.resource == "s3"
+
+- name: Set _object_missing to false if object exist.
+  ansible.builtin.set_fact:
+    _object_missing: false
+  when: item.resource == "s3" and item.object in _objects_in_s3_bucket.s3_keys
+
+- name: Set _object_missing to true if object doesn't exist.
+  ansible.builtin.set_fact:
+    _object_missing: true
+  when: item.resource == "s3" and item.object not in _objects_in_s3_bucket.s3_keys
+
+- name: Create default file for S3.
+  ansible.builtin.template:
+    src: default_s3_object.j2
+    dest: default_s3_object
+  when: _object_missing is defined and _object_missing
+
+- name: Add default file to S3 bucket if it doesn't exist.
+  amazon.aws.s3_object:
+    bucket: "{{ item.bucket }}"
+    object: "{{ item.object }}"
+    src: "default_s3_object"
+    mode: put
+  when: _object_missing is defined and _object_missing
+
+- name: Build arn for Lambda.
+  ansible.builtin.set_fact:
+    _target_arn: "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+  when: item.resource == "api"
+
+- name: Add Service for method without URL params.
   ansible.builtin.command: >-
     aws apigateway put-integration
     --rest-api-id "{{ _api_gate.id }}"
@@ -72,9 +89,10 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --integration-http-method POST
-    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+    --integration-http-method {{ 'GET' if item.resource == 's3' else 'POST' }}
+    --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
+    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/api_get_s3"' if item.resource == 's3' else '' }}
   when: item.url_params is not defined or item.url_params | length == 0
 
 - name: Generate template parts for each param
@@ -93,7 +111,7 @@
     dest: integration_template
   when: item.url_params is defined and item.url_params | length > 0
 
-- name: Add Lambda for method with URL params.
+- name: Add Service for method with URL params.
   ansible.builtin.command: >-
     aws apigateway put-integration
     --rest-api-id "{{ _api_gate.id }}"
@@ -101,11 +119,12 @@
     --http-method "{{ item.type }}"
     --type AWS
     --content-handling CONVERT_TO_TEXT
-    --integration-http-method POST
+    --integration-http-method {{ 'GET' if item.resource == 's3' else 'POST' }}
     --passthrough-behavior WHEN_NO_TEMPLATES
     --request-template file://integration_template
-    --uri "arn:aws:apigateway:{{ _aws_region }}:lambda:path/2015-03-31/functions/arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:api_{{ item.name }}/invocations"
+    --uri "{{ _target_arn }}"
     --region {{ _aws_region }}
+    {{ '--credentials "arn:aws:iam::' + _acc_id + ':role/api_get_s3"' if item.resource == 's3' else '' }}
   when: item.url_params is defined and item.url_params | length > 0
 
 - name: Add method response.
