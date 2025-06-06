@@ -1,32 +1,24 @@
+aws_admin_tools_enable: true
 aws_admin_tools:
-  runtime: "python3.12"
-  timeout: 20
+  runtime: "python3.12" # Version of pythn for functions
+  timeout: 20 # Global timeout for all functions
   allowed_ips:
     - 192.168.1.1/32 # Ip of server with access to API-s
   functions:
-    - name: "get_forecasted_costs"
-      resource: api # can be "api" or "schedule"
-      type: GET
-      inline_policies: # Define inline policies which will be in use for executing Lambda function
-        name: "{{ _aws_profile }}Billing"
-        resource: "*"
-        action:
-          - "ce:*"
-      policies: []
-    - name: "change_asg_scaling"
-      resource: api
-      type: POST
-      policies: []
-      inline_policies:
-        name: "change_asg_scaling"
-        resource: "*"
-        action:
+    - name: "change_asg_scaling" # Name used for creating API Gateway and Lambda functions
+      resource: api # Refers to type of resource for needed function (can be api, schedule and s3)
+      type: POST # Type of HTTP method, can be GET and POST
+      policies: [] # List of policies to use for lambda function
+      inline_policies: # Inline policies to allow defining least privilages access
+        name: "change_asg_scaling" # Name of inline policies
+        resource: "*" # Resources that are allowed for access
+        action: # List of policies to attach
           - "autoscaling:DescribePolicies"
           - "autoscaling:PutScalingPolicy"
     - name: "get_ip_set"
       resource: api
       type: GET
-      url_params:
+      url_params: # URL parameters are used for some functions and they allow u to provide more details to the function
         - set_name
         - id
       policies: []
@@ -35,20 +27,20 @@ aws_admin_tools:
         resource: "*"
         action:
           - "wafv2:GetIPSet"
-    - name: "test"
-      resource: schedule
-      cron: "cron(0 0 ? * MON *)" # If schedule is defined, we need the cron
-      timeout: 300 # Timeout can be set per function, or use global if missing
+    - name: "get_infra_data_from_s3"
+      resource: schedule # If resource is set to schedule it will require cron variable
+      cron: "cron(0 0 ? * MON *)" # Cron for running scheduled tasks
+      timeout: 300 # Override timeout if task takes more than the timeout defined globally
       policies: []
       inline_policies:
         name: "test"
         resource: "*"
         action:
           - "wafv2:GetWebACL"
-    - name: "get_infra_data_from_s3" # This is the bit that sets up the API Gateway to pull and share infra data over API. No Lambda function needed here though. How do we do this? See docs
-      resource: s3
+    - name: "get_infra_data_from_s3"
+      resource: s3 # s3 resource is to set bucket as the target for API Gateway
       type: GET
-      bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
-      object: "lambda-results/infra-info"
+      bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}" # Name of the bucket from where it's pulling the data
+      object: "lambda-results/infra-info" # Object which is targeted by API Gateway
       url_params:
         - date
