@@ -1,0 +1,16 @@
+# On first run, otel will fail (but continue pipeline) because it can't read journal files. Tasks below adds it  to proper group and ensures it's started
+- name: Add the otel system user to journal group
+  ansible.builtin.user:
+    name: "otel"
+    groups: "systemd-journal"
+    system: true
+    append: true
+    create_home: false
+    state: present
+
+- name: Make sure OpenTelemetry Collector is started
+  ansible.builtin.systemd:
+    name: "{{ otel_collector_service_name }}"
+    state: started
+  become: true
+  ignore_errors: '{{ ansible_check_mode | bool }}'
