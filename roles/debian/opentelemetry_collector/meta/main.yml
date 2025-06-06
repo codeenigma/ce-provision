@@ -1,0 +1,3 @@
+---
+dependencies:
+  - role: grafana.grafana.opentelemetry_collector
