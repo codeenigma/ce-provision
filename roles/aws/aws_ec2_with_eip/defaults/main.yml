@@ -6,8 +6,13 @@ aws_ec2_with_eip:
   force: false # Force a new EC2 machine to be created if a new AMI is packed.
   instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
-  ami_name: "{{ _domain_name }}" # The name of an AMI image to use. Image must exists in the same region.
-  ami_owner: self # Default to self-created image.
+  pubkey: ""  # The contents of the controller's public key to place in authorized_keys on boot, usually handled by a lookup()
+  # See also the aws_ami role, generally these AMI variables will match
+  # Filter values available here - https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeImages.html
+  ami_owner: "136693071363"  # Global AWS account ID of owner, defaults to Debian official
+  ami_virtualization_type: hvm
+  ami_root_device_type: ebs
+  ami_name_filter: "debian-12-amd64-*"
   # vpc_subnet_id: subnet-xxx # One of vpc_subnet_id or vpc_name + vpc_subnet_profile is mandatory.
   vpc_name: "{{ _infra_name }}"
   vpc_subnet_profile: core # if you are looking up subnets we need a Profile tag to search against

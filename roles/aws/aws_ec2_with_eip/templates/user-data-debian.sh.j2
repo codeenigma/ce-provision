@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Update Linux
+/usr/bin/apt-get -y update
+/usr/bin/apt-get dist-upgrade -y -o Dpkg::Options::="--force-confnew"
+
+# Set bash vars
+CONTROLLER_USER="{{ _ce_provision_username }}"
+CONTROLLER_PUBKEY="{{ aws_ec2_with_eip.pubkey }}"
+
+# Create provision user
+/usr/sbin/useradd -s /bin/bash "$CONTROLLER_USER"
+/usr/bin/echo "$CONTROLLER_USER":"$CONTROLLER_USER" | chpasswd -m
+/usr/bin/install -m 755 -o "" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"
+/usr/bin/install -m 700 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh
+/usr/bin/install -m 644 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh/authorized_keys
+/usr/bin/echo root:"$CONTROLLER_USER" | chpasswd -m
+/usr/bin/echo "$CONTROLLER_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$CONTROLLER_USER"
+/usr/bin/chmod 0440 /etc/sudoers.d/"$CONTROLLER_USER"
+/usr/bin/echo "$CONTROLLER_PUBKEY" >> /home/"$CONTROLLER_USER"/.ssh/authorized_keys

@@ -1,17 +1,4 @@
 ---
-- name: Gather AMI image from name.
-  amazon.aws.ec2_ami_info:
-    profile: "{{ aws_ec2_with_eip.aws_profile }}"
-    region: "{{ aws_ec2_with_eip.region }}"
-    owners: self
-    filters:
-      name: "{{ aws_ec2_with_eip.ami_name }}"
-  register: _aws_ec2_with_eip_image
-
-- name: Register latest AMI image.
-  ansible.builtin.set_fact:
-    _aws_ec2_with_eip_image_latest: "{{ _aws_ec2_with_eip_image.images | sort(attribute='creation_date') | last }}"
-
 - name: Gather IAM role info.
   amazon.aws.iam_role_info:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -102,6 +89,17 @@
       return_type: ids
   when: aws_ec2_with_eip.security_groups | length > 0
 
+- name: Look up the base AMI to use.
+  amazon.aws.ec2_ami_info:
+    profile: "{{ aws_ec2_with_eip.aws_profile }}"
+    region: "{{ aws_ec2_with_eip.region }}"
+    filters:
+      name: "{{ aws_ec2_with_eip.ami_name_filter }}"
+      root-device-type: "{{ aws_ec2_with_eip.ami_root_device_type }}"
+      owner-id: "{{ aws_ec2_with_eip.ami_owner }}"
+      virtualization-type: "{{ aws_ec2_with_eip.ami_virtualization_type }}"
+  register: _aws_ec2_with_eip_ami_images
+
 # Do not create an instance if _aws_hostname is not an EC2 generated address unless `force: true`
 - name: Create new EC2 instance.
   amazon.aws.ec2_instance:
@@ -110,7 +108,8 @@
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
     instance_role: "{{ _aws_ec2_with_eip_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     region: "{{ aws_ec2_with_eip.region }}"
-    image_id: "{{ _aws_ec2_with_eip_image_latest.image_id }}"
+    user_data: "{{ lookup('ansible.builtin.template', 'user-data-debian.sh.j2') }}"
+    image_id: "{{ _aws_ec2_with_eip_ami_images.images[-1].image_id }}"  # [-1] is the last item, which is alway latest released
     state: "{{ aws_ec2_with_eip.state }}"
     wait: true
     termination_protection: "{{ aws_ec2_with_eip.termination_protection }}"
