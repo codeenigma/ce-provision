@@ -27,6 +27,7 @@ aws_ec2_with_eip:
   root_volume_delete_on_termination: true
   ebs_optimized: true
   security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
+  public_ip: true  # usually this needs to be true for cloud-init to work
   tags:
     Name: "{{ _domain_name }}"
   # Add an A record tied to the EIP.
