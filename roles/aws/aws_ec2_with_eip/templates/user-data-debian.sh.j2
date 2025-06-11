@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Disable ipv6
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+
 # Update Linux
 /usr/bin/apt-get -y update
 /usr/bin/apt-get dist-upgrade -y -o Dpkg::Options::="--force-confnew"
