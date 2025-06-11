@@ -129,6 +129,8 @@ nginx:
     cache_behavior_public: "add_header Cache-Control \"public, max-age=604800\""
     proxy_host: localhost
     proxy_port: 8443
+    # Set a custom port for Let's Encrypt to bind to during the initial certificate run
+    # vhost_letsencrypt_port: []
     # You can inject custom directives into the main nginx.conf file here by providing them as a list of strings.
     #custom_directives: []
   # Group prefix. Useful for grouping by environments.
@@ -139,6 +141,18 @@ nginx:
   php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.', '') }}" # for unix socket use "unix:/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock"
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
+  # drupal_fallback: []
+  # Default location behavior for nginx
+  # If no custom location behavior is defined, this will be used:
+  # nginx_location_behavior: ['try_files @rewrite /index.php?$query_string;']
+
+  # Uncomment and customize the following lines if you want to use custom location behavior:
+  # custom_nginx_location_behavior:
+  #   - 'index index.php index.html;'
+  #   - 'expires max;'
+  #   - 'set $boost_cache_path "/cache/normal/$host";'
+  #   - 'set $boost_cache_file "${boost_cache_path}${uri}_.html";'
+  #   - 'try_files $boost_cache_file $uri $uri/ @drupal;'
   fastcgi_read_timeout: 60
   recreate_vhosts: true # handle vhosts with ansible, if 'true' then clean up 'sites-enabled' dir and run domain.yml.
   vhost_backup_location: "/home/{{ _ce_provision_username }}" # see _init for _ce_provision_username

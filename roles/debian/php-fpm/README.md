@@ -66,6 +66,9 @@ php:
       validate_timestamps: 1
       interned_strings_buffer: 8
     clear_env: "yes"
+    # Cloudwatch log settings.
+    log_group_prefix: ""
+    log_stream_name: example
 
 ```
 
