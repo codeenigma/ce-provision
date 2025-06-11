@@ -19,6 +19,8 @@ ce_deploy:
 
   # Other ce-deploy settings.
   aws_support: true # installs boto3
+  #uid: 1300 # optional
+  #gid: 1300 # optional
   new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
   ssh_key_bits: "521" # ignored for ED25519 keys, recommended to use 4096 for RSA keys, 521 is the maximum for ECDSA keys
   ssh_key_type: ed25519 # set to rsa to create an RSA key or ecdsa to create an ECDSA key
@@ -29,7 +31,7 @@ ce_deploy:
   config_repository: ""
   config_repository_branch: "master"
   local_dir: "/home/{{ _ce_deploy.username }}/ce-deploy"
-  ce_provision_dir: "/home/controller/ce-provision"
+  ansible_collections_dir: "/home/{{ _ce_deploy.username }}/ce-deploy/galaxy/ansible_collections" # See ansible.cfg.
   # List of additional groups to add the user to.
   groups: []
   # File containing default roles and collections to install via Ansible Galaxy.

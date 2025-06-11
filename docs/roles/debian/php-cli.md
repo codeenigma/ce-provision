@@ -39,6 +39,7 @@ php:
       memory_consumption: 128
       max_accelerated_files: 2000
       validate_timestamps: 1
+      interned_strings_buffer: 8
 
 ```
 
