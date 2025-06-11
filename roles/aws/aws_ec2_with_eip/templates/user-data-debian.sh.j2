@@ -13,7 +13,6 @@ CONTROLLER_PUBKEY="{{ aws_ec2_with_eip.pubkey }}"
 /usr/bin/echo "$CONTROLLER_USER":"$CONTROLLER_USER" | chpasswd -m
 /usr/bin/install -m 755 -o "" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"
 /usr/bin/install -m 700 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh
-/usr/bin/install -m 644 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh/authorized_keys
 /usr/bin/echo root:"$CONTROLLER_USER" | chpasswd -m
 /usr/bin/echo "$CONTROLLER_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$CONTROLLER_USER"
 /usr/bin/chmod 0440 /etc/sudoers.d/"$CONTROLLER_USER"
