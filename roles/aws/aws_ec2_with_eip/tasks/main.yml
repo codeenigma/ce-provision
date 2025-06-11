@@ -113,7 +113,7 @@
     instance_type: "{{ aws_ec2_with_eip.instance_type }}"
     instance_role: "{{ _aws_ec2_with_eip_iam_role_info.iam_roles[0].instance_profiles[0].arn }}"
     region: "{{ aws_ec2_with_eip.region }}"
-    user_data: "{{ lookup('ansible.builtin.template', 'cloud-config-debian.j2') }}"
+    user_data: "{{ lookup('ansible.builtin.template', 'user-data-debian.sh.j2') }}"
     image_id: "{{ _aws_ec2_with_eip_ami_images.images[-1].image_id }}"  # [-1] is the last item, which is alway latest released
     state: "{{ aws_ec2_with_eip.state }}"
     wait: true
