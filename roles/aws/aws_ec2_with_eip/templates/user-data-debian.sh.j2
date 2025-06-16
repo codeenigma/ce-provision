@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Disable ipv6
+sysctl -w net.ipv6.conf.all.disable_ipv6=1
+
+# Update Linux
+/usr/bin/apt-get -y update
+/usr/bin/apt-get dist-upgrade -y -o Dpkg::Options::="--force-confnew"
+
+# Set bash vars
+CONTROLLER_USER="{{ _ce_provision_username }}"
+CONTROLLER_PUBKEY="{{ aws_ec2_with_eip.pubkey }}"
+VENV_PATH="{{ _venv_path }}"
+VENV_COMMAND="{{ _venv_command }}"
+
+# Create provision user
+/usr/sbin/useradd -s /bin/bash "$CONTROLLER_USER"
+/usr/bin/echo "$CONTROLLER_USER":"$CONTROLLER_USER" | chpasswd -m
+/usr/bin/install -m 755 -o "" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"
+/usr/bin/install -m 700 -o "$CONTROLLER_USER" -g "$CONTROLLER_USER" -d /home/"$CONTROLLER_USER"/.ssh
+/usr/bin/echo root:"$CONTROLLER_USER" | chpasswd -m
+/usr/bin/echo "$CONTROLLER_USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/"$CONTROLLER_USER"
+/usr/bin/chmod 0440 /etc/sudoers.d/"$CONTROLLER_USER"
+/usr/bin/echo "$CONTROLLER_PUBKEY" >> /home/"$CONTROLLER_USER"/.ssh/authorized_keys
+
+# Install Ansible
+/usr/bin/apt-get install -y -o Dpkg::Options::="--force-confnew" python3-venv python3-debian
+/usr/bin/chown -R "$CONTROLLER_USER":"$CONTROLLER_USER" /home/"$CONTROLLER_USER"
+/usr/bin/su - "$CONTROLLER_USER" -c "$VENV_COMMAND $VENV_PATH"
+/usr/bin/su - "$CONTROLLER_USER" -c "$VENV_PATH/bin/python3 -m pip install --upgrade pip"
+/usr/bin/su - "$CONTROLLER_USER" -c "$VENV_PATH/bin/pip install ansible netaddr python-debian"
