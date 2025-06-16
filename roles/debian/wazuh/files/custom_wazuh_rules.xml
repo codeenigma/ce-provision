@@ -8,7 +8,7 @@
   <!-- Match HTTP 401 Unauthorized responses using regex -->
   <rule id="41101" level="5">
     <if_sid>31151</if_sid>
-    <regex>\s401\s</regex>
+    <regex type="pcre2">^\S+\s+-\s+(?!-)\S+\s+\[.*?\]\s+".*?"\s+401\s</regex>
     <description>HTTP 401 Unauthorized response</description>
     <group>web,accesslog</group>
   </rule>
