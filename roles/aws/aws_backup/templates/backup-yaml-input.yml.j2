@@ -29,6 +29,6 @@ BackupPlan: # [REQUIRED] Specifies the body of a backup plan.
 {% endif %}
       DestinationBackupVaultArn: "{% if _copy_vault_info is defined %}{{ _copy_vault_info.stdout | from_json | json_query('BackupVaultArn') }}{% else %}{{ _copy_vault_exists.stdout | from_json | json_query('BackupVaultArn') }}{% endif %}" # [REQUIRED] An Amazon Resource Name (ARN) that uniquely identifies the destination backup vault for the copied backup.
 {% endif %}
-    EnableContinuousBackup: {{ rule.continuous_backup | bool }} # Specifies whether Backup creates continuous backups.
+    EnableContinuousBackup: {{ rule.continuous_backup | default(false) | bool }} # Specifies whether Backup creates continuous backups.
 {% endfor %}
 CreatorRequestId: '' # Identifies the request and allows failed requests to be retried without the risk of running the operation twice.
