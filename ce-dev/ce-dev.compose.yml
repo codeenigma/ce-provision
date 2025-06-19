@@ -1,19 +1,19 @@
 x-ce_dev:
-  version: 1.x
+  version: 2.x
   registry: localhost:5000
   project_name: provision
   provision:
     - ce-dev/ansible/setup.yml
 services:
   controller:
-    image: codeenigma/ce-dev-1.x:devel
+    image: codeenigma/ce-dev:2.x
     x-ce_dev: {}
     volumes:
       - ../:/home/ce-dev/ce-provision
     platform: linux/amd64
     cgroup: host
   target:
-    image: codeenigma/ce-dev-1.x:devel
+    image: codeenigma/ce-dev:2.x
     x-ce_dev:
       host_aliases:
         - provision-target.local
@@ -25,7 +25,7 @@ services:
     platform: linux/amd64
     cgroup: host
   privileged:
-    image: codeenigma/ce-dev-1.x:devel
+    image: codeenigma/ce-dev:2.x
     x-ce_dev:
       host_aliases:
         - provision-privileged.local
