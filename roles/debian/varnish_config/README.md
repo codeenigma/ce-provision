@@ -23,6 +23,10 @@ This behaviour allows you to manage different Varnish templates for different ap
 ---
 # Defaults file for varnish_config, other variables exist from importing geerlingguy.varnish and can be overriden
 
+limit_memlock: 82000
+limit_core: infinity
+tasks_max: infinity
+varnish_storage: "malloc,{{ ansible_facts.memtotal_mb // 10 }}M"
 varnish_config:
   # List of IPs that are allowed to ask for content purge.
   allowed_purge_IP: []
@@ -39,6 +43,7 @@ varnish_config:
   upstream_proxies: []
   # Provide an alternative filename if you are providing a template.
   template_filename: default.vcl
+  # Varnish systemd overrides to make varnish consistent even after upgrades
 
 ```
 

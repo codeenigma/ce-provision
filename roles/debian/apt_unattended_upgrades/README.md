@@ -49,8 +49,7 @@ apt_unattended_upgrades:
 ---
 _apt_unattended_upgrades_default_origins:
     - "origin=Debian,codename=${distro_codename},label=Debian"
-    - "origin=Debian,codename=${distro_codename},label=Debian-Security"
-
+    - "origin=Debian,codename=${distro_codename}-security,label=Debian-Security"
 apt_unattended_upgrades:
   enable: true
   # unattended-upgrades template vars.

@@ -28,7 +28,7 @@
 - name: Place Lambda function in S3 bucket.
   amazon.aws.s3_object:
     bucket: "{{ aws_lambda.s3_bucket }}"
-    object: "{{ aws_lambda.name }}.zip"
+    object: "{{ aws_lambda.s3_bucket_prefix }}/{{ aws_lambda.name }}.zip"
     src: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
     mode: put
 
@@ -39,7 +39,7 @@
     region: "{{ _aws_region }}"
     timeout: "{{ aws_lambda.timeout }}"
     s3_bucket: "{{ aws_lambda.s3_bucket }}"
-    s3_key: "{{ aws_lambda.name }}.zip"
+    s3_key: "{{ aws_lambda.s3_bucket_prefix }}/{{ aws_lambda.name }}.zip"
     state: present
     runtime: "{{ aws_lambda.runtime }}"
     role: "{{ aws_lambda.role.iam_role.arn }}"
