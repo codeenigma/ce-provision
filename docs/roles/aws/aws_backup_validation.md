@@ -11,6 +11,7 @@ Creates AWS Restore testing plan for EC2 and RDS, EventBridge rule that gets tri
 ---
 aws_backup_validation:
   s3_bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
+  s3_bucket_prefix: "backup-validation" # Prefix used for storing backup validation info
   name: "RestoreValidation"
   description: "Restore validation is running every Sunday at 00:00AM, and validation reporting is triggered on Monday 00:00AM"
   timeout: 60

@@ -8,6 +8,57 @@
     group: "{{ user_provision.username }}"
     force: true
 
+- name: Update network options in the OpenVPN install script.
+  when: openvpn.ipv4_settings | length > 0
+  block:
+    - name: Set base network vars.
+      ansible.builtin.set_fact:
+        ovpn_net: "{{ openvpn.ipv4_settings.split(' ')[0] }}"
+        ovpn_mask: "{{ openvpn.ipv4_settings.split(' ')[1] }}"
+
+    - name: Set calculated network prefix.
+      ansible.builtin.set_fact:
+        ovpn_prefix: "{{ (ovpn_net ~ '/' ~ ovpn_mask) | ansible.utils.ipaddr('prefix') }}"
+
+    - name: Set calculated network cidr.
+      ansible.builtin.set_fact:
+        ovpn_cidr: "{{ ovpn_net }}/{{ ovpn_prefix }}"
+
+    - name: Set calculated network gateway.
+      ansible.builtin.set_fact:
+        ovpn_gateway: "{{ ovpn_cidr | ansible.utils.ipaddr('first_usable') }}"
+
+    - name: Show final derived values.
+      ansible.builtin.debug:
+        msg:
+          ovpn_prefix: "{{ ovpn_prefix }}"
+          ovpn_cidr: "{{ ovpn_cidr }}"
+          ovpn_gateway: "{{ ovpn_gateway }}"
+
+    - name: Replace OpenVPN server network.
+      ansible.builtin.lineinfile:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        search_string: 'server 10.8.0.0 255.255.255.0'
+        line: "server {{ openvpn.ipv4_settings }}"
+
+    - name: Replace 10.8.0.0/24 with new CIDR.
+      ansible.builtin.replace:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        regexp: '\b10\.8\.0\.0/24\b'
+        replace: '{{ ovpn_cidr }}'
+
+    - name: Replace 10.8.0.1/24 with new gateway/mask.
+      ansible.builtin.replace:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        regexp: '\b10\.8\.0\.1/24\b'
+        replace: '{{ ovpn_gateway }}/{{ ovpn_prefix }}'
+
+    - name: Replace bare 10.8.0.1 with new gateway.
+      ansible.builtin.replace:
+        path: "{{ openvpn.script_install_path }}/openvpn-install.sh"
+        regexp: '(?<=\s)10\.8\.0\.1(?=[\s"|]|$)'
+        replace: '{{ ovpn_gateway }}'
+
 - name: Place the headless installer script.
   ansible.builtin.template:
     src: headless-openvpn-install.sh.j2
@@ -36,17 +87,6 @@
   when: openvpn.allow_floating_client_ip
   notify: Restart OpenVPN.
 
-- name: Replace OpenVPN client IP range.
-  ansible.builtin.lineinfile:
-    path: /etc/openvpn/server.conf
-    search_string: 'server 10.8.0.0 255.255.255.0'
-    line: "server {{ openvpn.ipv4_settings }}"
-    owner: root
-    group: root
-    mode: '0644'
-  when: openvpn.ipv4_settings | length > 0
-  notify: Restart OpenVPN.
-
 - name: Set a different server cipher.
   when: openvpn.cipher | length > 0
   block:
@@ -68,6 +108,14 @@
         group: root
         mode: '0644'
       notify: Restart OpenVPN.
+
+# Removing duplicate lines created by the openvpn-install during multiple runs.
+- name: Ensure exactly one include of openvpn.conf when Unbound is used.
+  ansible.builtin.replace:
+    path: /etc/unbound/unbound.conf
+    regexp: '(?m)^(?:include: /etc/unbound/openvpn\.conf\s*\n?)+'
+    replace: "include: /etc/unbound/openvpn.conf\n"
+  when: openvpn.dns == "2"
 
 # Push routes
 - name: Set up ipv4 push routes.
@@ -111,14 +159,13 @@
       with_items: "{{ openvpn.push_routes_ipv6 }}"
       notify: Restart OpenVPN.
 
-# You can use a 'DEFAULT' file in the specified directory to provide client-specifig config, such as managed push routes
-- name: Set up client config directory.
+- name: Override client config directory.
   when: openvpn.client_config_dir | length > 0
   block:
     - name: Remove default push-route.
       ansible.builtin.lineinfile:
         path: /etc/openvpn/server.conf
-        search_string: 'redirect-gateway'
+        search_string: 'redirect-gateway' # this string is absent by default, leaving the task for now just in case.
         state: absent
         owner: root
         group: root
@@ -132,6 +179,12 @@
         owner: root
         group: root
         mode: '0755'
+
+    - name: Remove default client-config-dir param.
+      ansible.builtin.lineinfile:
+        path: /etc/openvpn/server.conf
+        search_string: 'client-config-dir /etc/openvpn/ccd'
+        state: absent
 
     - name: Add client config directory to config if path is provided.
       ansible.builtin.lineinfile:
@@ -215,6 +268,74 @@
         group: root
         mode: '0644'
       notify: Restart OpenVPN.
+
+# Update routes with non-persistent IP addresses, such as Loadbalancers. Because 'allow_pull_fqdn' may not work properly.
+- name: Install a script to update routes with non-persistent IP addresses.
+  when: openvpn.push_routes_elb | length > 0
+  block:
+    - name: Check if OpenVPN routes file exists.
+      ansible.builtin.stat:
+        path: "{{ openvpn.push_routes_elb_path }}"
+      register: _push_routes_elb_path
+
+    - name: Create OpenVPN routes file if missing.
+      ansible.builtin.file:
+        path: "{{ openvpn.push_routes_elb_path }}"
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+      when: not _push_routes_elb_path.stat.exists
+
+    - name: Place the ELB-routes updater script.
+      ansible.builtin.template:
+        src: update-elb-routes.sh.j2
+        dest: /usr/local/bin/update-elb-routes.sh
+        mode: '0755'
+
+    - name: Install systemd service unit for ELB-routes updater.
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/update-elb-routes.service
+        content: |
+          #
+          # Managed by ansible
+          # Role: systemd-timer
+          #
+          [Unit]
+          Description=Update ELB routes for OpenVPN Service
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/bin/update-elb-routes.sh
+      notify: Reload systemd.
+
+    - name: Install systemd timer unit for ELB-routes updater.
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/update-elb-routes.timer
+        content: |
+          #
+          # Managed by ansible
+          # Role: systemd-timer
+          #
+          [Unit]
+          Description=Update ELB routes for OpenVPN Timer
+
+          [Timer]
+          OnCalendar=*-*-* *:00:00
+          Persistent=false
+          AccuracySec=600s
+
+          [Install]
+          WantedBy=timers.target
+      notify: Reload systemd.
+
+    - name: Enable & start update-elb-routes timer.
+      ansible.builtin.systemd_service:
+        name: update-elb-routes.timer
+        enabled: true
+        state: restarted
+        masked: false
+        daemon_reload: true
 
 # Only works when openvpn.port_choice == '1' because otherwise port will not be 1194 and regexp will not match
 - name: Use FQDN as OpenVPN server remote in client config.

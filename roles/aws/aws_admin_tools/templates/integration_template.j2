@@ -1,0 +1,7 @@
+{
+  "application/json": "{
+    {% for param in item.url_params %}
+    \"{{ param }}\": \"$input.params('{{ param }}')\"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  }"
+}

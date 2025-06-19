@@ -60,7 +60,7 @@ LoadPlugin syslog
 #	PrintSeverity false
 #</Plugin>
 <Plugin syslog>
-	LogLevel info
+	LogLevel error
 </Plugin>
 #<Plugin log_logstash>
 #	LogLevel info
@@ -444,28 +444,28 @@ LoadPlugin memory
 #		Host "..."
 #	</Database>
 #</Plugin>
-<Plugin df>
+#<Plugin df>
 #	Device "/dev/sda1"
 #	Device "192.168.0.2:/mnt/nfs"
 #	MountPoint "/home"
 #	FSType "ext3"
-	# ignore rootfs; else, the root file-system would appear twice, causing
-	# one of the updates to fail and spam the log
-	FSType rootfs
-	# ignore the usual virtual / temporary file-systems
-	FSType sysfs
-	FSType proc
-	FSType devtmpfs
-	FSType devpts
-	FSType tmpfs
-	FSType fusectl
-	FSType cgroup
-	IgnoreSelected true
+#	# ignore rootfs; else, the root file-system would appear twice, causing
+#	# one of the updates to fail and spam the log
+#	FSType rootfs
+#	# ignore the usual virtual / temporary file-systems
+#	FSType sysfs
+#	FSType proc
+#	FSType devtmpfs
+#	FSType devpts
+#	FSType tmpfs
+#	FSType fusectl
+#	FSType cgroup
+#	IgnoreSelected true
 #	ReportByDevice false
 #	ReportInodes false
 #	ValuesAbsolute true
 #	ValuesPercentage false
-</Plugin>
+#</Plugin>
 #<Plugin disk>
 #	Disk "hda"
 #	Disk "/sda[23]/"

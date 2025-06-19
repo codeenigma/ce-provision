@@ -25,15 +25,12 @@
       timeout: "{{ aws_backup_validation.timeout }}"
       role: "{{ aws_iam_role._result['LambdaBackupRestoreRole'] }}"
       runtime: "{{ aws_backup_validation.runtime }}"
-      function_file: "{{ lookup('template', item + '_validation.py.j2')  }}"
-      s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+      function_file: "{{ lookup('template', item + '_validation.py.j2') }}"
+      s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
+      s3_bucket_prefix: "lambda-functions"
       tags:
         Name: "{{ item }}_backup_validation"
   loop: "{{ aws_backup_validation.resources }}"
-
-#- name: Remove variables containing "-".
-#  ansible.builtin.set_fact:
-#    aws_lambda: "{{ aws_lambda | ansible.utils.remove_keys(target=['response_metadata', 'function_file']) }}"
 
 - name: Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
@@ -45,7 +42,8 @@
       inline_policies:
         name: "PassRole"
         resource: "*"
-        action: "iam:PassRole"
+        action:
+          - "iam:PassRole"
       policy_document: "{{ lookup('file', 'pass_role_backup.j2') }}"
       managed_policies:
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
@@ -71,7 +69,8 @@
       role: "{{ aws_iam_role._result['LambdaBackupRestoreRole'] }}"
       runtime: "{{ aws_backup_validation.runtime }}"
       function_file: "{{ lookup('template', 'validation_report.py.j2') }}"
-      s3_bucket: "ce-{{ _aws_profile }}-lambda-functions"
+      s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
+      s3_bucket_prefix: "lambda-functions"
       tags:
         Name: "validation_report"
 
@@ -110,15 +109,11 @@
         arn: "{{ (aws_lambda._result['validation_report'].configuration.function_arn.split(':') | map('trim'))[:-1] | join(':') }}" # Remove the version number from ARN
   register: _validation_event
 
-- name: Generate unique string.
-  ansible.builtin.set_fact:
-    _rand_str: "{{ lookup('community.general.random_string', length=8, special=false, min_lower=2, min_numeric=2, min_upper=2) }}"
-
 - name: Update Lambda policy.
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ item.rule.name }}"
-    statement_id: "{{ item.rule.name }}_{{ _rand_str }}"
+    statement_id: "{{ item.rule.name }}"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ item.rule.arn }}"
@@ -129,7 +124,7 @@
   amazon.aws.lambda_policy:
     state: present
     function_name: "validation_report"
-    statement_id: "validation_report_{{ _rand_str }}"
+    statement_id: "validation_report"
     action: lambda:InvokeFunction
     principal: events.amazonaws.com
     source_arn: "{{ _validation_event.rule.arn }}"
