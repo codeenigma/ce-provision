@@ -3,13 +3,13 @@
   ansible.builtin.group:
     name: "{{ user_ansible.username }}"
     gid: "{{ user_ansible.gid | default(omit) }}"
-    system: true
+    system: "{{ user_ansible.system_user }}"
 
 - name: Create additional groups.
   ansible.builtin.group:
     name: "{{ group }}"
     state: present
-    system: true
+    system: "{{ user_ansible.system_user }}"
   with_items: "{{ user_ansible.groups }}"
   loop_control:
     loop_var: group
@@ -21,7 +21,7 @@
     shell: /bin/bash
     group: "{{ user_ansible.username }}"
     uid: "{{ user_ansible.uid | default(omit) }}"
-    system: true
+    system: "{{ user_ansible.system_user }}"
     create_home: "{{ user_ansible.create_home }}"
     home: "{{ user_ansible.home }}"
     password: "*"
