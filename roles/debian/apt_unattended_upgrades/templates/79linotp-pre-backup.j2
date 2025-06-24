@@ -1,0 +1,12 @@
+// r71691 Makes sure linotp database is backed up prior to upgrade.
+DPkg::Pre-Invoke {
+    "if apt list --upgradable 2>/dev/null | grep -q '^linotp/'; then \
+        echo '[linotp-pre] linotp will be upgraded. Backing up database...' | tee -a /var/log/linotp-upgrade.log; \
+        mkdir -p /home/deploy/linotp_dbbackups; \
+        mysqldump --defaults-file=/home/deploy/.mysql.creds linotp > /home/deploy/linotp_dbbackups/linotp_backup_$(date +%F_%H-%M-%S).sql && \
+        echo '[linotp-pre] Backup complete.' | tee -a /var/log/linotp-upgrade.log || \
+        echo '[linotp-pre] WARNING: Backup failed!' | tee -a /var/log/linotp-upgrade.log; \
+    else \
+        echo '[linotp-pre] linotp not listed for upgrade. Skipping backup.' | tee -a /var/log/linotp-upgrade.log; \
+    fi";
+};

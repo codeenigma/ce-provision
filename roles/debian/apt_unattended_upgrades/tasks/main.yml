@@ -25,6 +25,30 @@
     force: true
   when: apt_unattended_upgrades.enable
 
+- name: Copy unattended-upgrades linotp configuration file.
+  ansible.builtin.template:
+    src: 79linotp-pre-backup.j2
+    dest: /etc/apt/apt.conf.d/79linotp-pre-backup
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.linotp
+
+- name: Copy unattended-upgrades linotp configuration file.
+  ansible.builtin.template:
+    src: 80linotp-post-init.j2
+    dest: /etc/apt/apt.conf.d/80linotp-post-init
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.linotp
+
 - name: Enable and start service unattended-upgrades.
   ansible.builtin.service:
     name: unattended-upgrades
