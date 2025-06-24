@@ -1,0 +1,20 @@
+#!/bin/bash
+
+LOG="/var/log/linotp-upgrade.log"
+BACKUP_DIR="/home/deploy/linotp_dbbackups"
+CREDS="/home/deploy/.mysql.creds"
+
+if apt list --upgradable 2>/dev/null | grep -q '^linotp/'; then
+    echo "[linotp-pre] linotp will be upgraded. Backing up database..." | tee -a "$LOG"
+    mkdir -p "$BACKUP_DIR"
+    mysqldump --defaults-file="$CREDS" linotp > "$BACKUP_DIR/linotp_backup_$(date +%F_%H-%M-%S).sql" && \
+        echo "[linotp-pre] Backup complete." | tee -a "$LOG" || \
+        echo "[linotp-pre] WARNING: Backup failed!" | tee -a "$LOG"
+fi
+
+if grep -q 'Upgrade: linotp:' /var/log/apt/history.log; then
+    echo "[linotp-post] linotp was upgraded. Running database init..." | tee -a "$LOG"
+    linotp init database && \
+        echo "[linotp-post] linotp init database completed." | tee -a "$LOG" || \
+        echo "[linotp-post] linotp init database failed!" | tee -a "$LOG"
+fi
