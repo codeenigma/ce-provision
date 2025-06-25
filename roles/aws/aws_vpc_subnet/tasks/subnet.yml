@@ -34,6 +34,11 @@
     rules:
       - proto: all
         group_name: "{{ subnet.name }}"
+        rule_desc: "Allow internal traffic for subnet {{ subnet.name }}"
+    rules_egress:
+      - proto: all
+        group_name: "{{ subnet.name }}"
+        rule_desc: "Allow internal traffic for subnet {{ subnet.name }}"
   when:
     - subnet.security_group is defined
     - subnet.security_group
