@@ -27,6 +27,7 @@ usage(){
   echo '--boto-profile: Name of a profile to export as AWS_PROFILE before calling Ansible.'
   echo '--parallel: Run all playbooks in the --playbook directory in parallel (using ansible-parallel).'
   echo '--lint: Run ansible-lint against the playbooks instead of executing them.'
+  echo '--tags: Only tagged parts of the playbooks. Can be used in combo with --list tasks'
 }
 
 # Common processing.
