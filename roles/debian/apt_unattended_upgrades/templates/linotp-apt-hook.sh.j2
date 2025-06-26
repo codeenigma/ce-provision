@@ -10,11 +10,13 @@ if apt list --upgradable 2>/dev/null | grep -q '^linotp/'; then
     mysqldump --defaults-file="$CREDS" linotp > "$BACKUP_DIR/linotp_backup_$(date +%F_%H-%M-%S).sql" && \
         echo "[linotp-pre] Backup complete." | tee -a "$LOG" || \
         echo "[linotp-pre] WARNING: Backup failed!" | tee -a "$LOG"
+    export LINOTP_UPGRADING=1
 fi
 
-if grep -q 'Upgrade: linotp:' /var/log/apt/history.log; then
+if [ "$LINOTP_UPGRADING" = "1" ]; then
     echo "[linotp-post] linotp was upgraded. Running database init..." | tee -a "$LOG"
     linotp init database && \
         echo "[linotp-post] linotp init database completed." | tee -a "$LOG" || \
         echo "[linotp-post] linotp init database failed!" | tee -a "$LOG"
+    export LINOTP_UPGRADING=0
 fi
