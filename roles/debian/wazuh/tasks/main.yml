@@ -139,6 +139,10 @@
   ignore_errors: true
   changed_when: false
 
+- name: Set fact if wazuh-manager service exists
+  ansible.builtin.set_fact:
+    wazuh_manager_exists: "'wazuh-manager.service' in wazuh_service.stdout"
+
 - name: Deploy custom Wazuh local rules
   ansible.builtin.copy:
     src: custom_wazuh_rules.xml
@@ -149,7 +153,7 @@
   notify: restart wazuh-manager
   tags:
     - rules
-  when: "'wazuh-manager.service' in wazuh_service.stdout"
+  when: wazuh_manager_exists
 
 - name: Write the password to /var/ossec/etc/authd.pass
   ansible.builtin.copy:
@@ -158,16 +162,50 @@
     mode: '0640'
     owner: root
     group: wazuh
-  when: "'wazuh-manager.service' in wazuh_service.stdout or 'wazuh-agent.service' in wazuh_service.stdout"
+  when: wazuh_manager_exists or 'wazuh-agent.service' in wazuh_service.stdout"
 
-- name: Restart wazuh-manager to apply changes
+- name: Restart wazuh-manager to apply changes.
   ansible.builtin.systemd_service:
     name: wazuh-manager
     state: restarted
-  when: "'wazuh-manager.service' in wazuh_service.stdout"
+  when: wazuh_manager_exists
 
-- name: Restart wazuh-agent to apply changes
+- name: Restart wazuh-agent to apply changes.
   ansible.builtin.systemd_service:
     name: wazuh-agent
     state: restarted
   when: "'wazuh-agent.service' in wazuh_service.stdout"
+
+- name: Read filebeat.yml content (base64 encoded)
+  ansible.builtin.shell: |
+    set -o pipefail && awk -F'"' '/password:/ {print $2}' {{ wazuh.mitre_report.password_file }}
+  register: report_password
+  no_log: true
+  args:
+    executable: /bin/bash
+  when: wazuh_manager_exists
+
+- name: Set password fact
+  ansible.builtin.set_fact:
+    filebeat_password: "{{ report_password.stdout }}"
+  no_log: true
+  when: wazuh_manager_exists
+
+- name: Deploy the weekly report script
+  ansible.builtin.template:
+    src: generate_weekly_report.sh.j2
+    dest: /usr/local/bin/generate_weekly_report.sh
+    owner: root
+    group: root
+    mode: '0755'
+  when: wazuh_manager_exists
+
+- name: Ensure weekly report cron job is present
+  ansible.builtin.cron:
+    name: "Weekly OpenSearch report generation"
+    user: root
+    minute: 0
+    hour: 2
+    weekday: 1      # Monday
+    job: "/usr/local/bin/generate_weekly_report.sh >> /var/log/opensearch-reports.log 2>&1"
+  when: wazuh_manager_exists
