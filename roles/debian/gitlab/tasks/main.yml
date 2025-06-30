@@ -134,7 +134,7 @@
   vars:
     timers:
       block_removed_ldap_users:
-        timer_command: "gitlab-rake gitlab:cleanup:block_removed_ldap_users"
+        timer_command: "/usr/bin/gitlab-rake gitlab:cleanup:block_removed_ldap_users"
         timer_OnCalendar: "{{ gitlab.block_removed_ldap_users_on_calendar }}"
   when: gitlab.ldap.enable
 
