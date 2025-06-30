@@ -128,6 +128,15 @@
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
   when: gitlab.force_stop
 
+- name: Create systemd timer to sync removed LDAP users.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      block_removed_ldap_users:
+        timer_command: "gitlab-rake gitlab:cleanup:block_removed_ldap_users"
+        timer_OnCalendar: "{{ gitlab.block_removed_ldap_users_on_calendar }}"
+
 # @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
