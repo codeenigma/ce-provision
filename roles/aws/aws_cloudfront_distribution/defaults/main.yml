@@ -1,5 +1,19 @@
 ---
 aws_cloudfront_distribution:
+  functions:
+    - name: "example-cf-function"
+      type: "cf" # This can be cf or lambda
+      description: "This is example function."
+      runtime: "cloudfront-js-2.0" # Can be either cloudfront-js-2.0 or cloudfront-js-1.0
+      kvs: "" # arn of KeyValueStore
+      code: "function.js"
+    - name: "example-lambda-edge-function"
+      type: "lambda" # This can be cf or lambda
+      description: "This is example lambda function."
+      timeout: 5
+      runtime: "nodejs22.x" # Lambda runtimes are defined here https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+      kvs: "" # arn of KeyValueStore
+      code: "function.js"
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   tags: {}
