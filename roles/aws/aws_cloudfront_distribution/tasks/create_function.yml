@@ -9,7 +9,7 @@
 
 - name: Create CF function.
   ansible.builtin.command:
-    cmd: "aws cloudfront create-function --function-config file://cf_config --name new-funct --profile dummy --function-code fileb://{{ _ce_provision_build_dir }}/vars/_global/files/{{ _funct.code }}"
+    cmd: "aws cloudfront create-function --function-config file://cf_config --name new-funct --profile dummy --function-code fileb://{{ _ce_provision_build_dir }}/files/{{ _funct.code }}"
   when: _funct.type == cf
   register: _cf_function
 
