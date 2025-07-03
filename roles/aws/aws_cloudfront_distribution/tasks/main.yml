@@ -29,6 +29,17 @@
       include_cookies: false # Set true to add cookies in logs
       prefix: "cf-logging/" # Prefix for S3 object names
 
+- name: Set empty list for function results.
+  ansible.builtin.set_fact:
+    _function_results: []
+
+- name: Create CloudFront function if defined.
+  ansible.builtin.include_tasks: create_function.yml
+  loop: "{{ aws_cloudfront_distribution.functions }}"
+  loop_control:
+    loop_var: _funct
+  when: aws_cloudfront_distribution.functions is defined
+
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
     profile: "{{ aws_cloudfront_distribution.aws_profile }}"
