@@ -1,0 +1,8 @@
+---
+# Default variables for Fluent-bit role
+fluent_bit_repo_key_url: https://packages.fluentbit.io/fluentbit.key
+fluent_bit_key_location: /usr/share/keyrings/fluentbit-keyring.asc
+fluent_bit_apt_source: "deb [signed-by=/usr/share/keyrings/fluentbit-keyring.asc] https://packages.fluentbit.io/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+fluentbit_startup_command: /opt/fluent-bit/bin/fluent-bit -c /etc/fluent-bit/fluent-bit.yml
+
+fluent-bit_configuration: {}
