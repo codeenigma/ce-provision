@@ -10,7 +10,7 @@ Role expects to be provided with the following information:
 * `fluentbit_main_config` - the main Fluent-bit configuration
 
 ### Example
-Minimum Fluent-bit config that will ingest journal and some file logs, then ship them to AWS CloudWatch.
+Minimum Fluent-bit config that will send a test log, filter it, and output to stdout.
 
 ```yaml
 fluentbit_main_config:
