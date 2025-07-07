@@ -36,7 +36,7 @@
   amazon.aws.lambda:
     name: "{{ aws_lambda.name }}"
     description: "{{ aws_lambda.description }}"
-    region: "{{ _aws_region }}"
+    region: "{{ aws_lambda.region }}"
     timeout: "{{ aws_lambda.timeout }}"
     s3_bucket: "{{ aws_lambda.s3_bucket }}"
     s3_key: "{{ aws_lambda.s3_bucket_prefix }}/{{ aws_lambda.name }}.zip"

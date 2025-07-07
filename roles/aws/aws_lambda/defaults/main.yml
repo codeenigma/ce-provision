@@ -1,6 +1,7 @@
 aws_lambda:
   name: "lambda_function_name"
   description: "Description for AWS Lambda function"
+  region: "{{ _aws_region }}"
   timeout: "20" # Maximum number of seconds before function times out
   handler: "lambda_handler" # Name of main function
   s3_bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
