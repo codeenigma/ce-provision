@@ -1,19 +1,5 @@
 ---
 aws_cloudfront_distribution:
-  functions:
-    - name: "example-cf-function"
-      type: "cf" # This can be cf or lambda
-      description: "This is example function."
-      runtime: "cloudfront-js-2.0" # Can be either cloudfront-js-2.0 or cloudfront-js-1.0
-      kvs: "" # arn of KeyValueStore
-      code: "function.js"
-    - name: "example-lambda-edge-function"
-      type: "lambda" # This can be cf or lambda
-      description: "This is example lambda function."
-      timeout: 5
-      runtime: "nodejs22.x" # Lambda runtimes are defined here https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
-      kvs: "" # arn of KeyValueStore
-      code: "function.js"
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   tags: {}
@@ -75,4 +61,3 @@ aws_cloudfront_distribution:
   cache_behaviors: [] # A list of cache behaviors same as default_cache_behavior with additional path_pattern var required.
   enabled: true
   purge_existing: true # Set to false to append entries instead of replacing them.
-  web_acl: false # Set to true to create Web ACL for WAF.

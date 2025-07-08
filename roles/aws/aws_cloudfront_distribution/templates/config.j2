@@ -1,12 +1,11 @@
 {
     "Comment": "{{ _funct.description }}",
-    "Runtime": "{{ _funct.runtime }}",
-    {% if _funct.kvs %}
+    "Runtime": "{{ _funct.runtime }}"{% if _funct.kvs %},
     "KeyValueStoreAssociations": {
         "Quantity": 1,
         "Items": [
             {
-                "KeyValueStoreARN": {{_funct.kvs }}
+                "KeyValueStoreARN": "{{_funct.kvs }}"
             }
         ]
     }
