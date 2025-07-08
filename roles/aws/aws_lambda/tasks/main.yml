@@ -4,7 +4,7 @@
   vars:
     aws_s3_bucket:
       profile: "{{ _aws_profile }}"
-      region: "{{ _aws_region }}"
+      region: "{{ aws_lambda.region }}"
       name: "{{ aws_lambda.s3_bucket }}"
       tags: []
       state: "present"
