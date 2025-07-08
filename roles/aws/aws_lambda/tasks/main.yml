@@ -42,7 +42,7 @@
   when: string_type == 'single'
 
 - name: Copy a zip archive of Lambda function.
-  community.general.copy:
+  ansible.builtin.copy:
     src: "{{ aws_lambda.code }}"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
     owner: deploy
