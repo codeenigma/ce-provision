@@ -3,7 +3,7 @@
   ansible.builtin.include_role:
     name: aws/aws_acl
   when:
-    - aws_cloudfront_distribution.web_acl
+#    - aws_cloudfront_distribution.web_acl
     - aws_acl.name is defined
     - aws_acl.scope is defined
     - aws_acl.scope == 'CLOUDFRONT'
@@ -34,11 +34,87 @@
     _function_results: []
 
 - name: Create CloudFront function if defined.
-  ansible.builtin.include_tasks: create_function.yml
+  ansible.builtin.include_tasks: check_function.yml
   loop: "{{ aws_cloudfront_distribution.functions }}"
   loop_control:
     loop_var: _funct
   when: aws_cloudfront_distribution.functions is defined
+
+- name: Initialize processed cache behaviors list.
+  ansible.builtin.set_fact:
+    _processed_cache_behaviors: []
+
+- name: Process default cache behavior if it has lambda functions
+  ansible.builtin.include_tasks: add_function.yml
+  vars:
+    _behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
+  register: default_result
+  when: aws_cloudfront_distribution.default_cache_behavior.lambda_functions is defined
+
+- name: Update default cache behavior
+  ansible.builtin.set_fact:
+    _default_cache_string: "{{ _processed_behavior }}"
+  when: aws_cloudfront_distribution.default_cache_behavior.lambda_functions is defined
+
+- name: Create dict for default cache behavior
+  ansible.builtin.set_fact:
+    _default_cache: "{{ _default_cache_string | from_yaml }}"
+  when: aws_cloudfront_distribution.default_cache_behavior.lambda_functions is defined
+
+- name: Create dict for default cache behavior
+  ansible.builtin.set_fact:
+    _default_cache: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
+  when: aws_cloudfront_distribution.default_cache_behavior.lambda_functions is not defined
+
+- name: Initialize processed cache behaviors list.
+  ansible.builtin.set_fact:
+    _processed_cache_behaviors: []
+
+- name: Extract the cache behaviors with Lambda function.
+  ansible.builtin.set_fact:
+    _cache_behavior_with_lambda: "{{ aws_cloudfront_distribution.cache_behaviors | selectattr('lambda_functions', 'defined') | list }}"
+
+- name: Extract the cache behaviors with Lambda function.
+  ansible.builtin.set_fact:
+    _cache_behavior_without_lambda: "{{ aws_cloudfront_distribution.cache_behaviors | selectattr('lambda_functions', 'undefined') | list }}"
+
+# Process behaviors with lambda functions
+- name: Process behavior with lambda functions
+  ansible.builtin.include_tasks: add_function.yml
+  loop: "{{ _cache_behavior_with_lambda | default([]) }}"
+  loop_control:
+    loop_var: _behavior
+  when: _cache_behavior_with_lambda | length > 0
+
+# Add each behavior to the final list (processed or original)
+- name: Add behavior to final list
+  ansible.builtin.set_fact:
+    _processed_cache_behaviors: "{{ _processed_cache_behaviors + _cache_behavior_without_lambda }}"
+
+- name: Update cache behaviors in aws_cloudfront_distribution
+  ansible.builtin.set_fact:
+    _cache_behavior_with_lambda: "{{ {'cache_behaviors': _processed_cache_behaviors} }}"
+
+- name: Extract the Lambda functios.
+  ansible.builtin.set_fact:
+    _lambda_functions: "{{ aws_cloudfront_distribution.functions | selectattr('type', '==', 'lambda') | list }}"
+
+- name: Wait for Lambda function to be Active.
+  ansible.builtin.command: >
+    aws lambda get-function
+    --function-name {{ item.name }}
+    --query 'Configuration.[State, LastUpdateStatus]'
+    --region us-east-1
+  register: lambda_status
+  until: (lambda_status.stdout | from_json)[0] == "Active"
+  retries: 30
+  delay: 10
+  changed_when: false
+  loop: "{{ _lambda_functions }}"
+
+- name: Wait for 10 seconds.
+  ansible.builtin.wait_for:
+    timeout: 10
 
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
@@ -49,8 +125,8 @@
     aliases: "{{ aws_cloudfront_distribution.aliases }}"
     origins: "{{ aws_cloudfront_distribution.origins }}"
     web_acl_id: "{{ _created_acl.arn | default(omit) }}"
-    default_cache_behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
-    cache_behaviors: "{{ aws_cloudfront_distribution.cache_behaviors }}"
+    default_cache_behavior: "{{ _default_cache }}"
+    cache_behaviors: "{{ _processed_cache_behaviors }}"
     validate_certs: "{{ aws_cloudfront_distribution.validate_certs }}"
     viewer_certificate: "{{ aws_cloudfront_distribution.viewer_certificate }}"
     purge_origins: "{{ aws_cloudfront_distribution.purge_existing }}"

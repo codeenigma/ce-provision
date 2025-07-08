@@ -1,0 +1,28 @@
+- name: Process default cache behavior lambda functions.
+  when: aws_cloudfront_distribution.default_cache_behavior.lambda_functions is defined
+  block:
+    - name: Set empty list for default behavior.
+      ansible.builtin.set_fact:
+        _lambda_funct_list: []
+
+    - name: Create lambda function associations for default behavior.
+      ansible.builtin.set_fact:
+        _lambda_funct_list: "{{ _lambda_funct_list + [{'event_type': item.event_type, 'lambda_function_arn': aws_lambda._result[item.lambda_name].configuration.function_arn}] }}"
+      loop: "{{ aws_cloudfront_distribution.default_cache_behavior.lambda_functions }}"
+
+    - name: Update default cache behavior.
+      ansible.builtin.set_fact:
+        aws_cloudfront_distribution: "{{ aws_cloudfront_distribution | combine({'default_cache_behavior': (aws_cloudfront_distribution.default_cache_behavior | dict2items | rejectattr('key', 'equalto', 'lambda_functions') | items2dict) | combine({'lambda_function_associations': _lambda_funct_list})}) }}"
+
+- name: Process cache behaviors lambda functions.
+  ansible.builtin.set_fact:
+    updated_cache_behaviors: "{{ updated_cache_behaviors | default([]) + [processed_behavior] }}"
+  vars:
+    lambda_list: "{{ item.lambda_functions | map('combine', {'lambda_function_arn': aws_lambda._result[item.lambda_name].configuration.function_arn}) | map('dict2items') | map('rejectattr', 'key', 'equalto', 'lambda_name') | map('items2dict') | list if item.lambda_functions is defined else [] }}"
+    processed_behavior: "{{ (item | dict2items | rejectattr('key', 'equalto', 'lambda_functions') | items2dict) | combine({'lambda_function_associations': lambda_list}) if item.lambda_functions is defined else item }}"
+  loop: "{{ aws_cloudfront_distribution.cache_behaviors | default([]) }}"
+
+- name: Update cache behaviors in main structure.
+  ansible.builtin.set_fact:
+    aws_cloudfront_distribution: "{{ aws_cloudfront_distribution | combine({'cache_behaviors': updated_cache_behaviors}) }}"
+  when: updated_cache_behaviors is defined
