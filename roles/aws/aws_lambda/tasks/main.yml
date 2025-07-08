@@ -45,8 +45,8 @@
   ansible.builtin.copy:
     src: "{{ aws_lambda.function_file }}"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
-    owner: deploy
-    group: deploy
+    owner: controller
+    group: controller
     mode: '0644'
   when: string_type == 'zip'
 
