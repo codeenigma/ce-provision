@@ -43,7 +43,7 @@
 
 - name: Copy a zip archive of Lambda function.
   ansible.builtin.copy:
-    src: "{{ aws_lambda.code }}"
+    src: "{{ aws_lambda.function_file }}"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
     owner: deploy
     group: deploy
