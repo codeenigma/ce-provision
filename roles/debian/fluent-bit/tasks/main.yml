@@ -53,8 +53,7 @@
 - name: Reload systemd daemon.
   ansible.builtin.systemd_service:
     daemon_reload: true
-  when:
-    - config_service.changed
+  when: config_service.changed
 
 - name: Restart Fluent-bit to apply config updates.
   ansible.builtin.service:
