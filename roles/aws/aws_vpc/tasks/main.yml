@@ -22,15 +22,15 @@
   ansible.builtin.include_tasks: "security_group.yml"
   vars:
     aws_vpc:
-      name: "{{ security_group.name }}"
-      tags: "{{ aws_vpc.tags | combine({'Name': security_group.name}) }}"
+      name: "{{ _sec_group.name }}"
+      tags: "{{ aws_vpc.tags | combine({'Name': _sec_group.name}) }}"
       id: "{{ _aws_vpc_vpc.vpc.id }}"
       description: "default VPC security group"
-      rules: "{{ security_group.rules | default(omit) }}"
-      rules_egress: "{{ security_group.rules_egress | default(omit) }}"
+      rules: "{{ _sec_group.rules | default(omit) }}"
+      rules_egress: "{{ _sec_group.rules_egress | default(omit) }}"
   with_items: "{{ aws_vpc.security_groups }}"
   loop_control:
-    loop_var: security_group
+    loop_var: _sec_group
     label: "{{ security_group.name }}"
 
 - name: Create IGW.
