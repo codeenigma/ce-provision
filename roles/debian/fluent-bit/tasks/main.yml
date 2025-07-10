@@ -22,7 +22,7 @@
     patterns: .*conf
   register: conf
 
-- name: Remove configuration files that come with the pacakge installation.
+- name: Remove configuration files that come with the package installation.
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
@@ -42,6 +42,17 @@
     dest: "/etc/systemd/system/fluent-bit.service.d/override.conf"
     mode: '0644'
   register: config_service
+
+- name: Gather information about instance
+  amazon.aws.ec2_instance_info:
+    filters:
+      "tag:Name": "*deploy*"
+      instance-state-name: ["running"]
+  register: deploy_server_ip
+
+- name: Debug print
+  ansible.builtin.debug:
+    var: deploy_server_ip
 
 - name: Create or update main configuration file.
   ansible.builtin.template:
