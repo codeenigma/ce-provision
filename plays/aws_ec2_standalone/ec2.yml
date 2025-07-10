@@ -1,6 +1,6 @@
 ---
-# First step. Spin up a "blank" instance from a fresh AMI.
-- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+# First step. Spin up a "blank" instance and add the controller user and Ansible via user-data.
+- hosts: "{{ _aws_resource_name }}"
   connection: local
   become: false
 
@@ -11,11 +11,6 @@
         - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
         - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
         - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
-    aws_groups:
-      - "all"
-      - "_{{ _aws_resource_name | regex_replace('-', '_') }}"
-      - "_{{ _infra_name | regex_replace('-', '_') }}"
-      - "_{{ _env_type | regex_replace('-', '_') }}"
 
   tasks:
     - ansible.builtin.import_role:
@@ -24,12 +19,7 @@
         name: aws/aws_ec2_with_eip
     - ansible.builtin.import_role:
         name: _exit
-    - name: Ensure the new host public EIP is added to the inventory before continuing.
-      ansible.builtin.add_host:
-        name: "{{ _aws_ec2_with_eip_instances_eip.addresses[0].public_ip }}"
-        groups: "{{ aws_groups }}"
-      when:
-        - _aws_ec2_with_eip_instances_eip.addresses[0].public_ip is defined
-        - _aws_ec2_with_eip_instances_eip.addresses | length > 0
+
+  post_tasks:
     - name: Refresh inventory.
       ansible.builtin.meta: refresh_inventory
