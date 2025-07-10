@@ -1,14 +1,14 @@
 - name: Create Security Group.
   amazon.aws.ec2_security_group:
-    name: "{{ security_group.name }}"
+    name: "{{ aws_vpc.name }}"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
     tags: "{{ aws_vpc.tags | combine({'Name': security_group.name}) }}"
     state: "{{ aws_vpc.state }}"
-    vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
-    description: "{{ security_group.description | default('') }}"
-    rules: "{{ security_group.rules | default(omit) }}"
-    rules_egress: "{{ security_group.rules_egress | default(omit) }}"
+    vpc_id: "{{ aws_vpc.id }}"
+    description: "{{ aws_vpc.description }}"
+    rules: "{{ aws_vpc.rules | default(omit) }}"
+    rules_egress: "{{ aws_vpc.rules_egress | default(omit) }}"
     purge_rules: "{{ aws_vpc.purge_rules | default(omit) }}"
   register: _aws_vpc_result
 
