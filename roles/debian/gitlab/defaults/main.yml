@@ -11,6 +11,7 @@ gitlab:
   apt_origin: "origin=packages.gitlab.com/gitlab/gitlab-ce,codename=${distro_codename},label=gitlab-ce" # used by apt_unattended_upgrades
   apt_signed_by: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
   server_name: "gitlab.{{ _domain_name }}"
+  ssh_url: "" # custom SSH URL. Similar to https one if empty.
   force_stop: true # whether to stop GitLab to reconfigure or not
   # Add a record for GitLab in AWS Route 53
   # If you use the aws_ec2_with_eip role to create your server this will not be necessary
@@ -95,3 +96,4 @@ gitlab:
     redirect_http_to_https: "true" # must be enabled if you're using LetsEncrypt above
     redirect_http_to_https_port: 80 # must be 80 if you're using LetsEncrypt above
     custom_nginx_config: "" # include extra config, for example "include /etc/nginx/conf.d/example.conf;"
+  block_removed_ldap_users_on_calendar: "*-*-* 02:30:00"

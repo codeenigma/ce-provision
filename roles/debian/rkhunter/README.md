@@ -22,6 +22,7 @@ rkhunter:
   allow_ssh_root_user: "{{ sshd.PermitRootLogin | default('prohibit-password') }}"
   disable_tests: "suspscan hidden_procs deleted_files packet_cap_apps apps os_specific"
   os_package_manager: "NONE" # PKGMGR=NONE is default for Debian, set it to what you need.
+  portpathwhitelist: []
   scriptwhitelist:
     - /bin/egrep
     - /bin/fgrep

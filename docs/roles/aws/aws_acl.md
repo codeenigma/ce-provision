@@ -40,6 +40,7 @@ aws_acl:
     region: "us-east-1"
     tags: "{{ _aws_tags }}"
     recreate: false # set to true to creating the ACL
+    default_action: "Allow" # Default action if no rules are triggered, can be Block
     rules:
       rate_limit:
         value: 600 # set to 0 to skip rate limit rule, set to a value to set how many requests to allow in period before blocking

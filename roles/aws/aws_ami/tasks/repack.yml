@@ -27,6 +27,7 @@
           - 22
         cidr_ip: "{{ aws_ami.repack.controller_cidr }}"
         rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
+    rules_egress: []
 
 - name: Create an AMI with an existing EC2 instance.
   amazon.aws.ec2_ami:

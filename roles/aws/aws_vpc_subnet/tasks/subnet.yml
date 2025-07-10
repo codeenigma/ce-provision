@@ -1,17 +1,6 @@
-- name: Print out VPC info.
-  ansible.builtin.debug:
-    msg: "{{ _aws_vpc_subnet_vpc }}"
-
 - name: Set IPv6 subnet CIDR.
   ansible.builtin.set_fact:
     _ipv6_subnet_cidr: "{{ _aws_vpc_subnet_vpc.vpcs[0].ipv6_cidr_block_association_set[0].ipv6_cidr_block | ansible.utils.ipsubnet(64, subnet.ipv6_cidr_block) }}"
-  when:
-    - subnet.ipv6_cidr_block is defined
-    - subnet.ipv6_cidr_block | length > 0
-
-- name: Print out IPv6 subnet CIDR for debugging.
-  ansible.builtin.debug:
-    msg: "{{ _ipv6_subnet_cidr }}"
   when:
     - subnet.ipv6_cidr_block is defined
     - subnet.ipv6_cidr_block | length > 0
@@ -34,21 +23,22 @@
   when: subnet.nat_ipv4 is defined and subnet.nat_ipv4
 
 - name: Create matching Security Group.
-  ansible.builtin.include_role:
-    name: aws/aws_vpc
-    tasks_from: security_group
-  vars:
-    aws_vpc:
-      name: "{{ subnet.name }}"
-      profile: "{{ aws_vpc_subnet.aws_profile }}"
-      region: "{{ aws_vpc_subnet.region }}"
-      tags: "{{ aws_vpc_subnet.tags | combine({'Name': subnet.name}) }}"
-      state: "{{ aws_vpc_subnet.state }}"
-      id: "{{ _aws_vpc_subnet_vpc_id }}"
-      description: "Allow internal traffic for subnet {{ subnet.name }}"
-      rules:
-        - proto: all
-          group_name: "{{ subnet.name }}"
+  amazon.aws.ec2_security_group:
+    name: "{{ subnet.name }}"
+    profile: "{{ aws_vpc_subnet.aws_profile }}"
+    region: "{{ aws_vpc_subnet.region }}"
+    tags: "{{ aws_vpc_subnet.tags | combine({'Name': subnet.name}) }}"
+    state: "{{ aws_vpc_subnet.state }}"
+    vpc_id: "{{ _aws_vpc_subnet_vpc_id }}"
+    description: "Allow internal traffic for subnet {{ subnet.name }}"
+    rules:
+      - proto: all
+        group_name: "{{ subnet.name }}"
+        rule_desc: "Allow internal traffic for subnet {{ subnet.name }}"
+    rules_egress:
+      - proto: all
+        group_name: "{{ subnet.name }}"
+        rule_desc: "Allow internal traffic for subnet {{ subnet.name }}"
   when:
     - subnet.security_group is defined
     - subnet.security_group

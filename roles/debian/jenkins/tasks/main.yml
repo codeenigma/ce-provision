@@ -1,17 +1,17 @@
 ---
-- name: Add Jenkins repository and key.
+- name: Add Jenkins repository.
   ansible.builtin.include_role:
     name: debian/apt_repository
   vars:
     apt_repository:
-      legacy_repo: "deb http://pkg.jenkins.io/debian binary/"
+      legacy_repo: "deb http://pkg.jenkins.io/debian-stable binary/"
       format: list # Jenkins repo does not support deb822
-      list_repo_string: "http://pkg.jenkins.io/debian binary/" # override automated repo string generation
+      list_repo_string: "http://pkg.jenkins.io/debian-stable binary/" # override automated repo string generation
       name: jenkins
       types:
         - deb
       uris:
-        - http://pkg.jenkins.io/debian
+        - http://pkg.jenkins.io/debian-stable
       signed_by: "{{ jenkins.apt_signed_by }}"
       state: present
       key_refresh_timer_OnCalendar: "Mon *-*-* 00:00:00"
@@ -100,20 +100,23 @@
     group: "{{ jenkins.user }}"
     mode: 0775
 
-- name: Restart Jenkins.
+- name: Copy jenkins service file with jenkins port number.
+  ansible.builtin.template:
+    src: "jenkins.service.j2"
+    dest: "/usr/lib/systemd/system/jenkins.service"
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: Restart Jenkins and reload daemon.
   ansible.builtin.service:
     name: jenkins
+    daemon_reload: true
     state: restarted
-  when: aptoutput.changed
-
-- name: Paise for 2 minutes.
-  ansible.builtin.pause:
-    minutes: 2
-  when: aptoutput.changed
 
 - name: Download Jenkins CLI.
   ansible.builtin.get_url:
-    url: "https://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
+    url: "http://localhost:{{ jenkins.listen_https_port }}/jnlpJars/jenkins-cli.jar"
     validate_certs: false
     dest: /opt/jenkins-cli.jar
 
@@ -135,13 +138,20 @@
         timer_OnCalendar: "{{ jenkins.on_calendar }}"
 
 - name: Install Jenkins Plugins.
-  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
+  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s http://localhost:{{ jenkins.listen_https_port }}/ install-plugin {{ jenkins.plugins | join(' ') }}"
   become: true
   become_user: "{{ jenkins.user }}"
   register: pluginoutput
 
 - name: Safe restart Jenkins.
-  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s https://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
+  ansible.builtin.command: "java -jar /opt/jenkins-cli.jar -auth {{ jenkins.adminuser }}:{{ jenkins.adminpass }}  -noCertificateCheck -s http://localhost:{{ jenkins.listen_https_port }}/ safe-restart"
   become: true
   become_user: "{{ jenkins.user }}"
   when: pluginoutput.changed
+
+- name: Add jenkins to the unattended upgrades.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [jenkins.apt_origin_jenkins] }}"
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable

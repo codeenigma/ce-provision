@@ -92,7 +92,7 @@
   register: config_service
 
 - name: Reload systemd daemon.
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     daemon_reload: true
   when: config_service.changed
 
@@ -103,7 +103,7 @@
   when: config.changed
 
 - name: Ensure YACE exporter is enabled and started.
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: "{{ yace_exporter_service_name }}"
     enabled: true
     state: started
