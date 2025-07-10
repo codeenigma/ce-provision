@@ -27,13 +27,13 @@
     loop_var: security_group
     label: "{{ security_group.name }}"
 
-- name: Create IGW
+- name: Create IGW.
   amazon.aws.ec2_vpc_igw:
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
     state: present
-    tags: "{{ aws_vpc.tags | combine({ 'Name': aws_vpc.name }) }}"
+    tags: "{{ aws_vpc.tags | combine({'Name': aws_vpc.name}) }}"
   register: _aws_vpc_gateway
 
 - name: Update Main route table.

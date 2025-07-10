@@ -1,0 +1,7 @@
+auto {{ dhcpdefaultnic.stdout }}
+iface {{ dhcpdefaultnic.stdout }} inet static
+        address {{ dhcpipaddressoffer.stdout }}
+        netmask {{ dhcpnetmaskoffer.stdout }}
+        gateway {{ dhcpgatewayoffer.stdout }}
+        pointopoint {{ dhcpgatewayoffer.stdout }}
+        dns-nameservers {{ dhcpnameserversoffer.stdout }}

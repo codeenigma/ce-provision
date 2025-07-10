@@ -4,7 +4,7 @@ Supports either AWS EC2 Autoscaling Groups (ASGs) or AWS ECS clusters. Note, thi
 * https://github.com/codeenigma/ce-deploy/tree/1.x/roles/deploy_code (EC2)
 
 Note also that the `deploy_code` role needs to be used in tandem with this `ce-provision` role, which ensures there is a `cloud-init` script in place to install the code in the event of an instance replacement:
-* https://github.com/codeenigma/ce-provision/tree/1.x/roles/mount_sync
+* https://github.com/codeenigma/ce-provision/tree/2.x/roles/debian/mount_sync
 
 ## Networking
 Regardless of the scenario, ECS or EC2, if you decide to use a private subnet instead of giving your instances or containers public IP addresses, you will need at least one NAT gateway (more than one for resilience). When you are creating NAT gateways they must be in a *public* subnet and your routing tables in the private subnets should use the NAT gateway as the default route. Do not put the NAT gateways on the private subnets, it cannot possibly work and your containers or instances will not have internet access.
@@ -29,7 +29,7 @@ aws_ec2_autoscale_cluster:
     extra_domains: [] # list of Subject Alternative Name domains and zones
     #  - domain: www2.example.com
     #    zone: example.com
-    #    aws_profile: us-east-1
+    #    aws_profile: "{{ _aws_profile }}"
     route_53:
       aws_profile: another # the zone might not be in the same account as the certificate
       zone: example.com
@@ -57,7 +57,7 @@ aws_ec2_autoscale_cluster:
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
   ami_owner: self # Default to self-created image.
   root_volume_size: 30
-  root_volume_type: gp2 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+  root_volume_type: gp3 # available options - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
   root_volume_delete_on_termination: true
   device_name: /dev/xvda
   ebs_optimized: true
@@ -95,6 +95,7 @@ aws_ec2_autoscale_cluster:
   packer_force: false # see aws_ami for details
   packer_vpc_filter: "" # see aws_ami for details
   packer_subnet_filter_az: "" # see aws_ami for details
+  packer_name_filter: "debian-12-amd64-*" # see aws_ami for details, Packer base image
   ami_refresh: true # Whether to build a new AMI or not.
   asg_refresh: true # Whether to build a new ASG or not.
   # Define if you want to launch config to use a specific AMI, e.g. to pack a new AMI but not use it right away for QA reasons.
@@ -105,15 +106,15 @@ aws_ec2_autoscale_cluster:
     - name: "{{ _env_type }}-scale-up-policy"
       policy_type: "SimpleScaling"
       adjustment_type: "ChangeInCapacity"
-      adjustment: 2
+      adjustment: 2 # Add two servers per scaling event
       adjustment_step: 1 # Only used when adjustment_type is PercentChangeInCapacity.
-      cooldown: 300
+      cooldown: 120
     - name: "{{ _env_type }}-scale-down-policy"
       policy_type: "SimpleScaling"
       adjustment_type: "ChangeInCapacity"
-      adjustment: -2
+      adjustment: -1 # Reduce by one server at a time
       adjustment_step: -1 # Only used when adjustment_type is PercentChangeInCapacity.
-      cooldown: 300
+      cooldown: 120
   asg_cloudwatch_alarm_scale_up_name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-up"
   asg_cloudwatch_alarm_scale_down_name: "{{ _env_type }}-cloudwatch-metric-alarm-cpu-scale-down"
   asg_cloudwatch_alarms:
@@ -125,8 +126,8 @@ aws_ec2_autoscale_cluster:
       threshold: 80
       unit: "Percent"
       comparison: "GreaterThanOrEqualToThreshold"
-      period: 120
-      evaluation_periods: 5
+      period: 30
+      evaluation_periods: 3
     - scale_direction: "down"
       description: "CPU under 40% so scale down."
       metric: "CPUUtilization"
@@ -162,6 +163,12 @@ aws_ec2_autoscale_cluster:
   health_check_timeout: 5
   health_check_healthy_count: 5
   health_check_unhealthy_count: 2
+  ## Target Group Stickiness. Disabled by default unless set otherwise. Uncomment if needed:
+  # target_group_stickiness_enabled: true
+  # target_group_stickiness_type: "lb_cookie" # Valid values are lb_cookie, app_cookie or source_ip.
+  # target_group_stickiness_app_cookie_name: "my_app_cookie"
+  # target_group_stickiness_app_cookie_duration: 86400
+  # target_group_stickiness_lb_cookie_duration: 86400
   # ALB settings
   create_elb: true # determines whether an ELB (currently, this is an ALB) is created as part of the ASG. This needs to be `true` in order to create a CloudFront distribution.
   alb_idle_timeout: 60
@@ -177,22 +184,39 @@ aws_ec2_autoscale_cluster:
       region: "{{ _aws_region }}"
   # Associated RDS instance.
   rds:
-    rds: false # wether to create an instance.
+    rds: false # whether to create an instance.
     db_instance_class: db.t3.medium
-    #db_cluster_identifier: example-aurora-cluster
+    # name: example # Default is cluster name.
+    # description: example # Default is cluster name.
+    multi_az: true
+    publicly_accessible: false # Wether to allocate an IP address.
     engine: mariadb
-    aurora_reader: false
-    #engine_version: 5.7.9
-    # db_parameter_group_name: "example" # Omit to use default
-    # db_parameter_group_description: "Custom parameter group" # Description of parameter group
+    # engine_version: '5.7.2' # Omit to use latest.
+      # In an Aurora cluster reader and writer can swap role at any time, so by default we name them 'blue' and 'green'.
+    aurora_suffix: blue # appended to cluster name to create a unique instance name for the first (initially write) instance.
+    aurora_reader: false # If true, an Aurora reader instance will be created.
+    aurora_reader_suffix: green # appended to cluster name to create unique instance name for the second (initially read-only) instance - must not match aurora_suffix.
+    # db_cluster_identifier: example # Default is cluster name.
+      # See parameter group docs: https://docs.ansible.com/ansible/latest/collections/community/aws/rds_param_group_module.html
+    # db_parameter_group_name: "example" # Omit to use default.
+    # db_parameter_group_description: "Custom parameter group" # Description of parameter group.
     # db_parameter_group_engine: "mariadb10.5" # accepts different values to RDS instance 'engine'
-    # db_parameters: {} # dictionary of available parameters
+    # db_parameters: {} # dictionary of available parameters.
+    # character_set_name: undefined # not required. The character set to associate with the DB cluster.
     allocated_storage: 100 # Initial size in GB. Minimum is 100.
     max_allocated_storage: 1000 # Max size in GB for autoscaling.
     storage_encrypted: false # Whether to encrypt the RDS instance or not.
+    # storage_type: standard # not required. choices: standard;gp2;gp3;io1. I(storage_type) does not apply to Aurora DB instances.
+    # storage_throughput: 125 # required if storage_type is "gp3". For <400Gb storage it's limited to 125Mbs. Requires botocore >= 1.29.0
     master_username: hello # The name of the master user for the DB cluster. Must be 1-16 letters or numbers and begin with a letter.
     master_user_password: hellothere
-    multi_az: true
+    # force_update_password: true # not required. Set to True to update your cluster password with I(master_user_password).
+    # enable_performance_insights: undefined # not required. Whether to enable Performance Insights for the DB instance.
+    # preferred_backup_window: undefined # not required. The daily time range (in UTC) of at least 30 minutes, during which automated backups are created if automated backups are enabled using I(backup_retention_period). The option must be in the format of "hh24:mi-hh24:mi" and not conflict with I(preferred_maintenance_window).
+    copy_tags_to_snapshot: true
+    # preferred_maintenance_window: undefined # not required. The weekly time range (in UTC) of at least 30 minutes, during which system maintenance can occur. Sample: "sun:09:31-sun:10:01".
+    allow_major_version_upgrade: false
+    # auto_minor_version_upgrade: undefined # not required. Whether minor version upgrades are applied automatically to the DB instance during the maintenance window.
     rds_cloudwatch_alarms:
       - name: "example_free_storage_space_threshold_{{ _env_type }}_asg"
         description: "Average database free storage space over the last 10 minutes too low."
@@ -272,6 +296,27 @@ aws_ec2_autoscale_cluster:
     create_cert: false
     create_distribution: false
     cf_certificate_ARN: "" # Certificate must be in us-east-1 for CloudFront. Define a certificate to build a distribution.
+  # Add rules to http or https listener
+  listeners_http:
+    rules: []
+  # Example of a domain redirect rule
+  #  rules:
+  #    - Conditions:
+  #        - Field: host-header
+  #          Values:
+  #            - "example-redirect.com"
+  #      Priority: '4'
+  #      Actions:
+  #        - Type: redirect
+  #          RedirectConfig:
+  #            Host: "codeenigma.com"
+  #            Port: "#{port}"
+  #            Protocol: "HTTPS"
+  #            Path: "/#{path}"
+  #            Query: "#{query}"
+  #            StatusCode: "HTTP_301"
+  listeners_https:
+    rules: []
   # Add custom listeners. See https://docs.ansible.com/ansible/latest/collections/community/aws/elb_application_lb_module.html
   listeners: []
   alb_ssl_policy: "ELBSecurityPolicy-TLS-1-2-2017-01" # Sets the ALB SSL policy to only accect TLSv1.2 and apply more secure ciphers.

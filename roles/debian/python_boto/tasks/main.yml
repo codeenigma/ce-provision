@@ -5,14 +5,30 @@
 
 - name: Set specific boto3 version to install.
   ansible.builtin.set_fact:
-    _boto3_install_package: "boto3=={{ python_boto.boto3_version}}"
+    _boto3_install_package: "boto3=={{ python_boto.boto3_version }}"
   when:
     - python_boto.boto3_version | length > 0
 
-- name: Ensure boto3 is installed.
-  ansible.builtin.pip:
-    name: "{{ _boto3_install_package }}"
-    virtualenv: "{{ python_boto.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ python_boto.venv_command | default(_venv_command) }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+  vars:
+    python_common:
+      cleanup: true
+      remove_packages:
+        - python-pip
+        - python3-yaml # linters need a newer version of PyYAML than the one that ships with Debian
+        - python-botocore
+        - python-urllib3
+      install_packages:
+        - python3-distutils
+        - python3-venv
+        - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
+
+- name: Install boto3.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: "{{ _boto3_install_package }}"

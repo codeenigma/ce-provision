@@ -1,0 +1,16 @@
+[Unit]
+Description=Mailpit server
+
+[Service]
+ExecStart=/usr/local/bin/mailpit {{ _mailpit_service_command }}
+Restart=always
+# Restart service after 10 seconds if node service crashes
+RestartSec=10
+SyslogIdentifier=mailpit
+{% if not mailpit.https %}
+User={{ mailpit.user }}
+Group={{ mailpit.group }}
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

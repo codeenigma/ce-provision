@@ -1,7 +1,7 @@
 # phpMyAdmin
-This role only installs phpMyAdmin ready for configuration, it does not do any active configuration, nor does it create the necessary NGINX vhost. It will install `debian/php-fpm` and `debian/nginx` so do review their variables and set what you need prior to running a first build with `phpmyadmin`.
+This role only installs phpMyAdmin ready for configuration, it does not do any active configuration, nor does it create the necessary NGINX vhost. It will install `debian/php-fpm` so do review the variables for PHP and set what you need prior to running a first build with `phpmyadmin`.
 
-Here is an example NGINX vhost config you can copy to your `nginx.yml` file and adjust as required:
+Similarly, it can optionally install `debian/nginx` if you set `phpmyadmin.install_nginx: true`, so if you do that be sure to provide a sensible NGINX config. Here is an example NGINX vhost config you can copy to your `nginx.yml` file and adjust as required:
 
 ```yaml
 nginx:
@@ -21,14 +21,12 @@ nginx:
         email: sysadm@codeenigma.com
         services: []
         web_server: standalone
-        certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
-        certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+        certbot_register_command: "certonly --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "certonly --agree-tos --force-renew"
         reload_command: reload
         reload:
           - nginx
-        renewal_minute: "0" # minute to run renewal cron job
-        renewal_hour: "0" # hour to run renewal cron job
-        renewal_weekday: "0" # day of week to run renewal
+        on_calendar: "Mon *-*-* 04:00:00"
       ratelimitingcrawlers: true
       is_default: false
       servers:
@@ -54,6 +52,8 @@ phpmyadmin:
   # Assuming user and group should match php-fpm by default
   www_user: "{{ php.fpm.pool_user }}"
   www_group: "{{ php.fpm.pool_group }}"
+  install_nginx: false
+
 ```
 
 <!--ENDROLEVARS-->

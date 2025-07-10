@@ -5,6 +5,11 @@
     state: present
     update_cache: true
 
+- name: Create LDAP config directory.
+  ansible.builtin.file:
+    path: /etc/ldap
+    state: directory
+
 - name: Create certificate directory.
   ansible.builtin.file:
     path: /etc/ldap/ssl

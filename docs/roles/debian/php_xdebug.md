@@ -1,6 +1,6 @@
 # PHP XDebug
 
-Installs and configure XDebug extension for PHP
+Installs and configures XDebug extension for PHP.
 
 <!--TOC-->
 <!--ENDTOC-->

@@ -1,58 +1,67 @@
 ---
-- name: Add a DNS record for GitLab
-  amazon.aws.route53:
-    state: "{{ gitlab.gitlab_route_53.state }}"
-    profile: "{{ gitlab.gitlab_route_53.aws_profile }}"
-    zone: "{{ gitlab.gitlab_route_53.zone }}"
-    record: "{{ gitlab.server_name }}"
-    type: "{{ gitlab.gitlab_route_53.type }}"
-    value: "{{ gitlab.gitlab_route_53.value }}"
-    overwrite: true
-  delegate_to: localhost
-  become: false
+- name: Add DNS records.
   when:
     - gitlab.gitlab_route_53.zone is defined
     - gitlab.gitlab_route_53.zone | length > 0
+  block:
+    - name: Add a DNS record for GitLab.
+      amazon.aws.route53:
+        state: "{{ gitlab.gitlab_route_53.state }}"
+        profile: "{{ gitlab.gitlab_route_53.aws_profile }}"
+        zone: "{{ gitlab.gitlab_route_53.zone }}"
+        record: "{{ gitlab.server_name }}"
+        type: "{{ gitlab.gitlab_route_53.type }}"
+        value: "{{ gitlab.gitlab_route_53.value }}"
+        overwrite: true
+      delegate_to: localhost
+      become: false
 
-- name: Add a DNS record for Mattermost
-  amazon.aws.route53:
-    state: "{{ gitlab.mattermost_route_53.state }}"
-    profile: "{{ gitlab.mattermost_route_53.aws_profile }}"
-    zone: "{{ gitlab.mattermost_route_53.zone }}"
-    record: "{{ gitlab.mattermost_url }}"
-    type: CNAME
-    value: "{{ gitlab.server_name }}"
-    overwrite: true
-  delegate_to: localhost
-  become: false
-  when:
-    - gitlab.mattermost_route_53.zone is defined
-    - gitlab.mattermost_route_53.zone | length > 0
+    - name: Add a DNS record for Mattermost.
+      amazon.aws.route53:
+        state: "{{ gitlab.mattermost_route_53.state }}"
+        profile: "{{ gitlab.mattermost_route_53.aws_profile }}"
+        zone: "{{ gitlab.mattermost_route_53.zone }}"
+        record: "{{ gitlab.mattermost_url }}"
+        type: CNAME
+        value: "{{ gitlab.server_name }}"
+        overwrite: true
+      delegate_to: localhost
+      become: false
+      when: gitlab.mattermost
 
-- name: Add repository key for Gitlab.
-  ansible.builtin.apt_key:
-    url: https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
-    state: present
-
-- name: Add repository for Gitlab.
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
-    state: present
-
-- name: Add source repository for Gitlab.
-  ansible.builtin.apt_repository:
-    repo: "deb-src https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
-    state: present
-
-- name: Add GitLab repository to unattended-upgrades origins list.
-  ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ gitlab.apt_origin ] }}"
-  when: apt_unattended_upgrades.enable
-
-- name: Install the unattended-upgrades config.
+- name: Add GitLab repository and key.
   ansible.builtin.include_role:
-    name: debian/apt_unattended_upgrades
-  when: apt_unattended_upgrades.enable
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://packages.gitlab.com/gitlab/gitlab-ce/debian/ {{ ansible_distribution_release }} main"
+      format: deb822
+      name: gitlab
+      types:
+        - deb
+        - deb-src
+      uris:
+        - https://packages.gitlab.com/gitlab/gitlab-ce/debian/
+      signed_by: "{{ gitlab.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 00:20:00"
+
+- name: Set up unattended-upgrades.
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable
+  block:
+    - name: Add GitLab repository to unattended-upgrades origins list.
+      ansible.builtin.set_fact:
+        _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [gitlab.apt_origin] }}"
+
+    - name: Install the unattended-upgrades config.
+      ansible.builtin.include_role:
+        name: debian/apt_unattended_upgrades
 
 - name: Ensure Gitlab is installed.
   ansible.builtin.apt:
@@ -65,7 +74,7 @@
     name: debian/ssl
   when: gitlab.ssl.enabled
   vars:
-    ssl: "{{ gitlab.ssl | combine( { 'domain': gitlab.server_name } ) }}"
+    ssl: "{{ gitlab.ssl | combine({'domain': gitlab.server_name}) }}"
 
 - name: Copy Gitlab configuration file.
   ansible.builtin.template:
@@ -77,20 +86,20 @@
     src: gitlab-config.rb.j2
     dest: /etc/gitlab/gitlab-config.rb
 
-- name: Stop Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
-
-- name: Reconfigure Gitlab.
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
-
 - name: Let Gitlab know it's on Docker.
   ansible.builtin.copy:
     content: "gitlab-docker"
     dest: "/opt/gitlab/embedded/service/gitlab-rails/INSTALLATION_TYPE"
     mode: "0666"
-  when:
-    - is_local is defined
-    - is_local
+  when: is_local
+
+- name: Stop Gitlab.
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
+  when: gitlab.force_stop
+
+- name: Reconfigure Gitlab.
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl reconfigure
+  when: not is_local
 
 - name: Copy startup script in place.
   ansible.builtin.template:
@@ -100,11 +109,9 @@
     group: root
     mode: "0555"
     force: true
-  when:
-    - is_local is defined
-    - is_local
+  when: is_local
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:
@@ -115,12 +122,23 @@
 
 - name: Manually restart Gitlab/Docker.
   ansible.builtin.command: "/bin/sh /opt/gitlab-init.sh"
-  when:
-    - is_local is defined
-    - is_local
+  when: is_local
 
 - name: Ensure GitLab is started.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
+  when: gitlab.force_stop
 
+- name: Create systemd timer to sync removed LDAP users.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      block_removed_ldap_users:
+        timer_command: "/usr/bin/gitlab-rake gitlab:cleanup:block_removed_ldap_users BLOCK=true"
+        timer_OnCalendar: "{{ gitlab.block_removed_ldap_users_on_calendar }}"
+  when: gitlab.ldap.enable
+
+# @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
-  ansible.builtin.command: "gitlab-rails runner /etc/gitlab/gitlab-config.rb"
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
+  when: not is_local

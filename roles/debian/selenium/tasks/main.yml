@@ -16,7 +16,7 @@
     state: present
   when: selenium.display_manager == 'VNC'
 
-- name: Set Selenium major version
+- name: Set Selenium major version.
   ansible.builtin.set_fact:
     _selenium_major_version: "{{ selenium.version | regex_replace('\\.[0-9]+$', '') }}"
 

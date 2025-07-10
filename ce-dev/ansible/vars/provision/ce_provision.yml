@@ -1,11 +1,12 @@
 # Common vars for local development.
+_ce_provision_username: "ce-dev"
 ce_provision:
   username: "ce-dev"
   own_repository: "https://github.com/codeenigma/ce-provision.git"
   own_repository_branch: "devel-2.x"
   own_repository_skip_checkout: true
   config_repository: "https://github.com/codeenigma/ce-dev-ce-provision-config.git"
-  config_repository_branch: "1.x"
+  config_repository_branch: "devel-2.x"
   config_repository_skip_checkout: true
   local_dir: "/home/ce-dev/ce-provision"
   galaxy_custom_requirements_file: "/home/ce-dev/ce-provision/ce-dev/ansible/vars/provision/galaxy-requirements.yml"

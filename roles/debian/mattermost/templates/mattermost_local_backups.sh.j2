@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Back up mattermost database
+sudo -u postgres pg_dump mattermost | gzip > /home/mattermost/backups/mattermost_dbdump_$(date --rfc-3339=date).sql.gz
+
+# Back up mattermost data and configuration
+sudo tar -zcvf /home/mattermost/backups/mattermost_data_$(date --rfc-3339=date).gz -C /opt/mattermost data config.json
+
+# Purge old local backups after two weeks
+find /home/mattermost/backups -name "*.gz" -type f -mtime +15 -delete

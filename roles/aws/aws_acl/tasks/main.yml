@@ -1,0 +1,13 @@
+---
+- name: Create ACLs when list is passed.
+  ansible.builtin.include_tasks: create_acl.yml
+  loop: "{{ aws_acl | list }}"
+  loop_control:
+    loop_var: _acl
+  when:
+    - aws_acl | type_debug == 'list'
+    - _acl.recreate is not defined or _acl.recreate
+
+- name: Set ACL to CF/ALB if dict is passed.
+  ansible.builtin.include_tasks: set_acl.yml
+  when: aws_acl | type_debug == 'dict'

@@ -38,7 +38,7 @@
     - gpg_user.publish
     - not user_ansible_gpg_key_exists.stdout
 
-- name: Publish GPG key to openpgp.org.
+- name: Publish GPG key to key servers.
   ansible.builtin.command:
     cmd: "gpg --keyserver {{ server }} --send-keys {{ user_ansible_gpg_key.stdout_lines[1] }}"
   become: true

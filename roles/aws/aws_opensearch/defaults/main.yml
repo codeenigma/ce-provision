@@ -26,3 +26,5 @@ aws_opensearch:
   #      value: 2
   #      unit: "HOURS"
   #    cron_expression_for_recurrence: "cron(0 2 * * *)"
+  wait: true
+  wait_timeout: 1800 # Default is 300 seconds, but in fact the domain becomes available in about 30 minutes.

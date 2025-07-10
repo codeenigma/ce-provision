@@ -1,0 +1,30 @@
+import json
+import boto3
+
+asg_cli = boto3.client('autoscaling', region_name="{{ _aws_region }}")
+
+def lambda_handler(event, context):
+
+    policies = asg_cli.describe_policies(
+        AutoScalingGroupName=event['asg_name']
+    )
+
+    if policies['ScalingPolicies'][0]['Enabled']:
+        enable = False
+    else:
+        enable = True
+
+    for inst in policies['ScalingPolicies']:
+        put_result = asg_cli.put_scaling_policy(
+            AutoScalingGroupName=inst['AutoScalingGroupName'],
+            PolicyName=inst['PolicyName'],
+            PolicyType=inst['PolicyType'],
+            AdjustmentType=inst['AdjustmentType'],
+            ScalingAdjustment=inst['ScalingAdjustment'],
+            Enabled=enable
+        )
+
+    return {
+        'statusCode': 200,
+        'body': event
+    }

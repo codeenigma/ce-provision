@@ -1,7 +1,10 @@
 ---
 blackfire:
+  apt_signed_by: https://packages.blackfire.io/gpg.key
   enable: false
   agent_server_id: ""
   agent_server_token: ""
   agent_client_id: ""
   agent_client_token: ""
+  agent_cli_config_path: /home/ce-dev/.blackfire.ini
+  agent_cli_config_owner: ce-dev

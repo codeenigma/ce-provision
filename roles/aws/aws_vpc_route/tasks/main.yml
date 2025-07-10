@@ -1,7 +1,9 @@
 - name: Update main VPC route.
   ansible.builtin.include_tasks: vpc.yml
-  when: ( aws_vpc_route.subnet_id is not defined or aws_vpc_route.subnet_id | length < 1 )
+  when: aws_vpc_route.subnet_id is not defined or (aws_vpc_route.subnet_id | length) < 1
 
 - name: Update subnet route.
   ansible.builtin.include_tasks: subnet.yml
-  when: ( aws_vpc_route.subnet_id is defined and aws_vpc_route.subnet_id | length > 0 )
+  when:
+    - aws_vpc_route.subnet_id is defined
+    - aws_vpc_route.subnet_id | length > 0

@@ -1,0 +1,7 @@
+---
+# Creates hosts entry so play isn't skipped.
+- ansible.builtin.import_playbook: ../aws_ec2_standalone/launch.yml
+# Spins up the instance.
+- ansible.builtin.import_playbook: ../aws_ec2_standalone/ec2.yml
+# Actual provisioning
+- ansible.builtin.import_playbook: provision.yml

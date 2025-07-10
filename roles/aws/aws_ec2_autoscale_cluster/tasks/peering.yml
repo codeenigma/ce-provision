@@ -8,15 +8,15 @@
     region: "{{ peering.region }}"
   register: _aws_ec2_autoscale_cluster_peer_instance
 
-- name: Gather peer VPC information
+- name: Gather peer VPC information.
   amazon.aws.ec2_vpc_net_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ peering.region }}"
     vpc_ids: "{{ _aws_ec2_autoscale_cluster_peer_instance.instances[0].vpc_id }}"
   register: _aws_ec2_autoscale_cluster_peer_vpc
 
-- name: Create local VPC peering Connection
-  community.aws.ec2_vpc_peer:
+- name: Create local VPC peering Connection.
+  amazon.aws.ec2_vpc_peering:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
@@ -27,7 +27,7 @@
   register: _aws_ec2_autoscale_cluster_peer_connection
 
 - name: Accept VPC peering request.
-  community.aws.ec2_vpc_peer:
+  amazon.aws.ec2_vpc_peering:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     region: "{{ aws_ec2_autoscale_cluster.region }}"
     peering_id: "{{ _aws_ec2_autoscale_cluster_peer_connection.peering_id }}"

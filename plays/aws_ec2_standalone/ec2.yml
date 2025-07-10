@@ -1,0 +1,25 @@
+---
+# First step. Spin up a "blank" instance and add the controller user and Ansible via user-data.
+- hosts: "{{ _aws_resource_name }}"
+  connection: local
+  become: false
+
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+        - "{{ _ce_provision_build_dir }}/vars/{{ _aws_resource_name }}"
+
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: aws/aws_ec2_with_eip
+    - ansible.builtin.import_role:
+        name: _exit
+
+  post_tasks:
+    - name: Refresh inventory.
+      ansible.builtin.meta: refresh_inventory

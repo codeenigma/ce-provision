@@ -1,3 +1,3 @@
 ---
 openjdk:
-  version: 11 # 11 is current version in bullseye - 17 in sid
+  version: 17 # 17 is current version in bookworm and also available in bullseye - 11 also in bullseye

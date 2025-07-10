@@ -82,6 +82,8 @@ ldap_server:
     purge: false
     backup: false # set to true to create local backups of LDAP
     backup_path: /opt/slap-bak
+    backup_script: /usr/local/bin/slap-bak # full filename of the backup script
+    slapcat_path: /usr/sbin # path to the location of slapcat on the server
     on_calendar: "*-*-* 23:45:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
   # TLS settings in LDAP are not separately handled, you need to manually set it up or use the config import feature.
   # If you use 'manual' SSL handling you need to provide a separate CA certificate.
@@ -90,6 +92,7 @@ ldap_server:
   #   olcTLSCertificateFile: /etc/letsencrypt/live/{{ _domain_name }}/cert.pem
   #   olcTLSCertificateKeyFile:  /etc/letsencrypt/live/{{ _domain_name }}/privkey.pem
   ssl: # @see the 'ssl' role - does nothing by default.
+    replace_existing: false
     domain: "{{ _domain_name }}"
     handling: "unmanaged"
     key: ""
@@ -102,11 +105,12 @@ ldap_server:
     # email: sysadm@codeenigma.com
     # services: []
     # web_server: standalone
-    # certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n"
-    # certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew"
+    # certbot_register_command: "certonly --agree-tos --preferred-challenges http -n"
+    # certbot_renew_command: "certonly --agree-tos --force-renew"
     # reload_command: restart
     # reload:
     #   - slapd
+    # on_calendar: "Mon *-*-* 04:00:00"
   replication:
     host: "" # host must be present in config/hosts for ce-provision, leave empty if no replication is desired
     port: "636"

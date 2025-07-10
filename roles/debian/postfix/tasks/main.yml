@@ -1,15 +1,15 @@
 ---
-- name: Install Postfix
+- name: Install Postfix.
   ansible.builtin.apt:
     pkg: postfix
     state: present
 
-- name: Install procmail
+- name: Install procmail.
   ansible.builtin.apt:
     pkg: procmail
     state: present
 
-- name: Copy master config
+- name: Copy master config.
   ansible.builtin.copy:
     src: "files/{{ item }}"
     dest: "/etc/postfix/"
@@ -19,7 +19,7 @@
   with_items:
     - master.cf
 
-- name: Configure mailname
+- name: Configure mailname.
   ansible.builtin.template:
     src: "mailname.j2"
     dest: "/etc/mailname"
@@ -27,7 +27,7 @@
     group: root
     mode: "0644"
 
-- name: Configure main.cf
+- name: Configure main.cf.
   ansible.builtin.template:
     src: "main.cf.j2"
     dest: "/etc/postfix/main.cf"
@@ -36,7 +36,7 @@
     mode: "0644"
   notify: Reload Postfix configuration.
 
-- name: Configure transport
+- name: Configure transport.
   ansible.builtin.template:
     src: "transport.j2"
     dest: "/etc/postfix/transport"
@@ -46,17 +46,17 @@
   notify:
     - Reload Postfix configuration.
 
-- name: Initialise transport db
+- name: Initialise transport db.
   ansible.builtin.command:
     cmd: /usr/sbin/postmap /etc/postfix/transport
 
-- name: Install SASL
+- name: Install SASL.
   ansible.builtin.package:
     name: libsasl2-modules
     state: present
   when: postfix.use_ses
 
-- name: Configure SASL
+- name: Configure SASL.
   ansible.builtin.template:
     src: "sasl_passwd.j2"
     dest: "/etc/postfix/sasl_passwd"
@@ -99,7 +99,6 @@
     state: directory
   when:
     - postfix.ce_dev_delivery_mode == "host"
-    - is_local is defined
     - is_local
 
 - name: Configure procmail to NULL.
@@ -110,9 +109,7 @@
     group: root
     mode: "0644"
     force: true
-  when:
-    - is_local is defined
-    - is_local
+  when: is_local
 
 - name: Configure procmail to host directory.
   ansible.builtin.template:
@@ -124,7 +121,6 @@
     force: true
   when:
     - postfix.ce_dev_delivery_mode == "host"
-    - is_local is defined
     - is_local
 
 - name: Configure procmail to local.
@@ -133,28 +129,68 @@
     state: absent
   when:
     - postfix.ce_dev_delivery_mode == "local"
-    - is_local is defined
     - is_local
 
+- name: Copy postfix configuration in place.
+  ansible.builtin.template:
+    src: "postfix_conf.j2"
+    dest: "/etc/rsyslog.d/25-postfix.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+   - postfix.disable_syslog is defined
+   - postfix.disable_syslog
+
+- name: Restart rsyslog based on environment to apply postfix changes.
+  block:
+    - name: Restart rsyslog in a container to apply postfix changes (if is_local is true).
+      ansible.builtin.shell: |
+        pkill -HUP rsyslogd || true
+      when: is_local
+
+    - name: Restart rsyslog using systemd to apply postfix changes (if is_local is false).
+      ansible.builtin.systemd_service:
+        name: rsyslog.service
+        state: restarted
+      when: is_local is not defined or not is_local
+
 # Needed for Docker.
-- name: Stop Postfix
-  ansible.builtin.command:
-    cmd: /usr/sbin/service postfix stop
+- name: Manage Postfix Service.
+  block:
+    - name: Stop Postfix in a container (if is_local is true).
+      ansible.builtin.command:
+        cmd: /usr/sbin/service postfix stop
+      when: is_local
 
-- name: Remove trailing lock files.
-  ansible.builtin.file:
-    path: "{{ lock_file }}"
-    state: absent
-  with_items:
-    - /var/spool/postfix/pid/master.pid
-    - /var/lib/postfix/master.lock
-  loop_control:
-    loop_var: lock_file
+    - name: Stop Postfix using systemd (if is_local is false).
+      ansible.builtin.systemd_service:
+        name: postfix
+        state: stopped
+      when: is_local is not defined or not is_local
 
-- name: Create Postfix Aliases database
-  ansible.builtin.command:
-    cmd: /usr/bin/newaliases
+    - name: Remove trailing lock files.
+      ansible.builtin.file:
+        path: "{{ lock_file }}"
+        state: absent
+      with_items:
+        - /var/spool/postfix/pid/master.pid
+        - /var/lib/postfix/master.lock
+      loop_control:
+        loop_var: lock_file
 
-- name: Restart Postfix
-  ansible.builtin.command:
-    cmd: /usr/sbin/service postfix start
+    - name: Create Postfix Aliases database.
+      ansible.builtin.command:
+        cmd: /usr/bin/newaliases
+
+    - name: Start Postfix in a container (if is_local is true).
+      ansible.builtin.command:
+        cmd: /usr/sbin/service postfix start
+      when: is_local
+
+    - name: Start Postfix using systemd (if is_local is false).
+      ansible.builtin.systemd_service:
+        name: postfix
+        state: started
+      when: is_local is not defined or not is_local

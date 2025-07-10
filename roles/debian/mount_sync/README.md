@@ -5,8 +5,9 @@ It will:
 
 - perform an initial rsync using a cloud-init script
 - use Unison to perform regular checks (mostly to catch edge-cases where an instance would be spinned up during the middle of a deployment)
-  <!--TOC-->
-  <!--ENDTOC-->
+
+<!--TOC-->
+<!--ENDTOC-->
 
 <!--ROLEVARS-->
 ## Default variables

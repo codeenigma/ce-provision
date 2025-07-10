@@ -3,17 +3,18 @@
   ansible.builtin.include_role:
     name: aws/aws_security_groups
   vars:
-    profile: "{{ aws_efs.aws_profile }}"
-    region: "{{ aws_efs.region }}"
-    group_names: "{{ aws_efs.security_groups }}"
-    return_type: ids
+    aws_security_groups:
+      profile: "{{ aws_efs.aws_profile }}"
+      region: "{{ aws_efs.region }}"
+      group_names: "{{ aws_efs.security_groups }}"
+      return_type: ids
   when: aws_efs.security_groups | length > 0
 
-- name: Reset subnet ids info
+- name: Reset subnet ids info.
   ansible.builtin.set_fact:
     _aws_efs_subnets_ids: []
 
-- name: Reset targets info
+- name: Reset targets info.
   ansible.builtin.set_fact:
     _aws_efs_targets: {}
 
@@ -29,7 +30,7 @@
   loop_control:
     loop_var: target
 
-- name: Create EFS volume
+- name: Create EFS volume.
   community.aws.efs:
     profile: "{{ aws_efs.aws_profile }}"
     name: "{{ aws_efs.name }}"

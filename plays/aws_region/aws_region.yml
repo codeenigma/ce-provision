@@ -1,0 +1,23 @@
+---
+# Global infra setup.
+- hosts: localhost
+  connection: local
+  become: false
+  vars:
+    _init:
+      vars_dirs:
+        - "{{ _ce_provision_build_dir }}/vars/_global"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/_common"
+        - "{{ _ce_provision_build_dir }}/vars/_regions/{{ _aws_region }}/{{ _env_type }}"
+    # used for tagging
+    _profile: core
+  tasks:
+    - ansible.builtin.import_role:
+        name: _init
+    - ansible.builtin.import_role:
+        name: _meta/aws_region
+    - ansible.builtin.import_role:
+        name: aws/aws_admin_tools
+      when: aws_admin_tools_enable
+    - ansible.builtin.import_role:
+        name: _exit
