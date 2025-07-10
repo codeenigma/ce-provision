@@ -43,17 +43,6 @@
     mode: '0644'
   register: config_service
 
-- name: Gather information about instance
-  amazon.aws.ec2_instance_info:
-    filters:
-      "tag:Name": "*deploy*"
-      instance-state-name: ["running"]
-  register: deploy_server_ip
-
-- name: Debug print
-  ansible.builtin.debug:
-    var: deploy_server_ip
-
 - name: Create or update main configuration file.
   ansible.builtin.template:
     src: fluent-bit.config.yml.j2
@@ -64,7 +53,7 @@
 - name: Reload systemd daemon.
   ansible.builtin.systemd_service:
     daemon_reload: true
-  when: 
+  when:
     - config_service.changed
     - not is_local
 
