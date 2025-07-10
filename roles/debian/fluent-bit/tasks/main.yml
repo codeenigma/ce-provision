@@ -22,7 +22,7 @@
     patterns: .*conf
   register: conf
 
-- name: Remove configuration files that come with the pacakge installation.
+- name: Remove configuration files that come with the package installation.
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
