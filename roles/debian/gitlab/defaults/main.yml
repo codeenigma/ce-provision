@@ -96,3 +96,4 @@ gitlab:
     redirect_http_to_https: "true" # must be enabled if you're using LetsEncrypt above
     redirect_http_to_https_port: 80 # must be 80 if you're using LetsEncrypt above
     custom_nginx_config: "" # include extra config, for example "include /etc/nginx/conf.d/example.conf;"
+  block_removed_ldap_users_on_calendar: "*-*-* 02:30:00"
