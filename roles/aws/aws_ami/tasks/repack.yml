@@ -9,21 +9,25 @@
   register: aws_ami_running_instances
 
 - name: Create a Security Group to access the controller.
-  amazon.aws.ec2_security_group:
-    profile: "{{ aws_ami.aws_profile }}"
-    region: "{{ aws_ami.region }}"
-    name: "{{ aws_ami.repack.cluster_name }}-repacker"
-    tags: "{{ aws_ami.tags }}"
-    state: present
-    vpc_id: "{{ aws_ami.repack.vpc_id }}"
-    description: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
-    rules:
-      - proto: tcp
-        ports:
-          - 22
-        cidr_ip: "{{ aws_ami.repack.controller_cidr }}"
-        rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
-    rules_egress: []
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    tasks_from: security_group
+  vars:
+    aws_vpc:
+      profile: "{{ aws_ami.aws_profile }}"
+      region: "{{ aws_ami.region }}"
+      name: "{{ aws_ami.repack.cluster_name }}-repacker"
+      tags: "{{ aws_ami.tags }}"
+      state: present
+      id: "{{ aws_ami.repack.vpc_id }}"
+      description: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
+      rules:
+        - proto: tcp
+          ports:
+            - 22
+          cidr_ip: "{{ aws_ami.repack.controller_cidr }}"
+          rule_desc: "Allow controller to access the {{ aws_ami.ami_name }}-repacking instance"
+      rules_egress: []
 
 - name: Create an AMI with an existing EC2 instance.
   amazon.aws.ec2_ami:
