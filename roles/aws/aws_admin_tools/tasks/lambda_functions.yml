@@ -13,7 +13,7 @@
       timeout: "{{ item.timeout | default(aws_admin_tools.timeout) }}"
       role: "{{ aws_iam_role._result[item.resource + '_' + item.name] }}"
       runtime: "{{ aws_admin_tools.runtime }}"
-      function_file: "{{ lookup('template', item.resource + '_' + item.name + '.py.j2') }}"
+      function_file: "{{ item.git_url }}"
       s3_bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}"
       s3_bucket_prefix: "lambda-functions"
       tags:
