@@ -28,7 +28,7 @@
       description: "default VPC security group"
       rules: "{{ _sec_group.rules | default(omit) }}"
       rules_egress: "{{ _sec_group.rules_egress | default(omit) }}"
-  with_items: "{{ aws_vpc.security_groups }}"
+  loop: "{{ aws_vpc.security_groups }}"
   loop_control:
     loop_var: _sec_group
     label: "{{ security_group.name }}"
