@@ -12,7 +12,7 @@
 - name: Check string type using regex
   ansible.builtin.set_fact:
     _string_type: >-
-      {%- if input_string | regex_search('^https?://') -%}
+      {%- if input_string | regex_search('^(https?://|git@)') -%}
         url
       {%- elif input_string | regex_search('\.zip$', ignorecase=True) -%}
         zip
