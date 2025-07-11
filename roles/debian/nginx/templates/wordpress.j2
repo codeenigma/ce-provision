@@ -22,7 +22,7 @@ location ~* /(?:uploads|files)/.*\.php$ {
 }
 
 location / {
-  index index.php
+  index index.php;
 	try_files $uri $uri/ /index.php?$args;
 }
 
