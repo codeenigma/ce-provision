@@ -150,11 +150,13 @@
         pkill -HUP rsyslogd || true
       when: is_local
 
-    - name: Restart rsyslog using systemd to apply postfix changes (if is_local is false).
-      ansible.builtin.systemd_service:
-        name: rsyslog.service
+    - name: Restart systemd service if it exists to apply postfix changes (if is_local is false).
+      service:
         state: restarted
-      when: is_local is not defined or not is_local
+        name: rsyslog.service
+      when:
+        - ansible_facts['services']['rsyslog.service']['status'] | default('not-found') != 'not-found'
+        - is_local is not defined or not is_local
 
 # Needed for Docker.
 - name: Manage Postfix Service.
