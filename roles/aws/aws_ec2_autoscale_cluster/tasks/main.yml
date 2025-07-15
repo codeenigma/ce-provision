@@ -54,10 +54,6 @@
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc._result[aws_ec2_autoscale_cluster.name] }}"
 
-- name: Set _aws_ec2_autoscale_cluster_security_group variable.
-  ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc._result[aws_ec2_autoscale_cluster.name] }}"
-
 - name: Reset subnets lists.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_subnets_ids: []
