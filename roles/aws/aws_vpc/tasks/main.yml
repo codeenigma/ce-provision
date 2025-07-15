@@ -27,8 +27,8 @@
   vars:
     aws_vpc:
       name: "{{ sec_group.name | default('') }}"
-      tags: "{{ aws_vpc_vpc.vpc.tags | combine({'Name': sec_group.name}) }}"
-      id: "{{ aws_vpc_vpc.vpc.id }}"
+      tags: "{{ _aws_vpc_vpc.vpc.tags | combine({'Name': sec_group.name}) }}"
+      id: "{{ _aws_vpc_vpc.vpc.id }}"
       description: "{{ sec_group.description }}"
       rules: "{{ sec_group.rules | default(omit) }}"
       rules_egress: "{{ sec_group.rules_egress | default(omit) }}"
