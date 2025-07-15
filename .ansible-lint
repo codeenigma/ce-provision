@@ -16,5 +16,6 @@ skip_list:
   - name[casing] # sometimes included Galaxy roles break linting rules and cause failures
   - args[module] # causing odd issue with ACL role
   - jinja[spacing] # pendantic! we get these from GitHub Actions anyway
+  - latest[git] # Breaks if there is no version control in task
 exclude_paths:
   - roles/contrib/ # we don't control these roles
