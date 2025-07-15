@@ -7,14 +7,13 @@
   ansible.builtin.find:
     paths: "{{ work_dir }}/{{ repo_name }}"
     patterns: "*.j2"
-    recurse: yes
+    recurse: true
   register: _j2_files
 
 - name: Template all .j2 files.
   ansible.builtin.template:
     src: "{{ item.path }}"
     dest: "{{ item.path | regex_replace('\\.j2$', '') }}"
-    backup: no
   loop: "{{ _j2_files.files }}"
   loop_control:
     label: "{{ item.path }}"
