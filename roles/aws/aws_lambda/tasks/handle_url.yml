@@ -2,9 +2,6 @@
   ansible.builtin.git:
     repo: "{{ aws_lambda.function_file }}"
     dest: /tmp/funct
-    clone: yes
-    update: yes
-    force: yes
 
 - name: Find all .j2 template files.
   ansible.builtin.find:
