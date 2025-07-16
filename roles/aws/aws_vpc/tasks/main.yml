@@ -20,15 +20,7 @@
 
 - name: Create VPC Security groups.
   ansible.builtin.include_tasks: "security_group.yml"
-  vars:
-    aws_vpc:
-      name: "{{ _sec_group.name | default('') }}"
-      tags: "{{ aws_vpc.tags | combine({'Name': _sec_group.name}) }}"
-      id: "{{ _aws_vpc_vpc.vpc.id }}"
-      description: "default VPC security group"
-      rules: "{{ _sec_group.rules | default(omit) }}"
-      rules_egress: "{{ _sec_group.rules_egress | default(omit) }}"
-  loop: "{{ aws_vpc.security_groups }}"
+  loop: "{{ aws_vpc.security_groups | list }}"
   loop_control:
     loop_var: _sec_group
 
