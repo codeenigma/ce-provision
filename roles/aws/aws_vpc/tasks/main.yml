@@ -32,7 +32,7 @@
       description: "{{ item.description }}"
       rules: "{{ item.rules | default(omit) }}"
       rules_egress: "{{ item.rules_egress | default(omit) }}"
-  loop: "{{ aws_vpc.security_groups }}"
+  loop: "{{ aws_vpc.security_groups | list }}"
 
 - name: Create IGW.
   amazon.aws.ec2_vpc_igw:
