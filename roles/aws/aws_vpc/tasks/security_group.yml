@@ -1,3 +1,14 @@
+- name: Configure vars if looping over list.
+  ansible.builtin.set_fact:
+    aws_vpc:
+      name: "{{ _sec_group.name | default('') }}"
+      tags: "{{ _aws_vpc_vpc.vpc.tags | combine({'Name': _sec_group.name}) }}"
+      id: "{{ _aws_vpc_vpc.vpc.id }}"
+      description: "{{ _sec_group.description }}"
+      rules: "{{ _sec_group.rules | default(omit) }}"
+      rules_egress: "{{ _sec_group.rules_egress | default(omit) }}"
+  when: _sec_group is defined
+
 - name: Create Security Group.
   amazon.aws.ec2_security_group:
     name: "{{ aws_vpc.name }}"
