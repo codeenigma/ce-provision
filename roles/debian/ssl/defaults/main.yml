@@ -33,12 +33,10 @@ ssl:
   http_01_port: 80 # you can set a non-standard port to listen on, but certbot still needs port 80 - see https://letsencrypt.org/docs/challenge-types/#http-01-challenge
   # For "letsencrypt" auto renewal
   autorenew: false # set to true to create a systemd timer to renew LE certs
-  certbot_renew_command: "certonly --agree-tos --force-renew" # root of the command used in the systemd timer
-  # See systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
-  on_calendar: "Mon *-*-* 04:00:00"
+  on_calendar: "Mon *-*-* 04:00:00" # this is still needed to define when the cron will run, and it's needed in each ssl item not to break task
   web_server: standalone
   # values are standalone, webroot, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
-  # webroot unlike standalone, won't start webserver with certain port
+  # webroot unlike standalone, won't start webserver with certain port, so we can remove http_01_port
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
