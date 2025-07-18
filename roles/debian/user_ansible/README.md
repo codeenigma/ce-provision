@@ -13,14 +13,15 @@ user_ansible:
   # This sets both username and main group.
   username: "{{ _user_ansible_username }}"
   home: "/home/{{ _user_ansible_username }}"
-  create: true # if you know the user already exists, set this to false to not create the user.
+  create: true  # if you know the user already exists, set this to false to not create the user.
   create_home: true
   update_password: "always"
+  system_user: true  # creates a system user - see useradd --system docs
   # It is often desirable to fix POSIX IDs for system users so they are consistent across your fleet
   # This is shown for documentation, you should do this in your config repo
   # uid: 999
   # gid: 999
-  sudo_config: {} # an empty dictionary will skip creating a sudo config
+  sudo_config: {}  # an empty dictionary will skip creating a sudo config
   # Example sudo config allowing full sudo permissions - see the debian/sudo_config role for more details.
   #  entity_name: "{{ _user_ansible_username }}"
   #  hosts: "ALL"
