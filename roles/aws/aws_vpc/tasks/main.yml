@@ -18,10 +18,6 @@
       description: "default VPC security group"
       purge_rules: false
 
-- name: Debug.
-  ansible.builtin.debug:
-    msg: "{{ aws_vpc.security_groups }}"
-
 - name: Create VPC Security groups.
   ansible.builtin.include_tasks: "security_group.yml"
   loop: "{{ aws_vpc.security_groups | list }}"
