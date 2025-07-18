@@ -6,11 +6,11 @@ collections:
   - name: community.sops
   - name: community.aws
   - name: community.general
+  - name: community.postgresql
   - name: amazon.aws
 
 roles:
   - name: geerlingguy.varnish
-    version: "3.3.1" # bad release, remove later when 'master' is gone from here: https://galaxy.ansible.com/ui/standalone/roles/geerlingguy/varnish/
   - name: geerlingguy.firewall
   - name: geerlingguy.composer
   - name: geerlingguy.clamav

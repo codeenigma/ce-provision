@@ -16,7 +16,7 @@
 
 - name: Create list of security group IDs.
   ansible.builtin.set_fact:
-    _aws_security_group_ids: "{{ _aws_security_group_ids + [ item.group_id ] }}"
+    _aws_security_group_ids: "{{ _aws_security_group_ids + [item.group_id] }}"
   with_items: "{{ _aws_security_groups.security_groups }}"
 
 - name: Set return variable to SG names.

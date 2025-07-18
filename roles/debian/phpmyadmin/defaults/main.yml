@@ -6,3 +6,4 @@ phpmyadmin:
   # Assuming user and group should match php-fpm by default
   www_user: "{{ php.fpm.pool_user }}"
   www_group: "{{ php.fpm.pool_group }}"
+  install_nginx: false

@@ -21,14 +21,14 @@
 
 - name: Add/replace subnets CIDR block routes.
   ansible.builtin.set_fact:
-    _aws_vpc_route_routes: "{{ _aws_vpc_route_routes | combine( { new_route.dest: new_route } ) }}"
+    _aws_vpc_route_routes: "{{ _aws_vpc_route_routes | combine({new_route.dest: new_route}) }}"
   with_items: "{{ aws_vpc_route.routes }}"
   loop_control:
     loop_var: new_route
 
 - name: Construct final routes list.
   ansible.builtin.set_fact:
-    _aws_vpc_route_new_routes: "{{ _aws_vpc_route_new_routes + [ item.value ] }}"
+    _aws_vpc_route_new_routes: "{{ _aws_vpc_route_new_routes + [item.value] }}"
   with_items: "{{ _aws_vpc_route_routes | dict2items() }}"
 
 - name: Create new route table.

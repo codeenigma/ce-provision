@@ -25,7 +25,7 @@ REMOVE_OLDER_THAN="{{ duplicity.retention_period }}"
 
 # Args to pass to duplicity
 {% if duplicity.exclude_other_filesystems %}
-backup_options="--full-if-older-than $FULL_BACKUPS --exclude-other-filesystems --num-retries=30 {{ duplicity.s3_options }}"
+backup_options="--full-if-older-than $FULL_BACKUPS --exclude-other-filesystems --num-retries=30 {{ duplicity.s3_options }} --allow-source-mismatch"
 {% else %}
 backup_options="--full-if-older-than $FULL_BACKUPS --num-retries=30 {{ duplicity.s3_options }}"
 {% endif %}
@@ -56,12 +56,12 @@ for dir in ${DIRS[@]}; do
   fi
 
   DEST=s3://{{ duplicity.backend_url }}/{{ duplicity.bucketname }}$dir
-  /usr/local/bin/duplicity $backup_options $extra_options $dir $DEST || exit 1
+  {{ _venv_path }}/bin/duplicity $backup_options $extra_options $dir $DEST || exit 1
 
   if [ $REMOVE_OLD_BACKUPS -eq 1 ]; then
     # Do some maintenance on the remote end to clean up old backups
     echo "Performing routine maintenance on $dir..."
-    /usr/local/bin/duplicity $maintenance_options $DEST || exit 1
+    {{ _venv_path }}/bin/duplicity $maintenance_options $DEST || exit 1
   fi
 done
 

@@ -5,6 +5,7 @@ PROVISION_CONTAINER="provision-controller"
 CONTAINER_BASE_PATH="/home/ce-dev/ce-provision"
 OS=$(uname -s)
 DOCKER_USER="ce-dev"
+YAMLLINT_PATH="/home/ce-dev/ce-python/bin/yamllint"
 if [ "$OS" = "Darwin" ]; then
     DOCKER_BIN="docker"
 else
@@ -12,7 +13,7 @@ else
 fi
 DOCKER_CMD="$DOCKER_BIN exec --user $DOCKER_USER --workdir $CONTAINER_BASE_PATH -i $PROVISION_CONTAINER"
 printf "\e[36m Running Yaml linter \n"
-YAML_LINT_CMD="$DOCKER_CMD yamllint roles"
+YAML_LINT_CMD="$DOCKER_CMD $YAMLLINT_PATH roles"
 ERRORS=$($YAML_LINT_CMD | wc -l)
 if [ "$ERRORS" != "0" ]; then
   $YAML_LINT_CMD

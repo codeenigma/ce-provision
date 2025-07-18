@@ -1,0 +1,11 @@
+- name: Reload systemd units and Restart Mattermost.
+  ansible.builtin.systemd_service:
+    state: restarted
+    enabled: true
+    daemon_reload: true
+    name: mattermost
+
+- name: Reload PostgreSQL.
+  ansible.builtin.systemd_service:
+    state: reloaded
+    name: postgresql

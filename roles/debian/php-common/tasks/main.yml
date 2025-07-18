@@ -1,13 +1,23 @@
 ---
-- name: Add Sury repository key for PHP.
-  ansible.builtin.apt_key:
-    url: https://packages.sury.org/php/apt.gpg
-    state: present
-
-- name: Add Sury repository.
-  ansible.builtin.apt_repository:
-    repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
-    state: present
+- name: Add Sury repository and key.
+  ansible.builtin.include_role:
+    name: debian/apt_repository
+  vars:
+    apt_repository:
+      legacy_repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+      format: deb822
+      name: sury
+      types:
+        - deb
+      uris:
+        - https://packages.sury.org/php/
+      signed_by: "{{ php.apt_signed_by }}"
+      suites: "{{ ansible_distribution_release }}"
+      components:
+        - main
+      state: present
+      enabled: true
+      key_refresh_timer_OnCalendar: "Mon *-*-* 01:00:00"
 
 - name: Pin Sury packages.
   ansible.builtin.template:
@@ -20,7 +30,7 @@
 
 - name: Add Sury PHP repository to unattended-upgrades origins list.
   ansible.builtin.set_fact:
-    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [ php.apt_origin ] }}"
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + [php.apt_origin] }}"
   when: apt_unattended_upgrades.enable
 
 - name: Install the unattended-upgrades config.

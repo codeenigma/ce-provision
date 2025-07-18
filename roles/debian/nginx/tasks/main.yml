@@ -1,36 +1,79 @@
 ---
-- name: Ensure nginx is installed.
+- name: Ensure NGINX is installed.
   ansible.builtin.apt:
     name: nginx
     state: present
     update_cache: true
     cache_valid_time: 240
+  register: _nginx_installed
 
-- name: Ensure passlib is installed with pip3.
-  ansible.builtin.pip:
-    name: passlib
-    executable: pip3
-  when: ansible_distribution_major_version | int < 12
+- name: Remove default NGINX vhost that could clash with other services running on port 80.
+  when:
+    # We only need to do this once when Nginx is installed initially.
+    - _nginx_installed.changed
+    - not nginx.keep_default_vhost
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
 
-- name: Ensure python3-passlib is installed with apt.
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+  vars:
+    python_common:
+      cleanup: false
+      remove_packages: []
+      install_packages:
+        - python3-pip
+
+- name: Ensure python3-passlib is installed.
   ansible.builtin.apt:
     pkg: python3-passlib
     state: present
-  when: ansible_distribution_major_version | int >= 12
 
-- name: Copy main nginx config.
+- name: Install passlib in the Ansible venv.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: passlib
+
+- name: Backup the whole NGINX config with vhosts.
+  ansible.builtin.command: "tar -czf {{ nginx.vhost_backup_location }}/nginx_backup.tar.gz /etc/nginx/"
+
+- name: Test NGINX configuration.
+  ansible.builtin.command: nginx -t
+  register: _nginx_test_result
+  failed_when: false
+
+- name: Display current NGINX config test result.
+  ansible.builtin.debug:
+    msg: "{{ _nginx_test_result.stderr }}"
+
+- name: Copy main NGINX config.
   ansible.builtin.template:
     src: nginx.conf.j2
     dest: "/etc/nginx/nginx.conf"
     owner: root
     group: root
     mode: 0644
+    force: true
 
 - name: Ensure passwords directory exists.
   ansible.builtin.file:
     path: /etc/nginx/passwords
     state: directory
     mode: "0755"
+
+- name: Set nginx location behavior, fallback to default if no custom behavior is provided.
+  set_fact:
+    nginx_location_behavior: "{{ nginx.custom_nginx_location_behavior | default(['try_files @rewrite /index.php?$query_string;']) }}"
+
+- name: Set drupal fallback location if defined.
+  set_fact:
+    drupal_fallback_behavior: "{{ nginx.drupal_fallback }}"
+  when: nginx.drupal_fallback is defined and nginx.drupal_fallback
 
 - name: Copy project type-specific configuration in place.
   ansible.builtin.template:
@@ -50,29 +93,31 @@
     - drupal10
     - flat
     - matomo
+    - mattermost
     - mautic
     - proxy
     - simplesamlphp
     - symfony3
+    - symfony3_prod
     - symfony4
     - wordpress
+    - blank
 
 - name: Ensure log dir exists.
   ansible.builtin.file:
     path: "/var/log/nginx"
     state: directory
 
-- name: Remove existing vhosts
+- name: Remove existing vhosts.
   ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: absent
   when: nginx.recreate_vhosts
 
-- name: Recreate vhosts folder
+- name: Ensure vhosts folder is present.
   ansible.builtin.file:
     path: "/etc/nginx/sites-enabled"
     state: directory
-  when: nginx.recreate_vhosts
 
 - name: Check if we have an AWS Cloudwatch folder.
   ansible.builtin.stat:
@@ -83,8 +128,17 @@
   ansible.builtin.template:
     src: cloudwatch-main.json.j2
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/nginx-main.json
+    force: true
   when:
     - _nginx_cloudwatch_dir.stat.isdir is defined and _nginx_cloudwatch_dir.stat.isdir
+
+- name: Update nginx mime.types.
+  ansible.builtin.template:
+    src: mime.types.j2
+    dest: /etc/nginx/mime.types
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Generate domain specific configuration.
   ansible.builtin.include_tasks: domain.yml
@@ -96,7 +150,7 @@
     - nginx.domains | length > 0
     - nginx.recreate_vhosts
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:
@@ -105,21 +159,29 @@
     - nginx.overrides is defined
     - nginx.overrides | length > 0
 
-- name: Test Nginx configuration.
+- name: Test NGINX configuration.
   ansible.builtin.command: nginx -t
-  register: nginx_test_result
+  register: _nginx_test_result
   failed_when: false
 
-- name: Display Nginx test result.
+- name: Display NGINX test result.
   ansible.builtin.debug:
-    msg: "{{ nginx_test_result.stderr }}"
+    msg: "{{ _nginx_test_result.stderr }}"
 
-- name: Fail the playbook if Nginx test fails.
-  ansible.builtin.fail:
-    msg: "Nginx configuration test failed."
-  when: nginx_test_result.rc != 0
-
-- name: Ensure Nginx is restarted.
+- name: Ensure NGINX is restarted.
   ansible.builtin.service:
     name: nginx
     state: restarted
+  when: _nginx_test_result.rc == 0
+
+- name: Restore previous NGINX config from backup if test fails.
+  ansible.builtin.unarchive:
+    src: "{{ nginx.vhost_backup_location }}/nginx_backup.tar.gz"
+    dest: /
+    remote_src: true
+  when: _nginx_test_result.rc != 0
+
+- name: Fail the playbook after restore.
+  ansible.builtin.fail:
+    msg: "NGINX configuration test failed. Previous configuration was restored. You need to check it manually."
+  when: _nginx_test_result.rc != 0

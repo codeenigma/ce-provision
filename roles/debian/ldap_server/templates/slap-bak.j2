@@ -1,11 +1,11 @@
 #!/bin/sh
 BACKUPDIR="{{ ldap_server.config.backup_path }}"
-mkdir -p "$BACKUPDIR"
+/usr/bin/mkdir -p "$BACKUPDIR"
 
 CONFIG_LDAPBK="ldap-config-$( date +%y%m%d-%H%M ).ldif"
-slapcat -n 0 > "$BACKUPDIR/$CONFIG_LDAPBK"
-gzip -9 "$BACKUPDIR/$CONFIG_LDAPBK"
+{{ ldap_server.config.slapcat_path }}/slapcat -n 0 > "$BACKUPDIR/$CONFIG_LDAPBK"
+/usr/bin/gzip -9 "$BACKUPDIR/$CONFIG_LDAPBK"
 
 DATA_LDAPBK="ldap-data-$( date +%y%m%d-%H%M ).ldif"
-slapcat -n 1 > "$BACKUPDIR/$DATA_LDAPBK"
-gzip -9 "$BACKUPDIR/$DATA_LDAPBK"
+{{ ldap_server.config.slapcat_path }}/slapcat -n 1 > "$BACKUPDIR/$DATA_LDAPBK"
+/usr/bin/gzip -9 "$BACKUPDIR/$DATA_LDAPBK"

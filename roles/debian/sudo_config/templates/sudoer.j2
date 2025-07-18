@@ -1,1 +1,1 @@
-{{ sudo_config.entity_name }} {{ sudo_config.hosts }}={{ sudo_config.operators }} {{ sudo_config.tags }} {{ sudo_config.commands }}
+{{ item.entity_name }} {{ item.hosts | default('ALL') }}={{ item.operators | default('ALL') }} {{ item.tags | default('') }} {{ item.commands | default('ALL') }}

@@ -31,7 +31,7 @@ DIRS=(
 for dir in ${DIRS[@]}; do
   echo "Cleaning up $dir..."
   DEST=s3://{{ duplicity.backend_url }}/{{ duplicity.bucketname }}$dir
-   /usr/local/bin/duplicity $cleanup_options $DEST || exit 1
+   {{ _venv_path }}/bin/duplicity $cleanup_options $DEST || exit 1
 done
 
 unset PASSPHRASE

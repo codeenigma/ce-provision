@@ -1,0 +1,138 @@
+import json
+import boto3
+import socket
+import time
+import datetime
+
+# Defining Clients
+backup_cli = boto3.client('backup', region_name="{{ _aws_region }}")
+ses_cli = boto3.client('ses', region_name="{{ _aws_region }}")
+ec2_cli = boto3.client('ec2', region_name="{{ _aws_region }}")
+rds_cli = boto3.client('rds', region_name="{{ _aws_region }}")
+
+mail_title = ""
+mail_body = ""
+
+# Debugger
+#boto3.set_stream_logger('')
+
+def set_mail_body(success_restore, inst, instance_name, ami_id):
+  global mail_body
+  if success_restore:
+    mail_body+=instance_name + " was restored successfully from " + ami_id + ", "
+  else:
+    mail_body+=instance_name + " failed to restore from " + ami_id + ", "
+
+  if inst['ValidationStatus'] == "SUCCESSFUL":
+    mail_body+= "and validation was successful! \n"
+  elif inst['ValidationStatus'] == "FAILED":
+    failed_validation=True
+    mail_body+= "but validation has failed with following message: \n"
+    mail_body+= inst['ValidationStatusMessage']
+  elif inst['ValidationStatus'] == "TIMED_OUT":
+    failed_validation=True
+    mail_body+= "but validation timed out. \n"
+  else:
+    failed_validation=True
+    mail_body+="with unknown validation failure! \n"
+
+def lambda_handler(event, context):
+  instance_name = ""
+  success_restore = False
+  failed_validation = False
+  global mail_body
+  last_restore_valdation_date = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+  completed_jobs=[]
+  failed_jobs=[]
+
+  print("Getting list of successful restoration.")
+  {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
+completed_job = backup_cli.list_restore_jobs(
+    ByCreatedAfter=last_restore_valdation_date,
+    ByStatus='COMPLETED',
+    ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
+  )
+  completed_jobs+=completed_job['RestoreJobs']
+  {% endfor %}
+
+  print("Getting instance details.")
+  for inst in completed_jobs:
+    success_restore = True
+    print("Getting instance arn.")
+    ami_arn = inst['RecoveryPointArn'].split(':')[2]
+
+    if ami_arn == 'ec2':
+      ami_id = inst['RecoveryPointArn'].split('/')[-1]
+      instance_details = ec2_cli.describe_images(
+        ImageIds=[ami_id]
+      )
+      for tag in instance_details['Images'][0]['Tags']:
+        if tag['Key'] == 'Name':
+          instance_name = tag['Value']
+
+    elif ami_arn == 'rds':
+      ami_id = inst['RecoveryPointArn'].split('snapshot:')[-1]
+      instance_details = rds_cli.describe_db_snapshots(
+        DBSnapshotIdentifier=ami_id
+      )
+      print(instance_details)
+      for tag in instance_details['DBSnapshots'][0]['TagList']:
+        if tag['Key'] == 'Name':
+          instance_name = tag['Value']
+
+    else:
+      ami_id = 'Probably EFS'
+      instance_name = 'latest snapshot'
+
+    set_mail_body(success_restore, inst, instance_name, ami_id)
+
+  print(mail_body)
+  print("Getting list of failed restoration.")
+  {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
+failed_job = backup_cli.list_restore_jobs(
+    ByCreatedAfter=last_restore_valdation_date,
+    ByStatus='FAILED',
+    ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
+  )
+  failed_jobs += failed_job['RestoreJobs']
+  {% endfor %}
+
+  if len(failed_jobs) > 0:
+    mail_title = "🔴 Failed!"
+  else:
+    mail_title = "🟢 Success!"
+  print("Successful restore jobs:")
+  print(completed_jobs)
+
+  print("Failed restore jobs:")
+  print(failed_jobs)
+
+  print("Sending email!")
+  response = ses_cli.send_email(
+  Destination={
+    'BccAddresses': [
+    ],
+    'CcAddresses': [],
+    'ToAddresses': [
+      'sysadm@codeenigma.com'
+    ],
+  },
+  Message={
+    'Body': {
+      'Text': {
+        'Charset': 'UTF-8',
+        'Data': mail_body,
+      },
+    },
+    'Subject': {
+      'Charset': 'UTF-8',
+      'Data': 'Restore testing - {{ _aws_profile }}: ' + mail_title,
+    },
+  },
+  Source='Lambda Backup Validation <lambda@codeenigma.uk>',
+  )
+
+  return {
+    'statusCode': 200,
+    'body':  event
+  }

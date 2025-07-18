@@ -1,0 +1,14 @@
+- name: Attach CloudWatch policy.
+  ansible.builtin.set_fact:
+    _policies: "{{ item.policies + ['arn:aws:iam::aws:policy/CloudWatchLogsFullAccess'] }}"
+
+- name: Create a role and attach policies.
+  ansible.builtin.include_role:
+    name: aws/aws_iam_role
+  vars:
+    aws_iam_role:
+      name: "{{ item.resource }}_{{ item.name }}"
+      aws_profile: "{{ _aws_profile }}"
+      managed_policies: "{{ _policies }}"
+      inline_policies: "{{ item.inline_policies | default(omit) }}"
+      policy_document: "{{ lookup('template', 'trust_lambda.j2') }}"

@@ -16,24 +16,24 @@
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
-        name: user_provision
+        name: debian/user_provision
     - ansible.builtin.import_role:
         name: _meta/common_base
     - ansible.builtin.import_role:
-        name: ce_deploy
+        name: debian/ce_deploy
     - ansible.builtin.import_role:
         name: aws/aws_credentials
     - ansible.builtin.import_role:
-        name: gitlab
+        name: debian/gitlab
     - ansible.builtin.import_role:
-        name: gitlab_runner
+        name: debian/gitlab_runner
     - ansible.builtin.import_role:
-        name: ssh_server
+        name: debian/ssh_server
     - ansible.builtin.import_role:
-        name: sops
+        name: debian/sops
     - ansible.builtin.import_role:
-        name: gpg_key
+        name: debian/gpg_key
     - ansible.builtin.import_role:
-        name: firewall_config
+        name: debian/firewall_config
     - ansible.builtin.import_role:
         name: _exit

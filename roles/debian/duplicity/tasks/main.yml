@@ -1,16 +1,64 @@
-- name: Ensure duplicity is installed.
+---
+- name: Ensure system Duplicity is not installed.
   ansible.builtin.apt:
     pkg: duplicity
-    state: present
-  when: ansible_distribution_major_version | int >= 12
+    state: absent
 
-- name: Ensure duplicity is installed.
+- name: Ensure Duplicity is not installed globally with pip or pip3 on older versions of Debian.
   ansible.builtin.pip:
-    name: duplicity
-    executable: pip3
-    state: present
+    name:
+      - duplicity
+    state: absent
+    executable: "{{ item }}"
   when: ansible_distribution_major_version | int < 12
+  with_items:
+    - pip
+    - pip3
+  failed_when: false # don't stop the build if there's no system pip
 
+- name: Install compilation dependencies for duplicity.
+  ansible.builtin.apt:
+    pkg:
+      - gettext
+      - librsync-dev
+      - python3-dev
+
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ duplicity.venv_path }}"
+  when:
+    - duplicity.venv_path is defined
+
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ duplicity.venv_command }}"
+  when:
+    - duplicity.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ duplicity.venv_install_username }}"
+  when:
+    - duplicity.venv_install_username is defined
+
+# Install Python applications.
+- name: Manage required pip packages.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: pip
+          state: latest
+        - name: fasteners
+        - name: duplicity
+
+- name: Install python_boto.
+  ansible.builtin.include_role:
+    name: debian/python_boto
+
+# Install Duplicity scripts.
 - name: Create install dir.
   ansible.builtin.file:
     path: "{{ duplicity.install_dir }}"
@@ -53,7 +101,7 @@
 - name: Copy include-exclude filelist.
   ansible.builtin.template:
     src: include-exclude-filelist.j2
-    dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-filelist"
+    dest: "{{ duplicity.install_dir }}/etc/{{ dir.name }}-include-exclude-filelist"
     owner: root
     group: root
     mode: 0644
@@ -61,6 +109,16 @@
   when: "dir.rules|length"
   loop_control:
     loop_var: dir
+
+- name: Create systemd timer to upgrade Duplicity.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      upgrade_duplicity:
+        timer_command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade duplicity"
+        timer_OnCalendar: "{{ duplicity.upgrade_on_calendar }}"
+  when: duplicity.create_upgrade_timer
 
 # @TODO - cannot currently send failure notifications - see https://github.com/codeenigma/ce-provision/issues/1215
 - name: Create systemd timer for Duplicity backup.
@@ -73,7 +131,7 @@
         timer_OnCalendar: "{{ duplicity.on_calendar }}"
   when: duplicity.create_timer
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:

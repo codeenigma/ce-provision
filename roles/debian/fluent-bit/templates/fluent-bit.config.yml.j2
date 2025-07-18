@@ -1,0 +1,3 @@
+{{ ansible_managed | comment }}
+
+{{ fluent_bit_configuration | to_nice_yaml(indent=2, sort_keys=false) }}

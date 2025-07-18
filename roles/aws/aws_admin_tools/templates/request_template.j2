@@ -1,0 +1,3 @@
+{% for url in item.url_params %}
+method.request.querystring.{{ url }}=true{% if loop.last %}{% else %},{% endif %}
+{% endfor %}

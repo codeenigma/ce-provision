@@ -9,7 +9,7 @@ aws_acm:
   #    zone: example.com
   #    aws_profile: us-east-1
   validate: true # you need to set this to false if the validation zone is not in Route 53 or you do not have CLI access
-  export: true
+  export: false
   route_53:
     aws_profile: "{{ _aws_profile }}" # the zone might not be in the same account as the certificate
     zone: example.com

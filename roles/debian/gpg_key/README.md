@@ -8,11 +8,12 @@ Generates a passwordless GPG key for a given user or users.
 ```yaml
 ---
 gpg_key_servers:
-  - hkps://pgp.mit.edu
-  - hkps://keys.openpgp.org
+  - hkps://keyserver.ubuntu.com
+  #- hkps://keys.openpgp.org  # removed key servers from defaults due to reliability issues
+  #- hkps://pgp.mit.edu
 gpg_key:
-  - username: example # Must exist already on the server.
-    publish: false # Whether to publish to HKS public servers.
+  - username: example  # Must exist already on the server
+    publish: false     # Whether to publish to HKS public servers
     key_type: "RSA"
     key_length: 4096
     email: example@example.com

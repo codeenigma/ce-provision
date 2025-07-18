@@ -1,0 +1,4 @@
+---
+system:
+  noipv6: false
+  nohetznerdhcp: false

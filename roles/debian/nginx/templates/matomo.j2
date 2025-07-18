@@ -1,7 +1,8 @@
 ### {{ ansible_managed }}
 
 add_header Referrer-Policy origin always;
-add_header X-Content-Type-Options "nosniff" always;
+# Disable content sniffing, since it's an attack vector.
+add_header X-Content-Type-Options nosniff;
 add_header X-XSS-Protection "1; mode=block" always;
 
 # Generic rewrite rule.
@@ -25,7 +26,7 @@ location / {
 #    @todo
 #    limit_req zone=bots burst=5 nodelay;
     {% endif %}
-    
+
     index index.php;
     try_files @rewrite /index.php;
 }

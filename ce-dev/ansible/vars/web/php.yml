@@ -1,3 +1,6 @@
 php:
   version:
     - 8.1
+  # GitHub Actions doesn't make ansible_facts for CPU info available
+  fpm:
+    max_children: 5

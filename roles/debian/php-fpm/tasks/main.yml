@@ -37,7 +37,7 @@
   ansible.builtin.include_role:
     name: debian/php_xdebug
 
-- name: Trigger overrides
+- name: Trigger overrides.
   ansible.builtin.include_role:
     name: _overrides
   vars:
@@ -51,5 +51,31 @@
     name: "php{{ version }}-fpm"
     state: restarted
   with_items: "{{ php.version }}"
+  loop_control:
+    loop_var: version
+
+- name: Check if we have an AWS Cloudwatch folder.
+  ansible.builtin.stat:
+    path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d
+  register: _php_cloudwatch_dir
+
+- name: Generate AWS Cloudwatch config for a single, fixed port PHP version.
+  ansible.builtin.template:
+    src: cloudwatch-php-fpm-fixedport.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/php-fpm.json
+    force: true
+  when:
+    - _php_cloudwatch_dir.stat.isdir is defined and _php_cloudwatch_dir.stat.isdir
+    - php.fpm.tcp_port | length > 0
+
+- name: Generate AWS Cloudwatch config for dynamic PHP versioning.
+  ansible.builtin.template:
+    src: cloudwatch-php-fpm.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/php-fpm.json
+    force: true
+  with_items: "{{ php.version }}"
+  when:
+    - _php_cloudwatch_dir.stat.isdir is defined and _php_cloudwatch_dir.stat.isdir
+    - php.fpm.tcp_port | length == 0
   loop_control:
     loop_var: version

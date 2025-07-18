@@ -3,9 +3,15 @@
     name: "{{ security_group.name }}"
     profile: "{{ aws_vpc.aws_profile }}"
     region: "{{ aws_vpc.region }}"
-    tags: "{{ aws_vpc.tags | combine({ 'Name': security_group.name }) }}"
+    tags: "{{ aws_vpc.tags | combine({'Name': security_group.name}) }}"
     state: "{{ aws_vpc.state }}"
     vpc_id: "{{ _aws_vpc_vpc.vpc.id }}"
-    description: "{{ security_group.description }}"
+    description: "{{ security_group.description | default('') }}"
     rules: "{{ security_group.rules | default(omit) }}"
     rules_egress: "{{ security_group.rules_egress | default(omit) }}"
+    purge_rules: "{{ aws_vpc.purge_rules | default(omit) }}"
+  register: _aws_vpc_result
+
+- name: Register aws_vpc SG results.
+  ansible.builtin.set_fact:
+    aws_vpc: "{{ aws_vpc | combine({'_result': {aws_vpc.name: _aws_vpc_result}}, recursive=True) }}"
