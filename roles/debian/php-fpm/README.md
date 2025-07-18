@@ -2,6 +2,8 @@
 
 Installs and configures the PHP-FPM flavour of FastCGI.
 
+Note, for legacy reasons this role sets up PHP-FPM to use TCP/IP instead of a Unix socket by default. However, we *recommend* you change this by setting `unix_socket: true` unless you really need to run PHP-FPM over TCP/IP, as a Unix socket is much faster. If you do, be sure to set the `pool_group` variable to match your web server user, or the web server will be unable to interact with PHP.
+
 <!--TOC-->
 <!--ENDTOC-->
 
@@ -23,7 +25,7 @@ php:
     # It is important to scale up processes on bigger servers, so that more
     # requests can be handled. Double the number of vCPUs is a good default.
     # Can be between 5 and 64.
-    max_children: "{{ [5, [(ansible_facts.ansible_processor_nproc | default(1)) * 2, 64] | min] | max }}" # Fallback in case ansible_processor_nproc is not gathered before tasks
+    max_children: "{{ [10, [(ansible_facts.ansible_processor_nproc | default(1)) * 2, 64] | min] | max }}" # Fallback in case ansible_processor_nproc is not gathered before tasks
     start_servers: 2
     min_spare_servers: 1
     max_spare_servers: 3
