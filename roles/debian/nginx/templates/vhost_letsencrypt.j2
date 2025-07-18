@@ -7,6 +7,7 @@ server {
     listen 80;
     {% endif %}
     server_name {{ domain.server_name }};
+    root /tmp;
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
     access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
     # Proxy for certbot (LetsEncrypt)
