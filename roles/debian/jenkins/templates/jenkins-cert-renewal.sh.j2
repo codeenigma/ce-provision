@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mv /var/lib/jenkins/{{ jenkins.server_name }}.jks /var/lib/jenkins/{{ jenkins.server_name }}.jks.bak
-openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ _ssl_paths[jenkins.server_name].key }} -in {{ _ssl_paths[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}
+openssl pkcs12 -export -out /dev/shm/jenkins_keystore.p12 -passout 'pass:{{ jenkins.keystore_pass }}' -inkey {{ ssl_facts[jenkins.server_name].key }} -in {{ ssl_facts[jenkins.server_name].certificate }} -name {{ jenkins.server_name }}
 keytool -importkeystore -srckeystore /dev/shm/jenkins_keystore.p12 -srcstorepass '{{ jenkins.keystore_pass }}' -srcstoretype PKCS12 -srcalias {{ jenkins.server_name }} -deststoretype JKS -destkeystore /var/lib/jenkins/{{ jenkins.server_name }}.jks -deststorepass '{{ jenkins.keystore_pass }}' -destalias {{ jenkins.server_name }}
 chown -R "{{ jenkins.user }}":"{{ jenkins.user }}" /var/lib/jenkins
 chown -R "{{ jenkins.user }}":"{{ jenkins.user }}" /var/cache/jenkins

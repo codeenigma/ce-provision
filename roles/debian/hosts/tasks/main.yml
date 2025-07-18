@@ -3,7 +3,7 @@
   ansible.builtin.set_fact:
     _hosts_entries: "{{ hosts_entries + _default_hosts_entries }}"
 
-- name: Install custom hosts file
+- name: Install custom hosts file.
   ansible.builtin.template:
     src: etc_hosts.j2
     dest: "{{ hosts_file }}"
@@ -23,14 +23,10 @@
     path: "{{ cloud_init_file.stat.path }}"
     regexp: "manage_etc_hosts: true"
     line: "manage_etc_hosts: false"
-  when:
-    - cloud_init_file.stat.exists
+  when: cloud_init_file.stat.exists
 
 - name: Set system hostname.
-  ansible.builtin.template:
-    src: hostname.j2
-    dest: /etc/hostname
-    owner: root
-    group: root
-    mode: 0644
+  ansible.builtin.hostname:
+    name: "{{ hosts_hostname }}"
+    use: systemd
   when: hosts_hostname | length > 0

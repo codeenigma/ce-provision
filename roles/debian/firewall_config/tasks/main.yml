@@ -96,6 +96,11 @@
     state: absent
   when: firewall_config.purge
 
+- name: Touch firewall.bash to ensure it exists and avoid a crash.
+  ansible.builtin.file:
+    path: /etc/firewall.bash
+    state: touch
+
 - name: Apply firewall rules.
   ansible.builtin.import_role:
     name: geerlingguy.firewall

@@ -1,0 +1,27 @@
+import json
+import boto3
+
+def lambda_handler(event, context):
+    ec2 = boto3.client("ec2", "{{ _aws_region }}")
+
+    images = ec2.describe_images(
+        Filters=[
+            {
+                'Name': 'tag:Name',
+                'Values': [
+                    event['asg_name'] + '*'
+                ]
+            }
+        ]
+    )
+
+    # Order AMIs by CreationDate
+    ordered_images = sorted(images['Images'], key=lambda d: d['CreationDate'])
+
+    # Remove latest 10 AMIs from list
+    ordered_images = ordered_images[:len(ordered_images)-{{ aws_ami_asg_cleanup.keep_backups }}]
+
+    for x in ordered_images:
+        ec2.deregister_image(ImageId=x['ImageId'])
+
+    print(len(ordered_images))

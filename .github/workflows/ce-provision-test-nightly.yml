@@ -1,0 +1,43 @@
+name: Run night test builds
+
+# Run this workflow nightly
+on:
+  schedule:
+    - cron: '30 4 * * *'
+
+jobs:
+  # Set the job key. The key is displayed as the job name
+  # when a job name is not provided
+  test-nightly:
+    # Name the Job
+    name: Build server with ce-provision
+    # Set the type of machine to run on
+    runs-on: ubuntu-latest
+
+    # Use our ce-dev Debian base container
+    container:
+      image: codeenigma/ce-dev:2.x
+      volumes:
+        - ${{ github.workspace }}:/home/controller
+
+    steps:
+      - name: Install ce-provision
+        run: |
+          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/2.x/install.sh
+          /usr/bin/chmod +x ./install.sh
+          /usr/bin/sudo ./install.sh --docker --no-firewall
+
+      # Run a web server provision
+      - name: Prepare Git repos on disk
+        run: |
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
+          /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
+
+      - name: Start SSHD
+        run: /usr/sbin/sshd&
+
+      - name: Provision a test web server
+        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch 2.x --config-branch 2.x --force"
+
+      - name: Provision a test GitLab server
+        run: /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch 2.x --config-branch 2.x --force"

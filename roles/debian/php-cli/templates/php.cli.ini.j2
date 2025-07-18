@@ -1526,7 +1526,7 @@ url_rewriter.tags = "a=href,area=href,frame=src,input=src,form=fakeentry"
 ; Development Value: 1
 ; Production Value: -1
 ; http://php.net/zend.assertions
-zend.assertions = -1
+zend.assertions = {{ php.cli.zend_assertions }}
 
 ; Assert(expr); active by default.
 ; http://php.net/assert.active
@@ -1739,7 +1739,7 @@ opcache.enable_cli={{ php.cli.opcache.enable_cli }}
 opcache.memory_consumption={{ php.cli.opcache.memory_consumption }}
 
 ; The amount of memory for interned strings in Mbytes.
-;opcache.interned_strings_buffer=4
+opcache.interned_strings_buffer={{ php.cli.opcache.interned_strings_buffer }}
 
 ; The maximum number of keys (scripts) in the OPcache hash table.
 ; Only numbers between 200 and 100000 are allowed.

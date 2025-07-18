@@ -1,10 +1,11 @@
 # SSL
-Manages SSL certificates.
+Manages SSL certificates on servers. See the `aws/aws_acm` role for SSL handling in AWS services.
 
 <!--TOC-->
 <!--ENDTOC-->
 
-If you are using LetsEncrypt for handling it assume `standalone` mode. If you want to do DNS validation, please do not use this role at this time. There are a few pre-requisites for `standalone` mode to work:
+## LetsEncrypt
+If you are using LetsEncrypt for handling it assumes `standalone` mode. If you want to do DNS validation, please do not use this role at this time. There are a few pre-requisites for `standalone` mode to work:
 
 * You must have firewalls open to allow traffic to ports 80 and/or 443, regardless of your configuration
 * LetsEncrypt's certbot application will try to use port 80, if this will not be possible you can either:
@@ -35,11 +36,18 @@ nginx:
         autorenew: true
         email: administrator@example.com
         services: []
-        certbot_register_command: "/usr/bin/certbot certonly --standalone --agree-tos --preferred-challenges http -n"
-        certbot_renew_command: "/usr/bin/certbot certonly --standalone --agree-tos --force-renew"
+        web_server: standalone
+        certbot_register_command: "certonly --standalone --agree-tos --preferred-challenges http -n"
+        certbot_renew_command: "certonly --standalone --agree-tos --force-renew"
+        reload_command: reload
+        reload:
+          - nginx
 ```
+Variable "on_calendar" is no longer in use since we have 1 general cron to renew all domains
 
-You need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
+"web_server" can be standalone and webroot, differnce is that webroot wont start webserver to validate SSL, while standalone requires port on which webserver will be running in order to validate cert so we need the "http_01_port" for standalone option
+
+As in the example above, you need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.
 
 If you are using Nginx or Apache you can set the `ssl.web_server` for each domain to either `nginx` or `apache` to have the necessary plugin installed for `certbot` to do automatic handling of LetsEncrypt requests. Be aware, it does this by temporarily altering your web server config and reloading - use this option at your own risk. This is *not* intended to be used with but *instead of* `ssl.http_01_port`.
 
@@ -72,17 +80,21 @@ ssl:
     79RG06iurGJEorFopyQesKwix1h6aBYXpM8yZ0IPR0leeeipBtYHIwbPHEYRJiFn
     6XoQQlb5mYuLKCzAZws9uceeVH+z
     -----END PRIVATE KEY-----
+  # Set this to true to have Ansible replace the existing certificate.
+  replace_existing: false
 
   # For "letsencrypt" handling.
   email: admin@example.com
-  certbot_register_command: "/usr/bin/certbot certonly --agree-tos --preferred-challenges http -n" # root of the command to register a new cert
+  certbot_register_command: "certonly --agree-tos --preferred-challenges http -n" # root of the command to register a new cert
   http_01_port: 80 # you can set a non-standard port to listen on, but certbot still needs port 80 - see https://letsencrypt.org/docs/challenge-types/#http-01-challenge
   # For "letsencrypt" auto renewal
   autorenew: false # set to true to create a systemd timer to renew LE certs
-  certbot_renew_command: "/usr/bin/certbot certonly --agree-tos --force-renew" # root of the command used in the systemd timer
+  certbot_renew_command: "certonly --agree-tos --force-renew" # root of the command used in the systemd timer
   # See systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
-  #on_calendar: "Mon *-*-* 04:00:00"
-  web_server: standalone # values are standalone, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
+  on_calendar: "Mon *-*-* 04:00:00"
+  web_server: standalone
+  # values are standalone, webroot, nginx or apache - warning, nginx and apache will attempt to manipulate your vhosts!
+  # webroot unlike standalone, won't start webserver with certain port
 
   # For "letsencrypt" handling, a list of service to stop while creating the certificate.
   # This is because we need port 80 to be free.
@@ -94,6 +106,12 @@ ssl:
   # List of services to reload:
   reload: []
   reload_command: restart # use 'reload' if you do not want to restart, but in most cases a full restart is required to load a new cert.
+  # Location of Certbot installation and components for LetsEncrypt.
+  # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
+  #letsencrypt:
+  #  venv_path: "/home/{{ user_provision.username }}/certbot"
+  #  venv_command: /usr/bin/python3 -m venv
+  #  venv_install_username: "{{ user_provision.username }}"
 
 ############ Facts
 # ssl_facts

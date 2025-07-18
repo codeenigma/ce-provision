@@ -1,12 +1,19 @@
 ### {{ ansible_managed }}
 
 server {
+    {% if nginx.vhost_letsencrypt_port is defined %}
+    listen {{ nginx.vhost_letsencrypt_port }};
+    {% else %}
     listen 80;
+    {% endif %}
     server_name {{ domain.server_name }};
+    root /tmp;
     error_log {{ domain.error_log }} {{ domain.error_log_level }};
     access_log {{ domain.access_log }} {{ domain.access_log_format | default('main') }};
     # Proxy for certbot (LetsEncrypt)
-    location /.well-known/acme-challenge/ {
-        proxy_pass http://127.0.0.1:{{ domain.ssl.http_01_port }}$request_uri;
-    }
+    {% if domain.ssl.web_server | default('standalone') == 'standalone' %}
+        location /.well-known/acme-challenge/ {
+            proxy_pass http://127.0.0.1:{{ domain.ssl.http_01_port }}$request_uri;
+        }
+    {% endif %}
 }

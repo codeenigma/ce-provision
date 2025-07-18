@@ -13,5 +13,5 @@
 
 - name: Add route to the list.
   ansible.builtin.set_fact:
-    _aws_vpc_route_routes: "{{ _aws_vpc_route_routes | combine( { _aws_vpc_route_route.dest:  _aws_vpc_route_route } ) }}"
+    _aws_vpc_route_routes: "{{ _aws_vpc_route_routes | combine({_aws_vpc_route_route.dest: _aws_vpc_route_route}) }}"
   when: ( route.gateway_id is undefined or route.gateway_id != 'local' )

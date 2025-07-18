@@ -10,7 +10,12 @@ Supports standalone managers, scaled out services and agent installation (defaul
 ## Default variables
 ```yaml
 ---
+wazuh_agent_sources_installation:
+  enabled: true
 wazuh:
+  path: wazuh
+  #roles_directory: "/path/to/roles" # defaults to /home/controller/.ansible/roles/wazuh-ansible
+  branch: "v4.7.2" # wazuh-ansible git branch to checkout - not to be confused with wazuh_version!
   # Agent variables, installed locally by default
   # Role defaults - https://github.com/wazuh/wazuh-ansible/blob/master/roles/wazuh/ansible-wazuh-agent/defaults/main.yml
   agent:
@@ -37,7 +42,7 @@ wazuh:
   indexer:
     install: false # install the indexer packages
     single_node: true
-    domain_name: "{{ _domain_name }}"
+    domain_name: indexer.example.com # possible to use "{{ _domain_name }}" in local variables, but not defaults
     indexer_cluster_name: wazuh
     indexer_node_name: node-1 # this server name
     indexer_network_host: 127.0.0.1
@@ -85,12 +90,31 @@ wazuh:
     wazuh_manager_mailto:
       - admin@example.net
     wazuh_manager_email_smtp_server: localhost
+    wazuh_manager_email_notification: "no"
     wazuh_manager_email_from: wazuh@example.net
     wazuh_manager_email_maxperhour: 12
     wazuh_manager_email_queue_size: 131072
     wazuh_manager_email_log_source: alerts.log
     wazuh_manager_log_level: 3
     wazuh_manager_email_level: 12
+    wazuh_manager_config:
+      decoder_dir: "ruleset/decoders"
+      rule_dir: "ruleset/rules"
+      active_responses:
+        - command: "firewall-drop"
+          location: "all"
+          rules_id: "31151,5712,104130,101071,101132,101238,101251,103011"
+          repeated_offenders: "30,60,120"
+          timeout: 600
+        - command: "firewall-drop"
+          location: "all"
+          rules_id: "100205"
+          repeated_offenders: "30,60,120"
+          timeout: 3600
+      authd:
+        enabled: false
+    wazuh_manager_globals:
+      - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above
     wazuh_manager_extra_emails: [] # list of additional emails to send, e.g.
       #- enable: true
@@ -117,29 +141,29 @@ wazuh:
     wazuh_manager_api:
       bind_addr: 0.0.0.0
       port: 55000
-      behind_proxy_server: no
-      https: yes
+      behind_proxy_server: "no"
+      https: "yes"
       https_key: "api/configuration/ssl/server.key"
       https_cert: "api/configuration/ssl/server.crt"
-      https_use_ca: False
+      https_use_ca: false
       https_ca: "api/configuration/ssl/ca.crt"
       logging_level: "info"
       logging_path: "logs/api.log"
-      cors: no
+      cors: "no"
       cors_source_route: "*"
       cors_expose_headers: "*"
       cors_allow_headers: "*"
-      cors_allow_credentials: no
-      cache: yes
+      cors_allow_credentials: "no"
+      cache: "yes"
       cache_time: 0.750
       access_max_login_attempts: 5
       access_block_time: 300
       access_max_request_per_minute: 300
-      drop_privileges: yes
-      experimental_features: no
-      remote_commands_localfile: yes
+      drop_privileges: "yes"
+      experimental_features: "no"
+      remote_commands_localfile: "yes"
       remote_commands_localfile_exceptions: []
-      remote_commands_wodle: yes
+      remote_commands_wodle: "yes"
       remote_commands_wodle_exceptions: []
       #wazuh_api_users:
       #  - username: custom-user
@@ -151,7 +175,7 @@ wazuh:
     dashboard_node_name: node-1
     dashboard_server_host: "0.0.0.0"
     dashboard_server_port: "443" # if you want to use provided SSL certificates install a web server and proxy to Wazuh
-    dashboard_server_name: "{{ _domain_name }}"
+    dashboard_server_name: dashboard.example.com # possible to use "{{ _domain_name }}" in local variables, but not defaults
     dashboard_conf_path: "/etc/wazuh-dashboard/"
     wazuh_api_credentials:
       - id: "default"
@@ -162,6 +186,7 @@ wazuh:
     dashboard_security: true
     dashboard_user: kibanaserver
     dashboard_password: changeme
+
 ```
 
 <!--ENDROLEVARS-->

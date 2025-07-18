@@ -4,58 +4,96 @@
     pkg: ansible
     state: absent
 
-- name: Ensure Ansible is not installed globally with pip3 on older versions of Debian.
+- name: Ensure Ansible is not installed globally with pip or pip3 on older versions of Debian.
   ansible.builtin.pip:
-    name: ansible
+    name:
+      - ansible
+      - ansible-core
     state: absent
-    executable: pip3
+    executable: "{{ item }}"
   when: ansible_distribution_major_version | int < 12
+  with_items:
+    - pip
+    - pip3
+  failed_when: false # don't stop the build if there's no system pip
+
+# Optionally set Python venv variables.
+- name: Override Python venv path if provided.
+  ansible.builtin.set_fact:
+    _venv_path: "{{ ce_ansible.venv_path }}"
+  when:
+    - ce_ansible.venv_path is defined
+
+- name: Override Python venv command if provided.
+  ansible.builtin.set_fact:
+    _venv_command: "{{ ce_ansible.venv_command }}"
+  when:
+    - ce_ansible.venv_command is defined
+
+- name: Override Python user if provided.
+  ansible.builtin.set_fact:
+    _venv_install_username: "{{ ce_ansible.venv_install_username }}"
+  when:
+    - ce_ansible.venv_install_username is defined
 
 - name: Set up Python packages.
   ansible.builtin.include_role:
     name: debian/python_common
+  vars:
+    python_common:
+      cleanup: true
+      remove_packages:
+        - python-pip
+        - python3-yaml # linters need a newer version of PyYAML than the one that ships with Debian
+        - python-botocore
+        - python-urllib3
+      install_packages:
+        - python3-distutils
+        - python3-venv
+        - cloud-init # package can get removed with python3-yaml but we need it for auto-scale
 
-- name: Ensure pip is at latest version.
-  ansible.builtin.pip:
-    name:
-      - pip
-    state: latest
-    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
-
-- name: Install Ansible.
-  ansible.builtin.pip:
-    name:
-      - ansible
-    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
-  become: true
-  become_user: "{{ ce_provision.username }}"
+- name: Install pip, python-debian and Ansible.
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: pip
+          state: latest
+        - name: ansible
+        - name: python-debian
 
 - name: Install linters.
-  ansible.builtin.pip:
-    name:
-      - ansible-lint
-      - yamllint
-    virtualenv: "{{ ce_ansible.venv_path | default(_venv_path) }}"
-    virtualenv_command: "{{ ce_ansible.venv_command | default(_venv_command) }}"
+  ansible.builtin.include_role:
+    name: debian/python_pip_packages
+  vars:
+    python_pip_packages:
+      packages:
+        - name: ansible-lint
+        - name: yamllint
   when: ce_ansible.linters.enabled
-  become: true
-  become_user: "{{ ce_provision.username }}"
 
 - name: Add the venv to $PATH using profile.d.
   ansible.builtin.copy:
     content: "export PATH=$PATH:{{ ce_ansible.venv_path | default(_venv_path) }}/bin"
     dest: "/etc/profile.d/ansible-path.sh"
+    mode: '0644'
 
-- name: Create systemd timer to upgrade Ansible.
-  ansible.builtin.include_role:
-    name: contrib/systemd_timers
-  vars:
-    timers:
-      upgrade_ansible:
-        timer_command: "{{ ce_ansible.upgrade.command }}"
-        timer_OnCalendar: "{{ ce_ansible.upgrade.on_calendar }}"
-  when: ce_ansible.upgrade.enabled
+- name: Install systemd timer.
+  when:
+    - ce_ansible.upgrade.enabled
+    - not is_local
+  block:
+    - name: Build systemd timer variables string.
+      ansible.builtin.set_fact:
+        _timer: "{'{{ ce_ansible.upgrade.timer_name | default(_ce_ansible_timer_name) }}': { timer_command: '{{ ce_ansible.upgrade.command }}', timer_OnCalendar: '{{ ce_ansible.upgrade.on_calendar }}' }}"
+
+    - name: Turn the timer string into a dictionary.
+      ansible.builtin.set_fact:
+        _timer: "{{ _timer.splitlines() | map('from_yaml') | list }}"
+
+    - name: Create systemd timer to upgrade Ansible.
+      ansible.builtin.include_role:
+        name: contrib/systemd_timers
+      vars:
+        timers: "{{ _timer }}"

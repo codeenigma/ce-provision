@@ -1,4 +1,10 @@
 ---
+- name: Install rsyslog with apt.
+  ansible.builtin.apt:
+    name: rsyslog
+    state: present
+    update_cache: true
+
 - name: Copy rsyslog configuration in place.
   ansible.builtin.template:
     src: "rsyslog.{{ rsyslog.role }}.conf.j2"
@@ -8,7 +14,15 @@
     mode: "0644"
     force: true
 
-- name: Restart service.
-  ansible.builtin.service:
-    name: rsyslog
-    state: restarted
+- name: Restart rsyslog based on environment.
+  block:
+    - name: Restart rsyslog in a container (if is_local is true).
+      ansible.builtin.shell: |
+        pkill -HUP rsyslogd || true
+      when: is_local
+
+    - name: Restart rsyslog using systemd (if is_local is false).
+      ansible.builtin.systemd_service:
+        name: rsyslog.service
+        state: restarted
+      when: is_local is not defined or not is_local

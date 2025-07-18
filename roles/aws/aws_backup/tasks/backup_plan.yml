@@ -41,6 +41,12 @@
   register: _backup_plan_created_info
   when: _backup_plan_created is defined
 
+- name: Create restore testing plan.
+  ansible.builtin.include_role:
+    name: aws/aws_backup_validation
+    tasks_from: restore_testing_plan
+  when: _env_type != "dev"
+
 - name: Tidy up and remove the yaml input file.
   ansible.builtin.file:
     path: "/tmp/aws_backup/{{ _infra_name }}/{{ plan.name }}-backup-yaml-input.yml"

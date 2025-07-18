@@ -1,8 +1,17 @@
 ---
-# Assumes you have run the ce_provision role on your controller and it has already installed the Wazuh roles.
+- name: Load elastic-stack variables.
+  ansible.builtin.include_vars:
+    file: "/home/{{ user_provision.username }}/ce-provision/roles/contrib/{{ wazuh.path }}/roles/elastic-stack/ansible-kibana/defaults/main.yml"
+
+- name: Load opendistro variables.
+  ansible.builtin.include_vars:
+    file: "/home/{{ user_provision.username }}/ce-provision/roles/contrib/{{ wazuh.path }}/roles/opendistro/opendistro-kibana/defaults/main.yml"
+
 - name: Generate certificates.
   ansible.builtin.import_role:
-    name: contrib/wazuh/wazuh-indexer
+    name: "contrib/{{ wazuh.path }}/roles/wazuh/wazuh-indexer"
+  become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: localhost
   vars:
     indexer_node_master: "{{ wazuh.indexer.indexer_node_master }}"
@@ -13,7 +22,7 @@
 
 - name: Install Wazuh indexer.
   ansible.builtin.import_role:
-    name: contrib/wazuh/wazuh-indexer
+    name: "contrib/{{ wazuh.path }}/roles/wazuh/wazuh-indexer"
   vars:
     single_node: "{{ wazuh.indexer.single_node }}"
     domain_name: "{{ wazuh.indexer.domain_name }}"
@@ -41,37 +50,43 @@
 
 - name: Install Wazuh Manager.
   ansible.builtin.import_role:
-    name: contrib/wazuh/ansible-wazuh-manager
+    name: "contrib/{{ wazuh.path }}/roles/wazuh/ansible-wazuh-manager"
   vars:
     wazuh_manager_mailto: "{{ wazuh.manager.wazuh_manager_mailto }}"
     wazuh_manager_email_smtp_server: "{{ wazuh.manager.wazuh_manager_email_smtp_server }}"
     wazuh_manager_email_from: "{{ wazuh.manager.wazuh_manager_email_from }}"
+    wazuh_manager_email_notification: "{{ wazuh.manager.wazuh_manager_email_notification }}"
     wazuh_manager_email_maxperhour: "{{ wazuh.manager.wazuh_manager_email_maxperhour }}"
     wazuh_manager_email_queue_size: "{{ wazuh.manager.wazuh_manager_email_queue_size }}"
     wazuh_manager_email_log_source: "{{ wazuh.manager.wazuh_manager_email_log_source }}"
     wazuh_manager_log_level: "{{ wazuh.manager.wazuh_manager_log_level }}"
+    wazuh_manager_globals: "{{ wazuh.manager.wazuh_manager_globals }}"
+    wazuh_manager_config:
+      active_responses: "{{ wazuh.manager.wazuh_manager_config.active_responses }}"
+      authd: "{{ wazuh.manager.wazuh_manager_config.authd }}"
     wazuh_manager_email_level: "{{ wazuh.manager.wazuh_manager_email_level }}"
     wazuh_manager_extra_emails: "{{ wazuh.manager.wazuh_manager_extra_emails }}"
     wazuh_manager_reports: "{{ wazuh.manager.wazuh_manager_reports }}"
     wazuh_manager_api: "{{ wazuh.manager.wazuh_manager_api }}"
+    agent_groups: "{{ wazuh.manager.agent_groups }}"
   when: wazuh.manager.install
 
 - name: Install Filebeat.
   ansible.builtin.import_role:
-    name: contrib/wazuh/ansible-filebeat-oss
+    name: "contrib/{{ wazuh.path }}/roles/wazuh/ansible-filebeat-oss"
   vars:
     filebeat_version: "{{ wazuh.filebeat.filebeat_version }}"
     filebeat_node_name: "{{ wazuh.filebeat.filebeat_node_name }}"
     filebeat_output_indexer_hosts: "{{ wazuh.filebeat.filebeat_output_indexer_hosts }}"
     filebeat_module_package_url: "{{ wazuh.filebeat.filebeat_module_package_url }}"
     filebeat_module_package_name: "{{ wazuh.filebeat.filebeat_module_package_name }}"
-    indexer_security_user: "{{ wazuh.indexer.indexer_custom_user | default('admin') }}"
+    indexer_security_user: "{{ wazuh.filebeat.indexer_security_user | default('admin') }}"
     indexer_security_password: "{{ wazuh.indexer.indexer_admin_password }}"
   when: wazuh.filebeat.install
 
 - name: Install Wazuh dashboard.
   ansible.builtin.import_role:
-    name: contrib/wazuh/wazuh-dashboard
+    name: "contrib/{{ wazuh.path }}/roles/wazuh/wazuh-dashboard"
   vars:
     dashboard_node_name: "{{ wazuh.dashboard.dashboard_node_name }}"
     dashboard_server_host: "{{ wazuh.dashboard.dashboard_server_host }}"
@@ -81,6 +96,7 @@
     dashboard_security: "{{ wazuh.dashboard.dashboard_security }}"
     dashboard_user: "{{ wazuh.dashboard.dashboard_user }}"
     dashboard_password: "{{ wazuh.dashboard.dashboard_password }}"
+    indexer_admin_password: "{{ wazuh.indexer.indexer_admin_password }}"
     indexer_http_port: "{{ wazuh.indexer.indexer_http_port }}"
     indexer_api_protocol: "{{ wazuh.indexer.indexer_api_protocol }}"
     ansible_shell_allow_world_readable_temp: true
@@ -88,7 +104,7 @@
 
 - name: Install Wazuh agent.
   ansible.builtin.import_role:
-    name: contrib/wazuh/ansible-wazuh-agent
+    name: "contrib/{{ wazuh.path }}/roles/wazuh/ansible-wazuh-agent"
   vars:
     wazuh_managers: "{{ wazuh.agent.managers }}"
     wazuh_agent_enrollment:
@@ -97,5 +113,61 @@
       groups: "{{ wazuh.agent.wazuh_agent_enrollment.groups }}"
       agent_address: "{{ wazuh.agent.wazuh_agent_enrollment.agent_address }}"
       ssl_ciphers: "{{ wazuh.agent.wazuh_agent_enrollment.ssl_ciphers }}"
+      wazuh_custom_packages_installation_agent_enabled: false
     ansible_shell_allow_world_readable_temp: true
-  when: wazuh.agent.install
+  when: wazuh.agent.install and not wazuh_agent_sources_installation.enabled
+
+- name: Check if Filebeat service exists.
+  ansible.builtin.command:
+    cmd: systemctl list-units --type=service --state=running
+  register: _service_list
+  changed_when: false
+
+- name: Set fact if Filebeat is found & present.
+  ansible.builtin.set_fact:
+    filebeat_exists: "{{ _service_list.stdout is search('filebeat.service') }}"
+
+- name: Restart filebeat at the end. # If we do not, filebeat keeps using old certs and breaks connection with elasticsearch & dashboard stops showing data.
+  ansible.builtin.systemd_service:
+    name: filebeat
+    state: restarted
+  when: filebeat_exists
+
+- name: Check if wazuh-manager service exists
+  ansible.builtin.command: systemctl list-unit-files --type=service --no-pager
+  register: wazuh_service
+  ignore_errors: true
+  changed_when: false
+
+- name: Deploy custom Wazuh local rules
+  ansible.builtin.copy:
+    src: custom_wazuh_rules.xml
+    dest: "{{ wazuh_dir | default('/var/ossec') }}/etc/rules/custom_wazuh_rules.xml"
+    owner: wazuh
+    group: wazuh
+    mode: '0640'
+  notify: restart wazuh-manager
+  tags:
+    - rules
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
+
+- name: Write the password to /var/ossec/etc/authd.pass
+  ansible.builtin.copy:
+    dest: /var/ossec/etc/authd.pass
+    content: "{{ _wazuh_authd }}"
+    mode: '0640'
+    owner: root
+    group: wazuh
+  when: "'wazuh-manager.service' in wazuh_service.stdout or 'wazuh-agent.service' in wazuh_service.stdout"
+
+- name: Restart wazuh-manager to apply changes
+  ansible.builtin.systemd_service:
+    name: wazuh-manager
+    state: restarted
+  when: "'wazuh-manager.service' in wazuh_service.stdout"
+
+- name: Restart wazuh-agent to apply changes
+  ansible.builtin.systemd_service:
+    name: wazuh-agent
+    state: restarted
+  when: "'wazuh-agent.service' in wazuh_service.stdout"

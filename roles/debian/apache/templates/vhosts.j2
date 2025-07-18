@@ -17,10 +17,26 @@ Include "/etc/apache2/conf-available/{{ domain.project_type }}.conf"
   <Directory "{{ domain.webroot }}">
     Options FollowSymLinks
 
-    {% if domain.basic_auth.auth_enabled is defined and domain.basic_auth.auth_enabled %}
+    {% if 
+        domain.basic_auth.auth_enabled is defined and
+        domain.basic_auth.auth_enabled and
+        domain.basic_auth.auth_user is defined and
+        domain.basic_auth.auth_user | length > 0
+    %}
     AuthType Basic
     AuthName "{{ domain.basic_auth.auth_message | default('Restricted content') }}"
     AuthUserFile /etc/apache2/passwords/{{ domain.server_name }}.htpasswd
+    Require valid-user
+    {% endif %}
+    {% if 
+        domain.basic_auth.auth_enabled is defined and
+        domain.basic_auth.auth_enabled and
+        domain.basic_auth.auth_file is defined and
+        domain.basic_auth.auth_file | length > 0
+    %}
+    AuthType Basic
+    AuthName "{{ domain.basic_auth.auth_message | default('Restricted content') }}"
+    AuthUserFile /etc/apache2/passwords/{{ domain.server_name }}.provided.htpasswd
     Require valid-user
     {% endif %}
 

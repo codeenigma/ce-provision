@@ -13,8 +13,10 @@ pam_password crypt
 pam_filter {{ openvpn.ldap.lookup_filter }}
 pam_login_attribute {{ openvpn.ldap.login_attribute }}
 
-{% if openvpn.ldap.group_dn is defined and openvpn.ldap.group_dn %}
-pam_groupdn {{ openvpn.ldap.group_dn }}
+{% if openvpn.ldap.group_dn %}
+{% for group in openvpn.ldap.group_dn %}
+pam_groupdn {{ group }}
+{% endfor %}
 pam_member_attribute {{ openvpn.ldap.group_attribute }}
 {% endif %}
 
@@ -30,5 +32,5 @@ ssl on
 {% if openvpn.ldap.ssl_certificate_check is defined and not openvpn.ldap.ssl_certificate_check %}
 tls_checkpeer no
 {% endif %}
-tls_cacertfile /etc/ldap/ssl/{{ openvpn.ldap.ssl_certificate }}
+tls_cacertfile /etc/ldap/ssl/{{ openvpn.ldap.ssl_certificate | basename }}
 {% endif %}

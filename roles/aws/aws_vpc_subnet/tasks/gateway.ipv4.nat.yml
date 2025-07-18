@@ -12,7 +12,7 @@
   amazon.aws.ec2_vpc_nat_gateway:
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"
-    tags: "{{ aws_vpc_subnet.tags | combine({ 'Name': subnet.name }) }}"
+    tags: "{{ aws_vpc_subnet.tags | combine({'Name': subnet.name}) }}"
     subnet_id: "{{ _aws_vpc_subnet_subnet.subnet.id }}"
     wait: true
     allocation_id: "{{ _aws_vpc_subnet_eip.addresses[0].allocation_id | default(omit) }}"
@@ -22,6 +22,6 @@
 - name: Ensure EIP is tagged properly.
   amazon.aws.ec2_tag:
     resource: "{{ _aws_vpc_subnet_gateway.nat_gateway_addresses[0].allocation_id }}"
-    tags: "{{ aws_vpc_subnet.tags | combine({ 'Name': subnet.name }) }}"
+    tags: "{{ aws_vpc_subnet.tags | combine({'Name': subnet.name}) }}"
     profile: "{{ aws_vpc_subnet.aws_profile }}"
     region: "{{ aws_vpc_subnet.region }}"

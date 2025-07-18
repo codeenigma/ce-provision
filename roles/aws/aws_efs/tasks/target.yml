@@ -2,4 +2,4 @@
 # _aws_security_group_list variable populated by the aws_security_groups role.
 - name: Add subnet to the list of EFS targets.
   ansible.builtin.set_fact:
-    _aws_efs_targets: "{{ _aws_efs_targets | combine({target: {'subnet_id': target, 'security_groups': _aws_security_group_list }}) }}"
+    _aws_efs_targets: "{{ _aws_efs_targets | combine({target: {'subnet_id': target, 'security_groups': _aws_security_group_list}}) }}"

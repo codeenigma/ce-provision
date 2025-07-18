@@ -28,3 +28,9 @@ Ansible roles and group of roles that constitute the deploy stack.
 
 ### [Documentation](contribute/README.md#documentation)
 <!--ENDTOC-->
+
+<a href="https://github.com/codeenigma/ce-provision/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=codeenigma/ce-provision" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).

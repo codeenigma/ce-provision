@@ -1,3 +1,4 @@
+---
 # @todo Do we still need that? Used by AMI and LC,
 # but probably could simply use the base name.
 - name: Define unique name for resources.
@@ -12,31 +13,46 @@
     filters:
       "tag:Name": "{{ aws_ec2_autoscale_cluster.vpc_name }}"
   register: _aws_ec2_autoscale_cluster_vpc
-  when: (aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0)
+  when:
+    - aws_ec2_autoscale_cluster.vpc_name is defined
+    - aws_ec2_autoscale_cluster.vpc_name | length > 0
 
 - name: Set the VPC id from name.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc.vpcs[0].vpc_id }}"
-  when: (aws_ec2_autoscale_cluster.vpc_name is defined and aws_ec2_autoscale_cluster.vpc_name | length > 0)
+  when:
+    - aws_ec2_autoscale_cluster.vpc_name is defined
+    - aws_ec2_autoscale_cluster.vpc_name | length > 0
 
 - name: Use provided VPC id.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_vpc_id: "{{ aws_ec2_autoscale_cluster.vpc_id }}"
-  when: (aws_ec2_autoscale_cluster.vpc_name is not defined or aws_ec2_autoscale_cluster.vpc_name | length < 0)
+  when: aws_ec2_autoscale_cluster.vpc_name is not defined or (aws_ec2_autoscale_cluster.vpc_name | length) == 0
 
 - name: Create matching Security Group.
-  amazon.aws.ec2_security_group:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    name: "{{ aws_ec2_autoscale_cluster.name }}"
-    tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': aws_ec2_autoscale_cluster.name}) }}"
-    state: "{{ aws_ec2_autoscale_cluster.state }}"
-    vpc_id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
-    description: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
-    rules:
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    tasks_from: security_group
+  vars:
+    aws_vpc:
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': aws_ec2_autoscale_cluster.name}) }}"
+      state: "{{ aws_ec2_autoscale_cluster.state }}"
+      id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      description: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
+      rules:
+        - proto: all
+          group_name: "{{ aws_ec2_autoscale_cluster.name }}"
+    rules_egress:
       - proto: all
         group_name: "{{ aws_ec2_autoscale_cluster.name }}"
-  register: _aws_ec2_autoscale_cluster_security_group
+        rule_desc: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
+
+- name: Set _aws_ec2_autoscale_cluster_security_group variable.
+  ansible.builtin.set_fact:
+    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc._result[aws_ec2_autoscale_cluster.name] }}"
 
 - name: Reset subnets lists.
   ansible.builtin.set_fact:
@@ -129,25 +145,38 @@
       aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       db_instance_class: "{{ aws_ec2_autoscale_cluster.rds.db_instance_class }}"
-      db_cluster_identifier: "{{ aws_ec2_autoscale_cluster.rds.db_cluster_identifier | default(omit) }}"
+      name: "{{ aws_ec2_autoscale_cluster.rds.name | default(aws_ec2_autoscale_cluster.name) }}"
+      description: "{{ aws_ec2_autoscale_cluster.rds.description | default(aws_ec2_autoscale_cluster.name) }}"
+      multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
       subnets: "{{ _aws_ec2_autoscale_cluster_subnets_ids }}"
-      name: "{{ aws_ec2_autoscale_cluster.name }}"
-      description: "{{ aws_ec2_autoscale_cluster.name }}"
-      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
+      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
+      publicly_accessible: "{{ aws_ec2_autoscale_cluster.rds.publicly_accessible }}"
       engine: "{{ aws_ec2_autoscale_cluster.rds.engine }}"
       engine_version: "{{ aws_ec2_autoscale_cluster.rds.engine_version | default(omit) }}"
-      aurora_reader: "{{ aws_ec2_autoscale_cluster.rds.aurora_reader }}"
+      db_cluster_identifier: "{{ aws_ec2_autoscale_cluster.rds.db_cluster_identifier | default(aws_ec2_autoscale_cluster.name) }}"
+      aurora_suffix: "{{ aws_ec2_autoscale_cluster.rds.aurora_suffix }}"
+      aurora_reader: false "{{ aws_ec2_autoscale_cluster.rds.aurora_reader }}"
+      aurora_reader_suffix: "{{ aws_ec2_autoscale_cluster.rds.aurora_reader_suffix }}"
       db_parameter_group_name: "{{ aws_ec2_autoscale_cluster.rds.db_parameter_group_name | default(omit) }}"
       db_parameter_group_description: "{{ aws_ec2_autoscale_cluster.rds.db_parameter_group_description | default(omit) }}"
       db_parameter_group_engine: "{{ aws_ec2_autoscale_cluster.rds.db_parameter_group_engine | default(omit) }}"
       db_parameters: "{{ aws_ec2_autoscale_cluster.rds.db_parameters | default({}) }}"
+      character_set_name:  "{{ aws_ec2_autoscale_cluster.rds.character_set_name | default(omit) }}"
       allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.allocated_storage }}"
       max_allocated_storage: "{{ aws_ec2_autoscale_cluster.rds.max_allocated_storage }}"
       storage_encrypted: "{{ aws_ec2_autoscale_cluster.rds.storage_encrypted }}"
+      storage_type: "{{ aws_ec2_autoscale_cluster.rds.storage_type | default(omit) }}"
+      storage_throughput: "{{ aws_ec2_autoscale_cluster.rds.storage_throughput | default(omit) }}"
       master_username: "{{ aws_ec2_autoscale_cluster.rds.master_username }}"
       master_user_password: "{{ aws_ec2_autoscale_cluster.rds.master_user_password }}"
-      multi_az: "{{ aws_ec2_autoscale_cluster.rds.multi_az }}"
-      security_groups: "{{ aws_ec2_autoscale_cluster.rds_security_groups + [_aws_ec2_autoscale_cluster_security_group.group_name] }}"
+      force_update_password: "{{ aws_ec2_autoscale_cluster.rds.force_update_password | default(omit) }}"
+      enable_performance_insights: "{{ aws_ec2_autoscale_cluster.rds.enable_performance_insights | default(omit) }}"
+      preferred_backup_window: "{{ aws_ec2_autoscale_cluster.rds.preferred_backup_window | default(omit) }}"
+      copy_tags_to_snapshot: "{{ aws_ec2_autoscale_cluster.rds.copy_tags_to_snapshot }}"
+      preferred_maintenance_window: "{{ aws_ec2_autoscale_cluster.rds.preferred_maintenance_window | default(omit) }}"
+      allow_major_version_upgrade: "{{ aws_ec2_autoscale_cluster.rds.allow_major_version_upgrade }}"
+      auto_minor_version_upgrade: "{{ aws_ec2_autoscale_cluster.rds.auto_minor_version_upgrade | default(omit) }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags }}"
       rds_cloudwatch_alarms:
         - "{{ aws_ec2_autoscale_cluster.rds.rds_cloudwatch_alarms }}"
       sns:
@@ -247,6 +276,7 @@
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       ami_name: "{{ _aws_ec2_autoscale_cluster_unique_name }}"
       encrypt_boot: "{{ aws_ec2_autoscale_cluster.encrypt_boot }}"
+      name_filter: "{{ aws_ec2_autoscale_cluster.packer_name_filter }}"
       repack:
         root_volume_type: "{{ aws_ec2_autoscale_cluster.root_volume_type }}"
         root_volume_size: "{{ aws_ec2_autoscale_cluster.root_volume_size }}"
@@ -290,6 +320,10 @@
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
 
+- name: Create ami cleanup function.
+  ansible.builtin.include_role:
+    name: aws/aws_ami_asg_cleanup
+
 - name: Gather IAM role info.
   amazon.aws.iam_role_info:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -317,6 +351,11 @@
     health_check_timeout: "{{ aws_ec2_autoscale_cluster.health_check_timeout }}"
     healthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_healthy_count }}"
     unhealthy_threshold_count: "{{ aws_ec2_autoscale_cluster.health_check_unhealthy_count }}"
+    stickiness_enabled: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_enabled | default(omit) }}"
+    stickiness_type: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_type | default(omit) }}"
+    stickiness_app_cookie_name: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_app_cookie_name | default(omit) }}"
+    stickiness_app_cookie_duration: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_app_cookie_duration | default(omit) }}"
+    stickiness_lb_cookie_duration: "{{ aws_ec2_autoscale_cluster.target_group_stickiness_lb_cookie_duration | default(omit) }}"
     modify_targets: false
   register: _aws_ec2_target_group_created
   when:
@@ -330,6 +369,7 @@
       DefaultActions:
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+      Rules: "{{ aws_ec2_autoscale_cluster.listeners_http.rules }}"
     _aws_ec2_autoscale_cluster_listeners_redirect:
       Protocol: HTTP
       Port: "{{ aws_ec2_autoscale_cluster.alb_http_port }}"
@@ -351,7 +391,10 @@
       DefaultActions:
         - Type: forward
           TargetGroupName: "{{ aws_ec2_autoscale_cluster.name }}"
+      Rules: "{{ aws_ec2_autoscale_cluster.listeners_https.rules }}"
   when: aws_ec2_autoscale_cluster.create_elb
+
+# @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
 
 - name: Add HTTP listeners.
   ansible.builtin.set_fact:
@@ -379,10 +422,11 @@
   ansible.builtin.include_role:
     name: aws/aws_security_groups
   vars:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    group_names: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
-    return_type: ids
+    aws_security_groups:
+      profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      group_names: "{{ aws_ec2_autoscale_cluster.alb_security_groups }}"
+      return_type: ids
   when:
     - aws_ec2_autoscale_cluster.alb_security_groups | length > 0
     - aws_ec2_autoscale_cluster.create_elb
@@ -425,10 +469,11 @@
   ansible.builtin.include_role:
     name: aws/aws_security_groups
   vars:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    group_names: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
-    return_type: ids
+    aws_security_groups:
+      profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      group_names: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
+      return_type: ids
   when:
     - aws_ec2_autoscale_cluster.cluster_security_groups | length > 0
     - aws_ec2_autoscale_cluster.asg_refresh
@@ -436,7 +481,7 @@
     - aws_ec2_autoscale_cluster.deploy_cluster
 
 - name: Create launch template.
-  community.aws.ec2_launch_template:
+  amazon.aws.ec2_launch_template:
     profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     name: "{{ aws_ec2_autoscale_cluster.name }}"
     image_id: "{{ aws_ec2_autoscale_cluster.image_id if aws_ec2_autoscale_cluster.image_id is defined else aws_ec2_autoscale_cluster_image_latest.image_id }}"
@@ -717,6 +762,8 @@
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
     - _cf_certificate_ARN | length > 1
+
+# @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
 
 - name: Add DNS records in Route 53.
   amazon.aws.route53:

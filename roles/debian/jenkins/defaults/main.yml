@@ -7,6 +7,7 @@ ldap_client:
   bindpw: ""
 
 jenkins:
+  apt_signed_by: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
   server_name: "jenkins.{{ _domain_name }}"
   ssl_handling: "ssl_selfsigned"
   listen_http_port: -1
@@ -29,3 +30,4 @@ jenkins:
   mailto: "admins@example.com"
   # daily key renewal execution with systemd timer
   on_calendar: "*-*-* 02:15:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+  apt_origin_jenkins: "origin=jenkins.io"

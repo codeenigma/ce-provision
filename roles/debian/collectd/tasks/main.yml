@@ -1,0 +1,36 @@
+---
+- name: Check if we already have collectd installed.
+  ansible.builtin.stat:
+    path: "/usr/sbin/collectd"
+  register: collectd_bin
+
+- name: Check if collectd config directory exists.
+  ansible.builtin.stat:
+    path: "/etc/collectd"
+  register: collectd_configdir
+
+- name: Install collectd if not installed.
+  ansible.builtin.apt:
+    pkg: collectd
+    state: present
+  when:
+    - not collectd_bin.stat.exists
+
+- name: Create collectd config directory.
+  ansible.builtin.file:
+    path: /etc/collectd
+    state: directory
+    mode: '0755'
+  when:
+    - not collectd_configdir.stat.exists
+
+- name: Place collectd configuration.
+  ansible.builtin.template:
+    src: "collectd.conf.j2"
+    dest: "/etc/collectd/collectd.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: true
+  when:
+    - collectd_configdir.stat.exists

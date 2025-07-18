@@ -1,17 +1,50 @@
 ---
+# Set this variable to true to tell ce-provision it is running in a container.
+is_local: false
+
+_ce_provision_username: "{% if is_local %}ce-dev{% else %}controller{% endif %}"
+_venv_path: "/home/{{ _ce_provision_username }}/ce-python"
+_venv_command: /usr/bin/python3 -m venv
+_venv_install_username: "{{ _ce_provision_username }}"
+_ce_ansible_timer_name: upgrade_ansible
+_env_type: unspecified
+
+# AWS variables - if you are using an AWS account, you can preset certain variables
+# Generally it is recommended to place these in your ce-provision-config repository under hosts/group_vars/all
+#_aws_profile: example # boto profile name
+#_aws_region: eu-west-1
+_aws_vpc_cidr_base: 10.0 # used to define internal IP range that is unique for every client
+aws_admin_tools_enable: false # Set to true to include aws_admin_tools role.
+
+# AWS tags
+_aws_resource_name: "" # Name
+# _profile: web_server # Profile
+# _env_type: dev # Env
+# _infra_name: acme # Infra
+
 _init:
   # A list of var directories to include. We only support .yml extensions.
   # This is used to detect if the playbook must re-run or not.
   vars_dirs: []
   force_play: false
+  lock_file: /tmp/ce-provision-lock # set to an empty string to disable locking behaviour
+  deploy_lock_file: /tmp/ce-deploy-lock # must match lock_file in ce-deploy, set to an empty string to disable locking behaviour
+  ce_provision_version: 2.x # Outputted by the _init role at the start of plays
+  install_ansible: true # set to false to not install Ansible in a venv
 
   # Although these variables logically belong with ce_provision, the _init role needs to
   # gather the extra variables if there are any, so there are _init variables.
+
+  # ce-provision user creation
+  ce_provision_new_user: true # set to false if user already exists or is ephemeral, e.g. an LDAP user
+  #ce_provision_uid # optionally hardcode the UID for this user
+
   # Extra config repo.
   ce_provision_extra_repository: ""
   ce_provision_extra_repository_branch: "master"
   ce_provision_extra_repository_skip_checkout: false
   ce_provision_extra_repository_vars_file: "custom.yml"
+
   # Whether to commit back changes to extra repo.
   ce_provision_extra_repository_push: false
   ce_provision_extra_repository_allowed_vars: []

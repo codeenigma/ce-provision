@@ -13,15 +13,18 @@ rkhunter:
   allow_ssh_root_user: "{{ sshd.PermitRootLogin | default('prohibit-password') }}"
   disable_tests: "suspscan hidden_procs deleted_files packet_cap_apps apps os_specific"
   os_package_manager: "NONE" # PKGMGR=NONE is default for Debian, set it to what you need.
+  portpathwhitelist: []
   scriptwhitelist:
     - /bin/egrep
     - /bin/fgrep
-    - /bin/which
+    - /usr/bin/egrep
+    - /usr/bin/fgrep
     - /usr/bin/ldd
     # - /usr/bin/lwp-request
     - /usr/sbin/adduser
     # - /usr/sbin/prelink
     - /usr/sbin/unhide.rb
+    - /usr/bin/which
   allowhiddendir:
     - /etc/.java
     - /tmp/.ce-deploy # see https://github.com/codeenigma/ce-deploy/blob/1.x/roles/database_backup/database_backup-mysql/defaults/main.yml#L7
@@ -29,6 +32,7 @@ rkhunter:
     - /etc/.etckeeper
   allowdevfile:
     - /dev/shm/network/ifstate
+  allowipcproc: []
   allow_system_remote_logging: "0"
   supscan_directories: "/tmp /var/tmp"
   supscan_maxsize: "10240000"

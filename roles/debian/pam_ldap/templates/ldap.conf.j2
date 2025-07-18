@@ -1,9 +1,12 @@
 BASE {{ pam_ldap.lookup_base }}
-URI	{{ pam_ldap.endpoints | join(' ') }}
-{% if pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate %}
+
+URI {{ pam_ldap.endpoints | join(' ') }}
+{% if pam_ldap.ssl_use_system_ca %}
+TLS_CACERT /etc/ssl/certs/ca-certificates.crt
+{% elif pam_ldap.ssl_certificate | length > 0 %}
 TLS_CACERT /etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}
 {% endif %}
-BIND_TIMELIMIT	5
+BIND_TIMELIMIT 5
 TIMEOUT 5
 TIMELIMIT 5
 

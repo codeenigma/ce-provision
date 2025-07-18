@@ -1,11 +1,47 @@
 ---
-- name: Copy Varnish default VCL.
+- block:
+    - name: Copy Varnish default VCL.
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ varnish_config_path }}/default.vcl"
+        owner: root
+        group: root
+        mode: 0644
+      with_first_found:
+        - "{{ playbook_dir }}/templates/{{ varnish_config.template_filename }}.j2"
+        - "{{ _ce_provision_base_dir }}/config/files/templates/{{ varnish_config.template_filename }}.j2"
+        - "default.vcl.j2"
+# This will keep varnish config as it is even after varnish upgrade
+    - name: Template varnish systemd service file.
+      ansible.builtin.template:
+        src: varnish.service.j2
+        dest: /etc/systemd/system/varnish.service
+        mode: '0644'
+      notify:
+        - reload systemd
+        - restart varnish
+
+- name: Varnish pin packagecloud.io.
   ansible.builtin.template:
-    src: "default.vcl.j2"
-    dest: "{{ varnish_config_path }}/default.vcl"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - reload systemd
-    - restart varnish
+    src: varnish.preferences.j2
+    dest: /etc/apt/preferences.d/varnish
+    mode: '0644'
+
+- name: Apt update to apply changes.
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Get current varnish version.
+  ansible.builtin.shell: |
+    set -o pipefail
+    dpkg-query -W -f='${Version}' varnish | grep -oP '^\d+\.\d+' | sed 's/\.//g'
+  args:
+    executable: /bin/bash
+  register: varnish_version_result
+
+- name: Add varnish to the unattended upgrades.
+  ansible.builtin.set_fact:
+    _apt_unattended_upgrades_default_origins: "{{ _apt_unattended_upgrades_default_origins + ['origin=packagecloud.io/varnishcache/varnish{{ varnish_version_result.stdout }},suite=${distro_codename},component=main'] }}"
+  when:
+    - apt_unattended_upgrades.enable is defined
+    - apt_unattended_upgrades.enable

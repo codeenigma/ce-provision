@@ -14,6 +14,16 @@
     purge: true
   when: ldap_server.slapd.purge
 
+- name: Set up Python packages.
+  ansible.builtin.include_role:
+    name: debian/python_common
+  vars:
+    python_common:
+      cleanup: false
+      remove_packages: []
+      install_packages:
+        - python3-pip
+
 - name: Ensure LDAP and python-ldap and dependencies are installed.
   ansible.builtin.apt:
     pkg: ["slapd", "ldapscripts", "libldap2-dev"]
@@ -24,17 +34,10 @@
     pkg: ["libsasl2-dev", "libssl-dev", "python3-dev"] # python-ldap needs some dev packages
     state: present
 
-- name: Install python-ldap with pip3.
-  ansible.builtin.pip:
-    name: python-ldap
-    executable: pip3
-  when: ansible_distribution_major_version | int < 12
-
-- name: Ensure python3-ldap is installed with apt.
+- name: Ensure python3-ldap is installed.
   ansible.builtin.apt:
     pkg: python3-ldap
     state: present
-  when: ansible_distribution_major_version | int >= 12
 
 - name: Create the slapd config file.
   ansible.builtin.template:
@@ -64,6 +67,8 @@
   ansible.builtin.stat:
     path: "{{ ldap_server.config.path }}"
   register: _ldap_server_ldifs
+  become_user: "{{ _ce_provision_username }}"
+  become: true
   delegate_to: localhost
 
 - name: Copy LDAP schemas from config repo.
@@ -166,7 +171,7 @@
 - name: Create the slapd backup script.
   ansible.builtin.template:
     src: slap-bak.j2
-    dest: /usr/local/bin/slap-bak
+    dest: "{{ ldap_server.config.backup_script }}"
     owner: root
     group: root
     mode: 0755
@@ -178,6 +183,6 @@
   vars:
     timers:
       slapd_backups:
-        timer_command: "/usr/local/bin/slap-bak && find /opt/slap-bak/ -type f -mtime +60 -print0 | xargs -0 -r rm"
+        timer_command: "{{ ldap_server.config.backup_script }} &> {{ ldap_server.config.backup_path }}/ldap-backup-$( date +%y%m%d-%H%M ).log && find {{ ldap_server.config.backup_path }}/ -type f -mtime +60 -print0 | xargs -0 -r rm"
         timer_OnCalendar: "{{ ldap_server.config.on_calendar }}"
-  when: ssl.autorenew
+  when: ldap_server.config.backup

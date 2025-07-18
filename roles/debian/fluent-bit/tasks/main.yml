@@ -1,0 +1,68 @@
+---
+- name: Add the Fluent Bit server GPG key to system keyring and source repository to apt sources.
+  block:
+    - name: Get the repository key.
+      ansible.builtin.get_url:
+        url: "{{ fluent_bit_repo_key_url }}"
+        dest: "{{ fluent_bit_key_location }}"
+
+    - name: Set apt source.
+      ansible.builtin.apt_repository:
+        repo: "{{ fluent_bit_apt_source }}"
+        state: present
+
+- name: Install Fluent-bit.
+  ansible.builtin.apt:
+    name: fluent-bit
+    state: present
+
+- name: Get list of configuration files that come with the pacakge installation.
+  ansible.builtin.find:
+    path: /etc/fluent-bit
+    patterns: .*conf
+  register: conf
+
+- name: Remove configuration files that come with the package installation.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ conf.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Ensure that systemd override directory exists.
+  ansible.builtin.file:
+    path: "/etc/systemd/system/fluent-bit.service.d/"
+    state: directory
+    mode: '0755'
+
+- name: Ensure systemd service file override is in place.
+  ansible.builtin.template:
+    src: fluent-bit.service.j2
+    dest: "/etc/systemd/system/fluent-bit.service.d/override.conf"
+    mode: '0644'
+  register: config_service
+
+- name: Create or update main configuration file.
+  ansible.builtin.template:
+    src: fluent-bit.config.yml.j2
+    dest: "/etc/fluent-bit/fluent-bit.yml"
+    mode: '0644'
+  register: config
+
+- name: Reload systemd daemon.
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when: config_service.changed
+
+- name: Restart Fluent-bit to apply config updates.
+  ansible.builtin.service:
+    name: "fluent-bit.service"
+    state: restarted
+  when: config.changed
+
+- name: Check that service is enabled and started.
+  ansible.builtin.systemd_service:
+    name: fluent-bit.service
+    enabled: true
+    state: started

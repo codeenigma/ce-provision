@@ -3,7 +3,7 @@
 # Rename to ansible-lint.hook and alter to your needs.
 GIT_DIR=$(git rev-parse --show-toplevel 2> /dev/null)
 ROLES_LIST=$(cd "$GIT_DIR" && find roles/ -type d -name "tasks" -exec dirname {} \;)
-ANSIBLE_LINT="/usr/local/bin/ansible-lint"
+ANSIBLE_LINT="/home/ce-dev/ce-python/bin/ansible-lint"
 PROVISION_CONTAINER="provision-controller"
 CONTAINER_BASE_PATH="/home/ce-dev/ce-provision"
 OS=$(uname -s)
@@ -23,7 +23,7 @@ for file in $(git diff "$1/$BASE_BRANCH" --name-only --staged); do
       case $file in
         "$ROLE"*)
           printf "\e[36m Running Ansible linter against the\e[1m %s\e[0m\e[36m role. \e[0m \n" "$ROLE"
-          ANSIBLE_LINT_CMD="$DOCKER_CMD $ANSIBLE_LINT $CONTAINER_BASE_PATH/$ROLE"
+          ANSIBLE_LINT_CMD="$DOCKER_CMD $ANSIBLE_LINT -q $CONTAINER_BASE_PATH/$ROLE"
           ERRORS=$($ANSIBLE_LINT_CMD | wc -l)
           if [ "$ERRORS" != "0" ]; then
             $ANSIBLE_LINT_CMD
