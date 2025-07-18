@@ -62,6 +62,7 @@
        - [Docker Registry](/roles/debian/docker_registry)
        - [Duplicity](/roles/debian/duplicity)
        - [Firewall Config](/roles/debian/firewall_config)
+       - [Fluent-bit](/roles/debian/fluent-bit)
        - [Frontail](/roles/debian/frontail)
        - [Gitlab](/roles/debian/gitlab)
        - [Gitlab Runner](/roles/debian/gitlab_runner)
