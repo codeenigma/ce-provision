@@ -15,17 +15,17 @@ php:
   # see php-common for default version
   fpm:
     # FPM settings - official documentation is here: https://www.php.net/manual/en/install.fpm.configuration.php
-    unix_socket: false # set to true to use a unix socket, you must also update nginx and cachetool if you do
+    unix_socket: false  # set to true to use a unix socket, you must also update nginx and cachetool if you do
     server_ip: "127.0.0.1"
-    tcp_port: "" # leave empty to automate port selection - port will be "90{{ version | replace('.','') }}" - e.g. 9081 for PHP 8.1
-    pool_user: "{{ user_deploy.username }}"
-    pool_group: "{{ user_deploy.username }}" # if using unix socket this should be the web server user
+    tcp_port: ""  # leave empty to automate port selection - port will be "90{{ version | replace('.','') }}" - e.g. 9081 for PHP 8.1
+    pool_user: "{{ user_deploy.username }}"   # this should always be the deploy user, usually deploy
+    pool_group: "{{ user_deploy.username }}"  # if using unix socket this should be the web server user, often www-data
     pm: dynamic # can also be static, see https://tideways.com/profiler/blog/an-introduction-to-php-fpm-tuning
     default_socket_timeout: 60
     # It is important to scale up processes on bigger servers, so that more
     # requests can be handled. Double the number of vCPUs is a good default.
     # Can be between 5 and 64.
-    max_children: "{{ [10, [(ansible_facts.ansible_processor_nproc | default(1)) * 2, 64] | min] | max }}" # Fallback in case ansible_processor_nproc is not gathered before tasks
+    max_children: "{{ [10, [(ansible_facts.ansible_processor_nproc | default(1)) * 2, 64] | min] | max }}"  # Fallback in case ansible_processor_nproc is not gathered before tasks
     start_servers: 2
     min_spare_servers: 1
     max_spare_servers: 3
