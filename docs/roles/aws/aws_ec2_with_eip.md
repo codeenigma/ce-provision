@@ -12,7 +12,7 @@ Creates a new EC2 instance at AWS with a static IP address.
 aws_ec2_with_eip:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  hostname: "{{ _domain_name }}" # The hostname is used to check if the machine exists already.
+  hostname: "{{ _aws_resource_name }}" # The hostname is used to check if the machine exists already.
   force: false # Force a new EC2 machine to be created if a new AMI is packed.
   instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
@@ -37,6 +37,7 @@ aws_ec2_with_eip:
   root_volume_delete_on_termination: true
   ebs_optimized: true
   security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
+  public_ip: true  # usually this needs to be true for cloud-init to work
   tags:
     Name: "{{ _domain_name }}"
   # Add an A record tied to the EIP.
