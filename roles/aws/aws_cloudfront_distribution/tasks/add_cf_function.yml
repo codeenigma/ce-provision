@@ -1,0 +1,35 @@
+- name: Get account ID for ARN.
+  ansible.builtin.command: >-
+    aws sts get-caller-identity
+    --query Account
+    --output text
+  register: _acc_id
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _acc_id: "{{ _acc_id.stdout | from_json }}"
+
+- name: Get CloudFront info.
+  ansible.builtin.shell: "aws cloudfront get-distribution-config --id {{ _aws_cloudfront_distribution.id }} --output json > /tmp/dist-config.json"
+
+- name: Set CloudFront function on default cache behavior.
+  ansible.builtin.include_tasks: attach_function_to_conf.yml
+  vars:
+    _regex_find: "DefaultCacheBehavior"
+    _function_associations_list: "{{ aws_cloudfront_distribution.default_cache_behavior.cf_functions }}"
+  when: aws_cloudfront_distribution.default_cache_behavior.cf_functions is defined
+
+- name: Set CloudFront function on cache behavior.
+  ansible.builtin.include_tasks: process_cache_with_cf_funct.yml
+  when: _cache_behavior_with_cf | length > 0
+  loop: "{{ _cache_behavior_with_cf }}"
+
+- name: Get ETag value.
+  ansible.builtin.command: "sed -i 's,ETag,IfMatch,g' /tmp/dist-config.json"
+
+- name: Get ETag value.
+  ansible.builtin.command: "cat /tmp/dist-config.json"
+  register: _dist_conf
+
+- name: Update CF distro.
+  ansible.builtin.command: aws cloudfront update-distribution --id {{ _aws_cloudfront_distribution.id }} --cli-input-json file:///tmp/dist-config.json
