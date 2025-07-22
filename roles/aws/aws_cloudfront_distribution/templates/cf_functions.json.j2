@@ -1,0 +1,11 @@
+
+"FunctionAssociations": {
+  "Items": [
+{% for association in _function_associations_list %}
+    {
+      "EventType": "{{ association.event_type }}",
+      "FunctionARN": "{{ 'arn:aws:cloudfront::' + _acc_id + ':function/' + association.cf_function_name }}"
+    }{% if not loop.last %},{% endif %}
+{% endfor %}
+  ],
+  "Quantity": {{ _function_associations_list | length }}
