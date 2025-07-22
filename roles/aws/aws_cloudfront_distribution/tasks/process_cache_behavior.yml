@@ -1,0 +1,10 @@
+- name: Process behavior with lambda functions.
+  ansible.builtin.include_tasks: add_lambda_function.yml
+  loop: "{{ _cache_behavior_with_lambda | default([]) }}"
+  loop_control:
+    loop_var: _behavior
+  when: _cache_behavior_with_lambda | length > 0
+
+- name: Add behavior to final list.
+  ansible.builtin.set_fact:
+    _processed_cache_behaviors: "{{ _processed_cache_behaviors + _cache_behavior_without_lambda }}"
