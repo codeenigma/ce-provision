@@ -1,0 +1,10 @@
+- name: Process default cache behavior if it has lambda functions.
+  ansible.builtin.include_tasks: add_lambda_function.yml
+  when: aws_cloudfront_distribution.default_cache_behavior.lambda_functions is defined
+
+- name: Create dict for default cache behavior without functions.
+  ansible.builtin.set_fact:
+    _default_cache: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
+  when:
+  - aws_cloudfront_distribution.default_cache_behavior.lambda_functions is not defined
+  - aws_cloudfront_distribution.default_cache_behavior.cf_functions is not defined

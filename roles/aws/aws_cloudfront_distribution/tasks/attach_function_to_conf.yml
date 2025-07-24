@@ -1,0 +1,63 @@
+- name: Set _function_associations for default cache behavior.
+  ansible.builtin.template:
+    src: cf_functions.json.j2
+    dest: /tmp/cf_functions.json
+    mode: 0644
+
+- name: Read replacement content.
+  ansible.builtin.slurp:
+    src: /tmp/cf_functions.json
+  register: replacement
+
+- name: Set facts for files
+  ansible.builtin.set_fact:
+    input_file: /tmp/dist-config.json
+    output_file: /tmp/output_file.json
+
+- name: Replace using shell script.
+  ansible.builtin.shell: |
+    cat > /tmp/replace_script.py << 'SCRIPT'
+    import json
+    import re
+    import sys
+
+    with open('{{ input_file }}', 'r') as f:
+        content = f.read()
+
+    replacement = '''{{ replacement.content | b64decode }}'''
+
+    # Find position after the specified search term
+    default_pos = content.find('"{{ _regex_find }}"')
+
+    if default_pos != -1:
+        # Look for "FunctionAssociations": { on one line and "Quantity": 0 on the next
+        # This pattern captures everything from "FunctionAssociations" through the end of the line with "Quantity": 0
+        pattern = r'"FunctionAssociations"\s*:\s*{\s*\n[^\n]*"Quantity"\s*:\s*0[^\n]*'
+
+        # Search for the pattern after the found position
+        match = re.search(pattern, content[default_pos:])
+
+        if match:
+            # Calculate actual position in full content
+            actual_pos = default_pos + match.start()
+            end_pos = default_pos + match.end()
+
+            # Replace the matched 2 lines with the replacement content
+            new_content = content[:actual_pos] + replacement.strip() + content[end_pos:]
+
+            with open('{{ output_file }}', 'w') as f:
+                f.write(new_content)
+
+            print("Successfully replaced the 2 lines")
+        else:
+            print("Pattern not found after {{ _regex_find }}")
+    else:
+        print("{{ _regex_find }} not found in file")
+    SCRIPT
+
+    python3 /tmp/replace_script.py
+
+- name: Copy updated file into original.
+  ansible.builtin.copy:
+    src: /tmp/output_file.json
+    dest: /tmp/dist-config.json

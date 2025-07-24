@@ -29,6 +29,70 @@
       include_cookies: false # Set true to add cookies in logs
       prefix: "cf-logging/" # Prefix for S3 object names
 
+- name: Set empty list for tasks.
+  ansible.builtin.set_fact:
+    _cf_function_results: []
+    _processed_cache_behaviors: []
+
+- name: Create functions if defined.
+  ansible.builtin.include_tasks: check_function.yml
+  loop: "{{ aws_cloudfront_distribution.functions | default([]) }}"
+  loop_control:
+    loop_var: _funct
+  when: aws_cloudfront_distribution.functions is defined
+
+- name: Initialize _default_cache dict.
+  ansible.builtin.set_fact:
+    _default_cache: {}
+
+- name: Set _default_cache for CloudFront.
+  ansible.builtin.include_tasks: process_default_cache_behavior.yml
+  vars:
+    _behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
+
+- name: Extract the cache behaviors with Lambda function.
+  ansible.builtin.set_fact:
+    _cache_behavior_with_lambda: "{{ aws_cloudfront_distribution.cache_behaviors | selectattr('lambda_functions', 'defined') | list }}"
+
+- name: Extract the cache behaviors with cf function.
+  ansible.builtin.set_fact:
+    _cache_behavior_with_cf: "{{ aws_cloudfront_distribution.cache_behaviors | selectattr('cf_functions', 'defined') | list }}"
+
+- name: Extract the cache behaviors without Lambda function.
+  ansible.builtin.set_fact:
+    _cache_behavior_without_lambda: "{{ aws_cloudfront_distribution.cache_behaviors | selectattr('lambda_functions', 'undefined') | list }}"
+
+- name: Reset processed cache behaviors list.
+  ansible.builtin.set_fact:
+    _default_cache_behaviour: "{{ _default_cache }}"
+    _processed_cache_behaviors: []
+
+- name: Set _processed_cache_behaviors.
+  ansible.builtin.include_tasks: process_cache_behavior.yml
+
+# not working properly
+- name: Extract the Lambda functios.
+  ansible.builtin.set_fact:
+    _lambda_functions: "{{ aws_cloudfront_distribution.functions | selectattr('type', '==', 'lambda') | list }}"
+
+- name: Wait for Lambda function to be Active.
+  ansible.builtin.command: >
+    aws lambda get-function
+    --function-name {{ item.name }}
+    --query 'Configuration.[State, LastUpdateStatus]'
+    --region us-east-1
+  register: lambda_status
+  until: (lambda_status.stdout | from_json)[0] == "Active"
+  retries: 30
+  delay: 10
+  changed_when: false
+  loop: "{{ _lambda_functions }}"
+
+# Solves above
+- name: Wait for 10 seconds.
+  ansible.builtin.wait_for:
+    timeout: 10
+
 - name: Create a CloudFront distribution.
   community.aws.cloudfront_distribution:
     profile: "{{ aws_cloudfront_distribution.aws_profile }}"
@@ -38,8 +102,8 @@
     aliases: "{{ aws_cloudfront_distribution.aliases }}"
     origins: "{{ aws_cloudfront_distribution.origins }}"
     web_acl_id: "{{ _created_acl.arn | default(omit) }}"
-    default_cache_behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
-    cache_behaviors: "{{ aws_cloudfront_distribution.cache_behaviors }}"
+    default_cache_behavior: "{{ _default_cache_behaviour }}"
+    cache_behaviors: "{{ _processed_cache_behaviors }}"
     validate_certs: "{{ aws_cloudfront_distribution.validate_certs }}"
     viewer_certificate: "{{ aws_cloudfront_distribution.viewer_certificate }}"
     purge_origins: "{{ aws_cloudfront_distribution.purge_existing }}"
@@ -49,3 +113,15 @@
     purge_cache_behaviors: "{{ aws_cloudfront_distribution.purge_existing }}"
     enabled: "{{ aws_cloudfront_distribution.enabled }}"
   register: _aws_cloudfront_distribution
+
+- name: Set empty list for function results.
+  ansible.builtin.set_fact:
+    _function_results: []
+
+- name: Configure cf functions if defined.
+  ansible.builtin.include_tasks: add_cf_function.yml
+  vars:
+    _behavior: "{{ aws_cloudfront_distribution.default_cache_behavior }}"
+  when: >
+    (aws_cloudfront_distribution.default_cache_behavior.cf_functions is defined) or
+    (aws_cloudfront_distribution.cache_behaviors | selectattr('cf_functions', 'undefined') | list | length > 0)
