@@ -68,8 +68,7 @@
   with_items: "{{ php.version }}"
   loop_control:
     loop_var: version
-  when:
-    - php.apcu_installed | bool
+  when: php.apcu_installed | bool
 
 - name: Install PHP package JSON when PHP < 8.0.
   ansible.builtin.apt:
