@@ -4,3 +4,6 @@ php:
     - 8.1 # see https://www.php.net/supported-versions.php
   apt_signed_by: https://packages.sury.org/php/apt.gpg
   apt_origin: "origin=deb.sury.org,codename=${distro_codename}" # used by apt_unattended_upgrades
+  # APCU can be unstable, with this option you can prevent it from being
+  # installed. See https://github.com/krakjoe/apcu/issues/582
+  apcu_installed: true
