@@ -167,8 +167,8 @@
         mode: '0644'
 
     - name: Reload systemd daemon
-      ansible.builtin.command: systemctl daemon-reload
-      changed_when: true
+      ansible.builtin.systemd_service:
+        daemon_reload: true
 
     - name: Enable and start the LE renewal timer
       ansible.builtin.systemd:
