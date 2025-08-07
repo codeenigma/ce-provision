@@ -176,6 +176,7 @@
         name: gitlab-renew-le.timer
         enabled: true
         state: started
+      when: is_local is not defined or not is_local
 
 # @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
