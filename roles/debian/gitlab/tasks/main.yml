@@ -138,6 +138,44 @@
         timer_OnCalendar: "{{ gitlab.block_removed_ldap_users_on_calendar }}"
   when: gitlab.ldap.enable
 
+# Set up LE renewal timer and service on boot for servers that are shut down overnight.
+
+- name: Check if GitLab is installed
+  ansible.builtin.stat:
+    path: /opt/gitlab/bin/gitlab-ctl
+  register: gitlab_ctl_binary
+
+- name: Configure GitLab LE boot-time renewal timer
+  when:
+    - gitlab_le_boot_timer_enabled
+    - gitlab_ctl_binary.stat.exists
+  block:
+    - name: Install systemd service for LE renewal
+      ansible.builtin.template:
+        src: gitlab-renew-le.service.j2
+        dest: /etc/systemd/system/gitlab-renew-le.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install systemd timer for LE renewal
+      ansible.builtin.template:
+        src: gitlab-renew-le.timer.j2
+        dest: /etc/systemd/system/gitlab-renew-le.timer
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      ansible.builtin.command: systemctl daemon-reload
+      changed_when: true
+
+    - name: Enable and start the LE renewal timer
+      ansible.builtin.systemd:
+        name: gitlab-renew-le.timer
+        enabled: true
+        state: started
+
 # @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-rails runner /etc/gitlab/gitlab-config.rb
