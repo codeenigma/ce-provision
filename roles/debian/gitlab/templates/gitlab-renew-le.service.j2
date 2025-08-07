@@ -1,0 +1,7 @@
+[Unit]
+Description=Force GitLab LE Cert Renewal at Boot
+After=network.target
+
+[Service]
+ExecStart=/opt/gitlab/bin/gitlab-ctl renew-le-certs
+Type=oneshot
