@@ -147,7 +147,7 @@
 
 - name: Configure GitLab LE boot-time renewal timer
   when:
-    - gitlab_le_boot_timer_enabled
+    - gitlab.letsencrypt
     - gitlab_ctl_binary.stat.exists
   block:
     - name: Install systemd service for LE renewal
