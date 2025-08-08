@@ -34,3 +34,10 @@
     force: true
   when:
     - collectd_configdir.stat.exists
+  notify: Restart collectd
+
+- name: Ensure collectd service is enabled and started.
+  ansible.builtin.service:
+    name: collectd
+    state: started
+    enabled: true
