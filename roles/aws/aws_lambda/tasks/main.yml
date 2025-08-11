@@ -9,10 +9,18 @@
       tags: []
       state: "present"
 
-- name: Check and clean previous Lambda function.
-  ansible.builtin.file:
-    path: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
-    state: absent
+- name: Check string type using regex.
+  ansible.builtin.set_fact:
+    _string_type: >-
+      {%- if input_string | regex_search('^(https?://|git@)') -%}
+        url
+      {%- elif input_string | regex_search('\.zip$', ignorecase=True) -%}
+        zip
+      {%- else -%}
+        single
+      {%- endif -%}
+  vars:
+    input_string: "{{ aws_lambda.function_file }}"
 
 - name: Write Lambda function.
   ansible.builtin.copy:
@@ -36,7 +44,7 @@
   amazon.aws.lambda:
     name: "{{ aws_lambda.name }}"
     description: "{{ aws_lambda.description }}"
-    region: "{{ _aws_region }}"
+    region: "{{ aws_lambda.region }}"
     timeout: "{{ aws_lambda.timeout }}"
     s3_bucket: "{{ aws_lambda.s3_bucket }}"
     s3_key: "{{ aws_lambda.s3_bucket_prefix }}/{{ aws_lambda.name }}.zip"

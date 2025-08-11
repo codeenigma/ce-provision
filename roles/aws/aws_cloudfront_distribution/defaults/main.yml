@@ -1,5 +1,17 @@
 ---
 aws_cloudfront_distribution:
+#  functions:
+#    - name: "example-cf-function"
+#      type: "cf" # This can be cf or lambda
+#      description: "This is example function."
+#      runtime: "cloudfront-js-2.0" # Can be either cloudfront-js-2.0 or cloudfront-js-1.0
+#      kvs: "" # arn of KeyValueStore
+#      code: "function.js" # Name of the function file in _global folder
+#    - name: "example-lambda-function"
+#      type: "lambda" # This can be cf or lambda
+#      description: "This is example function."
+#      runtime: "nodejs22.x" # lambda runtimes can be found here https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+#      code: "lambda-function-example.zip" # Name of the function file in files folder next to plays and vars, can handle git URLs
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   tags: {}
@@ -28,6 +40,12 @@ aws_cloudfront_distribution:
   #s3_origin_access_identity_enabled: false
   default_cache_behavior:
     target_origin_id: "backend-example-com" # Must match the desired origin: id.
+#    lambda_functions:
+#      - event_type: "origin-request" # Can be viewer-request, origin-request, origin-response or viewer-response
+#        lambda_name: "example-lambda-function"
+#    cf_functions:
+#      - event_type: "viewer-request" # Can be viewer-request or viewer-response
+#        cf_function_name: "example-cf-function"
     viewer_protocol_policy: redirect-to-https
     allowed_methods:
       items:
