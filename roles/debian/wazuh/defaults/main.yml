@@ -102,6 +102,7 @@ wazuh:
           timeout: 3600
       authd:
         enabled: false
+        use_password: false
     wazuh_manager_globals:
       - '1.1.1.1'
     agent_groups: [] # maps to `groups` string in agent config above
