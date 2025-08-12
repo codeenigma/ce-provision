@@ -8,4 +8,5 @@ dependencies:
   - role: debian/nodejs
   - role: debian/php-cli
   - role: debian/php-fpm
+  - role: debian/php_composer
   - role: debian/nginx

@@ -1,0 +1,48 @@
+- name: Check if CF function exists.
+  ansible.builtin.command: "aws cloudfront list-functions --query \"FunctionList.Items[?Name=='{{ _funct.name }}']\""
+  register: _cf_funct_list_result
+
+- name: Get details of CloudFront function
+  ansible.builtin.command: "aws cloudfront get-function --name {{ _funct.name }} /tmp/cf_funct"
+  register: _cf_funct_result
+  when: (_cf_funct_list_result.stdout | from_json) | length > 0
+
+- name: Setting command output into variable.
+  ansible.builtin.set_fact:
+    _cf_funct_result: "{{ _cf_funct_result.stdout | from_json }}"
+  when: (_cf_funct_list_result.stdout | from_json) | length > 0
+
+- name: Create config for CloudFront function.
+  ansible.builtin.template:
+    src: "config.j2"
+    dest: "/tmp/cf_config"
+    owner: controller
+    group: controller
+    mode: 0644
+
+- name: Create CF function.
+  ansible.builtin.command: "aws cloudfront create-function --function-config file:///tmp/cf_config --name {{ _funct.name }} --function-code fileb://{{ _ce_provision_build_dir }}/files/{{ _funct.code }}"
+  register: _cf_function
+  when: (_cf_funct_list_result.stdout | from_json) | length == 0
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _cf_function: "{{ _cf_function.stdout | from_json }}"
+  when: (_cf_funct_list_result.stdout | from_json) | length == 0
+
+- name: Update CloudFront function.
+  ansible.builtin.command: "aws cloudfront update-function --name {{ _funct.name }} --if-match {{ _cf_funct_result.ETag }} --function-config file:///tmp/cf_config --function-code fileb://{{ _ce_provision_build_dir }}/files/{{ _funct.code }}"
+  register: _cf_function
+  when: (_cf_funct_list_result.stdout | from_json) | length > 0
+
+- name: Setting previous command output into variable.
+  ansible.builtin.set_fact:
+    _cf_function: "{{ _cf_function.stdout | from_json }}"
+  when: (_cf_funct_list_result.stdout | from_json) | length > 0
+
+- name: Publish CloudFront function.
+  ansible.builtin.command: "aws cloudfront publish-function --name {{ _funct.name }} --if-match {{ _cf_function.ETag }}"
+
+- name: Register aws_lambda results.
+  ansible.builtin.set_fact:
+    _cf_function_results: "{{ _cf_function_results + [_cf_function] }}"
