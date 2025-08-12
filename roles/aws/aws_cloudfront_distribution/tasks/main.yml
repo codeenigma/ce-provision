@@ -88,6 +88,7 @@
   delay: 10
   changed_when: false
   loop: "{{ _lambda_functions }}"
+  when: aws_cloudfront_distribution.functions is defined
 
 # Solves above
 - name: Wait for 10 seconds.
