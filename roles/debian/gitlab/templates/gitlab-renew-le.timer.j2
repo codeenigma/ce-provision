@@ -1,0 +1,9 @@
+[Unit]
+Description=Run GitLab LE Renewal at Boot
+
+[Timer]
+OnBootSec=5min
+Unit=gitlab-renew-le.service
+
+[Install]
+WantedBy=timers.target

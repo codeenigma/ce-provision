@@ -1,0 +1,24 @@
+- name: Set empty list.
+  ansible.builtin.set_fact:
+    _lambda_funct_list: []
+
+- name: Create dict.
+  ansible.builtin.set_fact:
+    _lambda_funct_list: "{{ _lambda_funct_list + [{'event_type': item.event_type, 'lambda_function_arn': aws_lambda._result[item.lambda_name].configuration.function_arn}] }}"
+  loop: "{{ _behavior.lambda_functions }}"
+
+- name: Remove lambda_functions and add lambda_function_associations.
+  ansible.builtin.set_fact:
+    _processed_behavior: "{{ (_behavior | dict2items | rejectattr('key', 'equalto', 'lambda_functions') | items2dict) | combine({'lambda_function_associations': _lambda_funct_list}) }}"
+
+- name: Remove cf_functions.
+  ansible.builtin.set_fact:
+    _processed_behavior: "{{ _processed_behavior | dict2items | rejectattr('key', 'equalto', 'cf_functions') | items2dict }}"
+
+- name: Append behaviour to list.
+  ansible.builtin.set_fact:
+    _processed_cache_behaviors: "{{ _processed_cache_behaviors + [_processed_behavior] }}"
+
+- name: Create dict for default cache behavior
+  ansible.builtin.set_fact:
+    _default_cache: "{{ _processed_behavior | from_yaml }}"

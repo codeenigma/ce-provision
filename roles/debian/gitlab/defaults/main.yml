@@ -45,6 +45,7 @@ gitlab:
   unicorn_worker_processes: 2
   puma_worker_processes: 2
   initial_root_password: "Ch@ng3m3"
+  letsencrypt_timer: false
   # LDAP settings
   ldap:
     enable: false # enable/disable LDAP integration
