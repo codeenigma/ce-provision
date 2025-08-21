@@ -12,6 +12,7 @@ aws_cloudfront_distribution:
 #      description: "This is example function."
 #      runtime: "nodejs22.x" # lambda runtimes can be found here https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
 #      code: "lambda-function-example.zip" # Name of the function file in files folder next to plays and vars, can handle git URLs
+#      handler: "main_file.main_function"
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
   tags: {}
