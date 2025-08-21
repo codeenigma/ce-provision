@@ -39,7 +39,7 @@ aws_admin_tools:
     - name: "get_infra_data_from_s3"
       resource: s3 # s3 resource is to set bucket as the target for API Gateway
       type: GET
-      bucket: "codeenigma-{{ _aws_profile }}-general-storage-{{ _aws_region }}" # Name of the bucket from where it's pulling the data
+      bucket: "{{ _general_bucket }}" # Name of the bucket from where it's pulling the data
       object: "lambda-results/infra-info" # Object which is targeted by API Gateway
       url_params:
         - date
