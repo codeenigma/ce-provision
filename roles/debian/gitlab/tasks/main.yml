@@ -94,7 +94,7 @@
   when: is_local
 
 - name: Stop Gitlab.
-  ansible.builtin.command: timeout 120 /opt/gitlab/bin/gitlab-ctl stop
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
   when: gitlab.force_stop
 
 - name: Reconfigure Gitlab.
