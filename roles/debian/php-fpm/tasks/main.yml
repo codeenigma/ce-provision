@@ -54,6 +54,19 @@
   loop_control:
     loop_var: version
 
+- name: Setup logrotate for PHP-FPM slow logs
+  ansible.builtin.template:
+    src: php-fpm-slow.logrotate.j2
+    dest: "/etc/logrotate.d/php{{ version }}-fpm-slow"
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  with_items: "{{ php.version }}"
+  when: php.fpm.slow_log
+  loop_control:
+    loop_var: version
+
 - name: Check if we have an AWS Cloudwatch folder.
   ansible.builtin.stat:
     path: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d
