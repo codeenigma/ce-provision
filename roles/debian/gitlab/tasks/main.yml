@@ -94,11 +94,12 @@
   when: is_local
 
 - name: Stop Sidekiq specifically first
-  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop sidekiq
+  ansible.builtin.command:
+    cmd: /opt/gitlab/bin/gitlab-ctl stop sidekiq
   args:
     timeout: 180
   register: sidekiq_stop
-  ignore_errors: yes
+  ignore_errors: true
 
 - name: Force stop Sidekiq if it's stuck.
   ansible.builtin.command:
