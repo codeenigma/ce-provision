@@ -93,9 +93,9 @@
     mode: "0666"
   when: is_local
 
-- name: Stop Sidekiq specifically first.
-  ansible.builtin.command:
-    cmd: /opt/gitlab/bin/gitlab-ctl stop sidekiq
+- name: Stop Sidekiq specifically first
+  ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop sidekiq
+  args:
     timeout: 180
   register: sidekiq_stop
   ignore_errors: yes
