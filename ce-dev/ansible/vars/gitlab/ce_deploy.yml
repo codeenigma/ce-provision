@@ -3,4 +3,4 @@ ce_deploy:
   own_repository_branch: 1.x
   username: deploy
   local_dir: /home/deploy/ce-deploy
-  ce_provision_dir: /home/ce-dev/ce-provision
+  ce_provision_dir: /home/controller/ce-provision
