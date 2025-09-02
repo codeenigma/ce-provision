@@ -96,15 +96,15 @@
 - name: Stop Sidekiq specifically first
   ansible.builtin.command:
     cmd: /opt/gitlab/bin/gitlab-ctl stop sidekiq
-  register: sidekiq_stop
-  ignore_errors: true
+  register: _sidekiq_stop
+  failed_when: false
   async: 180
   poll: 5
 
 - name: Force stop Sidekiq if it's stuck.
   ansible.builtin.command:
     cmd: /opt/gitlab/bin/gitlab-ctl kill sidekiq
-  when: sidekiq_stop is failed
+  when: _sidekiq_stop is failed
 
 - name: Stop Gitlab.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
