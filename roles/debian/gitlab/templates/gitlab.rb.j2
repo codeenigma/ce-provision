@@ -748,7 +748,7 @@ puma['worker_processes'] = {{ gitlab.puma_worker_processes }}
 
 # sidekiq['log_directory'] = "/var/log/gitlab/sidekiq"
 # sidekiq['log_format'] = "default"
-sidekiq['shutdown_timeout'] = 120
+sidekiq['shutdown_timeout'] = 20
 # sidekiq['concurrency'] = 25
 # sidekiq['metrics_enabled'] = true
 # sidekiq['listen_address'] = "localhost"
