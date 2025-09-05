@@ -29,7 +29,7 @@
     region: "{{ aws_rds.region }}"
     cluster_id: "{{ aws_rds.name }}"
     engine: "{{ aws_rds.engine }}"
-    db_cluster_parameter_group: "{{ aws_rds.db_parameter_group_engine }}"
+    engine_version: "3.08.2"
     password: "{{ aws_rds.master_user_password }}"
     username: "{{ aws_rds.master_username }}"
     tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
