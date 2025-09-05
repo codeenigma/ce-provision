@@ -28,7 +28,7 @@
     profile: "{{ aws_rds.aws_profile }}"
     region: "{{ aws_rds.region }}"
     cluster_id: "{{ aws_rds.name }}"
-    engine: "aurora"
+    engine: "{{ aws_rds.engine }}"
     password: "{{ aws_rds.master_user_password }}"
     username: "{{ aws_rds.master_username }}"
     tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
