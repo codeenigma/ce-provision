@@ -32,7 +32,6 @@
     engine_version: "{{ aws_rds.engine_version }}"
     password: "{{ aws_rds.master_user_password }}"
     db_subnet_group_name: "{{ aws_rds.name }}"
-    vpc_security_group_ids: "{{ aws_rds.security_groups }}"
     backup_retention_period: "{{ aws_rds.backup_retention_period | default(35) }}" # set to 1-35 to enable automated backups
     username: "{{ aws_rds.master_username }}"
     tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
@@ -45,6 +44,7 @@
     db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(aws_rds.name) }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     db_subnet_group_name: "{{ aws_rds.name }}"
+    db_security_groups: "{{ aws_rds.security_groups }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
@@ -66,6 +66,7 @@
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     db_subnet_group_name: "{{ aws_rds.name }}"
+    db_security_groups: "{{ aws_rds.security_groups }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
