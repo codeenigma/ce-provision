@@ -31,6 +31,7 @@
     engine: "{{ aws_rds.engine }}"
     engine_version: "{{ aws_rds.engine_version }}"
     password: "{{ aws_rds.master_user_password }}"
+    backup_retention_period: 0 # set to 1-35 to enable automated backups
     username: "{{ aws_rds.master_username }}"
     tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
 
