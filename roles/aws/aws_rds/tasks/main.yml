@@ -31,9 +31,12 @@
     engine: "{{ aws_rds.engine }}"
     engine_version: "{{ aws_rds.engine_version }}"
     password: "{{ aws_rds.master_user_password }}"
+    db_subnet_group_name: "{{ aws_rds.name }}"
+    vpc_security_group_ids: "{{ aws_rds.security_groups }}"
     backup_retention_period: "{{ aws_rds.backup_retention_period | default(35) }}" # set to 1-35 to enable automated backups
     username: "{{ aws_rds.master_username }}"
     tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
+  when: "'aurora' in aws_rds.engine"
 
 - name: Create Aurora RDS instance.
   amazon.aws.rds_instance:
