@@ -226,4 +226,4 @@
   when:
     - aws_rds.backup is defined
     - aws_rds.backup | length > 0
-    - "'aurora' not in aws_rds.engine"
+    - 'aurora' not in aws_rds.engine
