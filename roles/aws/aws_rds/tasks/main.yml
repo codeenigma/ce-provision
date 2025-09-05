@@ -23,6 +23,13 @@
     - aws_rds.db_parameters is defined
     - aws_rds.db_parameters | length > 0
 
+- name: Create Aurora cluster.
+  amazon.aws.rds_cluster:
+    cluster_id: "{{ aws_rds.name }}"
+    engine: "aurora"
+    password: "{{ aws_rds.master_user_password }}"
+    username: "{{ aws_rds.master_username }}"
+
 - name: Create Aurora RDS instance.
   amazon.aws.rds_instance:
     db_instance_identifier: "{{ aws_rds.name }}-{{ aws_rds.aurora_suffix }}"
