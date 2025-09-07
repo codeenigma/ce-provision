@@ -23,6 +23,10 @@
     - aws_rds.db_parameters is defined
     - aws_rds.db_parameters | length > 0
 
+- name: Set sec group list for IDs.
+  ansible.builtin.set_fact:
+    _aws_security_group_list: []
+
 - name: Generate security group information.
   ansible.builtin.include_role:
     name: aws/aws_security_groups
