@@ -60,7 +60,6 @@
     db_cluster_identifier: "{{ aws_rds.db_cluster_identifier | default(aws_rds.name) }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     db_subnet_group_name: "{{ aws_rds.name }}"
-    vpc_security_group_ids: "{{ _aws_security_group_list }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
@@ -82,7 +81,6 @@
     db_instance_class: "{{ aws_rds.db_instance_class }}"
     db_parameter_group_name: "{{ aws_rds.db_parameter_group_name | default(omit) }}"
     db_subnet_group_name: "{{ aws_rds.name }}"
-    vpc_security_group_ids: "{{ _aws_security_group_list }}"
     state: "{{ aws_rds.state }}"
     engine: "{{ aws_rds.engine }}"
     copy_tags_to_snapshot: true
