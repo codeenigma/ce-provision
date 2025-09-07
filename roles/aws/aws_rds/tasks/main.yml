@@ -38,6 +38,10 @@
       return_type: ids
   when: aws_rds.security_groups | length > 0
 
+- name: Print list of SGs.
+  ansible.builtin.debug:
+    msg: "{{ _aws_security_group_list }}"
+
 - name: Create Aurora cluster.
   amazon.aws.rds_cluster:
     profile: "{{ aws_rds.aws_profile }}"
