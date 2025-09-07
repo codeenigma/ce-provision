@@ -6,10 +6,6 @@
     _aws_security_group_names: "{{ aws_security_groups.group_names }}"
     _aws_security_group_list: []
 
-- name: Print list of SGs.
-  ansible.builtin.debug:
-    msg: "{{ aws_security_groups.group_names }}"
-
 - name: Fetch groups.
   amazon.aws.ec2_security_group_info:
     profile: "{{ aws_security_groups.aws_profile }}"
@@ -17,10 +13,6 @@
     filters:
       group-name: "{{ _aws_security_group_names }}"
   register: _aws_security_groups
-
-- name: Print list of SGs.
-  ansible.builtin.debug:
-    msg: "{{ _aws_security_groups }}"
 
 - name: Create list of security group IDs.
   ansible.builtin.set_fact:
@@ -36,7 +28,3 @@
   ansible.builtin.set_fact:
     _aws_security_group_list: "{{ _aws_security_group_ids }}"
   when: aws_security_groups.return_type == 'ids'
-
-- name: Print list of SGs.
-  ansible.builtin.debug:
-    msg: "{{ _aws_security_group_list }}"
