@@ -179,7 +179,7 @@
 - name: Read filebeat.yml content (base64 encoded)
   ansible.builtin.shell: |
     set -o pipefail && awk -F'"' '/password:/ {print $2}' {{ wazuh.mitre_report.password_file }}
-  register: report_password
+  register: _wazuh_filebeat_password
   no_log: true
   args:
     executable: /bin/bash
@@ -187,7 +187,7 @@
 
 - name: Set password fact
   ansible.builtin.set_fact:
-    filebeat_password: "{{ report_password.stdout }}"
+    filebeat_password: "{{ _wazuh_filebeat_password.stdout }}"
   no_log: true
   when: wazuh_manager_exists
 
