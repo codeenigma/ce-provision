@@ -7,7 +7,7 @@ REPORT_DATE=$(date +"%Y-%m-%d")
 REPORT_NAME="weekly-report-${REPORT_DATE}"
 LOG_FILE="/var/log/opensearch-reports.log"
 USERNAME= {{ wazuh.mitre_report.username }}
-PASSWORD= {{ filebeat_password }}
+PASSWORD= {{ _wazuh_filebeat_password }}
 
 # Function to log messages
 log_message() {
