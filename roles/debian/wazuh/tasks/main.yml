@@ -141,7 +141,7 @@
 
 - name: Set fact if wazuh-manager service exists
   ansible.builtin.set_fact:
-    wazuh_manager_exists: "'wazuh-manager.service' in wazuh_service.stdout"
+    wazuh_manager_exists: "{{ 'wazuh-manager.service' in wazuh_service.stdout }}"
 
 - name: Deploy custom Wazuh local rules
   ansible.builtin.copy:
@@ -162,16 +162,16 @@
     mode: '0640'
     owner: root
     group: wazuh
-  when: wazuh_manager_exists or 'wazuh-agent.service' in wazuh_service.stdout"
+  when: wazuh_manager_exists or 'wazuh-agent.service' in wazuh_service.stdout
 
 - name: Restart wazuh-manager to apply changes.
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: wazuh-manager
     state: restarted
   when: wazuh_manager_exists
 
 - name: Restart wazuh-agent to apply changes.
-  ansible.builtin.systemd_service:
+  ansible.builtin.systemd:
     name: wazuh-agent
     state: restarted
   when: "'wazuh-agent.service' in wazuh_service.stdout"
