@@ -210,7 +210,7 @@ ce_provision:
   venv_install_username: ${CONTROLLER_USER}
   upgrade_timer_name: upgrade_ce_provision_ansible
   aws_support: ${AWS_SUPPORT}
-  new_user: ${CONTROLLER_USER}
+  new_user: true
   username: ${CONTROLLER_USER}
   ssh_key_bits: "521"
   ssh_key_type: ed25519

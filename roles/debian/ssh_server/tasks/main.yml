@@ -18,7 +18,7 @@
   with_items: "{{ sshd.groups }}"
   loop_control:
     loop_var: group
-  when: sshd.groups | length
+  when: sshd.groups | length > 0
 
 - name: Generate group section of the sshd_config file.
   ansible.builtin.blockinfile:
@@ -29,7 +29,7 @@
   with_items: "{{ sshd.groups }}"
   loop_control:
     loop_var: group
-  when: sshd.groups | length
+  when: sshd.groups | length > 0
 
 - name: Generate user section of the sshd_config file.
   ansible.builtin.blockinfile:
@@ -40,7 +40,7 @@
   with_items: "{{ sshd.users }}"
   loop_control:
     loop_var: users
-  when: sshd.users | length
+  when: sshd.users | length > 0
 
 # - name: Trigger overrides
 #   include_role:

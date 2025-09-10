@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Install ce-provision
         run: |
-          /usr/bin/curl -LO https://raw.githubusercontent.com/codeenigma/ce-provision/${{ github.event.pull_request.head.ref }}/install.sh
+          /usr/bin/curl -LO https://raw.githubusercontent.com/${{ github.event.pull_request.head.repo.owner.login }}/${{ github.event.pull_request.head.repo.name }}/${{ github.event.pull_request.head.ref }}/install.sh
           /usr/bin/chmod +x ./install.sh
           /usr/bin/sudo ./install.sh --version ${{ github.event.pull_request.head.ref }} --config-branch ${{ github.event.pull_request.base.ref }} --docker --no-firewall
 
