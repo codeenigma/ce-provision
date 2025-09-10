@@ -3,8 +3,8 @@
 - name: Generate/Update custom vars file.
   ansible.builtin.include_tasks: allowed_vars.yml
   when:
-    - _init.ce_provision_extra_repository
-    - _init.ce_provision_extra_repository_vars_file
+    - _init.ce_provision_extra_repository | length > 0
+    - _init.ce_provision_extra_repository_vars_file | length > 0
     - _init.ce_provision_extra_repository_push
 
 - name: Store current playbook md5.
