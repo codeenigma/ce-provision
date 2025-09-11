@@ -92,7 +92,7 @@ wazuh:
       active_responses:
         - command: "firewall-drop"
           location: "all"
-          rules_id: "31151,5712,104130,101071,101132,101238,101251,103011"
+          rules_id: "31115,31151,31168,5712,104130,101071,101132,101238,101251,103011"
           repeated_offenders: "30,60,120"
           timeout: 600
         - command: "firewall-drop"
