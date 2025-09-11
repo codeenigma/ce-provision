@@ -93,6 +93,19 @@
     mode: "0666"
   when: is_local
 
+- name: Stop Sidekiq specifically first
+  ansible.builtin.command:
+    cmd: /opt/gitlab/bin/gitlab-ctl stop sidekiq
+  register: _sidekiq_stop
+  failed_when: false
+  async: 180
+  poll: 5
+
+- name: Force stop Sidekiq if it's stuck.
+  ansible.builtin.command:
+    cmd: /opt/gitlab/bin/gitlab-ctl kill sidekiq
+  when: _sidekiq_stop is failed
+
 - name: Stop Gitlab.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl stop
   when: gitlab.force_stop
@@ -127,6 +140,56 @@
 - name: Ensure GitLab is started.
   ansible.builtin.command: /opt/gitlab/bin/gitlab-ctl start
   when: gitlab.force_stop
+
+- name: Create systemd timer to sync removed LDAP users.
+  ansible.builtin.include_role:
+    name: contrib/systemd_timers
+  vars:
+    timers:
+      block_removed_ldap_users:
+        timer_command: "/usr/bin/gitlab-rake gitlab:cleanup:block_removed_ldap_users BLOCK=true"
+        timer_OnCalendar: "{{ gitlab.block_removed_ldap_users_on_calendar }}"
+  when: gitlab.ldap.enable
+
+# Set up LE renewal timer and service on boot for servers that are shut down overnight.
+
+- name: Check if GitLab is installed
+  ansible.builtin.stat:
+    path: /opt/gitlab/bin/gitlab-ctl
+  register: gitlab_ctl_binary
+
+- name: Configure GitLab LE boot-time renewal timer
+  when:
+    - gitlab.letsencrypt_timer
+    - gitlab_ctl_binary.stat.exists
+  block:
+    - name: Install systemd service for LE renewal
+      ansible.builtin.template:
+        src: gitlab-renew-le.service.j2
+        dest: /etc/systemd/system/gitlab-renew-le.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install systemd timer for LE renewal
+      ansible.builtin.template:
+        src: gitlab-renew-le.timer.j2
+        dest: /etc/systemd/system/gitlab-renew-le.timer
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+      when: is_local is not defined or not is_local
+
+    - name: Enable and start the LE renewal timer
+      ansible.builtin.systemd:
+        name: gitlab-renew-le.timer
+        enabled: true
+        state: started
+      when: is_local is not defined or not is_local
 
 # @TODO - this task fails in CI with GitHub Actions because PostGreSQL isn't running
 - name: Run the GitLab configuration script for config that cannot be set in gitlab.rb.

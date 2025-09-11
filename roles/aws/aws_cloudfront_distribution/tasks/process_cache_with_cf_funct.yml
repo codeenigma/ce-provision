@@ -1,0 +1,5 @@
+- name: Set CloudFront function on default cache behavior.
+  ansible.builtin.include_tasks: attach_function_to_conf.yml
+  vars:
+    _regex_find: "{{ item.path_pattern }}"
+    _function_associations_list: "{{ item.cf_functions }}"

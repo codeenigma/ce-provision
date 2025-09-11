@@ -1,6 +1,6 @@
 ---
-# First step. Spin up a "blank" instance from a fresh AMI.
-- hosts: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+# First step. Spin up a "blank" instance and add the controller user and Ansible via user-data.
+- hosts: "{{ _aws_resource_name }}"
   connection: local
   become: false
 
@@ -16,9 +16,10 @@
     - ansible.builtin.import_role:
         name: _init
     - ansible.builtin.import_role:
-        name: aws/aws_ami
-    - ansible.builtin.import_role:
         name: aws/aws_ec2_with_eip
     - ansible.builtin.import_role:
         name: _exit
-    - ansible.builtin.meta: refresh_inventory
+
+  post_tasks:
+    - name: Refresh inventory.
+      ansible.builtin.meta: refresh_inventory

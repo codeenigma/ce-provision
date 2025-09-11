@@ -78,6 +78,7 @@ _common_security_groups:
           - 22
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming tcp traffic on port 22.
+    rules_egress: []
   web_open:
     name: web_open
     description: Allow all incoming web traffic on ports 80 and 443.
@@ -88,6 +89,7 @@ _common_security_groups:
           - 443
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming tcp traffic on ports 80 and 443.
+    rules_egress: []
   mailpit_open:
     name: mailpit_open
     description: Allow all incoming traffic on port 8025 for Mailpit.
@@ -97,6 +99,7 @@ _common_security_groups:
           - 8025
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming tcp traffic on port 8025.
+    rules_egress: []
   ftp_open:
     name: ftp_open
     description: Allow all incoming traffic on ports 20 and 21 for FTP.
@@ -107,6 +110,7 @@ _common_security_groups:
           - 21
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming tcp traffic on ports 20 and 21.
+    rules_egress: []
   sftp_open:
     name: sftp_open
     description: Allow all incoming traffic on ports 989 and 990 for sFTP.
@@ -117,6 +121,7 @@ _common_security_groups:
           - 990
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming tcp traffic on ports 989 and 990.
+    rules_egress: []
   ossec:
     name: ossec
     description: Allow all incoming traffic on ports 1514 and 1515 for OSSEC.
@@ -127,6 +132,7 @@ _common_security_groups:
           - 1515
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming udp traffic on ports 1514 and 1515.
+    rules_egress: []
   openvpn:
     name: openvpn
     description: Allow all incoming traffic on port 1194 for OpenVPN.
@@ -136,6 +142,7 @@ _common_security_groups:
           - 1194
         cidr_ip: 0.0.0.0/0
         rule_desc: Allow all incoming udp traffic on port 1194.
+    rules_egress: []
 
 ```
 

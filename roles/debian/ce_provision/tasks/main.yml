@@ -57,11 +57,6 @@
       filename: "{{ ce_provision.username }}"
   when: _ce_provision_username != ce_provision.username
 
-# This prevent the original var to be re-evaluated when we move things around.
-- name: Register config repository.
-  ansible.builtin.set_fact:
-    ce_provision_has_config_repo: "{{ 'yes' if ce_provision.config_repository else 'no' }}"
-
 - name: Ensure APT dependencies are installed.
   ansible.builtin.apt:
     pkg: ["git", "parallel"]
@@ -102,7 +97,7 @@
   become: true
   become_user: "{{ ce_provision.username }}"
   when:
-    - ce_provision_has_config_repo
+    - ce_provision.config_repository | length > 0
     - not ce_provision.config_repository_skip_checkout
 
 - name: Create defaults folders.
@@ -111,13 +106,13 @@
     state: directory
   with_items:
     - hosts
-  when: not ce_provision_has_config_repo
+  when: not ce_provision.config_repository | length > 0
 
 - name: Create default config.
   ansible.builtin.copy:
     src: ansible.cfg
     dest: "{{ ce_provision.local_dir }}/ansible.cfg"
-  when: not ce_provision_has_config_repo
+  when: not ce_provision.config_repository | length > 0
 
 - name: Symlink config folders to /etc/ansible.
   ansible.builtin.file:
@@ -129,7 +124,7 @@
     - files
     - templates
     - ansible.cfg
-  when: ce_provision_has_config_repo
+  when: ce_provision.config_repository | length > 0
 
 - name: Create data dir.
   ansible.builtin.file:

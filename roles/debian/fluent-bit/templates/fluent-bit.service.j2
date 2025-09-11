@@ -1,0 +1,4 @@
+{# ExecStart is used twice so that the variable gets cleared first before applying our variable #}
+[Service]
+ExecStart=
+ExecStart={{ fluent_bit_startup_command }}
