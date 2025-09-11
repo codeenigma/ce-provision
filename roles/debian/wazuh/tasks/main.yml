@@ -176,11 +176,7 @@
     state: restarted
   when: "'wazuh-agent.service' in wazuh_service.stdout"
 
-<<<<<<< HEAD
 - name: Read filebeat.yml content.
-=======
-- name: Read filebeat.yml content (base64 encoded)
->>>>>>> devel-2.x
   ansible.builtin.shell: |
     set -o pipefail && awk -F'"' '/password:/ {print $2}' {{ wazuh.mitre_report.password_file }}
   register: _wazuh_filebeat_password
@@ -189,21 +185,13 @@
     executable: /bin/bash
   when: wazuh_manager_exists
 
-<<<<<<< HEAD
 - name: Set password fact.
-=======
-- name: Set password fact
->>>>>>> devel-2.x
   ansible.builtin.set_fact:
     filebeat_password: "{{ _wazuh_filebeat_password.stdout }}"
   no_log: true
   when: wazuh_manager_exists
 
-<<<<<<< HEAD
 - name: Deploy the weekly report script.
-=======
-- name: Deploy the weekly report script
->>>>>>> devel-2.x
   ansible.builtin.template:
     src: generate_weekly_report.sh.j2
     dest: /usr/local/bin/generate_weekly_report.sh
@@ -212,11 +200,7 @@
     mode: '0755'
   when: wazuh_manager_exists
 
-<<<<<<< HEAD
 - name: Ensure weekly report cron job is present.
-=======
-- name: Ensure weekly report cron job is present
->>>>>>> devel-2.x
   ansible.builtin.cron:
     name: "Weekly OpenSearch report generation"
     user: root
