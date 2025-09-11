@@ -25,7 +25,11 @@ opensearch-reporting-cli \
   -f pdf \
   -n "$REPORT_NAME" \
   -e smtp \
+<<<<<<< HEAD
   -s "{{ wazuh.mitre_report.e_mail_from }}" \
+=======
+  -s "{{ wazuh.mitre_report.e-mail_from }}" \
+>>>>>>> devel-2.x
   -r "{{ wazuh.manager.wazuh_manager_mailto}}" \
   --subject "Weekly OpenSearch Report - $(date '+%B %d, %Y')" \
   --note "Hi,\n\nPlease find attached the weekly Wazuh Mitre report covering the last 7 days.\n\nReport generated on: $(date '+%Y-%m-%d %H:%M:%S')\n\nBest regards,\nAutomated Reporting System" \
