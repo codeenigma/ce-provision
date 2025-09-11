@@ -1,4 +1,5 @@
 ---
+ce_ansible_version: "<12.0"
 ce_ansible:
   # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
   #venv_path: "/home/{{ ce_provision.username }}/ansible"
