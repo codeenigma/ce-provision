@@ -60,7 +60,7 @@
       packages:
         - name: pip
           state: latest
-        - name: ansible
+        - name: "ansible{{ ce_ansible_version }}"
         - name: python-debian
 
 - name: Install linters.
