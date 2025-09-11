@@ -24,7 +24,7 @@
 - name: Varnish pin packagecloud.io.
   ansible.builtin.template:
     src: varnish.preferences.j2
-    dest: /etc/apt/preferences.d
+    dest: /etc/apt/preferences.d/varnish
     mode: '0644'
 
 - name: Apt update to apply changes.

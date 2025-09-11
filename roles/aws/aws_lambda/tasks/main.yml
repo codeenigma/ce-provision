@@ -22,16 +22,17 @@
   vars:
     input_string: "{{ aws_lambda.function_file }}"
 
-- name: Write Lambda function.
-  ansible.builtin.copy:
-    content: "{{ aws_lambda.function_file }}"
-    dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
+- name: Handle single file.
+  ansible.builtin.include_tasks: handle_single.yml
+  when: _string_type == 'single'
 
-- name: Create a zip archive of Lambda function.
-  community.general.archive:
-    path: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
-    dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
-    format: zip
+- name: Handle zip file.
+  ansible.builtin.include_tasks: handle_zip.yml
+  when: _string_type == 'zip'
+
+- name: Handle url.
+  ansible.builtin.include_tasks: handle_url.yml
+  when: _string_type == 'url'
 
 - name: Place Lambda function in S3 bucket.
   amazon.aws.s3_object:
