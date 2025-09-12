@@ -60,7 +60,7 @@
       packages:
         - name: pip
           state: latest
-        - name: "ansible{{ ce_ansible_version }}"
+        - name: "ansible{{ ce_ansible.ansible_version }}"
         - name: python-debian
 
 - name: Install linters.
@@ -86,7 +86,8 @@
   block:
     - name: Build systemd timer variables string.
       ansible.builtin.set_fact:
-        _timer: "{'{{ ce_ansible.upgrade.timer_name | default(_ce_ansible_timer_name) }}': { timer_command: '{{ ce_ansible.upgrade.command | quote }}'', timer_OnCalendar: '{{ ce_ansible.upgrade.on_calendar }}' }}"
+        _timer: "{'{{ ce_ansible.upgrade.timer_name | default(_ce_ansible_timer_name) }}': { timer_command: '{{ ce_ansible.upgrade.command }}', timer_OnCalendar: '{{ ce_ansible.upgrade.on_calendar }}' }}"
+
     - name: Turn the timer string into a dictionary.
       ansible.builtin.set_fact:
         _timer: "{{ _timer.splitlines() | map('from_yaml') | list }}"
