@@ -1,0 +1,7 @@
+- name: Create CloudFront function.
+  ansible.builtin.include_tasks: create_cf_function.yml
+  when: _funct.type == 'cf'
+
+- name: Create Lambda function.
+  ansible.builtin.include_tasks: create_lambda_function.yml
+  when: _funct.type == 'lambda'

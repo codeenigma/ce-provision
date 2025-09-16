@@ -126,7 +126,7 @@ failed_job = backup_cli.list_restore_jobs(
     },
     'Subject': {
       'Charset': 'UTF-8',
-      'Data': 'Restore testing - {{ _aws_profile }}: ' + mail_title,
+      'Data': 'Restore testing - {{ _infra_name }}: ' + mail_title,
     },
   },
   Source='Lambda Backup Validation <lambda@codeenigma.uk>',

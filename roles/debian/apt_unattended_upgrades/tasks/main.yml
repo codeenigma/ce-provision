@@ -25,6 +25,30 @@
     force: true
   when: apt_unattended_upgrades.enable
 
+- name: Copy unattended-upgrades linotp APT hook script.
+  ansible.builtin.template:
+    src: linotp-apt-hook.sh.j2
+    dest: /usr/local/sbin/linotp-apt-hook.sh
+    owner: root
+    group: root
+    mode: "0755"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.linotp
+
+- name: Copy unattended-upgrades linotp configuration file.
+  ansible.builtin.template:
+    src: 79linotp-pre-and-post.j2
+    dest: /etc/apt/apt.conf.d/79linotp-pre-and-post
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.linotp
+
 - name: Enable and start service unattended-upgrades.
   ansible.builtin.service:
     name: unattended-upgrades

@@ -12,12 +12,17 @@ Creates a new EC2 instance at AWS with a static IP address.
 aws_ec2_with_eip:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
-  hostname: "{{ _domain_name }}" # The hostname is used to check if the machine exists already.
+  hostname: "{{ _aws_resource_name }}" # The hostname is used to check if the machine exists already.
   force: false # Force a new EC2 machine to be created if a new AMI is packed.
   instance_type: t3.micro
   key_name: "{{ ce_provision.username }}@{{ ansible_hostname }}" # This needs to match your "provision" user SSH key.
-  ami_name: "{{ _domain_name }}" # The name of an AMI image to use. Image must exists in the same region.
-  ami_owner: self # Default to self-created image.
+  pubkey: ""  # The contents of the controller's public key to place in authorized_keys on boot, usually handled by a lookup()
+  # See also the aws_ami role, generally these AMI variables will match
+  # Filter values available here - https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeImages.html
+  ami_owner: "136693071363"  # Global AWS account ID of owner, defaults to Debian official
+  ami_virtualization_type: hvm
+  ami_root_device_type: ebs
+  ami_name_filter: "debian-12-amd64-*"
   # vpc_subnet_id: subnet-xxx # One of vpc_subnet_id or vpc_name + vpc_subnet_profile is mandatory.
   vpc_name: "{{ _infra_name }}"
   vpc_subnet_profile: core # if you are looking up subnets we need a Profile tag to search against
@@ -32,6 +37,7 @@ aws_ec2_with_eip:
   root_volume_delete_on_termination: true
   ebs_optimized: true
   security_groups: [] # list of security group names, converted to IDs by aws_security_groups role
+  public_ip: true  # usually this needs to be true for cloud-init to work
   tags:
     Name: "{{ _domain_name }}"
   # Add an A record tied to the EIP.

@@ -22,7 +22,7 @@ location /.well-known/acme-challenge/ {
 }
 ```
 
-If you are using LetsEncrypt handling combined with our `nginx` role and you set `ssl.http_01_port` then it should take care of the proxying, for example:
+If you are using LetsEncrypt handling combined with our `nginx` role and you set `ssl.http_01_port` and `ssl.web_server` to `standalone` then it should take care of the proxying, for example:
 
 ```yaml
 nginx:
@@ -38,13 +38,30 @@ nginx:
         services: []
         web_server: standalone
         certbot_register_command: "certonly --standalone --agree-tos --preferred-challenges http -n"
-        certbot_renew_command: "certonly --standalone --agree-tos --force-renew"
+        on_calendar: "Mon *-*-* 04:00:00"
         reload_command: reload
         reload:
           - nginx
 ```
-Variable "on_calendar" is no longer in use since we have 1 general cron to renew all domains
-
+webroot option
+```yaml
+nginx:
+  domains:
+    - # other domain variables here
+      ssl:
+        domains:
+          - "{{ _domain_name }}"
+        handling: letsencrypt
+        autorenew: true
+        email: administrator@example.com
+        services: []
+        web_server: webroot
+        certbot_register_command: "certonly --standalone --agree-tos --preferred-challenges http -n"
+        on_calendar: "Mon *-*-* 04:00:00"
+        reload_command: reload
+        reload:
+          - nginx
+```
 "web_server" can be standalone and webroot, differnce is that webroot wont start webserver to validate SSL, while standalone requires port on which webserver will be running in order to validate cert so we need the "http_01_port" for standalone option
 
 As in the example above, you need to include *all* variables required by the `letsencrypt` SSL handler because defaults will not load from the `ssl` role in this context.

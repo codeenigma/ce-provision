@@ -24,6 +24,7 @@ ce_deploy:
   config_repository_branch: "master"
   local_dir: "/home/{{ _ce_deploy.username }}/ce-deploy"
   ansible_collections_dir: "/home/{{ _ce_deploy.username }}/ce-deploy/galaxy/ansible_collections" # See ansible.cfg.
+  ce_provision_dir: /home/controller/ce-provision  # location of ce-provision on the infra controller
   # List of additional groups to add the user to.
   groups: []
   # File containing default roles and collections to install via Ansible Galaxy.

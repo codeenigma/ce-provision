@@ -37,7 +37,8 @@ dependencies:
     when: is_local is not defined or not is_local
   - role: debian/rkhunter
     when: is_local is not defined or not is_local
-  - role: debian/rsyslog
+  - role: debian/fluent-bit
+    when: is_local is not defined or not is_local
   - role: debian/postfix
   - role: debian/clamav
     when: is_local is not defined or not is_local

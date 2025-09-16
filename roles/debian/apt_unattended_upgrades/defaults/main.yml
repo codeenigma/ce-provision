@@ -4,6 +4,7 @@ _apt_unattended_upgrades_default_origins:
     - "origin=Debian,codename=${distro_codename}-security,label=Debian-Security"
 apt_unattended_upgrades:
   enable: true
+  linotp: false
   # unattended-upgrades template vars.
   # booleans must be strings to avoid Jinja2 interpretting.
   origins: "{{ _apt_unattended_upgrades_default_origins }}"
