@@ -76,13 +76,6 @@
     _template_prefix: "{{ instance_type[backup.resource_type] }}"
   when: backup.resource_type != 'file-system'
 
-- name: Set instance type to Aurora if defined.
-  ansible.builtin.set_fact:
-    _instance_type_restore: "Aurora"
-  when:
-    - backup.resource_type == 'db'
-    - "'aurora' in aws_rds.engine"
-
 - name: Create restore testing query file.
   ansible.builtin.template:
     src: "{{ _template_prefix }}_restore_testing.j2"
