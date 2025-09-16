@@ -68,7 +68,7 @@
       instance: "EC2"
       file-system: "EFS"
       db: "RDS"
-      cluster: "RDS"
+      cluster: "AURORA"
 
 - name: Set instance type for template.
   ansible.builtin.set_fact:
