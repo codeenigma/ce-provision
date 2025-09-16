@@ -233,3 +233,18 @@
     - aws_rds.backup is defined
     - aws_rds.backup | length > 0
     - "'aurora' not in aws_rds.engine"
+
+- name: Assign Aurora resource to backup plan.
+  ansible.builtin.include_role:
+    name: aws/aws_backup
+    tasks_from: resource
+  vars:
+    backup:
+      backup_plan_name: "{{ aws_rds.backup }}"
+      selection_name: "RDS-{{ aws_rds.name }}-{{ _env_type }}"
+      resource_id: "{{ aws_rds.name }}-{{ aws_rds.aurora_suffix }}"
+      resource_type: "db"
+  when:
+    - aws_rds.backup is defined
+    - aws_rds.backup | length > 0
+    - "'aurora' in aws_rds.engine"
