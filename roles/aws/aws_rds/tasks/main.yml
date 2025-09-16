@@ -241,7 +241,7 @@
   vars:
     backup:
       backup_plan_name: "{{ aws_rds.backup }}"
-      selection_name: "RDS-{{ aws_rds.name }}-{{ _env_type }}"
+      selection_name: "AURORA-{{ aws_rds.name }}-{{ _env_type }}"
       resource_id: "{{ aws_rds.name }}"
       resource_type: "cluster"
   when:
