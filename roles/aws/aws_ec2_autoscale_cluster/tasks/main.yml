@@ -784,8 +784,4 @@
     aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
     source_region: "{{ aws_ec2_autoscale_cluster.region }}"
     region: "{{ aws_backup.copy_vault.region }}"
-<<<<<<< HEAD
-    source_image_id: "{{ aws_ec2_autoscale_cluster_image_latest }}"
-=======
     source_image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
->>>>>>> Fixing-copy-AMI-to-backup-region
