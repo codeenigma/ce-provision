@@ -41,9 +41,12 @@
 - name: Install PHP packages.
   ansible.builtin.apt:
     pkg:
+      - "php{{ version }}-apcu"
+      - "php{{ version }}-bcmath"
       - "php{{ version }}-curl"
       - "php{{ version }}-dev"
       - "php{{ version }}-gd"
+      - "php{{ version }}-gmp"
       - "php{{ version }}-imap"
       - "php{{ version }}-ldap"
       - "php{{ version }}-mbstring"
@@ -54,8 +57,6 @@
       - "php{{ version }}-soap"
       - "php{{ version }}-xml"
       - "php{{ version }}-zip"
-      - "php{{ version }}-bcmath"
-      - "php{{ version }}-apcu"
     state: present
   with_items: "{{ php.version }}"
   loop_control:

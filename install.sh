@@ -84,6 +84,7 @@ FIREWALL="true"
 AWS_SUPPORT="false"
 IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
+ANSIBLE_VERSION="<12"
 
 # Parse options.
 parse_options "$@"
@@ -146,7 +147,7 @@ fi
 /usr/bin/echo "-------------------------------------------------"
 /usr/bin/su - "$CONTROLLER_USER" -c "/usr/bin/python3 -m venv /home/$CONTROLLER_USER/ce-python"
 /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/python3 -m pip install --upgrade pip"
-/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install ansible netaddr python-debian"
+/usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install 'ansible$ANSIBLE_VERSION' netaddr python-debian"
 if [ "$AWS_SUPPORT" = "true" ]; then
   /usr/bin/su - "$CONTROLLER_USER" -c "/home/$CONTROLLER_USER/ce-python/bin/pip install boto3"
 fi
@@ -210,7 +211,7 @@ ce_provision:
   venv_install_username: ${CONTROLLER_USER}
   upgrade_timer_name: upgrade_ce_provision_ansible
   aws_support: ${AWS_SUPPORT}
-  new_user: ${CONTROLLER_USER}
+  new_user: true
   username: ${CONTROLLER_USER}
   ssh_key_bits: "521"
   ssh_key_type: ed25519

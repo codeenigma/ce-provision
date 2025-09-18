@@ -121,9 +121,9 @@
 - name: Load custom vars file.
   ansible.builtin.include_tasks: allowed_vars.yml
   when:
-    - _init.ce_provision_extra_repository
-    - _init.ce_provision_extra_repository_vars_file
-    - _init.ce_provision_extra_repository_allowed_vars
+    - _init.ce_provision_extra_repository | length > 0
+    - _init.ce_provision_extra_repository_vars_file | length > 0
+    - _init.ce_provision_extra_repository_allowed_vars | length > 0
 
 # Install Ansible under the controller user for all servers
 # Ensure ansible_connection == 'ssh' (i.e. we are connecting to a server) before executing

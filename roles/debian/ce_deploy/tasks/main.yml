@@ -62,7 +62,7 @@
     version: "{{ ce_deploy.config_repository_branch | default('main') }}"
   become: false
   delegate_to: localhost
-  when: ce_deploy.config_repository is defined and ce_deploy.config_repository
+  when: ce_deploy.config_repository is defined and ce_deploy.config_repository | length > 0
 
 - name: Synchronize config directory.
   ansible.posix.synchronize:
@@ -71,7 +71,7 @@
     delete: true
     rsync_opts:
       - "--chown={{ ce_deploy.username }}:{{ ce_deploy.username }}"
-  when: ce_deploy.config_repository is defined and ce_deploy.config_repository
+  when: ce_deploy.config_repository is defined and ce_deploy.config_repository | length > 0
 
 - name: Check if we have a config directory.
   ansible.builtin.stat:
@@ -81,7 +81,7 @@
 - name: Register config repository.
   ansible.builtin.set_fact:
     key_value: ce_deploy_has_config_repo
-    ce_deploy_has_config_repo: "{{ 'yes' if ce_deploy_config_repo.stat.isdir is defined and ce_deploy_config_repo.stat.isdir else 'no' }}"
+    ce_deploy_has_config_repo: "{{ true if ce_deploy_config_repo.stat.isdir is defined and ce_deploy_config_repo.stat.isdir else false }}"
 
 - name: Create defaults folders.
   ansible.builtin.file:
@@ -172,6 +172,15 @@
   ansible.builtin.copy:
     dest: /etc/profile.d/ansible-path.sh
     content: "PATH=$PATH:{{ _venv_path }}/bin"
+    force: true
+
+- name: Copy mandatory ansible-galaxy requirements file to deploy server.
+  ansible.builtin.copy:
+    src: "{{ ce_deploy.ce_provision_dir }}/roles/debian/ce_deploy/meta/requirements-{{ ansible_distribution_major_version }}.yml"
+    dest: "{{ ce_deploy.local_dir }}/requirements-{{ ansible_distribution_major_version }}.yml"
+    owner: "{{ ce_deploy.username }}"
+    group: "{{ ce_deploy.username }}"
+    mode: '0644'
     force: true
 
 - name: Install mandatory ansible-galaxy collections.

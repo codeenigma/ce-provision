@@ -13,7 +13,7 @@
   with_items: "{{ user_ansible.groups }}"
   loop_control:
     loop_var: group
-  when: user_ansible.groups | length
+  when: user_ansible.groups | length > 0
 
 - name: Create the system user.
   ansible.builtin.user:
@@ -74,7 +74,7 @@
     owner: "{{ user_ansible.username }}"
     group: "{{ user_ansible.username }}"
     mode: '0600'
-  when: user_ansible.known_hosts | length
+  when: user_ansible.known_hosts | length > 0
 
 - name: Add public keys to known_hosts.
   ansible.builtin.known_hosts:

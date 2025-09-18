@@ -71,9 +71,10 @@
   ansible.builtin.include_tasks: process_cache_behavior.yml
 
 # not working properly
-- name: Extract the Lambda functios.
+- name: Extract the Lambda functions.
   ansible.builtin.set_fact:
     _lambda_functions: "{{ aws_cloudfront_distribution.functions | selectattr('type', '==', 'lambda') | list }}"
+  when: aws_cloudfront_distribution.functions is defined
 
 - name: Wait for Lambda function to be Active.
   ansible.builtin.command: >
@@ -87,6 +88,7 @@
   delay: 10
   changed_when: false
   loop: "{{ _lambda_functions }}"
+  when: aws_cloudfront_distribution.functions is defined
 
 # Solves above
 - name: Wait for 10 seconds.
