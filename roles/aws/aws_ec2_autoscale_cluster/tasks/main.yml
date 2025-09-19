@@ -482,7 +482,7 @@
 
 - name: Print image_id
   ansible.builtin.debug:
-  msg: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    msg: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
 
 - name: Create launch template.
   amazon.aws.ec2_launch_template:
@@ -785,7 +785,7 @@
 
 - name: Print image_id
   ansible.builtin.debug:
-  msg: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    msg: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
 
 - name: Copy AMI to backup region.
   community.aws.ec2_ami_copy:
