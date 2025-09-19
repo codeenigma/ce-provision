@@ -6,8 +6,13 @@
 REPORT_DATE=$(date +"%Y-%m-%d")
 REPORT_NAME="weekly-report-${REPORT_DATE}"
 LOG_FILE="/var/log/opensearch-reports.log"
+<<<<<<< HEAD
 USERNAME="{{ wazuh.mitre_report.username | default('') }}"
 PASSWORD="{{ _wazuh_filebeat_password.stdout | default('') }}"
+=======
+USERNAME= {{ wazuh.mitre_report.username }}
+PASSWORD= {{ _wazuh_filebeat_password }}
+>>>>>>> Fixing-ami-copy-task
 
 # Function to log messages
 log_message() {
