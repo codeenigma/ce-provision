@@ -13,7 +13,7 @@
   amazon.aws.ec2_security_group:
     name: "{{ aws_vpc_sg.name }}"
     profile: "{{ aws_vpc_sg.aws_profile | default(_aws_profile) }}"
-    region: "{{ aws_vpc_sg.region | default(_aws_profile) }}"
+    region: "{{ aws_vpc_sg.region | default(_aws_region) }}"
     tags: "{{ aws_vpc_sg.tags | default({}) }}"
     state: "{{ aws_vpc_sg.state | default('present') }}"
     vpc_id: "{{ aws_vpc_sg.id }}"
