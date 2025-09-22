@@ -3,6 +3,16 @@
     name: "{{ item.resource }}_{{ item.name }}"
   register: _iam_lambda
 
+- name: Set previous command output into variable.
+  ansible.builtin.set_fact:
+    _function_file: "{{ lookup('template', item.resource + '_' + item.name + '.py.j2') }}"
+  when: item.git_url is not defined
+
+- name: Set previous command output into variable.
+  ansible.builtin.set_fact:
+    _function_file: "{{ item.git_url }}"
+  when: item.git_url is defined
+
 - name: Create Lambda function.
   ansible.builtin.include_role:
     name: aws/aws_lambda
@@ -13,7 +23,7 @@
       timeout: "{{ item.timeout | default(aws_admin_tools.timeout) }}"
       role: "{{ aws_iam_role._result[item.resource + '_' + item.name] }}"
       runtime: "{{ aws_admin_tools.runtime }}"
-      function_file: "{{ lookup('template', item.resource + '_' + item.name + '.py.j2') }}"
+      function_file: "{{ _function_file }}"
       s3_bucket: "{{ _general_bucket }}"
       s3_bucket_prefix: "lambda-functions"
       tags:

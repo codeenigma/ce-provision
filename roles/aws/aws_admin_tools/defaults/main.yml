@@ -7,6 +7,7 @@ aws_admin_tools:
     - name: "change_asg_scaling" # Name used for creating API Gateway and Lambda functions
       resource: api # Refers to type of resource for needed function (can be api, schedule and s3)
       type: POST # Type of HTTP method, can be GET and POST
+      git_url: "git@codeenigma.net:functions/example_function.git" # If git_url is provided it will be used to download code from gitlab/github
       policies: [] # List of policies to use for lambda function
       inline_policies: # Inline policies to allow defining least privilages access
         name: "change_asg_scaling" # Name of inline policies
