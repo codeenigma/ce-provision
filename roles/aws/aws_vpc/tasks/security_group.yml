@@ -1,6 +1,6 @@
 - name: Configure vars if looping over list.
   ansible.builtin.set_fact:
-    aws_vpc:
+    aws_vpc_sg:
       name: "{{ _sec_group.name | default('') }}"
       tags: "{{ _aws_vpc_vpc.vpc.tags | combine({'Name': _sec_group.name}) }}"
       id: "{{ _aws_vpc_vpc.vpc.id }}"
@@ -11,18 +11,18 @@
 
 - name: Create Security Group.
   amazon.aws.ec2_security_group:
-    name: "{{ aws_vpc.name }}"
-    profile: "{{ aws_vpc.aws_profile }}"
-    region: "{{ aws_vpc.region }}"
-    tags: "{{ aws_vpc.tags }}"
-    state: "{{ aws_vpc.state }}"
-    vpc_id: "{{ aws_vpc.id }}"
-    description: "{{ aws_vpc.description | default('') }}"
-    rules: "{{ aws_vpc.rules | default(omit) }}"
-    rules_egress: "{{ aws_vpc.rules_egress | default(omit) }}"
-    purge_rules: "{{ aws_vpc.purge_rules | default(omit) }}"
+    name: "{{ aws_vpc_sg.name }}"
+    profile: "{{ aws_vpc_sg.aws_profile }}"
+    region: "{{ aws_vpc_sg.region }}"
+    tags: "{{ aws_vpc_sg.tags }}"
+    state: "{{ aws_vpc_sg.state }}"
+    vpc_id: "{{ aws_vpc_sg.id }}"
+    description: "{{ aws_vpc_sg.description | default('') }}"
+    rules: "{{ aws_vpc_sg.rules | default(omit) }}"
+    rules_egress: "{{ aws_vpc_sg.rules_egress | default(omit) }}"
+    purge_rules: "{{ aws_vpc_sg.purge_rules | default(omit) }}"
   register: _aws_vpc_result
 
 - name: Register aws_vpc SG results.
   ansible.builtin.set_fact:
-    aws_vpc: "{{ aws_vpc | combine({'_result': {aws_vpc.name: _aws_vpc_result}}, recursive=True) }}"
+    aws_vpc_sg: "{{ aws_vpc_sg | combine({'_result': {aws_vpc.name: _aws_vpc_result}}, recursive=True) }}"
