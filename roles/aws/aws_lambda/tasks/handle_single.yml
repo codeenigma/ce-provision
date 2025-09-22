@@ -1,0 +1,15 @@
+- name: Check and clean previous Lambda function.
+  ansible.builtin.file:
+    path: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
+    state: absent
+
+- name: Write Lambda function.
+  ansible.builtin.copy:
+    content: "{{ aws_lambda.function_file }}"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
+
+- name: Create a zip archive of Lambda function.
+  community.general.archive:
+    path: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.py"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
+    format: zip

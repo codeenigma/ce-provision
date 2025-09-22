@@ -1,0 +1,33 @@
+- name: Clone git repo.
+  ansible.builtin.git:
+    repo: "{{ aws_lambda.function_file }}"
+    dest: /tmp/funct
+
+- name: Find all .j2 template files.
+  ansible.builtin.find:
+    paths: "{{ work_dir }}/{{ repo_name }}"
+    patterns: "*.j2"
+    recurse: true
+  register: _j2_files
+
+- name: Template all .j2 files.
+  ansible.builtin.template:
+    src: "{{ item.path }}"
+    dest: "{{ item.path | regex_replace('\\.j2$', '') }}"
+  loop: "{{ _j2_files.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Remove original .j2 files after templating.
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ _j2_files.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Copy a zip archive of Lambda function.
+  community.general.archive:
+    path: "/tmp/funct"
+    dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
+    format: zip
