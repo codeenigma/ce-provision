@@ -778,3 +778,10 @@
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
+
+- name: Copy AMI to backup region.
+  community.aws.ec2_ami_copy:
+    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+    source_region: "{{ aws_ec2_autoscale_cluster.region }}"
+    region: "{{ aws_backup.copy_vault.region }}"
+    source_image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"

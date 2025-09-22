@@ -16,7 +16,7 @@
   with_items: "{{ ce_provision.groups }}"
   loop_control:
     loop_var: group
-  when: ce_provision.groups | length
+  when: ce_provision.groups is defined and ce_provision.groups | length > 0
 
 # User normally created already in the _init role.
 - name: Generate SSH key for the controller user for provisioning.

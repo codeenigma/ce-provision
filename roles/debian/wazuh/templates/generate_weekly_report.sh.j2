@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# This script generates a PDF report from wazuh-dashboard visualization and emails it
+
+# Set variables
+REPORT_DATE=$(date +"%Y-%m-%d")
+REPORT_NAME="weekly-report-${REPORT_DATE}"
+LOG_FILE="/var/log/opensearch-reports.log"
+USERNAME="{{ wazuh.mitre_report.username | default('') }}"
+PASSWORD="{{ _wazuh_filebeat_password.stdout | default('') }}"
+
+# Function to log messages
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
+
+log_message "Starting weekly report generation"
+
+# Generate and send the report
+/usr/local/bin/opensearch-reporting-cli \
+  -u "{{ wazuh.mitre_report.visualization_url }}" \
+  -a basic \
+  -c "$USERNAME:$PASSWORD" \
+  -n "$REPORT_NAME" \
+  -e smtp \
+  -s "{{ wazuh.mitre_report.e_mail_from }}" \
+  -r "{{ wazuh.manager.wazuh_manager_mailto }}" \
+  --subject "Weekly OpenSearch Report - $(date '+%B %d, %Y')" \
+  --note "Hi,\n\nPlease find attached the weekly Wazuh Mitre report covering the last 7 days.\n\nReport generated on: $(date '+%Y-%m-%d %H:%M:%S')\n\nBest regards,\nAutomated Reporting System" \
+  --smtphost localhost \
+  --smtpport 25
+
+# Check if the command was successful
+if [ $? -eq 0 ]; then
+    log_message "Weekly report generated and sent successfully"
+else
+    log_message "ERROR: Failed to generate or send weekly report"
+    exit 1
+fi
+
+# Optional: Clean up old report files (keep last 2 weeks)
+find /tmp -name "weekly-report-*.pdf" -mtime +14 -delete 2>/dev/null
+
+log_message "Weekly report process completed"
