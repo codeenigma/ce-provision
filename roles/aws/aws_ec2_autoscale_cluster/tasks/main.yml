@@ -34,7 +34,7 @@
     name: aws/aws_vpc
     tasks_from: security_group
   vars:
-    aws_vpc:
+    aws_vpc_sg:
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
@@ -52,7 +52,7 @@
 
 - name: Set _aws_ec2_autoscale_cluster_security_group variable.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc._result[aws_ec2_autoscale_cluster.name] }}"
+    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc_sg._result[aws_ec2_autoscale_cluster.name] }}"
 
 - name: Reset subnets lists.
   ansible.builtin.set_fact:
