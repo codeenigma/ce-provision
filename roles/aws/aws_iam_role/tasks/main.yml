@@ -24,12 +24,12 @@
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
-  when: aws_iam_role.policy_document | type_debug == 'AnsibleUnicode'
+  when: aws_iam_role.policy_document is string
 
 - name: Create assume role policy document if template is provided.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ aws_iam_role.policy_document }}"
-  when: aws_iam_role.policy_document | type_debug != 'AnsibleUnicode'
+  when: aws_iam_role.policy_document is not string
 
 - name: Create an IAM role.
   amazon.aws.iam_role:
