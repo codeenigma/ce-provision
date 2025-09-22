@@ -25,4 +25,4 @@
 
 - name: Register aws_vpc SG results.
   ansible.builtin.set_fact:
-    aws_vpc_sg: "{{ aws_vpc_sg | combine({'_result': {aws_vpc.name: _aws_vpc_result}}, recursive=True) }}"
+    aws_vpc_sg: "{{ aws_vpc_sg | combine({'_result': {aws_vpc_sg.name: _aws_vpc_result}}, recursive=True) }}"
