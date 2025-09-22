@@ -14,7 +14,7 @@
     name: "{{ aws_vpc_sg.name }}"
     profile: "{{ aws_vpc_sg.aws_profile | default(_aws_profile) }}"
     region: "{{ aws_vpc_sg.region | default(_aws_profile) }}"
-    tags: "{{ aws_vpc_sg.tags | default([]) }}"
+    tags: "{{ aws_vpc_sg.tags | default('') }}"
     state: "{{ aws_vpc_sg.state | default('present') }}"
     vpc_id: "{{ aws_vpc_sg.id }}"
     description: "{{ aws_vpc_sg.description | default('') }}"
