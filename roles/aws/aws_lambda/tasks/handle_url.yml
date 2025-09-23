@@ -32,6 +32,6 @@
 
 - name: Copy a zip archive of Lambda function.
   community.general.archive:
-    path: "/tmp/funct"
+    path: "/tmp/funct/"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
     format: zip
