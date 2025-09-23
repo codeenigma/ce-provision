@@ -41,7 +41,7 @@
     name: "{{ aws_iam_role.name }}"
     assume_role_policy_document: "{{ _assume_role_policy }}"
     managed_policies: "{{ _combined_policies }}"
-    purge_policies: "{{ aws_iam_role.purge_policies | default('true') }}"
+    purge_policies: "{{ aws_iam_role.purge_policies | default(true) }}"
     tags: "{{ aws_iam_role.tags | default({}) }}"
     create_instance_profile: "{% if aws_iam_role.policy_document == 'ec2' %}true{% else %}false{% endif %}"
     wait: true
