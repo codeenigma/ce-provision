@@ -9,7 +9,7 @@
 
 - name: Find all .j2 template files.
   ansible.builtin.find:
-    paths: "{{ work_dir }}/{{ repo_name }}"
+    paths: "/tmp/funct/{{ repo_name }}"
     patterns: "*.j2"
     recurse: true
   register: _j2_files
