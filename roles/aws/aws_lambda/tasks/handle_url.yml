@@ -2,6 +2,9 @@
   ansible.builtin.git:
     repo: "{{ aws_lambda.function_file }}"
     dest: /tmp/funct
+    accept_hostkey: true
+  become: true
+  become_user: "{{ ce_deploy.username }}"
 
 - name: Find all .j2 template files.
   ansible.builtin.find:
