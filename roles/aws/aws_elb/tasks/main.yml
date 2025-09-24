@@ -111,7 +111,7 @@
     _aws_ec2_listeners: "{{ _aws_ec2_listeners + aws_elb.listeners }}"
   when:
     - aws_elb is defined
-    - aws_elb | length
+    - aws_elb | length > 0
 
 - name: Generate security group information.
   ansible.builtin.include_role:
