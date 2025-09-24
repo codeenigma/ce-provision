@@ -34,7 +34,7 @@
     name: aws/aws_vpc
     tasks_from: security_group
   vars:
-    aws_vpc:
+    aws_vpc_sg:
       name: "Restore_testing"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
       id: "{{ _main_vpc_info.vpcs[0].vpc_id }}"
@@ -55,7 +55,7 @@
 
 - name: Construct AWS instance type dict.
   ansible.builtin.set_fact:
-    _restore_testing_sg: "{{ aws_vpc._result['Restore_testing'] }}"
+    _restore_testing_sg: "{{ aws_vpc_sg._result['Restore_testing'] }}"
 
 - name: Remove restore testing query file.
   ansible.builtin.file:

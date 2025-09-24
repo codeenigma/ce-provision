@@ -1,3 +1,9 @@
+aws_vpc_sg:
+  aws_profile: "{{ _aws_profile }}"
+  region: "{{ _aws_region }}"
+  tags: {}
+  state: present
+  description: ""
 aws_vpc:
   aws_profile: "{{ _aws_profile }}"
   region: "{{ _aws_region }}"
