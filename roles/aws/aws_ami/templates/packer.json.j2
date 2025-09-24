@@ -31,7 +31,7 @@
         "owners": ["{{ aws_ami.owner }}"],
         "most_recent": true
       },
-      {% if aws_ami.vpc_filter is defined and aws_ami.vpc_filter | length > 0 %}
+      {% if aws_ami.vpc_filter is defined and aws_ami.vpc_filter|length > 0 %}
       "vpc_filter": {
         "filters": {
           "tag:Name": "{{ aws_ami.vpc_filter }}"
@@ -53,7 +53,7 @@
       "playbook_file": "{{ aws_ami.playbook_file }}",
       "inventory_directory": "{{ _ce_provision_base_dir }}/hosts",
       "ssh_authorized_key_file": "/home/{{ user_provision.username }}/.ssh/{{ aws_ami.public_key_name }}",
-      {% if aws_ami.groups is defined and aws_ami.groups | length %}
+      {% if aws_ami.groups is defined and aws_ami.groups|length > 0 %}
       "groups": {{ aws_ami.groups | to_json }},
       {% endif %}
       "ansible_env_vars":
@@ -68,7 +68,7 @@
         {% if ansible_verbosity >= 1 %}
         "-vvvv",
         {% endif %}
-        {% if _aws_ami_extra_vars is defined and _aws_ami_extra_vars | length %}
+        {% if _aws_ami_extra_vars is defined and _aws_ami_extra_vars|length > 0 %}
         "--extra-vars",
         "{{ _aws_ami_extra_vars }}",
         {% endif %}
