@@ -14,14 +14,14 @@
   ansible.builtin.file:
     path: /etc/ldap/ssl
     state: directory
-  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
+  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate | length > 0
 
 - name: Copy certificate.
   ansible.builtin.copy:
     src: "{{ pam_ldap.ssl_certificate }}"
     dest: "/etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}"
     mode: "0666"
-  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate
+  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate | length > 0
 
 - name: Copy nslcd config.
   ansible.builtin.template:
