@@ -154,7 +154,11 @@
 
 - name: Build timer variables with dynamic key.
   ansible.builtin.set_fact:
-    _certbot_renewal_timer: "{'certbot_renewal':{'timer_command':'/usr/local/bin/le_cron.sh','timer_OnCalendar':'{{ _le_cron }}','timer_persistent':'true'}}"
+    _certbot_renewal_timer:
+      certbot_renewal:
+        timer_command: "/usr/local/bin/le_cron.sh"
+        timer_OnCalendar: "{{ _le_cron }}"
+        timer_persistent: true
   when: ssl.autorenew
 
 - name: Create systemd timer for certificate renewal.
