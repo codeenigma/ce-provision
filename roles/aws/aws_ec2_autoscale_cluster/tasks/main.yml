@@ -45,6 +45,21 @@
       rules:
         - proto: all
           group_name: "{{ aws_ec2_autoscale_cluster.name }}"
+  ansible.builtin.include_role:
+    name: aws/aws_vpc
+    tasks_from: security_group
+  vars:
+    aws_vpc:
+      name: "{{ aws_ec2_autoscale_cluster.name }}"
+      profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+      region: "{{ aws_ec2_autoscale_cluster.region }}"
+      tags: "{{ aws_ec2_autoscale_cluster.tags | combine({'Name': aws_ec2_autoscale_cluster.name}) }}"
+      state: "{{ aws_ec2_autoscale_cluster.state }}"
+      id: "{{ _aws_ec2_autoscale_cluster_vpc_id }}"
+      description: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
+      rules:
+        - proto: all
+          group_name: "{{ aws_ec2_autoscale_cluster.name }}"
     rules_egress:
       - proto: all
         group_name: "{{ aws_ec2_autoscale_cluster.name }}"
@@ -53,6 +68,10 @@
 - name: Set _aws_ec2_autoscale_cluster_security_group variable.
   ansible.builtin.set_fact:
     _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc_sg._result[aws_ec2_autoscale_cluster.name] }}"
+
+- name: Set _aws_ec2_autoscale_cluster_security_group variable.
+  ansible.builtin.set_fact:
+    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc._result[aws_ec2_autoscale_cluster.name] }}"
 
 - name: Reset subnets lists.
   ansible.builtin.set_fact:
