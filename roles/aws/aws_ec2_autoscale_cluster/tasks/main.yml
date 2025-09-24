@@ -34,7 +34,7 @@
     name: aws/aws_vpc
     tasks_from: security_group
   vars:
-    aws_vpc:
+    aws_vpc_sg:
       name: "{{ aws_ec2_autoscale_cluster.name }}"
       profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
       region: "{{ aws_ec2_autoscale_cluster.region }}"
@@ -45,14 +45,14 @@
       rules:
         - proto: all
           group_name: "{{ aws_ec2_autoscale_cluster.name }}"
-    rules_egress:
-      - proto: all
-        group_name: "{{ aws_ec2_autoscale_cluster.name }}"
-        rule_desc: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
+      rules_egress:
+        - proto: all
+          group_name: "{{ aws_ec2_autoscale_cluster.name }}"
+          rule_desc: "Allow internal traffic for cluster {{ aws_ec2_autoscale_cluster.name }}"
 
 - name: Set _aws_ec2_autoscale_cluster_security_group variable.
   ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc._result[aws_ec2_autoscale_cluster.name] }}"
+    _aws_ec2_autoscale_cluster_security_group: "{{ aws_vpc_sg._result[aws_ec2_autoscale_cluster.name] }}"
 
 - name: Reset subnets lists.
   ansible.builtin.set_fact:
@@ -779,9 +779,9 @@
     - aws_ec2_autoscale_cluster.route_53.zone is defined
     - aws_ec2_autoscale_cluster.route_53.zone | length > 0
 
-- name: Copy AMI to backup region.
-  community.aws.ec2_ami_copy:
-    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    source_region: "{{ aws_ec2_autoscale_cluster.region }}"
-    region: "{{ aws_backup.copy_vault.region }}"
-    source_image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+#- name: Copy AMI to backup region.
+#  community.aws.ec2_ami_copy:
+#    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+#    source_region: "{{ aws_ec2_autoscale_cluster.region }}"
+#    region: "{{ aws_backup.copy_vault.region }}"
+#    source_image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"

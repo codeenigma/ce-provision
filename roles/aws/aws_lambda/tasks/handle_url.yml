@@ -2,10 +2,14 @@
   ansible.builtin.git:
     repo: "{{ aws_lambda.function_file }}"
     dest: /tmp/funct
+    update: true
+    accept_hostkey: true
+  become: true
+  become_user: "{{ ce_provision.username }}"
 
 - name: Find all .j2 template files.
   ansible.builtin.find:
-    paths: "{{ work_dir }}/{{ repo_name }}"
+    paths: "/tmp/funct"
     patterns: "*.j2"
     recurse: true
   register: _j2_files
@@ -28,6 +32,11 @@
 
 - name: Copy a zip archive of Lambda function.
   community.general.archive:
-    path: "/tmp/funct"
+    path: "/tmp/funct/"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
     format: zip
+
+- name: Remove function directory
+  ansible.builtin.file:
+    path: /tmp/funct
+    state: absent

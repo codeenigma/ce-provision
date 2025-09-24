@@ -12,7 +12,7 @@
 - name: Ensure default Security group is tagged.
   ansible.builtin.include_tasks: "security_group.yml"
   vars:
-    aws_vpc:
+    aws_vpc_sg:
       name: "default"
       id: "{{ _aws_vpc_vpc.vpc.id }}"
       description: "default VPC security group"
