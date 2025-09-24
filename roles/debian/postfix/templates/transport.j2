@@ -1,7 +1,7 @@
 {{ ansible_hostname }} :
 {{ ansible_fqdn }} :
 {% for transport in postfix.transport_maps %}
-{% if transport|length %}
+{% if transport|length > 0 %}
 {{ transport }}
 {% endif %}
 {% endfor %}

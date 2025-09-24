@@ -27,7 +27,7 @@ ListenAddress {{ address }}
 #HostKey /etc/ssh/ssh_host_ecdsa_key
 #HostKey /etc/ssh/ssh_host_ed25519_key
 {% for key in sshd.HostKey %}
-{% if key|length %}
+{% if key|length > 0 %}
 HostKey {{ key }}
 {% endif %}
 {% endfor %}
@@ -119,7 +119,7 @@ UsePAM {{ sshd.UsePAM }}
 
 AllowAgentForwarding {{ sshd.AllowAgentForwarding }}
 AllowTcpForwarding {{ sshd.AllowTcpForwarding }}
-{% if sshd.AllowGroups|length %}
+{% if sshd.AllowGroups|length > 0 %}
 AllowGroups {{ sshd.AllowGroups }}
 {% endif %}
 GatewayPorts {{ sshd.GatewayPorts }}
