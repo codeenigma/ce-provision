@@ -21,15 +21,19 @@
     _combined_policies: "{{ aws_iam_role.managed_policies }}"
   when: aws_iam_role.inline_policies.action is not defined or aws_iam_role.inline_policies.action | length == 0
 
+- name: Create list of strings for predefined policies.
+  ansible.builtin.set_fact:
+    allowed_strings: ["ec2", "ecs", "backup"]
+
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
-  when: aws_iam_role.policy_document | type_debug == 'AnsibleUnicode'
+  when: aws_iam_role.policy_document in allowed_strings
 
 - name: Create assume role policy document if template is provided.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ aws_iam_role.policy_document }}"
-  when: aws_iam_role.policy_document | type_debug != 'AnsibleUnicode'
+  when: aws_iam_role.policy_document not in allowed_strings
 
 - name: Create an IAM role.
   amazon.aws.iam_role:
@@ -37,8 +41,8 @@
     name: "{{ aws_iam_role.name }}"
     assume_role_policy_document: "{{ _assume_role_policy }}"
     managed_policies: "{{ _combined_policies }}"
-    purge_policies: "{{ aws_iam_role.purge_policies }}"
-    tags: "{{ aws_iam_role.tags }}"
+    purge_policies: "{{ aws_iam_role.purge_policies | default(true) }}"
+    tags: "{{ aws_iam_role.tags | default({}) }}"
     create_instance_profile: "{% if aws_iam_role.policy_document == 'ec2' %}true{% else %}false{% endif %}"
     wait: true
   register: _aws_iam_role_result

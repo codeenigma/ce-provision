@@ -64,7 +64,7 @@
   with_items: "{{ aws_backup.plans }}"
   loop_control:
     loop_var: plan
-  when: aws_backup.plans | length
+  when: aws_backup.plans | length > 0
 
 - name: Include aws backup validation role.
   ansible.builtin.include_role:
