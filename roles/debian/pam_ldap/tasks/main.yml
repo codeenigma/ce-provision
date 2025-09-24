@@ -89,8 +89,8 @@
     mode: "0600"
     owner: root
   when:
-    - ldap_client.binddn is defined and ldap_client.binddn
-    - ldap_client.bindpw is defined and ldap_client.bindpw
+    - ldap_client.binddn is defined and ldap_client.binddn | length > 0
+    - ldap_client.bindpw is defined and ldap_client.bindpw | length > 0
 
 - name: Create wrapper script for LDAP key script.
   ansible.builtin.template:
@@ -99,8 +99,8 @@
     mode: "0555"
     owner: root
   when:
-    - ldap_client.binddn is defined and ldap_client.binddn
-    - ldap_client.bindpw is defined and ldap_client.bindpw
+    - ldap_client.binddn is defined and ldap_client.binddn | length > 0
+    - ldap_client.bindpw is defined and ldap_client.bindpw | length > 0
 
 - name: Configure SSH pub key command if there is a binddn set.
   ansible.builtin.lineinfile:
@@ -108,7 +108,7 @@
     regexp: "AuthorizedKeysCommand "
     line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap-wrapper.sh
   when:
-    - ldap_client.binddn is defined and ldap_client.binddn
+    - ldap_client.binddn is defined and ldap_client.binddn | length > 0
 
 - name: Configure SSH pub key command if no binddn set.
   ansible.builtin.lineinfile:
@@ -116,7 +116,7 @@
     regexp: "AuthorizedKeysCommand "
     line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap
   when:
-    - not ldap_client.binddn
+    - ldap_client.binddn | length = 0
 
 - name: Configure SSH pub key command user.
   ansible.builtin.lineinfile:
