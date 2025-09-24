@@ -27,7 +27,7 @@
     name: aws/aws_vpc
     tasks_from: security_group
   vars:
-    aws_vpc:
+    aws_vpc_sg:
       name: "{{ subnet.name }}"
       profile: "{{ aws_vpc_subnet.aws_profile }}"
       region: "{{ aws_vpc_subnet.region }}"

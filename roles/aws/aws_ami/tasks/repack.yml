@@ -13,7 +13,7 @@
     name: aws/aws_vpc
     tasks_from: security_group
   vars:
-    aws_vpc:
+    aws_vpc_sg:
       profile: "{{ aws_ami.aws_profile }}"
       region: "{{ aws_ami.region }}"
       name: "{{ aws_ami.repack.cluster_name }}-repacker"

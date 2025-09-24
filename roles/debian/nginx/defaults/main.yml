@@ -41,6 +41,7 @@ nginx:
       text/xml: ["xml", "rss"]
       image/gif: ["gif"]
       image/jpeg: ["jpeg", "jpg"]
+      image/webp: ["webp"]
       application/x-javascript: ["js"]
       application/atom+xml: ["atom"]
       text/mathml: ["mml"]
