@@ -35,3 +35,8 @@
     path: "/tmp/funct/"
     dest: "{{ _ce_provision_build_dir }}/{{ aws_lambda.name }}.zip"
     format: zip
+
+- name: Remove function directory
+  ansible.builtin.file:
+    path: /tmp/funct
+    state: absent
