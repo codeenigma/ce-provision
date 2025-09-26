@@ -1,0 +1,32 @@
+import os, time, re, boto3
+from botocore.exceptions import ClientError
+
+RDS_CLI = boto3.client("rds", region_name="{{ _aws_region }}")
+
+DB_CLASS   = os.getenv("DB_INSTANCE_CLASS", "db.t4g.medium")
+PREFIX     = os.getenv("DB_INSTANCE_ID_PREFIX", "restoretest")
+
+def lambda_handler(event, context):
+    print(event)
+    created_arn = event['detail']['createdResourceArn']
+    if not created_arn:
+        # Fallback: backup:DescribeRestoreJob if needed
+        raise RuntimeError("Missing createdResourceA
+
+    cluster_id = event['detail']['sourceResourceArn'].split(":")[-1]
+
+    cluster = RDS_CLI.describe_db_clusters(DBClusterIdentifier=cluster_id)["DBClusters"][0]
+    engine  = cluster["Engine"]
+
+    # Create instance
+    inst_id = f"{PREFIX}-{int(time.time())}"
+    rds.create_db_instance(
+        DBInstanceIdentifier=inst_id,
+        DBClusterIdentifier=cluster_id,
+        Engine=engine,
+        DBInstanceClass=DB_CLASS,
+        PubliclyAccessible=False,
+        Tags=[{"Key":"Purpose","Value":"RestoreTesting"},{"Key":"JobID","Value":event['detail']["restoreJobId"]}]
+    )
+
+    return payload
