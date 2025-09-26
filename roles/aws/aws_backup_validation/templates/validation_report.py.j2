@@ -5,10 +5,10 @@ import time
 import datetime
 
 # Defining Clients
-backup_cli = boto3.client('backup', region_name="{{ _aws_region }}")
-ses_cli = boto3.client('ses', region_name="{{ _aws_region }}")
+BACKUP_CLI = boto3.client('backup', region_name="{{ _aws_region }}")
+SES_CLI = boto3.client('ses', region_name="{{ _aws_region }}")
 ec2_cli = boto3.client('ec2', region_name="{{ _aws_region }}")
-rds_cli = boto3.client('rds', region_name="{{ _aws_region }}")
+RDS_CLI = boto3.client('rds', region_name="{{ _aws_region }}")
 
 mail_title = ""
 mail_body = ""
@@ -47,7 +47,7 @@ def lambda_handler(event, context):
 
   print("Getting list of successful restoration.")
   {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
-completed_job = backup_cli.list_restore_jobs(
+completed_job = BACKUP_CLI.list_restore_jobs(
     ByCreatedAfter=last_restore_valdation_date,
     ByStatus='COMPLETED',
     ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
@@ -72,7 +72,7 @@ completed_job = backup_cli.list_restore_jobs(
 
     elif ami_arn == 'rds':
       ami_id = inst['RecoveryPointArn'].split('snapshot:')[-1]
-      instance_details = rds_cli.describe_db_snapshots(
+      instance_details = RDS_CLI.describe_db_snapshots(
         DBSnapshotIdentifier=ami_id
       )
       print(instance_details)
@@ -89,7 +89,7 @@ completed_job = backup_cli.list_restore_jobs(
   print(mail_body)
   print("Getting list of failed restoration.")
   {% for plan in _testing_plans.stdout | from_json | json_query('RestoreTestingPlans') %}
-failed_job = backup_cli.list_restore_jobs(
+failed_job = BACKUP_CLI.list_restore_jobs(
     ByCreatedAfter=last_restore_valdation_date,
     ByStatus='FAILED',
     ByRestoreTestingPlanArn='{{ plan['RestoreTestingPlanArn'] }}'
@@ -108,7 +108,7 @@ failed_job = backup_cli.list_restore_jobs(
   print(failed_jobs)
 
   print("Sending email!")
-  response = ses_cli.send_email(
+  response = SES_CLI.send_email(
   Destination={
     'BccAddresses': [
     ],

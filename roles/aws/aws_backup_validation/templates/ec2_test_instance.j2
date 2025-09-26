@@ -5,10 +5,9 @@ import time
 
 # Defining Clients
 #s3_cli = boto3.client('s3', region_name='eu-west-2')
-backup_cli = boto3.client('backup', region_name="{{ _aws_region }}")
-ec2_cli = boto3.client("ec2", region_name="{{ _aws_region }}")
-ssm_cli = boto3.client('ssm', region_name="{{ _aws_region }}")
-ses_cli = boto3.client('ses', region_name="{{ _aws_region }}")
+BACKUP_CLI = boto3.client('backup', region_name="{{ _aws_region }}")
+EC2_CLI = boto3.client("ec2", region_name="{{ _aws_region }}")
+SSM_CLI = boto3.client('ssm', region_name="{{ _aws_region }}")
 
 # Debugger
 #boto3.set_stream_logger('')
@@ -21,7 +20,7 @@ def lambda_handler(event, context):
   ec2_instance_id=event['detail']['createdResourceArn'].split("/",1)[1]
 
   print("Gathering instance details.")
-  ec2_instances=ec2_cli.describe_instances()
+  ec2_instances=EC2_CLI.describe_instances()
 
   instance_exist = False
 
@@ -57,7 +56,7 @@ def lambda_handler(event, context):
       mail_body = mail_body + "Connection on " + str(port) + " is working!\n"
 
     # Check if SSM is set up for instance
-    ssm_status = ssm_cli.get_connection_status(Target=ec2_instance_id)
+    ssm_status = SSM_CLI.get_connection_status(Target=ec2_instance_id)
 
     if ssm_status['Status'] == 'connected':
       # Run scripts on EC2
@@ -70,7 +69,7 @@ def lambda_handler(event, context):
       """
 
       print("Running command!")
-      command_response = ssm_cli.send_command(
+      command_response = SSM_CLI.send_command(
         DocumentName ='AWS-RunShellScript',
         Parameters = {'commands': [script]},
         InstanceIds = [
@@ -80,7 +79,7 @@ def lambda_handler(event, context):
 
       print("Gathering commands details!")
       time.sleep(10)
-      c_res = ssm_cli.get_command_invocation(
+      c_res = SSM_CLI.get_command_invocation(
         CommandId=command_response['Command']['CommandId'],
         InstanceId=ec2_instance_id
       )
@@ -93,7 +92,7 @@ def lambda_handler(event, context):
       mail_body = mail_body + "SSM is not configured or accessible!\n"
 
     print("Validating Restore job!")
-    backup_cli.put_restore_validation_result(
+    BACKUP_CLI.put_restore_validation_result(
       RestoreJobId=event['detail']['restoreJobId'],
       ValidationStatus="SUCCESSFUL",
       ValidationStatusMessage=""
@@ -101,7 +100,7 @@ def lambda_handler(event, context):
 
   else:
     print("Validating Restore job!")
-    backup_cli.put_restore_validation_result(
+    BACKUP_CLI.put_restore_validation_result(
       RestoreJobId=event['detail']['restoreJobId'],
       ValidationStatus="FAILED",
       ValidationStatusMessage=""

@@ -23,7 +23,7 @@
 
 - name: Create list of strings for predefined policies.
   ansible.builtin.set_fact:
-    allowed_strings: ["ec2", "ecs", "backup"]
+    allowed_strings: ["ec2", "ecs", "backup", "event"]
 
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
