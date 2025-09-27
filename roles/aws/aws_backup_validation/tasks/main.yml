@@ -38,7 +38,7 @@
         name: "{{ item.name }}_lambda"
         resource: "*"
         action: "{{ item.lambda_policy }}"
-      policy_document: "{{ lookup('file', 'trusted_entitites.json.j2') }}"
+      policy_document: "{{ lookup('template', 'trusted_entitites.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create Lambda functions.
