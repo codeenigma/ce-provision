@@ -9,13 +9,30 @@
       tags: []
       state: "present"
 
+- name: Check string type using regex.
+  ansible.builtin.set_fact:
+    _string_type: >-
+      {%- if input_string | regex_search('^(https?://|git@)') -%}
+        url
+      {%- elif input_string | regex_search('\.zip$', ignorecase=True) -%}
+        zip
+      {%- else -%}
+        single
+      {%- endif -%}
+  vars:
+    input_string: "{{ aws_lambda.function_file }}"
+
 - name: Handle single file.
   ansible.builtin.include_tasks: handle_single.yml
-  when: aws_lambda.function_type is defined and aws_lambda.function_type == 'file'
+  when: _string_type == 'single'
+
+- name: Handle zip file.
+  ansible.builtin.include_tasks: handle_zip.yml
+  when: _string_type == 'zip'
 
 - name: Handle url.
   ansible.builtin.include_tasks: handle_url.yml
-  when: aws_lambda.function_type is defined and aws_lambda.function_type == 'url'
+  when: _string_type == 'url'
 
 - name: Place Lambda function in S3 bucket.
   amazon.aws.s3_object:
