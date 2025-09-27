@@ -34,12 +34,12 @@
   ansible.builtin.template:
     src: "{{ aws_iam_role.policy_document }}"
     dest: /tmp/policy_document.json
-  when: aws_iam_role.policy_document == "event"
+  when: (aws_iam_role.policy_document | basename) is match('.*\.j2$')
 
 - name: Create assume role policy document if event is provided.
   ansible.builtin.set_fact:
     _assume_role_policy: "/tmp/policy_document.json"
-  when: aws_iam_role.policy_document == "event"
+  when: (aws_iam_role.policy_document | basename) is match('.*\.j2$')
 
 - name: Create assume role policy document if template is provided.
   ansible.builtin.set_fact:
