@@ -28,7 +28,18 @@
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
-  when: aws_iam_role.policy_document in allowed_strings
+  when: aws_iam_role.policy_document in allowed_strings and aws_iam_role.policy_document != "event"
+
+- name: Copy Gitlab configuration file.
+  ansible.builtin.template:
+    src: "{{ aws_iam_role.policy_document }}"
+    dest: /tmp/policy_document.json
+  when: aws_iam_role.policy_document == "event"
+
+- name: Create assume role policy document if event is provided.
+  ansible.builtin.set_fact:
+    _assume_role_policy: "/tmp/policy_document.json"
+  when: aws_iam_role.policy_document == "event"
 
 - name: Create assume role policy document if template is provided.
   ansible.builtin.set_fact:

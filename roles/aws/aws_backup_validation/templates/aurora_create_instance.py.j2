@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         Engine=engine,
         DBInstanceClass=DB_CLASS,
         PubliclyAccessible=False,
-        Tags=[{"Key":"Purpose","Value":"RestoreTesting"},{"Key":"JobID","Value":str(event['detail']["restoreJobId"])}]
+        Tags=[{"Key":"Purpose","Value":"RestoreTesting"}]
     )
 
     return payload

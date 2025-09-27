@@ -36,6 +36,12 @@ def lambda_handler(event, context):
 
     instance_name_exist = False
 
+    for tag in clusters["DBClusters"][0]['TagList']:
+        if (tag['Key'] == "awsbackup-restore-test"):
+            backup_id = tag['Value']
+        else:
+            print("There is no tag available")
+
     print("Get instance name with access to RDS")
     for tag in clusters["DBClusters"][0]['TagList']:
         if tag['Key']=='Name':
