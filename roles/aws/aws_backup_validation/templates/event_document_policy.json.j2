@@ -1,0 +1,19 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "TrustEventBridgeService",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "events.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceArn": "arn:aws:events:{{ _aws_region }}:{{ _acc_id }}:rule/{{ aws_iam_role.name }}",
+                    "aws:SourceAccount": "{{ _acc_id }}"
+                }
+            }
+        }
+    ]
+}

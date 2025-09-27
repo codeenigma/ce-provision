@@ -10,6 +10,15 @@
   ansible.builtin.set_fact:
     _acc_id: "{{ _acc_id.stdout | from_json }}"
 
+- name: Create policy from template.
+  ansible.builtin.template:
+    src: "{{ aws_iam_role.policy_document_document_policy.json.j2 }}"
+    dest: "/etc/policy.json"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+
 - name: Create a role and attach policies for {{ item.name }} event.
   ansible.builtin.include_role:
     name: aws/aws_iam_role
@@ -22,7 +31,7 @@
         resource: "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ item.name }}"
         action:
           - "lambda:InvokeFunction"
-      policy_document: "event"
+      policy_document: "{{ lookup('template', 'event_document_policy.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create a role and attach policies for {{ item.name }} Lambda function.
@@ -113,7 +122,7 @@
   when: item.type == "Schedule"
   register: _validation_event
 
-- name: Update Lambda policy for "{{ item.name }}".
+- name: Update Lambda policy for {{ item.name }}.
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ item.name }}"
