@@ -107,7 +107,7 @@
     schedule_expression: "{{ item.schedule }}"
     description: "Run validation reporting."
     region: "{{ _aws_region }}"
-    role_arn: "{{ item.name }}"
+    role_arn: "arn:aws:iam::{{ _acc_id }}:role/{{ item.name }}_event"
     targets:
       - id: validation_report
         arn: "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ item.name }}"
