@@ -12,7 +12,7 @@
 - name: Check string type using regex.
   ansible.builtin.set_fact:
     _string_type: >-
-      {%- if (input_string | quote) | regex_search('^(https?://|git@)') -%}
+      {%- if (input_string.startswith('https://', 'http://', 'git@')) -%}
         url
       {%- else -%}
         single
