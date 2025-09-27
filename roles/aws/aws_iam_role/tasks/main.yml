@@ -25,6 +25,10 @@
   ansible.builtin.set_fact:
     allowed_strings: ["ec2", "ecs", "backup", "event"]
 
+- name: Debug vars-
+  ansible.builtin.debug:
+    msg: aws_iam_role.policy_document
+
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
@@ -46,7 +50,7 @@
     _assume_role_policy: "/tmp/policy_document.json"
   when: (aws_iam_role.policy_document | basename) is match('.*\.j2$')
 
-- name: Create an IAM role.
+- name: Create an IAM role {{ aws_iam_role.name }}.
   amazon.aws.iam_role:
     profile: "{{ aws_iam_role.aws_profile }}"
     name: "{{ aws_iam_role.name }}"
