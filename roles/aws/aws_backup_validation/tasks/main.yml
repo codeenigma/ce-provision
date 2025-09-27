@@ -105,7 +105,7 @@
     schedule_expression: "{{ item.schedule }}"
     description: "Run validation reporting."
     region: "{{ _aws_region }}"
-    role_arn: "{{ item.functions[0].name }}"
+    role_arn: "{{ item.name }}"
     targets:
       - id: validation_report
         arn: "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ item.name }}"
@@ -113,7 +113,7 @@
   when: item.type == "Schedule"
   register: _validation_event
 
-- name: Update Lambda policy.
+- name: Update Lambda policy for "{{ item.name }}".
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ item.name }}"
