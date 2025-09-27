@@ -12,16 +12,16 @@ aws_backup_validation:
       type: EC2
       lambda_policy:
         - "backup:PutRestoreValidationResult"
-        - "ssm.GetCommandInvocation"
-        - "ssm.GetConnectionStatus"
-        - "ssm.SendCommand"
+        - "ssm:GetCommandInvocation"
+        - "ssm:GetConnectionStatus"
+        - "ssm:SendCommand"
         - "ec2:DescribeInstances"
     - name: rds_test_instance
       type:  RDS
       lambda_policy:
         - "backup:PutRestoreValidationResult"
-        - "ssm.GetCommandInvocation"
-        - "ssm.SendCommand"
+        - "ssm:GetCommandInvocation"
+        - "ssm:SendCommand"
         - "ec2:DescribeInstances"
         - "rds:DescribeDBInstances"
     - name: aurora_create_instance
