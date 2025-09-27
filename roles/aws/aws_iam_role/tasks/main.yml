@@ -1,4 +1,4 @@
-- name: Create an IAM Managed Policy if defined.
+- name: Create an inline IAM Managed Policy if defined.
   amazon.aws.iam_managed_policy:
     policy_name: "inline_{{ aws_iam_role.inline_policies.name }}_policy"
     policy:
