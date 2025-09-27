@@ -22,7 +22,7 @@
         resource: "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ item.name }}"
         action:
           - "lambda:InvokeFunction"
-      policy_document: "event"
+      policy_document: "{{ lookup('template', 'event_document_policy.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
 
 - name: Create a role and attach policies for {{ item.name }} Lambda function.
@@ -113,7 +113,7 @@
   when: item.type == "Schedule"
   register: _validation_event
 
-- name: Update Lambda policy for "{{ item.name }}".
+- name: Update Lambda policy for {{ item.name }}.
   amazon.aws.lambda_policy:
     state: present
     function_name: "{{ item.name }}"
