@@ -49,6 +49,7 @@
   vars:
     aws_lambda:
       name: "{{ item.name }}"
+      function_type: "{{ item.function_type }}"
       description: "Lambda functions for {{ item.type }} validation."
       timeout: "{{ aws_backup_validation.timeout }}"
       role: "{{ aws_iam_role._result[item.name + '_lambda'] }}"

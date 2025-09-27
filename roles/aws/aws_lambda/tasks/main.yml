@@ -9,24 +9,13 @@
       tags: []
       state: "present"
 
-- name: Check string type using regex.
-  ansible.builtin.set_fact:
-    _string_type: >-
-      {%- if (input_string.startswith('https://', 'http://', 'git@')) -%}
-        url
-      {%- else -%}
-        single
-      {%- endif -%}
-  vars:
-    input_string: "{{ aws_lambda.function_file }}"
-
 - name: Handle single file.
   ansible.builtin.include_tasks: handle_single.yml
-  when: _string_type == 'single'
+  when: aws_lambda.function_type is defined and aws_lambda.function_type == 'file'
 
 - name: Handle url.
   ansible.builtin.include_tasks: handle_url.yml
-  when: _string_type == 'url'
+  when: aws_lambda.function_type is defined and aws_lambda.function_type == 'url'
 
 - name: Place Lambda function in S3 bucket.
   amazon.aws.s3_object:
