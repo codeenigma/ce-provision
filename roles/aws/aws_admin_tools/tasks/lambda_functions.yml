@@ -23,6 +23,7 @@
       timeout: "{{ item.timeout | default(aws_admin_tools.timeout) }}"
       role: "{{ aws_iam_role._result[item.resource + '_' + item.name] }}"
       runtime: "{{ aws_admin_tools.runtime }}"
+      function_type: "file"
       function_file: "{{ _function_file }}"
       s3_bucket: "{{ _general_bucket }}"
       s3_bucket_prefix: "lambda-functions"

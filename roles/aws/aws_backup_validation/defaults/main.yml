@@ -10,6 +10,7 @@ aws_backup_validation:
   resources:
     - name: ec2_test_instance
       type: EC2
+      function_type: file
       lambda_policy:
         - "backup:PutRestoreValidationResult"
         - "ssm:GetCommandInvocation"
@@ -18,6 +19,7 @@ aws_backup_validation:
         - "ec2:DescribeInstances"
     - name: rds_test_instance
       type:  RDS
+      function_type: file
       lambda_policy:
         - "backup:PutRestoreValidationResult"
         - "ssm:GetCommandInvocation"
@@ -26,10 +28,12 @@ aws_backup_validation:
         - "rds:DescribeDBInstances"
     - name: aurora_create_instance
       type: Aurora
+      function_type: file
       lambda_policy:
         - "lambda:InvokeFunction"
     - name: aurora_test_instance
       type: Aurora
+      function_type: file
       event_pattern: '{ "source": ["aws.rds"], "detail-type": ["RDS DB Instance Event"], "resources": [{ "prefix": "arn:aws:rds:eu-west-1:{{ _acc_id }}:db:restoretest" }], "detail": { "EventID": ["RDS-EVENT-0005"] } }'
       lambda_policy:
         - "backup:PutRestoreValidationResult"
@@ -39,6 +43,7 @@ aws_backup_validation:
         - "rds:DeleteDBInstance"
     - name: validation_report
       type: Schedule
+      function_type: file
       schedule: "cron(0 0 ? * MON *)"
       lambda_policy:
         - "backup:ListRestoreJobs"
