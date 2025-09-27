@@ -14,8 +14,6 @@
     _string_type: >-
       {%- if input_string | regex_search('^(https?://|git@)') -%}
         url
-      {%- elif input_string | regex_search('\.zip$', ignorecase=True) -%}
-        zip
       {%- else -%}
         single
       {%- endif -%}
@@ -25,10 +23,6 @@
 - name: Handle single file.
   ansible.builtin.include_tasks: handle_single.yml
   when: _string_type == 'single'
-
-- name: Handle zip file.
-  ansible.builtin.include_tasks: handle_zip.yml
-  when: _string_type == 'zip'
 
 - name: Handle url.
   ansible.builtin.include_tasks: handle_url.yml
