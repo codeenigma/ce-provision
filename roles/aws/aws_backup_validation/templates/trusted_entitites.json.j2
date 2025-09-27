@@ -9,7 +9,7 @@
       "Action": "sts:AssumeRole",
       "Condition": {
           "StringEquals": {
-              "aws:SourceArn": "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ aws_iam_role.name }}",
+              "aws:SourceArn": "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ aws_iam_role.source }}",
               "aws:SourceAccount": "{{ _acc_id }}"
           }
       }
