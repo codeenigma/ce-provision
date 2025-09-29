@@ -70,7 +70,7 @@
       tags:
         Name: "{{ item.name }}"
   loop: "{{ aws_backup_validation.resources }}"
-  when: item.git_url is not defined or not item.git_url
+  when: item.git_url is not defined
 
 - name: Create Lambda functions from git url.
   ansible.builtin.include_role:
@@ -82,13 +82,13 @@
       timeout: "{{ aws_backup_validation.timeout }}"
       role: "{{ aws_iam_role._result[item.name + '_lambda'] }}"
       runtime: "{{ aws_backup_validation.runtime }}"
-      function_file: "git@gitlab.infra1.codeenigma.net:functions/{{ item.name }}.git"
+      function_file: "{{ item.git_url }}"
       s3_bucket: "{{ aws_backup_validation.s3_bucket }}"
       s3_bucket_prefix: "lambda-functions"
       tags:
         Name: "{{ item.name }}"
   loop: "{{ aws_backup_validation.resources }}"
-  when: item.git_url is defined and item.git_url
+  when: item.git_url is defined
 
 - name: Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
