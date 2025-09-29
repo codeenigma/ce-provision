@@ -112,7 +112,17 @@
     state: present
     region: "{{ _aws_region }}"
     role_arn: "arn:aws:iam::{{ _acc_id }}:role/{{ item.name }}_event"
-    event_pattern: "{{ event_pattern | default('{ \"source\": [\"aws.backup\"], \"detail-type\": [\"Restore Job State Change\"], \"detail\": { \"resourceType\": [\"item.type\"], \"status\": [\"COMPLETED\"] } }') }}"
+    event_pattern: >-
+      {{ item.event_pattern | default(
+        {
+          "source": ["aws.backup"],
+          "detail-type": ["Restore Job State Change"],
+          "detail": {
+            "resourceType": [ item.type ],
+            "status": ["COMPLETED"]
+          }
+        } | to_json
+      ) }}
     targets:
       - id: "{{ item.name }}"
         arn: "arn:aws:lambda:{{ _aws_region }}:{{ _acc_id }}:function:{{ item.name }}"
