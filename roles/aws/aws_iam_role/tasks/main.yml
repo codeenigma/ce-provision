@@ -50,7 +50,7 @@
 - name: Wait for 6 seconds for IAM to be ready.
   ansible.builtin.wait_for:
     timeout: 6
-  when: ansible_loop.last
+  when: ansible_loop.last is defined and ansible_loop.last
 
 - name: Register aws_iam_role results.
   ansible.builtin.set_fact:
