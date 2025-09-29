@@ -25,6 +25,9 @@
           - "lambda:InvokeFunction"
       policy_document: "{{ lookup('template', 'event_document_policy.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
+  loop_control:
+    extended: true
+    extended_allitems: false
 
 - name: Create a role and attach policies for Lambda functions.
   ansible.builtin.include_role:
@@ -42,6 +45,9 @@
         action: "{{ item.lambda_policy }}"
       policy_document: "{{ lookup('template', 'trusted_entitites.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
+  loop_control:
+    extended: true
+    extended_allitems: false
 
 - name: Get info about newly created restore testing plan.
   ansible.builtin.command: >
