@@ -675,7 +675,9 @@
   when: aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
 
 - name: Handle CloudFront.
-  when: aws_ec2_autoscale_cluster.cloudfront.create_distribution
+  when:
+    - aws_ec2_autoscale_cluster.cloudfront.create_distribution
+    - aws_ec2_autoscale_cluster.create_elb
   block:
     - name: Create SSL certificate for CloudFront.
       ansible.builtin.include_role:
@@ -706,8 +708,6 @@
     - name: Initialise a list of CloudFront aliases with main domain name.
       ansible.builtin.set_fact:
         _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ [_domain_name] }}"
-      when:
-        - aws_ec2_autoscale_cluster.create_elb
 
     - name: Add extra_domains so we can set up additional CloudFront aliases.
       ansible.builtin.set_fact:
@@ -715,7 +715,6 @@
       loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
       when:
         - aws_ec2_autoscale_cluster.acm.extra_domains|length > 0
-        - aws_ec2_autoscale_cluster.create_elb
 
     - name: Create a CloudFront distribution.
       ansible.builtin.include_role:
@@ -732,7 +731,6 @@
           default_cache_behavior:
             target_origin_id: "ELB-{{ aws_ec2_autoscale_cluster.name }}"
       when:
-        - aws_ec2_autoscale_cluster.create_elb
         - _cf_certificate_ARN|length > 1
 
 # @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
