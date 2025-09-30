@@ -1,4 +1,4 @@
-- name: Create an IAM Managed Policy if defined.
+- name: Create an inline IAM Managed Policy if defined.
   amazon.aws.iam_managed_policy:
     policy_name: "inline_{{ aws_iam_role.inline_policies.name }}_policy"
     policy:
@@ -23,19 +23,19 @@
 
 - name: Create list of strings for predefined policies.
   ansible.builtin.set_fact:
-    allowed_strings: ["ec2", "ecs", "backup"]
+    allowed_strings: ["ec2", "ecs", "backup", "event"]
 
 - name: Create assume role policy document if predefined string is passed.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ lookup('file', aws_iam_role.policy_document + '_document_policy.json') }}"
-  when: aws_iam_role.policy_document in allowed_strings
+  when: aws_iam_role.policy_document in allowed_strings and aws_iam_role.policy_document != "event"
 
 - name: Create assume role policy document if template is provided.
   ansible.builtin.set_fact:
     _assume_role_policy: "{{ aws_iam_role.policy_document }}"
   when: aws_iam_role.policy_document not in allowed_strings
 
-- name: Create an IAM role.
+- name: Create an IAM role {{ aws_iam_role.name }}.
   amazon.aws.iam_role:
     profile: "{{ aws_iam_role.aws_profile }}"
     name: "{{ aws_iam_role.name }}"
@@ -50,6 +50,7 @@
 - name: Wait for 6 seconds for IAM to be ready.
   ansible.builtin.wait_for:
     timeout: 6
+  when: ansible_loop.last is defined and ansible_loop.last
 
 - name: Register aws_iam_role results.
   ansible.builtin.set_fact:
