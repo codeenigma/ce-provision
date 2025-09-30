@@ -122,17 +122,31 @@
     regexp: "AuthorizedKeysCommandUser "
     line: AuthorizedKeysCommandUser root
 
+- name: Check if nslcd service exists.
+  ansible.builtin.systemd:
+    name: nslcd
+  register: _nslcd_service_check
+  failed_when: false
+  changed_when: false
+
 - name: Restart nslcd service.
   ansible.builtin.service:
     name: nslcd
     state: restarted
-  when: ansible_facts.services['nslcd.service'] is defined
+  when: _nslcd_service_check is defined
+
+- name: Check if nscd service exists.
+  ansible.builtin.systemd:
+    name: nscd
+  register: _nscd_service_check
+  failed_when: false
+  changed_when: false
 
 - name: Restart nscd service.
   ansible.builtin.service:
     name: nscd
     state: restarted
-  when: ansible_facts.services['nscd.service'] is defined
+  when: _nscd_service_check is defined
 
 - name: Restart SSH service.
   ansible.builtin.service:
