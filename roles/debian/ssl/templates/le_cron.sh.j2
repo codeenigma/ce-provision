@@ -35,7 +35,7 @@ certbot_exit_code=$?
 
 if [ $certbot_exit_code -ne 0 ]; then
     # Certbot failed, send email notification
-    recipient="{{ ssl.email }}"
+    recipient="{{ _le_email }}"
     subject="Certbot Renewal Failed"
     hostname=$(cat /etc/hostname)
     body="Certbot renewal failed on server $hostname with the following output:
