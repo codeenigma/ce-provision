@@ -35,20 +35,30 @@
   when:
     - ssl.letsencrypt.venv_install_username is defined
 
-- name: Set LE email if defined globally.
+- name: Set LE email if defined globally for nginx.
   ansible.builtin.set_fact:
     _le_email: "{{ nginx.le_email }}"
   when: nginx.le_email is defined
+
+- name: Set LE email if defined globally for apache.
+  ansible.builtin.set_fact:
+    _le_email: "{{ apache.le_email }}"
+  when: apache.le_email is defined
 
 - name: Set LE email if defined per item.
   ansible.builtin.set_fact:
     _le_email: "{{ ssl.email }}"
   when: ssl.email is defined
 
-- name: Set LE cron if defined globally.
+- name: Set LE cron if defined globally for nginx.
   ansible.builtin.set_fact:
     _le_cron: "{{ nginx.le_cron }}"
   when: nginx.le_cron is defined
+
+- name: Set LE cron if defined globally for apache.
+  ansible.builtin.set_fact:
+    _le_cron: "{{ apache.le_cron }}"
+  when: apache.le_cron is defined
 
 - name: Set LE cron if defined per item.
   ansible.builtin.set_fact:

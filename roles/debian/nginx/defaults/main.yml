@@ -8,6 +8,8 @@ symfony_env: "{{ _env_type }}"
 # Nginx variables actually start here.
 nginx:
   # Global default config for nginx.conf.
+  # le_email: sysadm@codeenigma.com Globally defined email for Let's Encrypt notifications
+  # le_cron: Globally defined cron for LE renewals
   user: www-data
   worker_processes: auto
   events:
@@ -130,9 +132,6 @@ nginx:
   php_fastcgi_backend: "127.0.0.1:90{{ php.version[-1] | replace('.', '') }}" # for unix socket use "unix:/var/run/php{{ php.version[-1] | replace('.','') }}-fpm.sock"
   ratelimitingcrawlers: false
   client_max_body_size: "700M"
-  ssl_ciphers: [] # Defaults to empty list, you can add ciphers if needed
-#   - ECDHE-RSA-AES256-GCM-SHA384
-#   - ECDHE-RSA-CHACHA20-POLY1305
   # drupal_fallback: []
   # Default location behavior for nginx
   # If no custom location behavior is defined, this will be used:
