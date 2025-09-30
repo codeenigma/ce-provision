@@ -18,6 +18,7 @@ usage(){
   /usr/bin/echo '--hostname: the server hostname to set (default: depends on system or provider)'
   /usr/bin/echo '--no-firewall: skip installing iptables with ports 22, 80 and 443 open'
   /usr/bin/echo '--gitlab: install GitLab CE on this server (default: no, set to desired GitLab address to install, e.g. gitlab.example.com)'
+  /usr/bin/echo '--ansible-version: pass an Ansible version string such as <12 for less than version 12 (default: latest)'
   /usr/bin/echo '--letsencrypt: try to create an SSL certificate with LetsEncrypt (requires DNS pointing at this server for provided GitLab URL)'
   /usr/bin/echo '--aws: enable AWS support'
   /usr/bin/echo '--docker: script is running in a Docker container'
@@ -52,6 +53,10 @@ parse_options(){
           shift
           GITLAB_URL="$1"
         ;;
+      "--ansible-version")
+          shift
+          ANSIBLE_VERSION="$1"
+        ;;
       "--letsencrypt")
           LE_SUPPORT="yes"
         ;;
@@ -84,7 +89,7 @@ FIREWALL="true"
 AWS_SUPPORT="false"
 IS_LOCAL="false"
 SERVER_HOSTNAME=$(hostname)
-ANSIBLE_VERSION="<12"
+ANSIBLE_VERSION=""
 
 # Parse options.
 parse_options "$@"

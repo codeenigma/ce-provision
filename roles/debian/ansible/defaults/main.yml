@@ -1,14 +1,14 @@
 ---
 ce_ansible:
-  # These are usually set in the _init role using _venv_path, _venv_command and _venv_install_username but can be overridden.
-  #venv_path: "/home/{{ ce_provision.username }}/ansible"
-  #venv_command: /usr/bin/python3.11 -m venv
-  #venv_install_username: ansible # user to become when creating venv
-  ansible_version: "<12.0" # also check install.sh script in the repo root and set the version there accordingly.
+  # These are usually set in the _init role but can be overridden here.
+  venv_path: "{{ _venv_path }}"
+  venv_command: "{{ _venv_command }}"
+  venv_install_username: "{{ _venv_install_username }}"
+  ansible_version: ""  # if used with the install.sh script in the repo root, version strings should match
   upgrade:
-    enabled: false # create systemd timer to auto-upgrade Ansible. Temporary disabled due to ansible 2.19 breaking changes.
+    enabled: false  # create systemd timer to auto-upgrade Ansible. Temporary disabled due to ansible 2.19 breaking changes
     command: "{{ _venv_path }}/bin/python3 -m pip install --upgrade ansible" # if you set venv_path above then set it here too
-    on_calendar: "*-*-* 01:30:00" # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
+    on_calendar: "*-*-* 01:30:00"  # see systemd.time documentation - https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html#Calendar%20Events
     #timer_name: upgrade_ansible
   linters:
-    enabled: true # will not install linters if false, installing linters breaks cloud-init
+    enabled: true  # will not install linters if false, installing linters breaks cloud-init
