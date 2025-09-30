@@ -460,8 +460,8 @@
     cmd: "aws elbv2 add-listener-certificates --region {{ aws_ec2_autoscale_cluster.region }} --profile {{ aws_ec2_autoscale_cluster.aws_profile }} --listener-arn {{ _aws_ec2_autoscale_cluster_alb_listener_ARN }} --certificates CertificateArn={{ item }}"
   when:
     - aws_ec2_autoscale_cluster.create_elb
-    - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs
-    - _ssl_certificate_ARN | length > 1
+    - aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs|length > 0
+    - _ssl_certificate_ARN|length > 1
   with_items: "{{ aws_ec2_autoscale_cluster.ssl_extra_certificate_ARNs }}"
 
 # EC2 - BUILD ASG
@@ -475,7 +475,7 @@
       group_names: "{{ aws_ec2_autoscale_cluster.cluster_security_groups }}"
       return_type: ids
   when:
-    - aws_ec2_autoscale_cluster.cluster_security_groups | length > 0
+    - aws_ec2_autoscale_cluster.cluster_security_groups|length > 0
     - aws_ec2_autoscale_cluster.asg_refresh
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
@@ -542,60 +542,56 @@
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
 
-- name: Create step scaling AutoScale policies.
-  community.aws.autoscaling_policy:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    state: "present"
-    name: "{{ item.name }}-{{ item.policy_type }}"
-    adjustment_type: "{{ item.adjustment_type }}"
-    asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
-    scaling_adjustment: "{{ item.adjustment }}"
-    min_adjustment_step: "{{ item.adjustment_step }}"
-    metric_aggregation: "{{ item.metric_aggregation }}"
-    step_adjustments: "{{ item.step_adjustments }}"
+- name: Handle simple scaling AutoScale.
   when:
-    - aws_ec2_autoscale_cluster.asg_scaling_policies
-    - item.policy_type == 'StepScaling'
-    - aws_ec2_autoscale_cluster.type == "ec2"
-    - aws_ec2_autoscale_cluster.deploy_cluster
-  register: _aws_ec2_autoscale_cluster_step_scaling_policies
-  with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
-
-- name: Create simple scaling AutoScale policies.
-  community.aws.autoscaling_policy:
-    profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-    region: "{{ aws_ec2_autoscale_cluster.region }}"
-    state: "present"
-    name: "{{ item.name }}-{{ item.policy_type }}"
-    adjustment_type: "{{ item.adjustment_type }}"
-    asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
-    scaling_adjustment: "{{ item.adjustment }}"
-    min_adjustment_step: "{{ item.adjustment_step }}"
-    cooldown: "{{ item.cooldown }}"
-  when:
-    - aws_ec2_autoscale_cluster.asg_scaling_policies
+    - aws_ec2_autoscale_cluster.asg_scaling_policies|length > 0
     - item.policy_type == 'SimpleScaling'
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
-  register: _aws_ec2_autoscale_cluster_simple_scaling_policies
-  with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
+  block:
+    - name: Create simple scaling AutoScale policies.
+      community.aws.autoscaling_policy:
+        profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+        region: "{{ aws_ec2_autoscale_cluster.region }}"
+        state: "present"
+        name: "{{ item.name }}-{{ item.policy_type }}"
+        adjustment_type: "{{ item.adjustment_type }}"
+        asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
+        scaling_adjustment: "{{ item.adjustment }}"
+        min_adjustment_step: "{{ item.adjustment_step }}"
+        cooldown: "{{ item.cooldown }}"
+      register: _aws_ec2_autoscale_cluster_simple_scaling_policies
+      with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
-- name: Fetch step scaling policies.
-  ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
+    - name: Fetch simple scaling policies.
+      ansible.builtin.set_fact:
+        _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
+
+- name: Handle step scaling AustoScale.
   when:
-    - _aws_ec2_autoscale_cluster_step_scaling_policies
+    - aws_ec2_autoscale_cluster.asg_scaling_policies|length > 0
+    - item.policy_type == 'StepScaling'
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
+  block:
+    - name: Create step scaling AutoScale policies.
+      community.aws.autoscaling_policy:
+        profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
+        region: "{{ aws_ec2_autoscale_cluster.region }}"
+        state: "present"
+        name: "{{ item.name }}-{{ item.policy_type }}"
+        adjustment_type: "{{ item.adjustment_type }}"
+        asg_name: "{{ aws_ec2_autoscale_cluster.name }}"
+        scaling_adjustment: "{{ item.adjustment }}"
+        min_adjustment_step: "{{ item.adjustment_step }}"
+        metric_aggregation: "{{ item.metric_aggregation }}"
+        step_adjustments: "{{ item.step_adjustments }}"
+      register: _aws_ec2_autoscale_cluster_step_scaling_policies
+      with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
 
-- name: Fetch simple scaling policies.
-  ansible.builtin.set_fact:
-    _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
-  when:
-    - _aws_ec2_autoscale_cluster_simple_scaling_policies
-    - aws_ec2_autoscale_cluster.type == "ec2"
-    - aws_ec2_autoscale_cluster.deploy_cluster
+    - name: Fetch step scaling policies.
+      ansible.builtin.set_fact:
+        _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
 
 - name: Create placeholder ARN variables for scaling policies.
   ansible.builtin.set_fact:
@@ -740,7 +736,7 @@
     _aws_ec2_autoscale_cluster_cloudfront_aliases: "{{ _aws_ec2_autoscale_cluster_cloudfront_aliases + [item.domain] }}"
   loop: "{{ aws_ec2_autoscale_cluster.acm.extra_domains }}"
   when:
-    - aws_ec2_autoscale_cluster.acm.extra_domains | length > 0
+    - aws_ec2_autoscale_cluster.acm.extra_domains|length > 0
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
 
@@ -761,7 +757,7 @@
   when:
     - aws_ec2_autoscale_cluster.create_elb
     - aws_ec2_autoscale_cluster.cloudfront.create_distribution
-    - _cf_certificate_ARN | length > 1
+    - _cf_certificate_ARN|length > 1
 
 # @TODO - we can use the aws_acm_obsolete_certificate_arn variable to tidy up previous ACM certs, if it is defined.
 
@@ -777,11 +773,4 @@
   loop: "{{ _aws_ec2_autoscale_cluster_dns_all_domains }}"
   when:
     - aws_ec2_autoscale_cluster.route_53.zone is defined
-    - aws_ec2_autoscale_cluster.route_53.zone | length > 0
-
-#- name: Copy AMI to backup region.
-#  community.aws.ec2_ami_copy:
-#    aws_profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
-#    source_region: "{{ aws_ec2_autoscale_cluster.region }}"
-#    region: "{{ aws_backup.copy_vault.region }}"
-#    source_image_id: "{{ aws_ec2_autoscale_cluster_image_latest.image_id }}"
+    - aws_ec2_autoscale_cluster.route_53.zone|length > 0
