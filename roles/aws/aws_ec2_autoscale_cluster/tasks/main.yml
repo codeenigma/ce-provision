@@ -524,12 +524,16 @@
           - "{{ _aws_ec2_target_group_created.target_group_arn }}"
       register: _aws_ec2_asg_created
 
-- name: Handle simple scaling AutoScale.
+- name: Handle AutoScale policies and alarms.
   when:
     - aws_ec2_autoscale_cluster.asg_scaling_policies|length > 0
     - aws_ec2_autoscale_cluster.type == "ec2"
     - aws_ec2_autoscale_cluster.deploy_cluster
   block:
+    - name: Set empty scaling policies fact.
+      ansible.builtin.set_fact:
+        _aws_ec2_autoscale_cluster_scaling_policies: []
+
     - name: Create simple scaling AutoScale policies.
       community.aws.autoscaling_policy:
         profile: "{{ aws_ec2_autoscale_cluster.aws_profile }}"
@@ -545,9 +549,9 @@
       with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
       when: item.policy_type == 'SimpleScaling'
 
-    - name: Fetch simple scaling policies.
+    - name: Add simple scaling policies to scaling policies list.
       ansible.builtin.set_fact:
-        _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
+        _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_simple_scaling_policies.results }}"
       when: _aws_ec2_autoscale_cluster_simple_scaling_policies.results is defined
 
     - name: Create step scaling AutoScale policies.
@@ -566,9 +570,9 @@
       with_items: "{{ aws_ec2_autoscale_cluster.asg_scaling_policies }}"
       when: item.policy_type == 'StepScaling'
 
-    - name: Fetch step scaling policies.
+    - name: Add step scaling policies to scaling policies list.
       ansible.builtin.set_fact:
-        _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
+        _aws_ec2_autoscale_cluster_scaling_policies: "{{ _aws_ec2_autoscale_cluster_scaling_policies + _aws_ec2_autoscale_cluster_step_scaling_policies.results }}"
       when: _aws_ec2_autoscale_cluster_step_scaling_policies.results is defined
 
 - name: Create scaling policies and alarms.
