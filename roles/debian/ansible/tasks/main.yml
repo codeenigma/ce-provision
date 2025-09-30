@@ -21,20 +21,14 @@
 - name: Override Python venv path if provided.
   ansible.builtin.set_fact:
     _venv_path: "{{ ce_ansible.venv_path }}"
-  when:
-    - ce_ansible.venv_path is defined
 
 - name: Override Python venv command if provided.
   ansible.builtin.set_fact:
     _venv_command: "{{ ce_ansible.venv_command }}"
-  when:
-    - ce_ansible.venv_command is defined
 
 - name: Override Python user if provided.
   ansible.builtin.set_fact:
     _venv_install_username: "{{ ce_ansible.venv_install_username }}"
-  when:
-    - ce_ansible.venv_install_username is defined
 
 - name: Set up Python packages.
   ansible.builtin.include_role:
@@ -75,7 +69,7 @@
 
 - name: Add the venv to $PATH using profile.d.
   ansible.builtin.copy:
-    content: "export PATH=$PATH:{{ ce_ansible.venv_path | default(_venv_path) }}/bin"
+    content: "export PATH=$PATH:{{ ce_ansible.venv_path }}/bin"
     dest: "/etc/profile.d/ansible-path.sh"
     mode: '0644'
 
