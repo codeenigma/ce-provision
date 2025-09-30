@@ -17,7 +17,7 @@
     ami_base_image_latest: "{{ ami_base_image.images | sort(attribute='creation_date') | last }}"
   when:
     - ami_base_image.images is defined
-    - ami_base_image.images
+    - ami_base_image.images|length > 0
 
 - name: Delete existing image.
   ansible.builtin.include_tasks: delete.yml
