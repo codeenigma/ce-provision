@@ -8,6 +8,8 @@ symfony_env: "{{ _env_type }}"
 # Nginx variables actually start here.
 nginx:
   # Global default config for nginx.conf.
+  # le_email: sysadm@codeenigma.com Globally defined email for Let's Encrypt notifications
+  # le_cron: Globally defined cron for LE renewals
   user: www-data
   worker_processes: auto
   events:
