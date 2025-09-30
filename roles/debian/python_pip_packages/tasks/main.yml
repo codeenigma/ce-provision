@@ -12,5 +12,5 @@
     path: "{{ python_pip_packages.venv_path | default(_venv_path) }}"
     state: directory
     recurse: true
-    owner: "{{ python_pip_packages.install_username | default(_venv_install_username) }}"
-    group: "{{ python_pip_packages.install_username | default(_venv_install_username) }}"
+    owner: "{{ python_pip_packages.install_username }}"
+    group: "{{ python_pip_packages.install_username }}"
