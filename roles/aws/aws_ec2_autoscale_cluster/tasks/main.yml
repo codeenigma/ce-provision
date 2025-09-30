@@ -380,7 +380,7 @@
             Host: "#{host}"
             Query: "#{query}"
             Path: "/#{path}"
-            Port: "{{ aws_ec2_autoscale_cluster.alb_https_port }}"
+            Port: "{{ aws_ec2_autoscale_cluster.alb_https_port|string }}"
             StatusCode: HTTP_301
     _aws_ec2_autoscale_cluster_listeners_https:
       Protocol: HTTPS
