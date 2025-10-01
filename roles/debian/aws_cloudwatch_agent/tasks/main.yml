@@ -46,6 +46,7 @@
 - name: Install main config.
   ansible.builtin.template:
     src: config.json.j2
+    force: true
     dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/config.json
     owner: cwagent
     group: cwagent

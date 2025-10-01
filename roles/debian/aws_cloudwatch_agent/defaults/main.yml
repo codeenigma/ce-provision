@@ -7,6 +7,9 @@ aws_cloudwatch_agent:
   # Group prefix. Useful for grouping by environments.
   # Eg. instead of "syslog", you can have "dev syslog", "prod syslog", etc.
   log_group_prefix: ""
+  # Enable collectd integration
+  collectd:
+    enabled: false
   # You'd normally use IAM policies, but that allows
   # non-AWS servers to log in cloudwatch too.
   use_credentials: false
