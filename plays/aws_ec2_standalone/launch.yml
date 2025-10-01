@@ -27,6 +27,6 @@
       ansible.builtin.add_host:
         name: "{{ _aws_resource_name }}"
         groups: "_new_servers"
-      when: _aws_hostname | length == 0
+      when: _aws_hostname|length == 0
     - ansible.builtin.import_role:
         name: _exit
