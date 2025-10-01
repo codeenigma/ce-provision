@@ -71,6 +71,9 @@
     name: debian/python_pip_packages
   vars:
     python_pip_packages:
+      venv_path: "{{ _venv_path }}"  # variables in _init role
+      venv_command: "{{ _venv_command }}"
+      venv_install_username: "{{ _venv_install_username }}"
       packages:
         - name: pip
           state: latest
@@ -87,6 +90,9 @@
     name: debian/python_pip_packages
   vars:
     python_pip_packages:
+      venv_path: "{{ _venv_path }}"  # variables in _init role
+      venv_command: "{{ _venv_command }}"
+      venv_install_username: "{{ _venv_install_username }}"
       packages:
         - name: "certbot-{{ _ssl_web_server }}"
   when: not (_ssl_web_server == "standalone" or _ssl_web_server == "webroot")
