@@ -109,7 +109,7 @@
     msg: "No AMI found using the provided filters, exiting!"
   when: _aws_ec2_with_eip_ami_images.images | length == 0
 
-# Do not create an instance if _aws_hostname is not an EC2 generated address unless `force: true`
+# Create an instance if _aws_hostname is set (it cannot be unless there is an EC2 generated address in a tagged hostgroup) unless `force: true`
 - name: Create new EC2 instance.
   amazon.aws.ec2_instance:
     profile: "{{ aws_ec2_with_eip.aws_profile }}"
@@ -137,7 +137,7 @@
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: _aws_ec2_with_eip_instances
-  when: (_aws_hostname|length == 0) or (_aws_hostname == '_' + aws_ec2_with_eip.hostname|regex_replace('-', '_')) or aws_ec2_with_eip.force
+  when: (_aws_hostname|length == 0) or aws_ec2_with_eip.force
 
 # This task deliberately omits `image_id` so it cannot create a new instance, only refresh the state of an existing one.
 - name: Refresh EC2 instance.
@@ -163,7 +163,7 @@
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: _aws_ec2_with_eip_instances
-  when: (_aws_hostname|length > 0) or (_aws_hostname != '_' + aws_ec2_with_eip.hostname|regex_replace('-', '_')) or not aws_ec2_with_eip.force
+  when: (_aws_hostname|length > 0) or not aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
   amazon.aws.ec2_eip_info:
