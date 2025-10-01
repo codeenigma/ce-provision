@@ -7,7 +7,7 @@
 
 - name: Setting previous command output into variable.
   ansible.builtin.set_fact:
-    _acc_id: "{{ _acc_id.stdout | from_json }}"
+    _acc_id: "{{ _acc_id.stdout }}"
 
 - name: Get CloudFront info.
   ansible.builtin.shell: "aws cloudfront get-distribution-config --id {{ _aws_cloudfront_distribution.id }} --output json > /tmp/dist-config.json"
