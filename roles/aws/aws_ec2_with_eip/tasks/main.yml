@@ -15,7 +15,7 @@
   ansible.builtin.set_fact:
     _aws_hostname: "{{ item }}"
   with_inventory_hostnames:
-    - "{{ aws_ec2_with_eip.hostname }}"
+    - "_{{ aws_ec2_with_eip.hostname|regex_replace('-', '_') }}"
 
 # Subnet ID is stored in ce-provision's data directory
 - name: Ensure server data directory exists.
@@ -133,7 +133,7 @@
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: _aws_ec2_with_eip_instances
-  when: (_aws_hostname | length == 0) or (_aws_hostname == aws_ec2_with_eip.hostname) or aws_ec2_with_eip.force
+  when: (_aws_hostname|length == 0) or aws_ec2_with_eip.force
 
 # This task deliberately omits `image_id` so it cannot create a new instance, only refresh the state of an existing one.
 - name: Refresh EC2 instance.
@@ -159,7 +159,7 @@
           volume_type: "{{ aws_ec2_with_eip.root_volume_type }}"
           encrypted: "{{ aws_ec2_with_eip.root_volume_encrypted }}"
   register: _aws_ec2_with_eip_instances
-  when: (_aws_hostname | length > 0) or (_aws_hostname != aws_ec2_with_eip.hostname) or not aws_ec2_with_eip.force
+  when: (_aws_hostname|length > 0) or not aws_ec2_with_eip.force
 
 - name: Check if we have an existing EIP.
   amazon.aws.ec2_eip_info:
