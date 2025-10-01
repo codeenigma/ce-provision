@@ -25,8 +25,8 @@
         - "_{{ _aws_resource_name | regex_replace('-', '_') }}"
     - name: If an Ansible host is not found, create it so we can execute EC2 orchestration.
       ansible.builtin.add_host:
-        name: "_{{ _aws_resource_name | regex_replace('-', '_') }}"
+        name: "{{ _aws_resource_name }}"
         groups: "_new_servers"
-      when: _aws_hostname | length == 0
+      when: _aws_hostname|length == 0
     - ansible.builtin.import_role:
         name: _exit
