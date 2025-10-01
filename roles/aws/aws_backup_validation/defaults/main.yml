@@ -9,7 +9,7 @@ aws_backup_validation:
   handler: "lambda_handler"
   resources:
     - name: ec2_test_instance
-      git_url: git@gitlab.dummy-infra1.codeenigma.net:functions/ec2_test_instance.git
+      git_url: true
       type: EC2
       lambda_policy:
         - "backup:PutRestoreValidationResult"
@@ -18,7 +18,7 @@ aws_backup_validation:
         - "ssm:SendCommand"
         - "ec2:DescribeInstances"
     - name: rds_test_instance
-      git_url: git@gitlab.dummy-infra1.codeenigma.net:functions/rds_test_instance.git
+      git_url: true
       type:  RDS
       lambda_policy:
         - "backup:PutRestoreValidationResult"
@@ -27,12 +27,12 @@ aws_backup_validation:
         - "ec2:DescribeInstances"
         - "rds:DescribeDBInstances"
     - name: aurora_create_instance
-      git_url: git@gitlab.dummy-infra1.codeenigma.net:functions/aurora_create_instance.git
+      git_url: true
       type: Aurora
       lambda_policy:
         - "lambda:InvokeFunction"
     - name: aurora_test_instance
-      git_url: git@gitlab.dummy-infra1.codeenigma.net:functions/aurora_test_instance.git
+      git_url: true
       type: Aurora
       event_pattern: '{ "source": ["aws.rds"], "detail-type": ["RDS DB Instance Event"], "resources": [{ "prefix": "arn:aws:rds:eu-west-1:{{ _acc_id }}:db:restoretest" }], "detail": { "EventID": ["RDS-EVENT-0005"] } }'
       lambda_policy:
@@ -42,7 +42,7 @@ aws_backup_validation:
         - "rds:DescribeDBClusters"
         - "rds:DeleteDBInstance"
     - name: validation_report
-      git_url: git@gitlab.example.codeenigmma.net:functions/validation_report.git
+      git_url: true
       type: Schedule
       schedule: "cron(0 0 ? * MON *)"
       lambda_policy:
