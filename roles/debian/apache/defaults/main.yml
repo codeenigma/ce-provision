@@ -4,6 +4,8 @@ php:
     - 8.1 # see https://www.php.net/supported-versions.php
 symfony_env: "{{ _env_type }}"
 apache:
+  # le_email: sysadm@codeenigma.com Globally defined email for Let's Encrypt notifications
+  # le_cron: Globally defined cron for LE renewals
   # Global default config for apache2.conf.
   user: www-data
   mods_enabled:
