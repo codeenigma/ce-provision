@@ -45,7 +45,7 @@
     password: "{{ aws_rds.master_user_password }}"
     db_subnet_group_name: "{{ aws_rds.name }}"
     vpc_security_group_ids: "{{ _aws_security_group_list }}"
-    backup_retention_period: "{{ aws_rds.backup_retention_period | default(35) }}"
+    backup_retention_period: "{{ aws_rds.backup_retention_period | default(1) }}"
     character_set_name: "{{ aws_rds.character_set_name | default(omit) }}"
     tags: "{{ aws_rds.tags | combine({'Name': aws_rds.name}) }}"
   when: "'aurora' in aws_rds.engine"
@@ -157,7 +157,7 @@
       - "{{ _aws_sns_topic_info.sns_arn }}"
   when:
     - _aws_sns_topic_info is defined
-    - _aws_sns_topic_info.sns_arn
+    - _aws_sns_topic_info.sns_arn | length > 0
 
 - name: Create RDS CloudWatch alarms.
   ansible.builtin.include_role:
