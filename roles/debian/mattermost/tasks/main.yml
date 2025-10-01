@@ -5,6 +5,9 @@
     name: debian/python_pip_packages
   vars:
     python_pip_packages:
+      venv_path: "{{ _venv_path }}"  # variables in _init role
+      venv_command: "{{ _venv_command }}"
+      venv_install_username: "{{ _venv_install_username }}"
       packages:
         - name: psycopg2-binary
 
