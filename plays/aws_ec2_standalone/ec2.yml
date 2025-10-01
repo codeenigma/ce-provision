@@ -1,6 +1,6 @@
 ---
 # First step. Spin up a "blank" instance and add the controller user and Ansible via user-data.
-- hosts: "{{ _aws_resource_name }}"
+- hosts: "{{ _aws_resource_name }}, _{{ _aws_resource_name | regex_replace('-', '_') }}"
   connection: local
   become: false
 
