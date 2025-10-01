@@ -14,14 +14,14 @@
   ansible.builtin.file:
     path: /etc/ldap/ssl
     state: directory
-  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate | length > 0
+  when: pam_ldap.ssl_certificate|length > 0
 
 - name: Copy certificate.
   ansible.builtin.copy:
     src: "{{ pam_ldap.ssl_certificate }}"
     dest: "/etc/ldap/ssl/{{ pam_ldap.ssl_certificate | basename }}"
     mode: "0666"
-  when: pam_ldap.ssl_certificate is defined and pam_ldap.ssl_certificate | length > 0
+  when: pam_ldap.ssl_certificate|length > 0
 
 - name: Copy nslcd config.
   ansible.builtin.template:
@@ -82,33 +82,31 @@
     mode: 0555
     owner: root
 
-- name: Create LDAP key script passwd file.
-  ansible.builtin.template:
-    src: ldap-bindpw.j2
-    dest: /etc/ldap/ldap-bindpw
-    mode: "0600"
-    owner: root
+- name: LDAP password handling.
   when:
-    - ldap_client.binddn is defined and ldap_client.binddn | length > 0
-    - ldap_client.bindpw is defined and ldap_client.bindpw | length > 0
+    - ldap_client.binddn|length > 0
+    - ldap_client.bindpw|length > 0
+  block:
+    - name: Create LDAP key script passwd file.
+      ansible.builtin.template:
+        src: ldap-bindpw.j2
+        dest: /etc/ldap/ldap-bindpw
+        mode: "0600"
+        owner: root
 
-- name: Create wrapper script for LDAP key script.
-  ansible.builtin.template:
-    src: ssh-getkey-ldap-wrapper.sh.j2
-    dest: /usr/local/bin/ssh-getkey-ldap-wrapper.sh
-    mode: "0555"
-    owner: root
-  when:
-    - ldap_client.binddn is defined and ldap_client.binddn | length > 0
-    - ldap_client.bindpw is defined and ldap_client.bindpw | length > 0
+    - name: Create wrapper script for LDAP key script.
+      ansible.builtin.template:
+        src: ssh-getkey-ldap-wrapper.sh.j2
+        dest: /usr/local/bin/ssh-getkey-ldap-wrapper.sh
+        mode: "0555"
+        owner: root
 
-- name: Configure SSH pub key command if there is a binddn set.
-  ansible.builtin.lineinfile:
-    path: /etc/ssh/sshd_config
-    regexp: "AuthorizedKeysCommand "
-    line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap-wrapper.sh
-  when:
-    - ldap_client.binddn is defined and ldap_client.binddn | length > 0
+    # We don't support bind DN with no password because if there is no password the necessary script is not created.
+    - name: Configure SSH pub key command if there is a binddn set.
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "AuthorizedKeysCommand "
+        line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap-wrapper.sh
 
 - name: Configure SSH pub key command if no binddn set.
   ansible.builtin.lineinfile:
@@ -116,7 +114,7 @@
     regexp: "AuthorizedKeysCommand "
     line: AuthorizedKeysCommand /usr/local/bin/ssh-getkey-ldap
   when:
-    - ldap_client.binddn | length == 0
+    - ldap_client.binddn|length == 0
 
 - name: Configure SSH pub key command user.
   ansible.builtin.lineinfile:
@@ -124,17 +122,31 @@
     regexp: "AuthorizedKeysCommandUser "
     line: AuthorizedKeysCommandUser root
 
+- name: Check if nslcd service exists.
+  ansible.builtin.systemd:
+    name: nslcd
+  register: _nslcd_service_check
+  failed_when: false
+  changed_when: false
+
 - name: Restart nslcd service.
   ansible.builtin.service:
     name: nslcd
     state: restarted
-  when: ansible_facts.services['nslcd.service'] is defined
+  when: _nslcd_service_check is defined
+
+- name: Check if nscd service exists.
+  ansible.builtin.systemd:
+    name: nscd
+  register: _nscd_service_check
+  failed_when: false
+  changed_when: false
 
 - name: Restart nscd service.
   ansible.builtin.service:
     name: nscd
     state: restarted
-  when: ansible_facts.services['nscd.service'] is defined
+  when: _nscd_service_check is defined
 
 - name: Restart SSH service.
   ansible.builtin.service:

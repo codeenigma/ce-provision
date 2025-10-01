@@ -6,7 +6,7 @@
     loop_var: override_file
   when:
     - _overrides.files is defined
-    - _overrides.files | length
+    - _overrides.files|length > 0
 
 - name: Generate links overrides.
   ansible.builtin.include_tasks: link.yml
@@ -15,4 +15,4 @@
     loop_var: override_link
   when:
     - _overrides.links is defined
-    - _overrides.links | length
+    - _overrides.links|length > 0

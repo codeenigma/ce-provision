@@ -5,12 +5,12 @@
         "collect_list": [
           {
             "file_path": "/var/log/php{{ version }}-fpm.log",
-{% if php.fpm.log_group_prefix is defined and php.fpm.log_group_prefix|length %}
+{% if php.fpm.log_group_prefix is defined and php.fpm.log_group_prefix|length > 0 %}
             "log_group_name": "{{ php.fpm.log_group_prefix }}php{{ version }}",
 {% else %}
 						"log_group_name": "php",
 {% endif %}
-{% if php.fpm.log_stream_name is defined and php.fpm.log_stream_name|length %}
+{% if php.fpm.log_stream_name is defined and php.fpm.log_stream_name|length > 0 %}
             "log_stream_name": "{{ php.fpm.log_stream_name }}"
 {% else %}
 						"log_stream_name": "php-fpm"
@@ -18,12 +18,12 @@
           },
           {
             "file_path": "{{ php.fpm.slowlog_file_directory }}/php{{ version }}-fpm.slow.log",
-{% if php.fpm.log_group_prefix is defined and php.fpm.log_group_prefix|length %}
+{% if php.fpm.log_group_prefix is defined and php.fpm.log_group_prefix|length > 0 %}
             "log_group_name": "{{ php.fpm.log_group_prefix }}php{{ version }}",
 {% else %}
 						"log_group_name": "php",
 {% endif %}
-{% if php.fpm.log_stream_name is defined and php.fpm.log_stream_name|length %}
+{% if php.fpm.log_stream_name is defined and php.fpm.log_stream_name|length > 0 %}
             "log_stream_name": "{{ php.fpm.log_stream_name }}-slowlog"
 {% else %}
 						"log_stream_name": "php-fpm-slowlog"
