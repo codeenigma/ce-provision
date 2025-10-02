@@ -12,3 +12,7 @@
       managed_policies: "{{ _policies }}"
       inline_policies: "{{ item.inline_policies | default(omit) }}"
       policy_document: "{{ lookup('template', 'trust_lambda.j2') }}"
+
+- name: Wait for 6 seconds for IAM to be ready.
+  ansible.builtin.wait_for:
+    timeout: 6
