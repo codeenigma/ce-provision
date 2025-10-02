@@ -92,6 +92,10 @@
         - "s3:GetObject"
       policy_document: "{{ lookup('template', 'trust_apigateway.j2') }}"
 
+- name: Wait for 6 seconds for IAM to be ready.
+  ansible.builtin.wait_for:
+    timeout: 6
+
 - name: Configure Lambda IAM policies.
   ansible.builtin.include_tasks: lambda_iam.yml
   loop: "{{ _api_without_s3 }}"
