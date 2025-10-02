@@ -68,7 +68,7 @@
       tags:
         Name: "{{ item.name }}"
   loop: "{{ aws_backup_validation.resources }}"
-  when: item.git_url is not defined
+  when: item.git is not defined
 
 - name: Create Lambda functions from git url.
   ansible.builtin.include_role:
@@ -86,7 +86,7 @@
       tags:
         Name: "{{ item.name }}"
   loop: "{{ aws_backup_validation.resources }}"
-  when: item.git_url is defined
+  when: item.git is defined and item.git
 
 - name: Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
