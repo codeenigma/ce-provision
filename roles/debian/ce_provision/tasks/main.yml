@@ -172,8 +172,6 @@
 - name: Override systemd timer name for Ansible if provided.
   ansible.builtin.set_fact:
     _ce_ansible_timer_name: "{{ ce_provision.upgrade_timer_name }}"
-  when:
-    - ce_provision.upgrade_timer_name is defined
 
 # Install a new Ansible venv if we overrode the system Ansible venv path.
 - name: Install Ansible.
@@ -187,6 +185,9 @@
     name: debian/python_pip_packages
   vars:
     python_pip_packages:
+      venv_path: "{{ ce_provision.venv_path }}"
+      venv_command: "{{ ce_provision.venv_command }}"
+      venv_install_username: "{{ ce_provision.venv_install_username }}"
       packages:
         - name: ansible-lint
         - name: yamllint
@@ -202,6 +203,9 @@
     name: debian/python_pip_packages
   vars:
     python_pip_packages:
+      venv_path: "{{ ce_provision.venv_path }}"
+      venv_command: "{{ ce_provision.venv_command }}"
+      venv_install_username: "{{ ce_provision.venv_install_username }}"
       packages:
         - name: dnspython
         - name: certifi
