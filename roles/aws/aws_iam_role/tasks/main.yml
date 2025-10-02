@@ -1,5 +1,6 @@
 - name: Create an inline IAM Managed Policy if defined.
   amazon.aws.iam_managed_policy:
+    profile: "{{ aws_iam_role.aws_profile }}"
     policy_name: "inline_{{ aws_iam_role.inline_policies.name }}_policy"
     policy:
       Version: "2012-10-17"
