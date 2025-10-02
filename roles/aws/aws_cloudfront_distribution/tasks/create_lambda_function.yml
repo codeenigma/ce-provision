@@ -14,6 +14,10 @@
         - "lambda:GetFunction"
       policy_document: "{{ lookup('template', 'lambda_policy.json') }}"
 
+- name: Wait for 6 seconds for IAM to be ready.
+  ansible.builtin.wait_for:
+    timeout: 6
+
 - name: Create Lambda function.
   ansible.builtin.include_role:
     name: aws/aws_lambda

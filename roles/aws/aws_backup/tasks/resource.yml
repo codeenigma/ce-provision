@@ -36,6 +36,10 @@
       policy_document: backup
   when: aws_backup.backup.iam_role_arn == "Default"
 
+- name: Wait for 6 seconds for IAM to be ready.
+  ansible.builtin.wait_for:
+    timeout: 6
+
 - name: Set IAM role ARN for backups.
   ansible.builtin.set_fact:
     _iam_role_arn: "{{ _aws_iam_role_result.iam_role.arn }}"
