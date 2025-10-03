@@ -16,3 +16,6 @@ apt_unattended_upgrades:
   automatic_reboot_with_users: "false" # reboot even if users are logged in
   automatic_reboot_time: "02:00"
   enable_syslog: "false" # make apt log upgrades to syslog as well as apt history
+  rebootnotifyallow: false # Send email when reboot is required
+  rebootnotifymailfrom: "sysadmins@example.com" # Send reboot notify email from address
+  rebootnotifymailto: "sysadmins@example.com" # Send reboot notify email to address
