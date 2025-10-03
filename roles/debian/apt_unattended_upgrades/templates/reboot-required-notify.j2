@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+HOST="$(/bin/hostname -f)"
+STAMP_DIR="/var/lib/reboot-notify"
+STAMP_FILE="${STAMP_DIR}/last-notified"
+TODAY="$(/bin/date +%F)"
+if [ ! -f /run/reboot-required ]; then exit 0; fi
+/bin/mkdir -p "$STAMP_DIR"
+if [ -f "$STAMP_FILE" ] && [ "$(cat "$STAMP_FILE")" = "$TODAY" ]; then exit 0; fi
+(
+  echo "A reboot is still required on ${HOST}."
+  echo
+  echo "Flag present: /run/reboot-required"
+) | /usr/bin/mail -s "Reminder: reboot required on ${HOST}" -r "{{ apt_unattended_upgrades.rebootnotifymailfrom }}" "{{ apt_unattended_upgrades.rebootnotifymailto }}"
+echo "$TODAY" > "$STAMP_FILE"
