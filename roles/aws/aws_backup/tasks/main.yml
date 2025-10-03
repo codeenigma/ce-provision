@@ -66,6 +66,7 @@
     loop_var: plan
   when: aws_backup.plans | length > 0
 
-- name: Include aws backup validation role.
-  ansible.builtin.include_role:
-    name: aws/aws_backup_validation
+# Issues with IAM role after inline policies are passed
+#- name: Include aws backup validation role.
+#  ansible.builtin.include_role:
+#    name: aws/aws_backup_validation
