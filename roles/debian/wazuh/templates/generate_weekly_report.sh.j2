@@ -6,8 +6,8 @@
 REPORT_DATE=$(date +"%Y-%m-%d")
 REPORT_NAME="weekly-report-${REPORT_DATE}"
 LOG_FILE="/var/log/opensearch-reports.log"
-USERNAME="{{ wazuh.mitre_report.username | default('') }}"
-PASSWORD="{{ _wazuh_filebeat_password.stdout | default('') }}"
+USERNAME= {{ wazuh.mitre_report.username }}
+PASSWORD= {{ _wazuh_filebeat_password }}
 
 # Function to log messages
 log_message() {
@@ -17,7 +17,7 @@ log_message() {
 log_message "Starting weekly report generation"
 
 # Generate and send the report
-/usr/local/bin/opensearch-reporting-cli \
+opensearch-reporting-cli \
   -u "{{ wazuh.mitre_report.visualization_url }}" \
   -a basic \
   -c "$USERNAME:$PASSWORD" \
@@ -26,7 +26,7 @@ log_message "Starting weekly report generation"
   -n "$REPORT_NAME" \
   -e smtp \
   -s "{{ wazuh.mitre_report.e_mail_from }}" \
-  -r "{{ wazuh.manager.wazuh_manager_mailto }}" \
+  -r "{{ wazuh.manager.wazuh_manager_mailto}}" \
   --subject "Weekly OpenSearch Report - $(date '+%B %d, %Y')" \
   --note "Hi,\n\nPlease find attached the weekly Wazuh Mitre report covering the last 7 days.\n\nReport generated on: $(date '+%Y-%m-%d %H:%M:%S')\n\nBest regards,\nAutomated Reporting System" \
   --smtphost localhost \
