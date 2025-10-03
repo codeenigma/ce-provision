@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily reminder for reboot-required
+[Timer]
+OnCalendar=08:30
+Persistent=true
+Unit=reboot-required-notify.service
+[Install]
+WantedBy=timers.target
