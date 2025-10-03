@@ -241,6 +241,15 @@ ce_provision:
     enabled: true
     command: "/home/${CONTROLLER_USER}/ce-python/bin/ansible-galaxy collection install --force"
     on_calendar: "Mon *-*-* 04:00:00"
+ce_ansible:
+  venv_path: /home/${CONTROLLER_USER}/ce-python
+  venv_command: /usr/bin/python3 -m venv
+  venv_install_username: ${CONTROLLER_USER}
+  ansible_version: "${ANSIBLE_VERSION}"
+  upgrade:
+    enabled: false
+  linters:
+    enabled: true
 user_provision:
   username: "${CONTROLLER_USER}"
   home: "/home/${CONTROLLER_USER}"
