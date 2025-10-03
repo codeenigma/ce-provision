@@ -8,7 +8,7 @@
 
 - name: Setting previous command output into variable.
   ansible.builtin.set_fact:
-    _acc_id: "{{ _acc_id.stdout | from_json }}"
+    _acc_id: "{{ _acc_id.stdout }}"
 
 - name: Create a role and attach policies for events.
   ansible.builtin.include_role:
@@ -16,7 +16,7 @@
   vars:
     aws_iam_role:
       name: "{{ item.name }}_event"
-      source: "{{ item.name}}"
+      source: "{{ item.name }}"
       aws_profile: "{{ _aws_profile }}"
       inline_policies:
         name: "{{ item.name }}_event"
@@ -25,9 +25,6 @@
           - "lambda:InvokeFunction"
       policy_document: "{{ lookup('template', 'event_document_policy.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
-  loop_control:
-    extended: true
-    extended_allitems: false
 
 - name: Create a role and attach policies for Lambda functions.
   ansible.builtin.include_role:
@@ -35,7 +32,7 @@
   vars:
     aws_iam_role:
       name: "{{ item.name}}_lambda"
-      source: "{{ item.name}}"
+      source: "{{ item.name }}"
       aws_profile: "{{ _aws_profile }}"
       managed_policies:
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
@@ -45,9 +42,10 @@
         action: "{{ item.lambda_policy }}"
       policy_document: "{{ lookup('template', 'trusted_entitites.json.j2') }}"
   loop: "{{ aws_backup_validation.resources }}"
-  loop_control:
-    extended: true
-    extended_allitems: false
+
+- name: Wait for 6 seconds for IAM to be ready.
+  ansible.builtin.wait_for:
+    timeout: 6
 
 - name: Get info about newly created restore testing plan.
   ansible.builtin.command: >
@@ -70,7 +68,7 @@
       tags:
         Name: "{{ item.name }}"
   loop: "{{ aws_backup_validation.resources }}"
-  when: item.git_url is not defined
+  when: item.git is not defined
 
 - name: Create Lambda functions from git url.
   ansible.builtin.include_role:
@@ -88,7 +86,7 @@
       tags:
         Name: "{{ item.name }}"
   loop: "{{ aws_backup_validation.resources }}"
-  when: item.git_url is defined
+  when: item.git is defined and item.git
 
 - name: Create an IAM Managed Policy for passing roles and setup IAM role.
   ansible.builtin.include_role:
@@ -106,6 +104,10 @@
       managed_policies:
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup
         - arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores
+
+- name: Wait for 6 seconds for IAM to be ready.
+  ansible.builtin.wait_for:
+    timeout: 6
 
 # TODO: Not all clients have verified identity
 #- name: Get verified domain.

@@ -1,0 +1,5 @@
+[Unit]
+Description=Send daily email reminder if /run/reboot-required exists
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/reboot-required-notify

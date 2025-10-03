@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+if [ -f /run/reboot-required ] && [ ! -f /run/reboot-mail-sent ]; then
+  HOST=$(/bin/hostname -f)
+  printf 'A reboot is required on %s\n\nFlag: /run/reboot-required\n' "$HOST" \
+    | /usr/bin/mail -s "Reboot required on $HOST" -r "{{ apt_unattended_upgrades.rebootnotifymailfrom }}" "{{ apt_unattended_upgrades.rebootnotifymailto }}"
+  /usr/bin/touch /run/reboot-mail-sent
+fi
+exit 0

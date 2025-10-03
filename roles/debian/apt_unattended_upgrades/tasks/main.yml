@@ -55,3 +55,74 @@
     state: restarted
     enabled: true
   when: apt_unattended_upgrades.enable
+
+- name: Deploy apt reboot hook
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/99notify-reboot
+    owner: root
+    group: root
+    mode: "0644"
+    content: 'DPkg::Post-Invoke { "/usr/local/sbin/apt-reboot-notify-hook"; };'
+    backup: true
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.rebootnotifyallow
+
+- name: Deploy apt-reboot-notify-hook script
+  ansible.builtin.template:
+    src: apt-reboot-notify-hook.j2
+    dest: /usr/local/sbin/apt-reboot-notify-hook
+    owner: root
+    group: root
+    mode: "0755"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.rebootnotifyallow
+
+- name: Install reboot-required daily reminder script
+  ansible.builtin.template:
+    src: reboot-required-notify.j2
+    dest: /usr/local/sbin/reboot-required-notify
+    owner: root
+    group: root
+    mode: "0755"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.rebootnotifyallow
+
+- name: Install reboot-required systemd service
+  ansible.builtin.template:
+    src: reboot-required-notify.service.j2
+    dest: /etc/systemd/system/reboot-required-notify.service
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.rebootnotifyallow
+
+- name: Install reboot-required systemd timer
+  ansible.builtin.template:
+    src: reboot-required-notify.timer.j2
+    dest: /etc/systemd/system/reboot-required-notify.timer
+    owner: root
+    group: root
+    mode: "0644"
+    force: true
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.rebootnotifyallow
+
+- name: Reload systemd and enable reboot-required timer
+  ansible.builtin.systemd_service:
+    state: restarted
+    enabled: true
+    daemon_reload: true
+    name: reboot-required-notify.timer
+  when:
+    - apt_unattended_upgrades.enable
+    - apt_unattended_upgrades.rebootnotifyallow

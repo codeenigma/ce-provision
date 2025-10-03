@@ -1,5 +1,6 @@
 - name: Create an inline IAM Managed Policy if defined.
   amazon.aws.iam_managed_policy:
+    profile: "{{ aws_iam_role.aws_profile }}"
     policy_name: "inline_{{ aws_iam_role.inline_policies.name }}_policy"
     policy:
       Version: "2012-10-17"
@@ -46,11 +47,6 @@
     create_instance_profile: "{% if aws_iam_role.policy_document == 'ec2' %}true{% else %}false{% endif %}"
     wait: true
   register: _aws_iam_role_result
-
-- name: Wait for 6 seconds for IAM to be ready.
-  ansible.builtin.wait_for:
-    timeout: 6
-  when: ansible_loop.last is defined and ansible_loop.last
 
 - name: Register aws_iam_role results.
   ansible.builtin.set_fact:
