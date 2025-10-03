@@ -63,8 +63,8 @@
     group: root
     mode: "0644"
     content: 'DPkg::Post-Invoke { "/usr/local/sbin/apt-reboot-notify-hook"; };'
-    backup: yes
-    force: yes
+    backup: true
+    force: true
   when:
     - apt_unattended_upgrades.enable
     - apt_unattended_upgrades.rebootnotifyallow
