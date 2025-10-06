@@ -1,12 +1,68 @@
 ---
+variables:
+  FF_SCRIPT_SECTIONS: "true"
+
 before_script:
   - export $BASH_VARS
 
 stages:
   - linting
+  - builds
 
 ansible-lint:
   stage: linting
   image: registry.gitlab.com/pipeline-components/ansible-lint:latest
   script:
     - ansible-lint --show-relpath roles
+  rules:
+    - if: $CI_COMMIT_BRANCH != "$CI_DEFAULT_BRANCH"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+
+yamllint:
+  stage: linting
+  image: registry.gitlab.com/pipeline-components/yamllint:latest
+  script:
+    - yamllint roles
+  rules:
+    - if: $CI_COMMIT_BRANCH != "$CI_DEFAULT_BRANCH"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+
+webserver:
+  stage: builds
+  image: debian:bookworm
+  script:
+    - |
+      /usr/bin/apt-get update
+      /usr/bin/apt-get install -y curl sudo
+      /usr/bin/curl -LO ${CI_MERGE_REQUEST_SOURCE_PROJECT_URL}/-/raw/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}/install.sh
+      /usr/bin/chmod +x ./install.sh
+      /usr/bin/sudo ./install.sh --version ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} --config-branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --docker --no-firewall
+      /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
+      /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
+      /usr/sbin/sshd&
+      /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} --config-branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --force"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
+
+gitlabserver:
+  stage: builds
+  image: debian:bookworm
+  script:
+    - |
+      /usr/bin/apt-get update
+      /usr/bin/apt-get install -y curl sudo
+      /usr/bin/curl -LO ${CI_MERGE_REQUEST_SOURCE_PROJECT_URL}/-/raw/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}/install.sh
+      /usr/bin/chmod +x ./install.sh
+      /usr/bin/sudo ./install.sh --version ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} --config-branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --docker --no-firewall
+      /usr/bin/git config --global --add safe.directory /home/controller/ce-provision
+      /usr/bin/git config --global --add safe.directory /home/controller/ce-provision/config
+      /usr/sbin/sshd&
+      /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} --config-branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --force"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: always
