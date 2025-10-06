@@ -15,8 +15,7 @@ ansible-lint:
   script:
     - ansible-lint --show-relpath roles
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
+    - if: $CI_COMMIT_BRANCH != "$CI_DEFAULT_BRANCH"
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
 
@@ -26,8 +25,7 @@ yamllint:
   script:
     - yamllint roles
   rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: never
+    - if: $CI_COMMIT_BRANCH != "$CI_DEFAULT_BRANCH"
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
 
@@ -46,7 +44,7 @@ webserver:
       /usr/sbin/sshd&
       /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/web/ci.yml --own-branch ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} --config-branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --force"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
 
@@ -65,6 +63,6 @@ gitlabserver:
       /usr/sbin/sshd&
       /usr/bin/su - controller -c "cd /home/controller/ce-provision && /bin/sh /home/controller/ce-provision/scripts/provision.sh --python-interpreter /home/controller/ce-python/bin/python3 --repo dummy --branch dummy --workspace /home/controller/ce-provision/ce-dev/ansible --playbook plays/gitlab/ci.yml --own-branch ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} --config-branch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} --force"
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
