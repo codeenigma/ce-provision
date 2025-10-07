@@ -9,3 +9,4 @@ dependencies:
   - role: debian/gitlab_runner
   - role: debian/sops
   - role: debian/gpg_key
+  - role: debian/user_deploy  # usually the deploy server's config repo is on the deploy server, so it needs to be able to deploy to itself.
