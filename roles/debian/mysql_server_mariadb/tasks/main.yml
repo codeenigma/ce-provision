@@ -1,6 +1,4 @@
 ---
-# @todo Configuration is for dev.
-
 - name: Ensure mysql is installed.
   ansible.builtin.apt:
     pkg: "mariadb-server"
@@ -9,36 +7,11 @@
 
 - name: Copy MySQL overriding configuration in place.
   ansible.builtin.template:
-    src: mysql_dev.cnf.j2
-    dest: "/etc/mysql/conf.d/zz_dev.cnf"
+    src: zz_custom.cnf.j2
+    dest: "/etc/mysql/conf.d/zz_custom.cnf"
     owner: root
     group: root
     mode: "0644"
-
-# - name: Trigger overrides
-#   include_role:
-#     name: _overrides
-#   vars:
-#     _overrides: "{{ blackfire.overrides }}"
-#   when:
-#     - blackfire.overrides is defined
-#     - blackfire.overrides | length > 0
-
-- name: Restart mysql.
-  ansible.builtin.service:
-    name: mysql
-    state: restarted
-    enabled: true
-
-- name: Update MySQL root password.
-  ansible.builtin.shell: >
-    mysql -NBe 'GRANT ALL ON *.* TO "root"@"%" IDENTIFIED BY "root" WITH GRANT OPTION;'
-  when: is_local
-
-- name: Update MySQL ce-dev password.
-  ansible.builtin.shell: >
-    mysql -NBe 'GRANT ALL ON *.* TO "ce-dev"@"%" IDENTIFIED BY "ce-dev" WITH GRANT OPTION;'
-  when: is_local
 
 - name: Ensure mysql can write data.
   ansible.builtin.file:
@@ -62,5 +35,5 @@
 - name: Restart mysql.
   ansible.builtin.service:
     name: mysql
-    state: started
+    state: restarted
     enabled: true
