@@ -43,9 +43,9 @@ http {
 
     ssl_protocols {{ nginx.http.ssl_protocols }}; # Dropping SSLv3, ref: POODLE
     ssl_prefer_server_ciphers on;
-    {% if nginx.ssl_ciphers is defined and nginx.ssl_ciphers|length > 0 %}
+    {% if nginx.ssl_ciphers is defined and nginx.ssl_ciphers|length > 0 -%}
     ssl_ciphers {{ nginx.ssl_ciphers | join(':') }};
-    {% endif %}
+    {%- endif %}
     ##
     # Logging Settings
     ##
